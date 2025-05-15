@@ -1,6 +1,24 @@
 {
   "extends": "@repo/typescript-config/nextjs.json",
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@/components/*": [
+        "./components/*"
+      ],
+      "@/app/*": [
+        "./app/*"
+      ],
+      "@/public/*": [
+        "./public/*"
+      ]
+    },
     "plugins": [
       {
         "name": "next"
@@ -10,9 +28,14 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "components/**/*.ts",
+    "components/**/*.tsx",
     "next-env.d.ts",
-    "next.config.js",
-    ".next/types/**/*.ts"
+    "next.config.mjs",
+    "dist/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
