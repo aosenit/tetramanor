@@ -1,4 +1,5 @@
 import Image from "next/image";
+import hill from "../../../../../public/portfolio/hill.png";
 import {
   FaCheck,
   FaWifi,
@@ -38,7 +39,7 @@ export default function PropertyListing() {
             luxury apartments, including:
           </p>
 
-          <ul className="space-y-2 mb-6">
+          <ul className="space-y-3 mb-6">
             <li className="flex items-center">
               <FaCheck className="h-5 w-5 text-[#116114] mr-2 flex-shrink-0" />
               <span>1-Bedroom Apartments</span>
@@ -68,7 +69,7 @@ export default function PropertyListing() {
 
         <div className="relative h-[400px] lg:h-auto rounded-lg overflow-hidden">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Tetramanor-UJrQ0D72U3vqB9AgoIDHtEhHV8Mw9g.png"
+            src={hill}
             alt="TM HighGardens luxury residential building"
             fill
             className="object-cover"

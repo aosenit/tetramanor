@@ -1,9 +1,18 @@
-import { FaHome, FaHammer, FaUsers, FaKey, FaCheck } from "react-icons/fa";
+import {FaCheck } from "react-icons/fa";
+import Image from "next/image";
+import value from "../../../../public/services/value.png";
+import hammer from "../../../../public/services/hammer.png";
+import bar from "../../../../public/services/bar.png";
+import queen from "../../../../public/services/queen.png";
+import file from "../../../../public/services/file.png";
+import architect from "../../../../public/services/architect.png";
+import building from "../../../../public/services/building.png";
+import developer from "../../../../public/services/developer.png";
+import manager from "../../../../public/services/manager.png";
 
 export default function ValueSection() {
   return (
     <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-12 2xl:px-16">
-      {/* Hero Section */}
       <div className="text-center mb-16">
         <h1 className="text-4xl font-bold tracking-tight text-[#0B0A0A] ">
           Where Vision Becomes
@@ -12,10 +21,10 @@ export default function ValueSection() {
           <h1 className="text-4xl font-bold tracking-tight text-[#0B0A0A] ">
             Value
           </h1>
-          <img
-            src="/image-in-text.png"
+          <Image
+            src={value}
             alt="Building"
-            className="h-10 w-16 object-cover rounded"
+            className="h-8 w-20 object-cover rounded"
           />
           <h1 className="text-4xl font-bold tracking-tight text-[#0B0A0A] ">
             Through Expert Execution
@@ -37,12 +46,10 @@ export default function ValueSection() {
           </p>
         </div>
       </div>
-
-      {/* Architectural & Property Design Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 2xl:gap-24 items-center mb-24 ">
         <div>
-          <div className="inline-flex items-center justify-center p-3 bg-[#f0f0f0] rounded-full mb-6">
-            <FaHome className="h-6 w-6 text-[#116114]" />
+          <div className="inline-flex items-center justify-center ">
+            <Image src={bar} alt="Hammer" className="h-8 w-8 text-[#116114]" />
           </div>
           <h2 className="text-2xl font-semibold text-black mb-4">
             Architectural & Property Design
@@ -73,26 +80,24 @@ export default function ValueSection() {
           </div>
         </div>
         <div>
-          <img
-            src="/services/Frame 2147225196.png"
+          <Image
+            src={building}
             alt="Architectural Design"
             className="rounded-lg shadow-lg w-full h-auto object-cover"
           />
         </div>
       </div>
-
-      {/* Pre-Construction Services Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 2xl:gap-24 items-center mb-24  ">
         <div className="order-2 md:order-1">
-          <img
-            src="/services/Frame 2147225196 (1).png"
+          <Image
+            src={architect}
             alt="Pre-Construction Services"
             className="rounded-lg shadow-lg w-full h-auto object-cover"
           />
         </div>
         <div className="order-1 md:order-2 self-end">
-          <div className="inline-flex items-center justify-center p-3 bg-[#f0f0f0] rounded-full mb-6">
-            <FaHammer className="h-6 w-6 text-[#116114]" />
+        <div className="inline-flex items-center justify-center ">
+          <Image src={hammer} alt="Hammer" className="h-8 w-8 text-[#116114]" />
           </div>
           <h2 className="text-3xl font-bold text-[#0B0A0A] mb-4">
             Pre-Construction Services
@@ -122,12 +127,10 @@ export default function ValueSection() {
           </div>
         </div>
       </div>
-
-      {/* Property Development Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 2xl:gap-24 items-center mb-24 ">
         <div>
-          <div className="inline-flex items-center justify-center p-3 bg-[#f0f0f0] rounded-full mb-6">
-            <FaUsers className="h-6 w-6 text-[#116114]" />
+        <div className="inline-flex items-center justify-center ">
+          <Image src={queen} alt="Hammer" className="h-8 w-8 text-[#116114]" />
           </div>
           <h2 className="text-3xl font-bold text-[#0B0A0A] mb-4">
             Property Development
@@ -157,26 +160,24 @@ export default function ValueSection() {
           </div>
         </div>
         <div>
-          <img
-            src="/services/Frame 2147225196 (2).png"
+          <Image
+            src={developer}
             alt="Property Development"
             className="rounded-lg shadow-lg w-full h-auto object-cover"
           />
         </div>
       </div>
-
-      {/* Property Management Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 2xl:gap-24 items-center mb-16">
         <div className="order-2 md:order-1">
-          <img
-            src="/services/Frame 2147225196 (3).png"
+          <Image
+            src={manager}
             alt="Property Management"
             className="rounded-lg shadow-lg w-full h-auto object-cover"
           />
         </div>
         <div className="order-1 md:order-2">
-          <div className="inline-flex items-center justify-center p-3 bg-[#f0f0f0] rounded-full mb-6">
-            <FaKey className="h-6 w-6 text-[#116114]" />
+        <div className="inline-flex items-center justify-center ">
+          <Image src={file} alt="Hammer" className="h-8 w-8 text-[#116114]" />
           </div>
           <h2 className="text-3xl font-bold text-[#0B0A0A] mb-4">
             Property Management

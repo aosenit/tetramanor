@@ -1,23 +1,19 @@
 "use client";
 import Header from "./header";
+import Image from "next/image";
+import herobg from "../../../../public/herobg.png";
 import { motion } from "framer-motion";
 
 const HomeHero = () => {
   return (
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
-
-      {/* change the Background image */}
-      <img
-        src="/herobg.png"
+      <Image
+        src={herobg}
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
-
-      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black opacity-60 z-10" />
-
-      {/* Animated heading with Framer Motion */}
       <div className="absolute inset-0 flex items-center justify-center z-20">
         <motion.h1
           initial={{ opacity: 0, y: 60 }}

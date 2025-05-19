@@ -3,6 +3,8 @@
 import type React from "react";
 
 import { useState } from "react";
+import Image from "next/image";
+import hilltop from "../../../../../public/hilltop.jpg";
 import { FaPhone, FaEnvelope, FaCalendarAlt } from "react-icons/fa";
 
 export default function ScheduleInspection() {
@@ -29,19 +31,13 @@ export default function ScheduleInspection() {
 
   return (
     <div className="relative w-full bg-[#2c3e50] text-white">
-      {/* Background image overlay */}
-      <div
-        className="absolute inset-0 bg-black opacity-50 z-0"
-        style={{
-          backgroundImage: `url(https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Tetramanor-rM70vvasItjfMf3mplfdcENAMCMnRn.png)`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          mixBlendMode: "multiply",
-        }}
+      <Image
+        src={hilltop}
+        alt="Hero Background"
+        className="absolute inset-0 w-full h-full object-cover z-0"
       />
-
+      <div className="absolute inset-0 bg-black opacity-60 z-10" />
       <div className="relative z-10 container mx-auto px-4 lg:px-12 py-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        {/* Left side - Text content */}
         <div className="space-y-8">
           <div>
             <h2 className="text-4xl font-bold mb-6">Schedule an inspection</h2>

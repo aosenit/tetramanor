@@ -1,4 +1,6 @@
 import React from "react";
+import Image from "next/image";
+import logo from "../../public/logo.svg";
 import {
   FaFacebookF,
   FaTwitter,
@@ -14,7 +16,7 @@ export default function Footer() {
         {/* Left */}
         <div className="flex-1 flex flex-col gap-6">
           <div className="">
-            <img src="./logo.svg" alt="TM Logo" className="h-10 w-auto mb-2" />
+            <Image src={logo} alt="TM Logo" className="h-10 w-auto mb-2" />
           </div>
           <div className="text-gray-300 mb-4">
             Your Trusted Real Estate Partner in Lagos

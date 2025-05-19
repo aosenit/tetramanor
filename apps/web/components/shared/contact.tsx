@@ -1,12 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
+import contact from "../../public/services/contact.jpg";
 
 export default function ContactSection() {
   return (
     <section className="relative w-full h-[337px] overflow-hidden">
       {/* Background Image */}
       <Image
-        src="/images/aerial-view.jpg"
+        src={contact}
         alt="Aerial view of residential development"
         fill
         className="object-cover brightness-75"

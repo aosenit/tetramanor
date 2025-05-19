@@ -1,10 +1,10 @@
-// components/PropertyCard.tsx
 import { FC } from "react";
-// import { MapPin } from "lucide-react";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
+import Link from "next/link";
 
 interface PropertyCardProps {
-  image: string;
+  slug: string;
+  image: StaticImageData;
   title: string;
   location: string;
   status: string;
@@ -12,6 +12,7 @@ interface PropertyCardProps {
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
+  slug,
   image,
   title,
   location,
@@ -22,7 +23,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     <div
       className={`relative rounded-xl overflow-hidden shadow-md group ${className}`}
     >
-      <img
+      <Image
         src={image}
         alt={title}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -39,9 +40,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         <p className="text-sm mt-1">{location}</p>
       </div>
 
-      <button className="absolute bottom-4 right-4 bg-white text-black text-sm px-4 py-2 rounded-full font-medium shadow hover:bg-gray-200">
-        View property
-      </button>
+      <Link
+  href={{
+          pathname: "portfolio/view-property",
+          query: { slug },
+  }}
+  className="absolute bottom-4 right-4 bg-white text-black text-sm px-4 py-2 rounded-full font-medium shadow hover:bg-gray-200"
+>
+  View Property
+</Link>
+
+
     </div>
   );
 };

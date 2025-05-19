@@ -1,5 +1,8 @@
 import React from "react";
 import PropertyCard from "../components/property-card";
+import burrows from "../../../../public/portfolio/burrows.jpg";	
+import gardens from "../../../../public/portfolio/gardens.jpg";	
+import meadows from "../../../../public/portfolio/meadows.jpg";	
 
 function Completed() {
   return (
@@ -7,31 +10,30 @@ function Completed() {
       <h2 className="text-3xl md:text-4xl font-bold mb-10 text-gray-900 ">
         Completed Projects
       </h2>
-
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Left Card: Spans full height of right column */}
         <div className="w-full h-full md:col-span-2">
           <PropertyCard
-            image="/images/tm-highgardens.jpg"
-            title="TM HighGardens"
-            location="Eko Atlantic, Lagos, Nigeria."
+            slug="burrows"
+            image={burrows}
+            title="Comfy Burrows"
+            location="Yaba, Lagos, Nigeria."
             status="Sold Out"
             className="h-full min-h-[400px]"
           />
         </div>
-
-        {/* Right Column: Stack of two cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 col-span-1 md:col-span-2">
           <PropertyCard
-            image="/images/queen-mary.jpg"
-            title="Queen Mary"
-            location="Mende, Maryland, Lagos, Nigeria."
+            slug= "TM-Gardens"
+            image={gardens}
+            title="TM Gardens"
+            location="Surulere, Lagos, Nigeria."
             status="Sold Out"
             className="flex-1 min-h-[400px]"
           />
           <PropertyCard
-            image="/images/kings-landing.jpg"
-            title="King’s Landing"
+            slug="TM-Meadows"
+            image={meadows}
+            title="TM Meadows"
             location="Mende, Maryland, Lagos, Nigeria."
             status="Sold Out"
             className="flex-1 min-h-[400px]"

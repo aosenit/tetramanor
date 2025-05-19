@@ -1,3 +1,11 @@
+import Image from "next/image";
+import shelf from "../../../../public/services/shelf.png"
+import balcony from "../../../../public/services/balcony.png"
+import sittingroom from "../../../../public/services/sittingroom.png"
+import dining from "../../../../public/services/dining.png"
+import sidetable from "../../../../public/services/sidetable.png"
+
+
 export default function InteriorShowcase() {
   return (
     <section className="py-16 bg-[#f3f7f3]">
@@ -12,46 +20,37 @@ export default function InteriorShowcase() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {/* Interior 1 */}
           <div className="overflow-hidden rounded-lg shadow-md">
-            <img
-              src="/interior-bookshelf.png"
+            <Image
+              src={shelf}
               alt="Modern bookshelf and cabinet design"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
             />
           </div>
-
-          {/* Interior 2 */}
           <div className="overflow-hidden rounded-lg shadow-md">
-            <img
-              src="/interior-glass-living.png"
+            <Image
+              src={balcony}
               alt="Glass wall living space with outdoor views"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
             />
           </div>
-
-          {/* Interior 3 */}
           <div className="overflow-hidden rounded-lg shadow-md">
-            <img
-              src="/interior-yellow-sofa.png"
+            <Image
+              src={sittingroom}
               alt="Living room with yellow sofa and large windows"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
             />
           </div>
-
-          {/* Interior 4 */}
           <div className="overflow-hidden rounded-lg shadow-md">
-            <img
-              src="/interior-dining-gallery.png"
+            <Image
+              src={dining}
               alt="Dining area with framed artwork gallery wall"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
             />
           </div>
-
-          {/* Interior 5 */}
           <div className="overflow-hidden rounded-lg shadow-md">
-            <img
-              src="/interior-green-console.png"
+            <Image
+              src={sidetable}
               alt="Green console table with botanical prints"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
             />

@@ -2,6 +2,8 @@
 import { Button } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
 import { FaChevronDown } from "react-icons/fa6";
+import Image from "next/image";
+import logo from "../../../../public/logo.svg";
 
 const Header = ({
   featuresRef,
@@ -15,7 +17,6 @@ const Header = ({
     const handleScroll = () => {
       if (featuresRef?.current) {
         const rect = featuresRef.current.getBoundingClientRect();
-        // If the top of the section is <= 100px from the top of the viewport
         setScrolled(rect.top <= 100);
       }
     };
@@ -23,8 +24,6 @@ const Header = ({
     handleScroll(); // run on mount
     return () => window.removeEventListener("scroll", handleScroll);
   }, [featuresRef]);
-
-  // Only apply effect on large screens
   const isLargeScreen =
     typeof window !== "undefined" && window.innerWidth >= 1024;
   const headerBg =
@@ -43,11 +42,9 @@ const Header = ({
       className={`sticky top-0 left-0 w-full z-20 transition-colors duration-500 lg:h-[100px]`}
     >
       <div className="container mx-auto flex items-center justify-between py-8 px-10">
-        {/* Logo */}
         <div className="flex items-center">
-          <img src="./logo.svg" alt="TM Logo" className="h-10 w-auto" />
+          <Image src={logo} alt="TM Logo" className="h-10 w-auto" />
         </div>
-        {/* Mobile Menu Toggle */}
         <button
           className={`lg:hidden ${textClass}`}
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -67,7 +64,6 @@ const Header = ({
             />
           </svg>
         </button>
-        {/* Nav */}
         <nav
           className={`fixed top-0 right-0 h-full w-80 bg-black bg-opacity-90 transform transition-transform duration-300 ease-in-out ${
             isMenuOpen ? "translate-x-0" : "translate-x-full"

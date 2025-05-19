@@ -1,13 +1,16 @@
 import Image from "next/image";
+import tmhighgards from "../../../../../public/portfolio/highgards.png";
 import { FaCheck } from "react-icons/fa";
 
 export default function WhyInvest() {
   return (
-    <div className="container mx-auto px-4 lg:px-16 py-12 bg-white">
+    <div className="bg-[#f3f7f3]">
+
+    <div className="container mx-auto px-4 lg:px-16 py-12 ">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div className="relative h-[400px] lg:h-[500px] rounded-lg overflow-hidden">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Tetramanor-QdhAfPuTiJPYBS1RRFwNh4QRSjdjVk.png"
+            src={tmhighgards}
             alt="TM HighGardens luxury residential building"
             fill
             className="object-cover"
@@ -75,6 +78,7 @@ export default function WhyInvest() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

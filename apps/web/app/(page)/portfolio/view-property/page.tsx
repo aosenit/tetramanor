@@ -6,6 +6,7 @@ import MorePictures from "./sections/more-pictures";
 import EconomicAdvantages from "./sections/economic-advantages";
 import ScheduleInspection from "./sections/schedule-inspection";
 import Footer from "@/components/home/Footer";
+import MapSection from "./sections/map";
 function Page() {
   return (
     <div>
@@ -13,7 +14,7 @@ function Page() {
       <AboutProperty />
       <WhyInvest />
       <MorePictures />
-      {/* add map section */}
+     <MapSection/>
       <EconomicAdvantages />
       <ScheduleInspection />
       <Footer />
