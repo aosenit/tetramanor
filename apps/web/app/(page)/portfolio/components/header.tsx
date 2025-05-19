@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
 import { FaChevronDown } from "react-icons/fa6";
@@ -91,17 +92,17 @@ const Header = ({
             </button>
           </div>
           <ul
-            className={`flex flex-col justify-center lg:justify-start h-[80%] lg:h-auto lg:flex-row gap-8 lg:gap-6 items-center font-semibold ${textClass} text-lg lg:text-sm p-4 lg:p-0`}
+            className={`flex flex-col justify-center lg:justify-start h-[80%] lg:h-auto lg:flex-row gap-8 items-center font-semibold ${textClass} text-lg lg:text-sm p-4 lg:p-0`}
           >
-            <li onClick={handleNavClick}>Meet Tetramanor</li>
-            <li onClick={handleNavClick}>What we do</li>
+            <li onClick={handleNavClick}>Home</li>
+            <li onClick={handleNavClick}>About us</li>
+            <li onClick={handleNavClick}>Services</li>
             <li className="flex items-center gap-1" onClick={handleNavClick}>
-              Our Portfolio
+              Properties
               <FaChevronDown className="w-4 h-4" />
             </li>
-            <li onClick={handleNavClick}>Build wealth with us</li>
-            <li onClick={handleNavClick}>Our Journal</li>
-            <li onClick={handleNavClick}>Want to talk?</li>
+            <li onClick={handleNavClick}>Blogs</li>
+            <li onClick={handleNavClick}>Contact us</li>
             <li className="lg:hidden" onClick={handleNavClick}>
               <Button
                 size="sm"
