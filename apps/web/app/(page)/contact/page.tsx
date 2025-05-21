@@ -1,9 +1,21 @@
 import React from 'react'
-import Contact from './contact'
+import HomeHero from './components/Hero'
+import Footer from '@/components/home/Footer'
+import ContactForm from './components/ContactForm'
+import MapSection from './components/Map'
+import Agents from './components/Agents'
+import BecomeAnAgent from './components/BecomeAnAgent'
 
 function page() {
   return (
-    <Contact/>
+    <div className='bg-[#fafafa]'>
+      <HomeHero />
+      <ContactForm />
+      <MapSection />
+      <Agents />
+      <BecomeAnAgent/>
+         <Footer />
+    </div>
   )
 }
 
