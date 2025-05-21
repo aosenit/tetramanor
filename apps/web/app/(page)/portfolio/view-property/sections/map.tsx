@@ -1,6 +1,6 @@
 const MapSection = () => {
     return (
-      <section className="container mx-auto px-4 lg:px-16 py-12 bg-white">
+      <section className="container mx-auto px-4 lg:px-16 py-12">
         <h2 className="text-2xl font-bold mb-4">Location</h2>
         <div className="relative w-full h-96 rounded-lg overflow-hidden">
           <iframe

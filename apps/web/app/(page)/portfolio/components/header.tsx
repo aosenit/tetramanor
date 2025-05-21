@@ -21,7 +21,7 @@ const Header = ({
       }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // run on mount
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, [featuresRef]);
   const isLargeScreen =

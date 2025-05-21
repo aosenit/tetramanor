@@ -19,7 +19,7 @@ export default function RoiCalculator() {
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
       <div className="absolute inset-0 bg-black opacity-60 z-10" />
-      <div className="container mx-auto max-w-6xl z-10 flex flex-col lg:flex-row gap-8 lg:gap-16 items-center">
+      <div className="container mx-auto px-4 lg:px-16 z-10 flex flex-col lg:flex-row gap-8 lg:gap-16 items-center">
         <div className="w-full lg:w-1/2 text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Calculate Your ROI</h1>
           <p className="text-lg md:text-xl opacity-90 mb-12">
