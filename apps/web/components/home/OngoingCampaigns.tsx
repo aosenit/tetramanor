@@ -10,8 +10,8 @@ const campaigns = [
 
 export default function OngoingCampaigns() {
   return (
-    <section className="bg-white w-full py-16 px-4">
-      <div className="max-w-[1300px] mx-auto">
+    <section className="bg-white w-full">
+      <div className="container mx-auto px-4 lg:px-16 py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-black mb-2 text-center">
           Ongoing Campaigns
         </h2>
@@ -19,7 +19,7 @@ export default function OngoingCampaigns() {
           Lorem ipsum dolor sit amet consectetur. Et sit egestas sagittis
           facilisi.
         </div>
-        <div className="flex flex-wrap justify-center gap-6">
+        <div className="grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-5 justify-center gap-2">
           {campaigns.map((c, i) => (
             <img
               key={i}

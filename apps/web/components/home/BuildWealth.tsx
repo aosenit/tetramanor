@@ -1,4 +1,5 @@
 import { Button } from "@chakra-ui/react";
+import { FaCheck } from "react-icons/fa";
 
 export default function BuildWealth() {
   return (
@@ -9,38 +10,45 @@ export default function BuildWealth() {
         className="absolute inset-0 w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-black/70"></div>
-      <div className="relative z-10 max-w-[1300px] mx-auto flex flex-col md:flex-row items-center justify-between gap-8 py-16 px-4">
-        <div>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
+
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-20 container mx-auto px-4 sm:px-6 lg:px-16 py-12 sm:py-16 lg:py-20">
+        {/* Left column */}
+        <div className="w-full">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-4">
             Build Wealth with Tetramanor
           </h2>
-          <div className="text-white text-base mb-6 max-w-xl">
+          <p className="text-white text-base sm:text-lg mb-6 leading-relaxed">
             The Nigerian real estate market is booming, with a{" "}
             <b>7.2% annual growth rate</b>—and you can be part of it! Tetramanor
             offers exclusive investment opportunities with{" "}
             <b>high returns, minimal risk,</b> and a{" "}
             <b>proven strategy for success</b>.
-          </div>
+          </p>
         </div>
-        <div className="flex-1 flex flex-col gap-4 text-white text-base">
-          <div className="flex items-center gap-2">
-            <span className="text-green-500 text-xl">✔</span> Earn up to 50%
-            ROI in just 18 months
+
+        {/* Right column */}
+        <div className="space-y-4 w-full text-white text-base sm:text-lg">
+          <div className="flex items-start sm:items-center gap-2">
+            <span className="text-white text-xl"><FaCheck/></span>
+            <span>Earn up to 50% ROI in just 18 months</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-500 text-xl">✔</span> Hassle-free
-            investment—Tetramanor handles everything
+          <div className="flex items-start sm:items-center gap-2">
+            <span className="text-white text-xl"><FaCheck/></span>
+            <span>Hassle-free investment—Tetramanor handles everything</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-500 text-xl">✔</span> Choose between
-            fixed returns or profit-sharing models
+          <div className="flex items-start sm:items-center gap-2">
+            <span className="text-white text-xl"><FaCheck/></span>
+            <span>Choose between fixed returns or profit-sharing models</span>
           </div>
-          <Button
-            colorScheme="green"
-            className="bg-primary text-white font-semibold rounded px-8 py-3 shadow-none text-base w-fit mt-4"
-          >
-            Call for investors
-          </Button>
+
+          <div className="mt-6 sm:mt-8">
+            <Button
+              colorScheme="green"
+              className="bg-primary text-white font-semibold  px-6 py-3 text-sm sm:text-base"
+            >
+              Call for investors
+            </Button>
+          </div>
         </div>
       </div>
     </section>

@@ -2,8 +2,8 @@ import React from "react";
 
 export default function ConstructionPartners() {
   return (
-    <section className="bg-white w-full py-16 px-4">
-      <div className="max-w-[1300px] mx-auto flex flex-col items-center">
+    <section className="w-full container mx-auto px-4 lg:px-16 py-12">
+      <div className=" flex flex-col items-center">
         <h2 className="text-2xl md:text-3xl font-bold text-black mb-12 text-center">
           Our Construction Partners
         </h2>
