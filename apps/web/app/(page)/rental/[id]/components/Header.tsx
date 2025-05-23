@@ -7,15 +7,16 @@ import Logo from "../../../../../public/logo.svg";
 import { IoIosArrowDown } from "react-icons/io";
 
 const navItems = [
-  { name: "Solutions", href: "/",  icon: <IoIosArrowDown className="ml-1 text-[#2E2E2E] inline-block w-4 h-4" />, },
-  { name: "Buy a home", href: "/about" },
-  { name: "Apartment rentals", href: "/services" },
-  { name: "Build wealth with us", href: "/portfolio" },
+  { name: "Solutions", href: "/",  icon: <IoIosArrowDown className="ml-1 mt-1 text-white inline-block w-4 h-4" />, },
+  { name: "Buy a home", href: "/portfolio" },
+  { name: "Apartment rentals", href: "/rental" },
+  { name: "Build wealth with us", href: "/investment" },
   { name: "Our Journal", href: "/blog" },
   { name: "Want to talk?", href: "/contact" },
 ];
 
 const Header = () => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -34,26 +35,57 @@ const Header = () => {
       </Link>
 
       {/* Desktop Nav */}
-      <nav className="hidden sm:flex items-center gap-6">
-      {navItems.map((item) => (
-  <Link
-    key={item.name}
-    href={item.href}
-    className={`text-sm lg:text-base font-medium transition-colors ${
-      pathname === item.href
-        ? "text-black lg:text-[#2E2E2E]"
-        : "text-black hover:text-gray-800 lg:text-[#2E2E2E] lg:hover:text-gray-800"
-    }`}
-  >
-    {item.name}
-    {item.icon && item.icon}
-  </Link>
-))}
+      <nav className="hidden xl:flex items-center gap-6">
+      {navItems.map((item) =>
+  item.name === "Solutions" ? (
+    <div
+      key={item.name}
+      className="relative"
+      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+     
+    >
+      <button className="flex items-center text-sm lg:text-base font-medium text-black lg:text-white hover:text-gray-50">
+        {item.name}
+        {item.icon}
+      </button>
+
+      {isDropdownOpen && (
+        <div className="absolute left-0 mt-2 w-44 p-2 bg-white rounded shadow-lg z-50">
+          <Link
+            href="/about"
+            className="block px-4 py-2 text-black hover:bg-[#116114] hover:text-white"
+          >
+            Meet Tetramanor
+          </Link>
+          <Link
+            href="/services"
+            className="block px-4 py-2 text-black hover:bg-[#116114] hover:text-white"
+          >
+            What We Do
+          </Link>
+        </div>
+      )}
+    </div>
+  ) : (
+    <Link
+      key={item.name}
+      href={item.href}
+      className={`text-sm lg:text-base font-medium transition-colors ${
+        pathname === item.href
+          ? "text-black lg:text-white"
+          : "text-black hover:text-gray-800 lg:text-white lg:hover:text-gray-50"
+      }`}
+    >
+      {item.name}
+    </Link>
+  )
+)}
+
 
       </nav>
 
       {/* Desktop Auth Button */}
-      <div className="hidden md:flex">
+      <div className="hidden xl:flex">
         <Link
           href="/dashboard"
           className="px-6 py-2 text-[#FFFFFF] bg-[#116114] text-sm font-medium hover:bg-green-900"
@@ -64,7 +96,7 @@ const Header = () => {
 
       {/* Mobile Menu Button */}
       <button
-        className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-black hover:text-black focus:outline-none"
+        className="xl:hidden inline-flex items-center justify-center p-2 rounded-md text-black hover:text-black focus:outline-none"
         onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
         {isMenuOpen ? "✖" : "☰"}
@@ -73,29 +105,58 @@ const Header = () => {
 
     {/* Mobile Menu */}
     {isMenuOpen && (
-      <div className="md:hidden bg-white h-screen block mt-4 pb-4 space-y-6">
-        <div className="flex flex-col space-y-4 pt-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`text-lg space-y-6 font-medium text-black`}
+  <div className="xl:hidden bg-white h-screen block mt-4 pb-4 space-y-6">
+    <div className="flex flex-col space-y-4 pt-4">
+      {navItems.map((item) =>
+        item.name === "Solutions" ? (
+          <div key={item.name}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center text-lg font-medium text-black"
             >
-              {pathname === item.href && (
-                <span className="inline-block mr-2 h-2 w-2 rounded-full bg-gray-600" />
-              )}
               {item.name}
-            </Link>
-          ))}
+              <IoIosArrowDown className={`ml-1 mt-1 w-4 h-4 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+            </button>
+            {isDropdownOpen && (
+              <div className="ml-4 mt-2 space-y-2">
+                <Link
+                  href="/about"
+                  className="block text-base text-black hover:text-green-800"
+                >
+                  Meet Tetramanor
+                </Link>
+                <Link
+                  href="/services"
+                  className="block text-base text-black hover:text-green-800"
+                >
+                  What We Do
+                </Link>
+              </div>
+            )}
+          </div>
+        ) : (
           <Link
-            href="/dashboard"
-            className="px-4 py-4 w-full text-white bg-[#116114] border border-primary-500 rounded-xl text-sm font-medium hover:bg-gray-800 text-center"
+            key={item.name}
+            href={item.href}
+            className={`text-lg font-medium text-black`}
           >
-            View Dashboard
+            {pathname === item.href && (
+              <span className="inline-block mr-2 h-2 w-2 rounded-full bg-gray-600" />
+            )}
+            {item.name}
           </Link>
-        </div>
-      </div>
-    )}
+        )
+      )}
+      <Link
+        href="/dashboard"
+        className="px-4 py-4 w-full text-white bg-black border border-primary-500 rounded-xl text-sm font-medium hover:bg-gray-800 text-center"
+      >
+        View Dashboard
+      </Link>
+    </div>
+  </div>
+)}
+
   </div>
 </header>
 

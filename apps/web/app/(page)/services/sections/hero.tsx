@@ -1,6 +1,6 @@
 "use client";
-import Header from "@/components/Header";
 import { motion } from "framer-motion";
+import Header from "../../portfolio/components/header";
 
 const Hero = () => {
   return (
