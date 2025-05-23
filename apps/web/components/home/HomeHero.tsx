@@ -1,5 +1,6 @@
+import Header from "@/app/(page)/portfolio/components/header";
 import React from "react";
-import Header from "../Header";
+
 
 const HomeHero = () => {
   return (

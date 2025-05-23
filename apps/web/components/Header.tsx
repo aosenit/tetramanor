@@ -25,7 +25,7 @@ const Header = () => {
   const pathname = usePathname();
 
   return (
-    <header className="bg-white sm:bg-white lg:bg-transparent fixed top-0 w-full z-50 ">
+    <header className="bg-white sm:bg-white xl:bg-transparent fixed top-0 w-full z-50 ">
       <div className="container mx-auto px-4 lg:px-16 py-3">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -39,7 +39,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden sm:flex items-center gap-6">
+          <nav className="hidden xl:flex items-center gap-6">
           {navItems.map((item) => (
   <Link
     key={item.name}
@@ -58,7 +58,7 @@ const Header = () => {
           </nav>
 
           {/* Desktop Auth Button */}
-          <div className="hidden md:flex">
+          <div className="hidden xl:flex">
             <Link
               href="/dashboard"
               className="px-6 py-2 text-black bg-white text-sm font-medium hover:bg-gray-100"
@@ -69,7 +69,7 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-black hover:text-black focus:outline-none"
+            className="xl:hidden inline-flex items-center justify-center p-2 rounded-md text-black hover:text-black focus:outline-none"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? "✖" : "☰"}
@@ -78,7 +78,7 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white h-screen block mt-4 pb-4 space-y-6">
+          <div className="xl:hidden bg-white h-screen block mt-4 pb-4 space-y-6">
             <div className="flex flex-col space-y-4 pt-4">
               {navItems.map((item) => (
                 <Link
