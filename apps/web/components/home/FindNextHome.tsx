@@ -2,8 +2,8 @@ import { Button } from "@chakra-ui/react";
 
 export default function FindNextHome() {
   return (
-    <section className="bg-[#FAFAFA] w-full py-12 px-4">
-      <div className="max-w-[1300px] mx-auto flex flex-col gap-8">
+    <section className=" w-full container mx-auto px-4 lg:px-16 py-12">
+      <div className="flex flex-col gap-8">
         {/* Header Row */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
@@ -28,7 +28,7 @@ export default function FindNextHome() {
           <img
             src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1000&q=80"
             alt="TM Meadows"
-            className="w-full h-[650px] md:h-[400px] object-cover rounded-xl"
+            className="w-full  object-cover rounded-xl"
           />
           {/* Badge */}
           <div className="absolute top-6 left-2 lg:left-6 bg-[#8B8B8B] bg-opacity-80 text-white text-sm px-5 py-2 rounded-full">

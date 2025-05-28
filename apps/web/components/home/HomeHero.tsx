@@ -1,11 +1,11 @@
+import Header from "@/app/(page)/portfolio/components/header";
 import React from "react";
-import Header from "../Header";
+
 
 const HomeHero = () => {
   return (
     <section className="relative h-[80vh] ">
       <Header />
-      {/* Background image (replace with video when ready) */}
       <img
         src="/herobg.png"
         alt="Hero Background"
@@ -22,7 +22,6 @@ const HomeHero = () => {
             Modern, sustainable homes designed for better living and stronger
             communities
           </p>
-          {/* Search Bar */}
           <form className="flex flex-col md:flex-row items-stretch w-full max-w-3xl bg-black/70 overflow-hidden border border-white/10">
             <div className="flex items-center px-4 md:px-6 py-3 md:py-4 border-b md:border-b-0 md:border-r border-white/30">
               <span className="text-white text-sm md:text-base mr-2">

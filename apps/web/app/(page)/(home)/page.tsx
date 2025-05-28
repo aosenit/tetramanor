@@ -11,7 +11,7 @@ import OngoingCampaigns from "@/components/home/OngoingCampaigns";
 import TetraOneWebApp from "@/components/home/TetraOneWebApp";
 export default function Home() {
   return (
-    <main className="bg-background min-h-screen font-sans text-gray">
+    <main className="bg-background bg-[#FAFAFA] min-h-screen font-sans text-gray">
       <HomeHero />
 
       <HomeKeyFeatures />

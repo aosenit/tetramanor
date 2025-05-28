@@ -1,8 +1,15 @@
 import React from "react";
-import Rental from "./rental";
+import HomeHero from "./components/Hero";
+import Footer from "@/components/home/Footer";
+import PropertyListing from "./components/ShortletProperty";
+
 
 const RentalPage = () => {
-  return <Rental />;
+  return (
+    <><HomeHero />
+      <PropertyListing/>
+      <Footer /></>
+  );
 };
 
 export default RentalPage;

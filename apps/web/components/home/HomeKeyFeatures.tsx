@@ -2,8 +2,8 @@ import { Button } from "@chakra-ui/react";
 
 export default function HomeKeyFeatures() {
   return (
-    <section className="bg-[#FAFAFA] w-full py-12 lg:py-24 px-4 fade-in-up">
-      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
+    <section className=" w-full container mx-auto px-4 lg:px-16 py-12 fade-in-up">
+      <div className=" grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Left Side */}
         <div className="flex flex-col gap-8">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
