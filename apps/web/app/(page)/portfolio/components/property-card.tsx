@@ -37,7 +37,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
       <div className="absolute bottom-4 left-4 right-4 text-white">
         <h3 className="text-lg font-bold">{title}</h3>
-        <p className="text-sm mt-1">{location}</p>
+        <p className="text-sm mt-1 truncate">{location}</p>
       </div>
 
       <Link

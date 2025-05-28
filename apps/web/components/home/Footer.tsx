@@ -8,6 +8,7 @@ import {
   FaLinkedinIn,
 } from "react-icons/fa";
 import { IoLocationOutline } from "react-icons/io5";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -47,11 +48,22 @@ export default function Footer() {
             <div className="grid grid-cols-2 gap-14">
               <div>
                 <h4 className="text-gray-400 font-semibold mb-3">QUICK LINKS</h4>
-                <ul className="space-y-2 text-sm">
-                  <li className="hover:text-gray-300 cursor-pointer">About us</li>
-                  <li className="hover:text-gray-300 cursor-pointer">Services</li>
-                  <li className="hover:text-gray-300 cursor-pointer">Investment</li>
-                  <li className="hover:text-gray-300 cursor-pointer">Blogs</li>
+                <ul className="space-y-2 text-white ">
+                <Link href="/about">
+              <li>About us</li>
+              
+              </Link>
+              <Link href="/services">
+              
+              <li>Services</li>
+              </Link>
+              <Link href="/investment">
+              
+              <li>Investment</li>
+              </Link>
+              <Link href="/blog"> 
+              <li>Blogs</li>
+              </Link>
                 </ul>
               </div>
 

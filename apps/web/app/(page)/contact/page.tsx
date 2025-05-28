@@ -11,9 +11,9 @@ function page() {
     <div className='bg-[#fafafa]'>
       <HomeHero />
       <ContactForm />
-      <MapSection />
-      <Agents />
       <BecomeAnAgent/>
+      <MapSection />
+      {/* <Agents /> */}
          <Footer />
     </div>
   )

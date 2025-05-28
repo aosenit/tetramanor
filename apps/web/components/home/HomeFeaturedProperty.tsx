@@ -1,8 +1,12 @@
 // apps/web/components/home/HomeFeaturedProperty.tsx
+"use client";
+import Modal from "@/app/(page)/portfolio/view-property/sections/modal";
 import { Button } from "@chakra-ui/react";
+import { useState } from "react";
 import { IoLocationOutline } from "react-icons/io5";
 
 export default function HomeFeaturedProperty() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <section className="w-full container mx-auto px-4 lg:px-16 py-12">
       <div className="flex flex-col lg:flex-row gap-12 items-center">
@@ -26,11 +30,13 @@ export default function HomeFeaturedProperty() {
                 </div>
               </div>
               <Button
+                  onClick={() => setIsModalOpen(true)}
                 size="sm"
                 className="bg-white text-[#202020] font-semibold rounded px-6 py-2 shadow-none text-base w-full md:w-auto"
               >
                 Download brochure
               </Button>
+              
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-white text-center">
               {[
@@ -88,6 +94,7 @@ export default function HomeFeaturedProperty() {
           </Button>
         </div>
       </div>
+      {isModalOpen && <Modal onClose={() => setIsModalOpen(false)} />}
     </section>
   );
 }

@@ -3,7 +3,8 @@ import Hero from "./components/hero";
 import Ongoing from "./sections/ongoing";
 import Completed from "./sections/completed";
 import ContactSection from "../../../components/shared/contact";
-import Footer from "@/components/home/Footer";
+import Footer from "./components/footer";
+
 
 function Page() {
   return (

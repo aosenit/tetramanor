@@ -6,7 +6,7 @@ import meadows from "../../../../public/portfolio/meadows.jpg";
 
 function Completed() {
   return (
-    <section className="py-16 px-4 md:px-10 lg:px-20 bg-white ">
+    <section className="py-16 container mx-auto px-4 lg:px-16 bg-white ">
       <h2 className="text-3xl md:text-4xl font-bold mb-10 text-gray-900 ">
         Completed Projects
       </h2>
