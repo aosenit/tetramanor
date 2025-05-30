@@ -44,7 +44,7 @@ const Header = () => {
       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
      
     >
-      <button className="flex items-center text-sm lg:text-base font-medium text-black lg:text-white hover:text-gray-50">
+      <button className="flex items-center text-sm lg:text-base font-medium text-black">
         {item.name}
         {item.icon}
       </button>
@@ -53,13 +53,13 @@ const Header = () => {
         <div className="absolute left-0 mt-2 w-44 p-2 bg-white rounded shadow-lg z-50">
           <Link
             href="/about"
-            className="block px-4 py-2 text-black hover:bg-[#116114] hover:text-white"
+            className="block px-4 py-2 text-black hover:bg-[#116114] hover:text-gray-800"
           >
             Meet Tetramanor
           </Link>
           <Link
             href="/services"
-            className="block px-4 py-2 text-black hover:bg-[#116114] hover:text-white"
+            className="block px-4 py-2 text-black hover:bg-[#116114] hover:text-gray-800"
           >
             What We Do
           </Link>
@@ -72,8 +72,8 @@ const Header = () => {
       href={item.href}
       className={`text-sm lg:text-base font-medium transition-colors ${
         pathname === item.href
-          ? "text-black lg:text-white"
-          : "text-black hover:text-gray-800 lg:text-white lg:hover:text-gray-50"
+          ? "text-black"
+          : "text-black hover:text-gray-800 "
       }`}
     >
       {item.name}
