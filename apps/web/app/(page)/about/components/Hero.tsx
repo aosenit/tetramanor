@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import about from "../../../../public/about/about.png";
+import about from "/public/about/about.png";
 import { motion } from "framer-motion";
 import Header from "../../portfolio/components/header";
 
@@ -23,12 +23,14 @@ const HomeHero = () => {
           viewport={{ once: true }}
           className="text-white text-3xl md:text-4xl lg:text-6xl font-extrabold leading-tight"
         >
-                  Building More Than Homes.
-                  <p className=" mt-2">Creating Lasting Value.</p>
+          Building More Than Homes.
+          <p className=" mt-2">Creating Lasting Value.</p>
         </motion.h1>
 
         <p className="text-white text-base md:text-xl mt-4 max-w-3xl">
-        At Tetramanor, we design and deliver modern, sustainable homes that enrich lives and drive long-term growth  for families, communities, and investors alike.
+          At Tetramanor, we design and deliver modern, sustainable homes that
+          enrich lives and drive long-term growth for families, communities, and
+          investors alike.
         </p>
       </div>
     </section>
