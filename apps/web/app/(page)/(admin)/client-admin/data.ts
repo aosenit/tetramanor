@@ -1,4 +1,4 @@
-import { DashboardData } from "./dashboard/types";
+import { DashboardData } from "./(client)/dashboard/types";
 
 export const mockData: DashboardData = {
   user: {
