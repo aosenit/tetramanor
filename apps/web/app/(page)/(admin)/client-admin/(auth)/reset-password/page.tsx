@@ -68,7 +68,9 @@ export default function ResetCodePage() {
           {code.map((digit, index) => (
             <Input
               key={index}
-              ref={(el) => (inputRefs.current[index] = el)}
+              ref={(el: HTMLInputElement | null): void => {
+                inputRefs.current[index] = el;
+              }}
               type="text"
               inputMode="numeric"
               maxLength={1}
