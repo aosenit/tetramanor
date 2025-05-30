@@ -86,7 +86,7 @@ export default function TestimonialsSection() {
     <section className="pl-4 md:pl-16 lg:pl-40 py-12">
       <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
         <div>
-          <h3 className="text-[#EB8A43] font-semibold text-sm mb-2">TESTIMONIALS</h3>
+          <p className="text-[#EB8A43] font-semibold text-sm mb-2">TESTIMONIALS</p>
           <h2 className="text-3xl text-[#000000] font-semibold">What People are Saying About Us</h2>
         </div>
         <div className="flex gap-2">
