@@ -1,14 +1,10 @@
-import React, { ReactNode } from 'react';
-import Image, { StaticImageData } from 'next/image';
-import one from '../../../../public/blog/first.png';
-import two from '../../../../public/blog/second.png';
-import three from '../../../../public/blog/third.png';
-import four from '../../../../public/blog/four.png';
-import five from '../../../../public/blog/five.png';
+"use client";
+import React, { ReactNode } from "react";
+import Image from "next/image";
 
 interface SidebarItem {
   id: number;
-  image: StaticImageData;
+  image: string;
   link: string;
   description: string;
 }
@@ -17,48 +13,51 @@ interface Props {
   children?: ReactNode;
 }
 
-const sidebar: SidebarItem[] = [
+const sidebarItems: SidebarItem[] = [
   {
     id: 1,
-    image: one,
+    image: "/blog/first.png",
     link: "/blog/featured",
-    description: "lorem ipsum dolor sit amet consectetur adipiscing elit. Curabitur nec odio vel dui euismod fermentum."
+    description:
+      "Tetramanor's Strategic Approach to Real Estate Investment in Nigeria",
   },
   {
     id: 2,
-    image: two,
+    image: "/blog/second.png",
     link: "/blog/latest",
-    description: "lorem ipsum dolor sit amet consectetur adipiscing elit. Curabitur nec odio vel dui euismod fermentum."
+    description:
+      "Tetramanor's Strategic Approach to Real Estate Investment in Nigeria",
   },
   {
     id: 3,
-    image: three,
+    image: "/blog/third.png",
     link: "/blog/latest",
-    description: "lorem ipsum dolor sit amet consectetur adipiscing elit. Curabitur nec odio vel dui euismod fermentum."
+    description:
+      "Tetramanor's Strategic Approach to Real Estate Investment in Nigeria",
   },
   {
     id: 4,
-    image: four,
+    image: "/blog/four.png",
     link: "/blog/latest",
-    description: "lorem ipsum dolor sit amet consectetur adipiscing elit. Curabitur nec odio vel dui euismod fermentum."
+    description:
+      "Tetramanor's Strategic Approach to Real Estate Investment in Nigeria",
   },
   {
     id: 5,
-    image: five,
+    image: "/blog/five.png",
     link: "/blog/latest",
-    description: "lorem ipsum dolor sit amet consectetur adipiscing elit. Curabitur nec odio vel dui euismod fermentum."
+    description:
+      "Tetramanor's Strategic Approach to Real Estate Investment in Nigeria",
   },
 ];
 
 const AppSideBar: React.FC<Props> = ({ children }) => {
   return (
     <div className="flex flex-col lg:flex-row gap-12">
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
       <aside className="lg:w-1/3 space-y-4">
         <h1 className="text-xl font-semibold mb-4">Featured Post</h1>
-        {sidebar.map((item) => (
+        {sidebarItems.map((item) => (
           <a
             key={item.id}
             href={item.link}

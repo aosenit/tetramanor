@@ -1,16 +1,8 @@
 import React from "react";
 import Image from "next/image";
-import icon1 from "../../../../public/about/book.png";
-import icon2 from "../../../../public/about/house.png";
-import icon3 from "../../../../public/about/forex.png";
-import highh from "../../../../public/about/highh.png";
-import about from "/public/about/about.png";
-import burrow from "../../../../public/portfolio/burrows.jpg";
-import queenmary from "../../../../public/portfolio/queenmary.png";
-import meadows from "../../../../public/portfolio/meadows.jpg";
 
 interface Achievement {
-  image: any;
+  image: string;
   title: string;
   description: string;
 }
@@ -20,24 +12,24 @@ interface Property {
   type: string;
   launchValue: string;
   currentValue: string;
-  image: any;
+  image: string;
 }
 
 const achievements: Achievement[] = [
   {
-    image: icon1,
+    image: "/about/book.png",
     title: "Rental Disbursements",
     description:
       "In 2024, we disbursed over ₦22m in rental payments to homeowners who subscribed to our property management services.",
   },
   {
-    image: icon2,
+    image: "/about/house.png",
     title: "100+ Families Housed",
     description:
       "We've helped over 100 families find modern, high-value homes that offer both comfort and long-term potential.",
   },
   {
-    image: icon3,
+    image: "/about/forex.png",
     title: "TM Gardens: 120% growth in 2 years.",
     description:
       "TM Gardens, initially priced at ₦55M, is now valued at ₦120M in two years. Every home we build is crafted to offer both comfort and tangible returns.",
@@ -50,28 +42,28 @@ const properties: Property[] = [
     type: "3-bedroom mansion",
     launchValue: "$250,000",
     currentValue: "$450,000",
-    image: about,
+    image: "/about/about.png",
   },
   {
     title: "Comfy Burrows",
     type: "3-bedroom mansion",
     launchValue: "$180,000",
     currentValue: "$320,000",
-    image: burrow,
+    image: "/portfolio/burrows.jpg",
   },
   {
     title: "Queen Mary",
     type: "3-bedroom mansion",
     launchValue: "$400,000",
     currentValue: "$700,000",
-    image: queenmary,
+    image: "/portfolio/queenmary.png",
   },
   {
     title: "TM Meadows",
     type: "3-bedroom mansion",
     launchValue: "$120,000",
     currentValue: "$210,000",
-    image: meadows,
+    image: "/portfolio/meadows.jpg",
   },
 ];
 
@@ -91,7 +83,13 @@ export default function Achievements() {
       <div className="grid mt-6 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {achievements.map((item, index) => (
           <div key={index} className=" p-6 bg-[#f5f5f5] rounded-lg ">
-            <Image src={item.image} alt={item.title} width={40} height={40} />
+            <Image
+              src={item.image}
+              alt={item.title}
+              width={40}
+              height={40}
+              className="object-contain"
+            />
             <h4 className="mt-4 text-black text-lg font-semibold">
               {item.title}
             </h4>
@@ -109,7 +107,13 @@ export default function Achievements() {
               We've also seen impressive capital growth across our projects.
             </p>
           </div>
-          <Image src={highh} alt="icon" width={40} height={40} />
+          <Image
+            src="/about/highh.png"
+            alt="icon"
+            width={40}
+            height={40}
+            className="object-contain"
+          />
         </div>
         <div className="grid gap-6 mt-12 sm:grid-cols-2 lg:grid-cols-4">
           {properties.map((property, index) => (
@@ -120,10 +124,9 @@ export default function Achievements() {
               <Image
                 src={property.image}
                 alt={property.title}
-                layout="responsive"
                 width={578}
                 height={766}
-                className="object-cover"
+                className="object-cover w-full h-full"
               />
 
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent p-4 flex flex-col justify-end">

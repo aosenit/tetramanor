@@ -1,10 +1,4 @@
 import Image from "next/image";
-import shelf from "../../../../public/services/shelf.png"
-import balcony from "../../../../public/services/balcony.png"
-import sittingroom from "../../../../public/services/sittingroom.png"
-import dining from "../../../../public/services/dining.png"
-import sidetable from "../../../../public/services/sidetable.png"
-
 
 export default function InteriorShowcase() {
   return (
@@ -22,37 +16,47 @@ export default function InteriorShowcase() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src={shelf}
+              src="/services/shelf.png"
               alt="Modern bookshelf and cabinet design"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
+              width={400}
+              height={320}
             />
           </div>
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src={balcony}
+              src="/services/balcony.png"
               alt="Glass wall living space with outdoor views"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
+              width={400}
+              height={320}
             />
           </div>
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src={sittingroom}
+              src="/services/sittingroom.png"
               alt="Living room with yellow sofa and large windows"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
+              width={400}
+              height={320}
             />
           </div>
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src={dining}
+              src="/services/dining.png"
               alt="Dining area with framed artwork gallery wall"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
+              width={400}
+              height={320}
             />
           </div>
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src={sidetable}
+              src="/services/sidetable.png"
               alt="Green console table with botanical prints"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
+              width={400}
+              height={320}
             />
           </div>
         </div>

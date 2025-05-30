@@ -1,6 +1,5 @@
 import React from "react";
 import Image from "next/image";
-import logo from "../../public/logo.svg";
 import {
   FaFacebookF,
   FaTwitter,
@@ -18,11 +17,9 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row gap-4 justify-between pb-10">
           {/* Brand + search */}
           <div className=" space-y-4">
-            <Image
-              src={logo}
-              alt="TM Logo"
-              className="h-10 w-auto object-contain"
-            />
+            <Link href="/">
+              <Image src="/logo.svg" alt="Logo" width={60} height={20} />
+            </Link>
 
             <p className="text-gray-300 max-w-md">
               Your Trusted Real Estate Partner in Lagos
@@ -47,23 +44,22 @@ export default function Footer() {
           <div className="">
             <div className="grid grid-cols-2 gap-14">
               <div>
-                <h4 className="text-gray-400 font-semibold mb-3">QUICK LINKS</h4>
+                <h4 className="text-gray-400 font-semibold mb-3">
+                  QUICK LINKS
+                </h4>
                 <ul className="space-y-2 text-white ">
-                <Link href="/about">
-              <li>About us</li>
-              
-              </Link>
-              <Link href="/services">
-              
-              <li>Services</li>
-              </Link>
-              <Link href="/investment">
-              
-              <li>Investment</li>
-              </Link>
-              <Link href="/blog"> 
-              <li>Blogs</li>
-              </Link>
+                  <Link href="/about">
+                    <li>About us</li>
+                  </Link>
+                  <Link href="/services">
+                    <li>Services</li>
+                  </Link>
+                  <Link href="/investment">
+                    <li>Investment</li>
+                  </Link>
+                  <Link href="/blog">
+                    <li>Blogs</li>
+                  </Link>
                 </ul>
               </div>
 
@@ -87,9 +83,7 @@ export default function Footer() {
       {/* ------------ Bottom bar ------------ */}
       <div className="bg-[#2E2E2E] border-t border-[#2D2D2D] py-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 px-4 sm:px-6 lg:px-16">
-          <span className="text-gray-400 text-sm">
-            © Tetramanor, 2025
-          </span>
+          <span className="text-gray-400 text-sm">© Tetramanor, 2025</span>
 
           <div className="flex gap-6 text-xl">
             <a aria-label="Facebook" className="hover:text-gray-300" href="#">

@@ -8,13 +8,7 @@ import {
   FaShieldAlt,
   FaMapMarkerAlt,
 } from "react-icons/fa";
-import Image, { StaticImageData } from "next/image";
-import one from "../../../../public/rental/one.jpg";
-import two from "../../../../public/rental/two.jpg";
-import three from "../../../../public/rental/three.png";
-import four from "../../../../public/rental/four.png";
-import five from "../../../../public/rental/five.png";
-import six from "../../../../public/rental/six.png";
+import Image from "next/image";
 import Link from "next/link";
 import { MdBed } from "react-icons/md";
 
@@ -27,7 +21,7 @@ const properties = [
     period: "year",
     beds: 3,
     features: ["Balcony", "Walk-In Closets", "CCTV"],
-    imageUrl: one,
+    imageUrl: "/rental/one.jpg",
   },
   {
     id: "2",
@@ -37,7 +31,7 @@ const properties = [
     period: "year",
     beds: 3,
     features: ["Balcony", "Walk-In Closets", "CCTV"],
-    imageUrl: two,
+    imageUrl: "/rental/two.jpg",
   },
   {
     id: "3",
@@ -47,7 +41,7 @@ const properties = [
     period: "year",
     beds: 4,
     features: ["Sea View", "Smart Home", "Security"],
-    imageUrl: three,
+    imageUrl: "/rental/three.png",
   },
   {
     id: "4",
@@ -57,7 +51,7 @@ const properties = [
     period: "year",
     beds: 2,
     features: ["Garden", "Walk-In Closets", "Security"],
-    imageUrl: four,
+    imageUrl: "/rental/four.png",
   },
   {
     id: "5",
@@ -67,7 +61,7 @@ const properties = [
     period: "year",
     beds: 3,
     features: ["Garage", "Balcony", "CCTV"],
-    imageUrl: five,
+    imageUrl: "/rental/five.png",
   },
   {
     id: "6",
@@ -77,7 +71,7 @@ const properties = [
     period: "year",
     beds: 4,
     features: ["Gym", "Smart Home", "24/7 Security"],
-    imageUrl: six,
+    imageUrl: "/rental/six.png",
   },
 ];
 
@@ -90,10 +84,11 @@ export default function PropertyListing() {
             Looking for a Premium Rental or Short-let Property in Lagos?
           </h4>
           <p className="text-[#202020] xl:max-w-xl text-sm sm:text-base leading-relaxed text-justify">
-            Tetramanor offers a curated selection of luxury apartments and homes,
-            perfect for short-term stays or long-term rentals. Whether you need a
-            fully serviced apartment for a getaway or a stylish home for an extended
-            stay – enjoy comfort, security, and convenience in prime locations.
+            Tetramanor offers a curated selection of luxury apartments and
+            homes, perfect for short-term stays or long-term rentals. Whether
+            you need a fully serviced apartment for a getaway or a stylish home
+            for an extended stay – enjoy comfort, security, and convenience in
+            prime locations.
           </p>
         </div>
 
@@ -130,7 +125,7 @@ interface PropertyCardProps {
   period: string;
   beds: number;
   features: string[];
-  imageUrl: StaticImageData;
+  imageUrl: string;
 }
 
 function PropertyCard({

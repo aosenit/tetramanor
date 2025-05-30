@@ -1,10 +1,8 @@
 "use client";
 
-import type React from "react";
-
+import React from "react";
 import { useState } from "react";
 import Image from "next/image";
-import hilltop from "../../../../../public/hilltop.jpg";
 import { FaPhone, FaEnvelope, FaCalendarAlt } from "react-icons/fa";
 
 export default function ScheduleInspection() {
@@ -32,9 +30,10 @@ export default function ScheduleInspection() {
   return (
     <div className="relative w-full bg-[#2c3e50] text-white">
       <Image
-        src={hilltop}
+        src="/hilltop.jpg"
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
+        fill
       />
       <div className="absolute inset-0 bg-black opacity-60 z-10" />
       <div className="relative z-10 container mx-auto px-4 lg:px-12 py-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">

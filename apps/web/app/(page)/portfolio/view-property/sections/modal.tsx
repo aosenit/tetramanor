@@ -1,7 +1,7 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
-import hill from "../../../../../public/portfolio/hill.png";
 
 const Modal = ({ onClose }: { onClose: () => void }) => {
   const [formData, setFormData] = useState({
@@ -16,7 +16,7 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
     return () => {
       document.body.style.overflow = "auto";
     };
-  },[])
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -26,7 +26,9 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-    alert("Thank you! Your inspection has been scheduled. We'll contact you shortly to confirm.");
+    alert(
+      "Thank you! Your inspection has been scheduled. We'll contact you shortly to confirm."
+    );
     setFormData({ name: "", phone: "", email: "", date: "" });
     onClose();
   };
@@ -45,9 +47,11 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
           {/* Left: Image */}
           <div className="w-full lg:w-1/2">
             <Image
-              src={hill}
-              alt="Modern bookshelf and cabinet design"
+              src="/portfolio/hill.png"
+              alt="Hill View"
               className="w-full h-full object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none"
+              width={800}
+              height={600}
             />
           </div>
 
@@ -56,12 +60,16 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <h2 className="text-2xl font-semibold">Download Brochure</h2>
-                <p className="text-sm text-[#737687]">Please fill in your information before you proceed.</p>
+                <p className="text-sm text-[#737687]">
+                  Please fill in your information before you proceed.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="name" className="block text-gray-700 mb-2">First name</label>
+                  <label htmlFor="name" className="block text-gray-700 mb-2">
+                    First name
+                  </label>
                   <input
                     type="text"
                     id="name"
@@ -74,7 +82,9 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-gray-700 mb-2">Phone number</label>
+                  <label htmlFor="phone" className="block text-gray-700 mb-2">
+                    Phone number
+                  </label>
                   <input
                     type="tel"
                     id="phone"
@@ -88,7 +98,9 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-gray-700 mb-2">Email address</label>
+                <label htmlFor="email" className="block text-gray-700 mb-2">
+                  Email address
+                </label>
                 <input
                   type="email"
                   id="email"

@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import about from "/public/about/about.png";
 import { motion } from "framer-motion";
 import Header from "../../portfolio/components/header";
 
@@ -10,9 +9,11 @@ const HomeHero = () => {
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
       <Image
-        src={about}
+        src="/about/about.png"
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
+        fill
+        priority
       />
       <div className="absolute inset-0 bg-black opacity-60 z-10" />
       <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-4 text-center">

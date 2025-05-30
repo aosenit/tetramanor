@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import contact from "../../../../public/contact/contacther.jpg";
 import { motion } from "framer-motion";
 import Header from "../../portfolio/components/header";
 
@@ -10,8 +9,10 @@ const HomeHero = () => {
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
       <Image
-        src={contact}
+        src={"/contact/contacther.jpg"}
         alt="Hero Background"
+        width={1000}
+        height={1000}
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
       <div className="absolute inset-0 bg-black opacity-60 z-10" />
@@ -23,11 +24,12 @@ const HomeHero = () => {
           viewport={{ once: true }}
           className="text-white text-3xl md:text-4xl lg:text-6xl font-extrabold leading-tight"
         >
-        Want to talk?
+          Want to talk?
         </motion.h1>
 
         <p className="text-white text-base md:text-xl mt-4 max-w-2xl">
-        We’re here to answer your questions, guide your investment journey, or simply have a chat about your next home.
+          We’re here to answer your questions, guide your investment journey, or
+          simply have a chat about your next home.
         </p>
       </div>
     </section>

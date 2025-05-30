@@ -1,10 +1,11 @@
-import { FC } from "react";
-import Image, { StaticImageData } from "next/image";
+"use client";
+import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 interface PropertyCardProps {
   slug: string;
-  image: StaticImageData;
+  image: string;
   title: string;
   location: string;
   status: string;
@@ -21,36 +22,26 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 }) => {
   return (
     <div
-      className={`relative rounded-xl overflow-hidden shadow-md group ${className}`}
+      className={`bg-white rounded-lg shadow-md overflow-hidden ${className}`}
     >
-      <Image
-        src={image}
-        alt={title}
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-      />
-
-      <div className="absolute inset-0 bg-black bg-opacity-40" />
-
-      <div className="absolute top-4 left-4 bg-white/20 text-white text-xs font-semibold px-4 py-1 rounded-full">
-        {status.toUpperCase()}
-      </div>
-
-      <div className="absolute bottom-4 left-4 right-4 text-white">
-        <h3 className="text-lg font-bold">{title}</h3>
-        <p className="text-sm mt-1 truncate">{location}</p>
-      </div>
-
-      <Link
-  href={{
-          pathname: "portfolio/view-property",
-          query: { slug },
-  }}
-  className="absolute bottom-4 right-4 bg-white text-black text-sm px-4 py-2 rounded-full font-medium shadow hover:bg-gray-200"
->
-  View Property
-</Link>
-
-
+      <Link href={`/portfolio/view-property?slug=${slug}`}>
+        <div className="relative h-64">
+          <Image
+            src={image}
+            alt={title}
+            className="w-full h-full object-cover"
+            width={800}
+            height={600}
+          />
+        </div>
+        <div className="p-4">
+          <h3 className="text-xl font-semibold mb-2">{title}</h3>
+          <p className="text-gray-600 mb-2">{location}</p>
+          <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
+            {status}
+          </span>
+        </div>
+      </Link>
     </div>
   );
 };

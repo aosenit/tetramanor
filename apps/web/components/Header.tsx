@@ -3,7 +3,6 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import Logo from "../public/logo.svg";
 import { IoIosArrowDown } from "react-icons/io";
 
 const navItems = [
@@ -19,7 +18,6 @@ const navItems = [
   { name: "Want to talk", href: "/contact" },
 ];
 
-
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -31,30 +29,30 @@ const Header = () => {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
-              alt="logo"
-              src={Logo}
-              className="h-10 w-auto"
+              alt="Logo"
+              src="/logo.svg"
+              width={150}
+              height={40}
               priority
             />
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden xl:flex items-center gap-6">
-          {navItems.map((item) => (
-  <Link
-    key={item.name}
-    href={item.href}
-    className={`text-sm lg:text-base font-medium transition-colors ${
-      pathname === item.href
-        ? "text-black lg:text-white"
-        : "text-black hover:text-gray-800 lg:text-white lg:hover:text-gray-50"
-    }`}
-  >
-    {item.name}
-    {item.icon && item.icon}
-  </Link>
-))}
-
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`text-sm lg:text-base font-medium transition-colors ${
+                  pathname === item.href
+                    ? "text-black lg:text-white"
+                    : "text-black hover:text-gray-800 lg:text-white lg:hover:text-gray-50"
+                }`}
+              >
+                {item.name}
+                {item.icon && item.icon}
+              </Link>
+            ))}
           </nav>
 
           {/* Desktop Auth Button */}

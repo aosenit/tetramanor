@@ -3,11 +3,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import Logo from "../../../../public/logo.svg";
 import { IoIosArrowDown } from "react-icons/io";
 
 const navItems = [
-  { name: "Solutions", href: "/", icon: <IoIosArrowDown className="ml-1 mt-1 inline-block w-4 h-4" /> },
+  {
+    name: "Solutions",
+    href: "/",
+    icon: <IoIosArrowDown className="ml-1 mt-1 inline-block w-4 h-4" />,
+  },
   { name: "Buy a home", href: "/portfolio" },
   { name: "Apartment rentals", href: "/rental" },
   { name: "Build wealth with us", href: "/investment" },
@@ -31,7 +34,9 @@ const Header = () => {
   }, []);
 
   const navLinkClass = `text-sm lg:text-base font-medium transition-colors ${
-    isScrolled ? "text-black hover:text-gray-800" : "text-white hover:text-gray-50"
+    isScrolled
+      ? "text-black hover:text-gray-800"
+      : "text-white hover:text-gray-50"
   }`;
 
   return (
@@ -44,7 +49,12 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <Image alt="logo" src={Logo} className="h-10 w-auto" priority />
+            <Image
+              src="/logo.svg"
+              alt="Tetramanor Logo"
+              width={80}
+              height={20}
+            />
           </Link>
 
           {/* Desktop Nav */}
@@ -56,9 +66,7 @@ const Header = () => {
                   className="relative"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
-                  <button
-                    className={`flex items-center ${navLinkClass}`}
-                  >
+                  <button className={`flex items-center ${navLinkClass}`}>
                     {item.name}
                     {item.icon}
                   </button>

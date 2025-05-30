@@ -1,5 +1,6 @@
+"use client";
+import React from "react";
 import Image from "next/image";
-import hill from "../../../../../public/portfolio/hill.png";
 import {
   FaCheck,
   FaWifi,
@@ -69,10 +70,12 @@ export default function PropertyListing() {
 
         <div className="relative h-[400px] lg:h-auto rounded-lg overflow-hidden">
           <Image
-            src={hill}
+            src="/portfolio/hill.png"
             alt="TM HighGardens luxury residential building"
             fill
             className="object-cover"
+            width={800}
+            height={600}
           />
         </div>
       </div>

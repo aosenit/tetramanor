@@ -3,7 +3,6 @@ import { useState } from "react";
 import Header from "./header";
 import Image from "next/image";
 import { CiLocationOn } from "react-icons/ci";
-import herobg from "../../../../public/herobg.png";
 import { motion } from "framer-motion";
 import Modal from "../view-property/sections/modal";
 
@@ -14,9 +13,11 @@ const HomeHero = () => {
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
       <Image
-        src={herobg}
+        src="/herobg.png"
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
+        fill
+        priority
       />
       <div className="absolute inset-0 bg-black opacity-60 z-10" />
 
@@ -37,7 +38,7 @@ const HomeHero = () => {
             </p>
             <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
               <p className="text-3xl md:text-4xl lg:text-5xl font-semibold">
-                The Billionaire’s Playground.
+                The Billionaire's Playground.
               </p>
               <button
                 onClick={() => setIsModalOpen(true)}

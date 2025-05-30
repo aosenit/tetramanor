@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import blog from "../../../../public/blog.jpg";
 import { motion } from "framer-motion";
 import Header from "../../portfolio/components/header";
 
@@ -9,8 +8,10 @@ const HomeHero = () => {
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
       <Image
-        src={blog}
+        src={"/blog.jpg"}
         alt="Hero Background"
+        width={1000}
+        height={1000}
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
       <div className="absolute inset-0 bg-black opacity-60 z-10" />
@@ -22,7 +23,7 @@ const HomeHero = () => {
           viewport={{ once: true }}
           className="text-white text-center text-3xl md:text-4xl lg:text-6xl font-extrabold leading-tight"
         >
-        Real Estate Journal
+          Real Estate Journal
         </motion.h1>
       </div>
     </section>

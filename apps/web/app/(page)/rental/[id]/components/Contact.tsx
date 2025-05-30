@@ -1,8 +1,7 @@
-"use client"
-import Image from "next/image"
-import skyscrapper from "../../../../../public/investment/skyscrapper.jpg"
-import type React from "react"
-import { useState } from "react"
+"use client";
+import Image from "next/image";
+import type React from "react";
+import { useState } from "react";
 
 export default function PropertyEnquiryForm() {
   const [formData, setFormData] = useState({
@@ -10,42 +9,50 @@ export default function PropertyEnquiryForm() {
     phone: "",
     email: "",
     message: "",
-  })
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log("Form submitted:", formData)
-    setFormData({ name: "", phone: "", email: "", message: "" })
-  }
+    e.preventDefault();
+    console.log("Form submitted:", formData);
+    setFormData({ name: "", phone: "", email: "", message: "" });
+  };
 
   return (
     <div className="relative w-full min-h-screen bg-gradient-to-r from-slate-800 to-slate-900 flex items-center justify-center p-4 md:p-8">
       <Image
-        src={skyscrapper}
-        alt="Hero Background"
-        className="absolute inset-0 w-full h-full object-cover z-0"
+        src="/investment/skyscrapper.jpg"
+        alt="Skyscraper"
+        className="object-cover"
+        fill
       />
       <div className="absolute inset-0 bg-black opacity-60 z-10" />
       <div className="container mx-auto px-4 lg:px-16 z-10 relative">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div className="text-white space-y-8">
             <div className="space-y-4">
-              <h1 className="text-4xl md:text-5xl font-bold">Send an Enquiry</h1>
+              <h1 className="text-4xl md:text-5xl font-bold">
+                Send an Enquiry
+              </h1>
               <p className="text-lg">
-                Have questions or want to know more about this property? Fill out the enquiry form and our team will get
-                back to you shortly with all the details you need.
+                Have questions or want to know more about this property? Fill
+                out the enquiry form and our team will get back to you shortly
+                with all the details you need.
               </p>
             </div>
 
             <div className="border-t border-white pt-8 mt-8"></div>
 
             <div className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-bold">Contact Us Directly</h2>
+              <h2 className="text-2xl md:text-3xl font-bold">
+                Contact Us Directly
+              </h2>
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <svg
@@ -89,7 +96,10 @@ export default function PropertyEnquiryForm() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Name
                   </label>
                   <input
@@ -104,7 +114,10 @@ export default function PropertyEnquiryForm() {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="phone"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Phone number
                   </label>
                   <input
@@ -119,7 +132,10 @@ export default function PropertyEnquiryForm() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Email address
                   </label>
                   <input
@@ -134,7 +150,10 @@ export default function PropertyEnquiryForm() {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Message
                   </label>
                   <textarea
@@ -160,5 +179,5 @@ export default function PropertyEnquiryForm() {
         </div>
       </div>
     </div>
-  )
+  );
 }

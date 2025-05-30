@@ -1,30 +1,28 @@
-import React from 'react';
-import Image from 'next/image';
-import people from '../../../../public/investment/people.png';
-import badge from '../../../../public/investment/badge.png';
-import hike from '../../../../public/investment/hike.png';
-import bank from '../../../../public/investment/bank.png';
+"use client";
+import React from "react";
+import Image from "next/image";
 
 const features = [
   {
-    icon: people,
-    title: 'Proven Track Record',
-    description: 'Completed projects in high-demand locations.',
+    icon: "/investment/people.png",
+    title: "Proven Track Record",
+    description: "Completed projects in high-demand locations.",
   },
   {
-    icon: badge,
-    title: 'High ROI',
-    description: 'Structured investment models with strong returns.',
+    icon: "/investment/badge.png",
+    title: "High ROI",
+    description: "Structured investment models with strong returns.",
   },
   {
-    icon: hike,
-    title: 'Risk Management',
-    description: 'Tetramanor handles all operational and financial complexities.',
+    icon: "/investment/hike.png",
+    title: "Risk Management",
+    description:
+      "Tetramanor handles all operational and financial complexities.",
   },
   {
-    icon: bank,
-    title: 'Market Expertise',
-    description: 'Extensive knowledge of Lagos and Abuja real estate markets.',
+    icon: "/investment/bank.png",
+    title: "Market Expertise",
+    description: "Extensive knowledge of Lagos and Abuja real estate markets.",
   },
 ];
 
@@ -37,9 +35,16 @@ function WhyPartnerWithTetramore() {
         {features.map((feature, index) => (
           <div key={index} className="space-y-4">
             <div className="max-w-[200px]">
-              <Image src={feature.icon} width={30} height={30} alt={`${feature.title} icon`} />
+              <Image
+                src={feature.icon}
+                width={30}
+                height={30}
+                alt={`${feature.title} icon`}
+              />
             </div>
-            <h3 className="text-lg font-semibold text-[#000000]">{feature.title}</h3>
+            <h3 className="text-lg font-semibold text-[#000000]">
+              {feature.title}
+            </h3>
             <p className="text-[#202020] text-sm">{feature.description}</p>
           </div>
         ))}

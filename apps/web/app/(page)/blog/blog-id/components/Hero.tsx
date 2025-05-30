@@ -2,7 +2,6 @@
 import Image from "next/image";
 import { FiClock } from "react-icons/fi";
 import { motion } from "framer-motion";
-import blog from "../../../../../public/blog.jpg";
 import { IoIosBriefcase } from "react-icons/io";
 import { FaTag } from "react-icons/fa";
 import Header from "@/app/(page)/portfolio/components/header";
@@ -12,9 +11,11 @@ const HomeHero = () => {
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
       <Image
-        src={blog}
+        src="/blog/blog.jpg"
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
+        fill
+        priority
       />
       <div className="absolute inset-0 bg-black opacity-60 z-10" />
       <div className="absolute inset-0 z-20  flex flex-col justify-center px-6 md:px-12 lg:px-20">

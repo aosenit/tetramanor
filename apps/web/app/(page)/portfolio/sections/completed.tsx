@@ -1,10 +1,30 @@
+"use client";
 import React from "react";
+import Image from "next/image";
 import PropertyCard from "../components/property-card";
-import burrows from "../../../../public/portfolio/burrows.jpg";	
-import gardens from "../../../../public/portfolio/gardens.jpg";	
-import meadows from "../../../../public/portfolio/meadows.jpg";	
 
 function Completed() {
+  const projects = [
+    {
+      id: 1,
+      title: "Burrows",
+      description: "A luxury residential development in the heart of Lagos.",
+      image: "/portfolio/burrows.jpg",
+    },
+    {
+      id: 2,
+      title: "Gardens",
+      description: "An exclusive gated community with modern amenities.",
+      image: "/portfolio/gardens.jpg",
+    },
+    {
+      id: 3,
+      title: "Meadows",
+      description: "A serene residential estate with beautiful landscapes.",
+      image: "/portfolio/meadows.jpg",
+    },
+  ];
+
   return (
     <section className="py-16 container mx-auto px-4 lg:px-16 bg-white ">
       <h2 className="text-3xl md:text-4xl font-bold mb-10 text-gray-900 ">
@@ -14,8 +34,8 @@ function Completed() {
         <div className="w-full h-full md:col-span-2">
           <PropertyCard
             slug="burrows"
-            image={burrows}
-            title="Comfy Burrows"
+            image={projects[0].image}
+            title={projects[0].title}
             location="Yaba, Lagos, Nigeria."
             status="Sold Out"
             className="h-full min-h-[400px]"
@@ -23,17 +43,17 @@ function Completed() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 col-span-1 md:col-span-2">
           <PropertyCard
-            slug= "TM-Gardens"
-            image={gardens}
-            title="TM Gardens"
+            slug="TM-Gardens"
+            image={projects[1].image}
+            title={projects[1].title}
             location="Surulere, Lagos, Nigeria."
             status="Sold Out"
             className="flex-1 min-h-[400px]"
           />
           <PropertyCard
             slug="TM-Meadows"
-            image={meadows}
-            title="TM Meadows"
+            image={projects[2].image}
+            title={projects[2].title}
             location="Mende, Maryland, Lagos, Nigeria."
             status="Sold Out"
             className="flex-1 min-h-[400px]"

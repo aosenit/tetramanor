@@ -1,34 +1,34 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
-import { Swiper, SwiperSlide } from 'swiper/react'; 
-import { Navigation } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
+import Image from "next/image";
+import { FaPhoneAlt, FaEnvelope } from "react-icons/fa";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 
-import burrows from '../../../../public/portfolio/burrows.jpg';
-import meadow from '../../../../public/portfolio/meadows.jpg';
-import queenmary from '../../../../public/portfolio/queenmary.png';
+import burrows from "./portfolio/burrows.jpg";
+import meadow from "./portfolio/meadows.jpg";
+import queenmary from "./portfolio/queenmary.png";
 
 const agents = [
   {
-    name: 'Comfy Burrows',
+    name: "Comfy Burrows",
     image: burrows,
-    phone: '+234 812 345 67',
-    email: 'tetramanor@mail.com',
+    phone: "+234 812 345 67",
+    email: "tetramanor@mail.com",
   },
   {
-    name: 'TM Meadows',
+    name: "TM Meadows",
     image: meadow,
-    phone: '+234 812 345 67',
-    email: 'tetramanor@mail.com',
+    phone: "+234 812 345 67",
+    email: "tetramanor@mail.com",
   },
   {
-    name: 'Queen Mary',
+    name: "Queen Mary",
     image: queenmary,
-    phone: '+234 812 345 67',
-    email: 'tetramanor@mail.com',
+    phone: "+234 812 345 67",
+    email: "tetramanor@mail.com",
   },
 ];
 
