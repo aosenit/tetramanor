@@ -9,7 +9,7 @@ const Hero = () => {
 
       {/* change the Background image */}
       <Image
-        src="/herobg.png"
+        src="/services.webp"
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
         fill

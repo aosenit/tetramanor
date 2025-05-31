@@ -2,11 +2,11 @@ import Image from "next/image";
 import React from "react";
 
 const campaigns = [
-  { img: "./campaign-one.png", alt: "Campaign 1" },
-  { img: "./campaign-two.png", alt: "Campaign 2" },
-  { img: "./campaign-three.png", alt: "Campaign 3" },
-  { img: "./campaign-four.png", alt: "Campaign 4" },
-  { img: "./campaign-five.png", alt: "Campaign 5" },
+  { img: "/campaign-one.png", alt: "Campaign 1" },
+  { img: "/campaign-two.png", alt: "Campaign 2" },
+  { img: "/campaign-three.png", alt: "Campaign 3" },
+  { img: "/campaign-four.png", alt: "Campaign 4" },
+  { img: "/campaign-five.png", alt: "Campaign 5" },
 ];
 
 export default function OngoingCampaigns() {

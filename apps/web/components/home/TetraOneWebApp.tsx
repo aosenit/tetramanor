@@ -18,7 +18,7 @@ export default function TetraOneWebApp() {
             <div className="relative">
               <Image
                 fill
-                src="./tetraweb-one.png"
+                src="/tetraweb-one.png"
                 alt="TetraManor Exclusive"
                 className="rounded-xl w-full h-auto object-cover"
               />
@@ -40,7 +40,7 @@ export default function TetraOneWebApp() {
                 </p>
                 <Image
                   fill
-                  src="./tetraweb-two.png"
+                  src="/tetraweb-two.png"
                   alt="Property Overview"
                   className="w-full h-32 object-cover rounded"
                 />
@@ -54,7 +54,7 @@ export default function TetraOneWebApp() {
                 </p>
                 <Image
                   fill
-                  src="./tetraweb-two.png"
+                  src="/tetraweb-two.png"
                   alt="Bookings"
                   className="w-full h-32 object-cover rounded"
                 />
@@ -74,7 +74,7 @@ export default function TetraOneWebApp() {
                 <div className="p-4">
                   <Image
                     fill
-                    src="./tetraweb-two.png"
+                    src="/tetraweb-two.png"
                     alt="Secure Login"
                     className="w-full h-32 object-cover rounded"
                   />

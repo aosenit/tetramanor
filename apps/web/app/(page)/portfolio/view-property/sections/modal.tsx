@@ -50,8 +50,7 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
               src="/portfolio/hill.png"
               alt="Hill View"
               className="w-full h-full object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none"
-              width={800}
-              height={600}
+              fill
             />
           </div>
 

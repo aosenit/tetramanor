@@ -6,13 +6,7 @@ const HomeHero = () => {
   return (
     <section className="relative h-[80vh] ">
       <Header />
-      {/* <Image
-        src="/herobg.png"
-        alt="Hero Background"
-        className="absolute inset-0 w-full h-full object-cover"
-        fill
-        priority
-      /> */}
+
       {/* should be a video
        */}
       <video

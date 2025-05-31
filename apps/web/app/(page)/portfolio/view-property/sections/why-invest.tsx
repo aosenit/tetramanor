@@ -14,8 +14,6 @@ export default function WhyInvest() {
               alt="TM HighGardens luxury residential building"
               fill
               className="object-cover"
-              width={800}
-              height={600}
             />
           </div>
 

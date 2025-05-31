@@ -11,31 +11,31 @@ export default function ConstructionPartners() {
         <div className="flex flex-wrap justify-center items-center gap-12 w-full">
           <Image
             fill
-            src="./clientLogo-one.png"
+            src="/clientLogo-one.png"
             alt="MOA"
             className="h-14 object-contain"
           />
           <Image
             fill
-            src="./clientLogo-two.png"
+            src="/clientLogo-two.png"
             alt="EMTRIPPLE"
             className="h-10 object-contain"
           />
           <Image
             fill
-            src="./clientLogo-three.png"
+            src="/clientLogo-three.png"
             alt="BEL"
             className="h-10 object-contain"
           />
           <Image
             fill
-            src="./clientLogo-four.png"
+            src="/clientLogo-four.png"
             alt="Prime"
             className="h-10 object-contain"
           />
           <Image
             fill
-            src="./clientLogo-five.png"
+            src="/clientLogo-five.png"
             alt="Build Africa"
             className="h-10 object-contain"
           />
