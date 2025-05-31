@@ -8,10 +8,10 @@ const HomeHero = () => {
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
       <Image
-        src={"/blog.jpg"}
+        src={"/blog.webp"}
         alt="Hero Background"
-        width={1000}
-        height={1000}
+        priority
+        fill
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
       <div className="absolute inset-0 bg-black opacity-60 z-10" />

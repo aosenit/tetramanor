@@ -13,7 +13,7 @@ const HomeHero = () => {
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
       <Image
-        src="/herobg.png"
+        src="/portfolio.webp"
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
         fill
