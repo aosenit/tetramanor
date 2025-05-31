@@ -20,6 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Image from "next/image";
 
 type Property = {
   id: string;
@@ -156,10 +157,12 @@ export function ActiveProperties() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className="h-12 w-16 rounded overflow-hidden">
-                        <img
+                        <Image
                           src={property.image || "/placeholder.svg"}
                           alt={property.name}
                           className="h-full w-full object-cover"
+                          priority
+                          fill
                         />
                       </div>
                       <span className="font-medium">{property.name}</span>

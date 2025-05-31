@@ -1,4 +1,5 @@
 import { Button } from "@chakra-ui/react";
+import Image from "next/image";
 
 export default function FindNextHome() {
   return (
@@ -25,10 +26,11 @@ export default function FindNextHome() {
         </div>
         {/* Image with Overlay Card */}
         <div className="relative w-full max-w-full rounded-[5px] overflow-hidden ">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1000&q=80"
             alt="TM Meadows"
             className="w-full  object-cover rounded-xl"
+            fill
           />
           {/* Badge */}
           <div className="absolute top-6 left-2 lg:left-6 bg-[#8B8B8B] bg-opacity-80 text-white text-sm px-5 py-2 rounded-full">

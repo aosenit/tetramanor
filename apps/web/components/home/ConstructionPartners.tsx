@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 export default function ConstructionPartners() {
   return (
@@ -8,27 +9,32 @@ export default function ConstructionPartners() {
           Our Construction Partners
         </h2>
         <div className="flex flex-wrap justify-center items-center gap-12 w-full">
-          <img
+          <Image
+            fill
             src="./clientLogo-one.png"
             alt="MOA"
             className="h-14 object-contain"
           />
-          <img
+          <Image
+            fill
             src="./clientLogo-two.png"
             alt="EMTRIPPLE"
             className="h-10 object-contain"
           />
-          <img
+          <Image
+            fill
             src="./clientLogo-three.png"
             alt="BEL"
             className="h-10 object-contain"
           />
-          <img
+          <Image
+            fill
             src="./clientLogo-four.png"
             alt="Prime"
             className="h-10 object-contain"
           />
-          <img
+          <Image
+            fill
             src="./clientLogo-five.png"
             alt="Build Africa"
             className="h-10 object-contain"

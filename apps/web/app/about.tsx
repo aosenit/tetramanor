@@ -2,16 +2,19 @@ import Footer from "@/components/home/Footer";
 import HomeKeyFeatures from "@/components/home/HomeKeyFeatures";
 import React from "react";
 import Header from "@/components/Header";
+import Image from "next/image";
 
 export default function About() {
   return (
     <main className="bg-background min-h-screen font-sans text-gray">
       <Header />
       <section className="relative h-[60vh] flex items-center justify-center">
-        <img
+        <Image
           src="/aboutBg.png"
           alt="About Hero Background"
           className="absolute inset-0 w-full h-full object-cover"
+          priority
+          fill
         />
         <div className="absolute inset-0 bg-black opacity-60"></div>
         <div className="relative z-10 flex flex-col items-center justify-center w-full px-4 h-full">

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 const campaigns = [
@@ -21,7 +22,8 @@ export default function OngoingCampaigns() {
         </div>
         <div className="grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-5 justify-center gap-2">
           {campaigns.map((c, i) => (
-            <img
+            <Image
+              fill
               key={i}
               src={c.img}
               alt={c.alt}

@@ -1,10 +1,11 @@
+import Image from "next/image";
 import React from "react";
 
 export default function TetraOneWebApp() {
   return (
     <section className=" w-full container mx-auto px-4 lg:px-16 py-12">
       <div className="">
-      <h2 className="text-2xl md:text-3xl font-bold text-black mb-10">
+        <h2 className="text-2xl md:text-3xl font-bold text-black mb-10">
           TetraOne Web App – Seamless Home Management
         </h2>
 
@@ -15,7 +16,8 @@ export default function TetraOneWebApp() {
               Exclusive for Tetramanor Homeowners.
             </div>
             <div className="relative">
-              <img
+              <Image
+                fill
                 src="./tetraweb-one.png"
                 alt="TetraManor Exclusive"
                 className="rounded-xl w-full h-auto object-cover"
@@ -36,7 +38,8 @@ export default function TetraOneWebApp() {
                 <p className="text-gray-700 text-sm mb-2">
                   See payment plans, rental income, and property value.
                 </p>
-                <img
+                <Image
+                  fill
                   src="./tetraweb-two.png"
                   alt="Property Overview"
                   className="w-full h-32 object-cover rounded"
@@ -49,7 +52,8 @@ export default function TetraOneWebApp() {
                 <p className="text-gray-700 text-sm mb-2">
                   Manage short-let or long-term tenants.
                 </p>
-                <img
+                <Image
+                  fill
                   src="./tetraweb-two.png"
                   alt="Bookings"
                   className="w-full h-32 object-cover rounded"
@@ -68,7 +72,8 @@ export default function TetraOneWebApp() {
                   </p>
                 </div>
                 <div className="p-4">
-                  <img
+                  <Image
+                    fill
                     src="./tetraweb-two.png"
                     alt="Secure Login"
                     className="w-full h-32 object-cover rounded"

@@ -1,13 +1,16 @@
 import { Button } from "@chakra-ui/react";
+import Image from "next/image";
 import { FaCheck } from "react-icons/fa";
 
 export default function BuildWealth() {
   return (
     <section className="relative w-full min-h-[340px]">
-      <img
+      <Image
         src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1000&q=80"
         alt="Build Wealth"
         className="absolute inset-0 w-full h-full object-cover"
+        fill
+        priority
       />
       <div className="absolute inset-0 bg-black/70"></div>
 
@@ -29,15 +32,21 @@ export default function BuildWealth() {
         {/* Right column */}
         <div className="space-y-4 w-full text-white text-base sm:text-lg">
           <div className="flex items-start sm:items-center gap-2">
-            <span className="text-white text-xl"><FaCheck/></span>
+            <span className="text-white text-xl">
+              <FaCheck />
+            </span>
             <span>Earn up to 50% ROI in just 18 months</span>
           </div>
           <div className="flex items-start sm:items-center gap-2">
-            <span className="text-white text-xl"><FaCheck/></span>
+            <span className="text-white text-xl">
+              <FaCheck />
+            </span>
             <span>Hassle-free investment—Tetramanor handles everything</span>
           </div>
           <div className="flex items-start sm:items-center gap-2">
-            <span className="text-white text-xl"><FaCheck/></span>
+            <span className="text-white text-xl">
+              <FaCheck />
+            </span>
             <span>Choose between fixed returns or profit-sharing models</span>
           </div>
 

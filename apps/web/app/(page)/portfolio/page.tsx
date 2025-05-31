@@ -5,7 +5,6 @@ import Completed from "./sections/completed";
 import ContactSection from "../../../components/shared/contact";
 import Footer from "./components/footer";
 
-
 function Page() {
   return (
     <div>

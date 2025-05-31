@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import {
@@ -15,7 +16,13 @@ export default function Footer() {
         {/* Left */}
         <div className="flex-1 flex flex-col gap-6">
           <div>
-            <img src="./logo.svg" alt="TM Logo" className="h-10 w-auto mb-2" />
+            <Image
+              src="/logo.svg"
+              alt="TM Logo"
+              className="h-10 w-auto mb-2"
+              width={100}
+              height={100}
+            />
           </div>
           <p className="text-[#000000] mb-4">
             Your Trusted Real Estate Partner in Lagos
@@ -44,19 +51,16 @@ export default function Footer() {
             <h4 className="text-[#737373] font-semibold mb-3">QUICK LINKS</h4>
             <ul className="space-y-2 text-black">
               <Link href="/about">
-              <li>About us</li>
-              
+                <li>About us</li>
               </Link>
               <Link href="/services">
-              
-              <li>Services</li>
+                <li>Services</li>
               </Link>
               <Link href="/investment">
-              
-              <li>Investment</li>
+                <li>Investment</li>
               </Link>
-              <Link href="/blog"> 
-              <li>Blogs</li>
+              <Link href="/blog">
+                <li>Blogs</li>
               </Link>
             </ul>
           </div>

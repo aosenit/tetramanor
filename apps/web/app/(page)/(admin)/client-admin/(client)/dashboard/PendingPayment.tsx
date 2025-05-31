@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import Link from "next/link";
 
 type PendingPayment = {
@@ -54,10 +55,12 @@ export function PendingPayments() {
           {pendingPayments.map((payment) => (
             <div key={payment.id} className="p-4 flex items-center gap-4">
               <div className="h-12 w-16 rounded overflow-hidden flex-shrink-0">
-                <img
+                <Image
                   src={payment.image || "/placeholder.svg"}
                   alt={payment.property}
                   className="h-full w-full object-cover"
+                  priority
+                  fill
                 />
               </div>
               <div className="flex-1 min-w-0">

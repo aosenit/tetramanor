@@ -1,17 +1,19 @@
 "use client";
 import { motion } from "framer-motion";
 import Header from "../../portfolio/components/header";
-
+import Image from "next/image";
 const Hero = () => {
   return (
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
 
       {/* change the Background image */}
-      <img
+      <Image
         src="/herobg.png"
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
+        fill
+        priority
       />
 
       {/* Dark overlay */}
