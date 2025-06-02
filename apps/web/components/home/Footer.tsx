@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 import { IoLocationOutline } from "react-icons/io5";
 import Link from "next/link";
+import logo from "@/assets/home/logo.webp";
 
 export default function Footer() {
   return (
@@ -18,7 +19,7 @@ export default function Footer() {
           {/* Brand + search */}
           <div className=" space-y-4">
             <Link href="/">
-              <Image src="/logo.svg" alt="Logo" width={60} height={20} />
+              <Image src={logo} alt="Logo" width={60} height={20} />
             </Link>
 
             <p className="text-gray-300 max-w-md">

@@ -1,5 +1,8 @@
 "use client";
 import Image from "next/image";
+import two from "@/assets/rental/two.webp"
+import three from "@/assets/rental/three.webp"
+import four from "@/assets/rental/four.webp"
 import {
   FaDog,
   FaParking,
@@ -41,7 +44,7 @@ export default function PropertyDetails() {
               UNFURNISHED
             </div>
             <Image
-              src="/rental/one.jpg"
+              src={two}
               alt="TM Meadows main view"
               className="w-full h-[250px] sm:h-[300px] md:h-[400px] object-cover rounded"
               width={800}
@@ -50,14 +53,14 @@ export default function PropertyDetails() {
           </div>
           <div className="w-full md:w-1/3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-1 gap-4">
             <Image
-              src="/rental/two.jpg"
+              src={three}
               alt="TM Meadows view 1"
               className="w-full h-[100px] sm:h-[120px] object-cover rounded"
               width={400}
               height={300}
             />
             <Image
-              src="/rental/three.png"
+              src={four}
               alt="TM Meadows view 2"
               className="w-full h-[100px] sm:h-[120px] object-cover rounded"
               width={400}
@@ -65,7 +68,7 @@ export default function PropertyDetails() {
             />
             <div className="relative w-full h-[100px] sm:h-[120px]">
               <Image
-                src="/rental/four.png"
+                src={two}
                 alt="TM Meadows view 3"
                 fill
                 className="w-full h-full object-cover rounded"

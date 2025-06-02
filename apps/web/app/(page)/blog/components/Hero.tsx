@@ -2,13 +2,14 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Header from "../../portfolio/components/header";
+import one from "@/assets/blog/one.webp"
 
 const HomeHero = () => {
   return (
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
       <Image
-        src={"/blog.webp"}
+        src={one}
         alt="Hero Background"
         priority
         fill

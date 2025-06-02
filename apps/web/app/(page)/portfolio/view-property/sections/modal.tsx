@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
+import two from "@/assets/portfolio/two.webp"
 
 const Modal = ({ onClose }: { onClose: () => void }) => {
   const [formData, setFormData] = useState({
@@ -35,7 +36,7 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center px-4 py-6 overflow-y-auto">
-      <div className="bg-white p-2 w-full max-w-5xl rounded-lg relative overflow-hidden shadow-lg">
+      <div className="bg-white w-full max-w-5xl rounded-lg relative overflow-hidden shadow-lg">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-2xl text-gray-600 hover:text-black z-10"
@@ -43,30 +44,32 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
           <IoClose />
         </button>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Left: Image */}
-          <div className="w-full lg:w-1/2">
+          <div className="relative h-[300px] lg:h-[600px]">
             <Image
-              src="/portfolio/hill.png"
+              src={two}
               alt="Hill View"
-              className="w-full h-full object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none"
+              className="object-cover"
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              priority
             />
           </div>
 
           {/* Right: Form */}
-          <div className="w-full lg:w-1/2 p-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="p-6 lg:p-8 flex flex-col justify-center">
+            <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto w-full">
               <div>
                 <h2 className="text-2xl font-semibold">Download Brochure</h2>
-                <p className="text-sm text-[#737687]">
+                <p className="text-sm text-[#737687] mt-2">
                   Please fill in your information before you proceed.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="name" className="block text-gray-700 mb-2">
+                  <label htmlFor="name" className="block text-gray-700 mb-2 text-sm">
                     First name
                   </label>
                   <input
@@ -81,7 +84,7 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-gray-700 mb-2">
+                  <label htmlFor="phone" className="block text-gray-700 mb-2 text-sm">
                     Phone number
                   </label>
                   <input
@@ -97,7 +100,7 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-gray-700 mb-2 text-sm">
                   Email address
                 </label>
                 <input

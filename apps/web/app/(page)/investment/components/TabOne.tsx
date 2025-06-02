@@ -2,25 +2,29 @@
 import React from "react";
 import Image from "next/image";
 import { FaCheck, FaCoins } from "react-icons/fa";
-
+import a from "@/assets/investment/icons/a.webp"
+import b from "@/assets/investment/icons/b.webp"
+import c from "@/assets/investment/icons/c.webp"
+import d from "@/assets/investment/icons/d.webp"
+import two from "@/assets/investment/two.webp"
 const steps = [
   {
-    icon: "/investment/cash.png",
+    icon: a,
     title: "Partner Provides Capital",
     description: "The Partner supplies the initial investment.",
   },
   {
-    icon: "/investment/hand.png",
+    icon: b,
     title: "Tetramanor Funds Balance",
     description: "Tetramanor funds the remaining project costs.",
   },
   {
-    icon: "/investment/check.png",
+    icon: c,
     title: "Project Completion & Sales",
     description: "The development is completed and sold.",
   },
   {
-    icon: "/investment/afuniloke.png",
+    icon: d,
     title: "Fixed ROI Payment",
     description:
       "Partner receives the agreed return, regardless of profit fluctuations.",
@@ -95,7 +99,7 @@ function TabOne() {
             <div className="flex items-center justify-center">
               <div className="bg-amber-100 rounded-xl  w-full">
                 <Image
-                  src="/blog/guaranteed.png"
+                  src={two}
                   alt="Fixed ROI illustration showing houses and guaranteed returns"
                   className="w-full"
                   width={1200}

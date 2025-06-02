@@ -1,22 +1,26 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+  import React, { useState } from "react";
+import twelve from "@/assets/about/icons/twelve.webp"
+import thirteen from "@/assets/about/icons/thirteen.webp"
+import fourteen from "@/assets/about/icons/fourteen.webp"
+
 
 const cardData = [
   {
-    icon: "/about/house.png",
+    icon: twelve,
     title: "Strategic Locations",
     description:
       "Our properties are situated in fully developed, high-demand areas, ensuring seamless access to essential infrastructure like roads, power, and water.",
   },
   {
-    icon: "/about/book.png",
+    icon: thirteen,
     title: "Quality & Affordability",
     description:
       "We strike the perfect balance between premium craftsmanship and cost efficiency, making luxury living accessible without compromise.",
   },
   {
-    icon: "/about/forex.png",
+    icon: fourteen,
     title: "Client-Centric Approach",
     description:
       "Your needs come first. From development to handover, we prioritize customer satisfaction, ensuring a seamless and rewarding experience",

@@ -1,14 +1,14 @@
 import React from "react";
 import Image from "next/image";
 import Pagination from "./Pagination";
-
+import two from "@/assets/blog/two.webp"
 export default function SingleBlog() {
   return (
     <div>
       <div className="space-y-10">
         <div className="h-full overflow-y-auto  rounded-md">
           <Image
-            src="/portfolio/queenmary.png"
+            src={two}
             alt="queen"
             className="w-full object-cover"
             width={1000}

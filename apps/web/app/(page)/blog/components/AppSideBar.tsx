@@ -1,10 +1,14 @@
 "use client";
 import React, { ReactNode } from "react";
-import Image from "next/image";
-
+import Image, { StaticImageData } from "next/image";
+import a from "@/assets/blog/a.webp"
+import b from "@/assets/blog/b.webp"
+import c from "@/assets/blog/c.webp"
+import d from "@/assets/blog/d.webp"
+import e from "@/assets/blog/e.webp"
 interface SidebarItem {
   id: number;
-  image: string;
+  image: StaticImageData;
   link: string;
   description: string;
 }
@@ -16,35 +20,35 @@ interface Props {
 const sidebarItems: SidebarItem[] = [
   {
     id: 1,
-    image: "/blog/first.png",
+    image: a,
     link: "/blog/featured",
     description:
       "Tetramanor's Strategic Approach to Real Estate Investment in Nigeria",
   },
   {
     id: 2,
-    image: "/blog/second.png",
+    image: b,
     link: "/blog/latest",
     description:
       "Tetramanor's Strategic Approach to Real Estate Investment in Nigeria",
   },
   {
     id: 3,
-    image: "/blog/third.png",
+    image: c,
     link: "/blog/latest",
     description:
       "Tetramanor's Strategic Approach to Real Estate Investment in Nigeria",
   },
   {
     id: 4,
-    image: "/blog/four.png",
+    image: d,
     link: "/blog/latest",
     description:
       "Tetramanor's Strategic Approach to Real Estate Investment in Nigeria",
   },
   {
     id: 5,
-    image: "/blog/five.png",
+    image: e,
     link: "/blog/latest",
     description:
       "Tetramanor's Strategic Approach to Real Estate Investment in Nigeria",
@@ -63,14 +67,16 @@ const AppSideBar: React.FC<Props> = ({ children }) => {
             href={item.link}
             className="flex gap-4 max-w-md items-start p-3 bg-[#f3f5f3] rounded-md shadow-sm hover:bg-gray-200 transition"
           >
-            <Image
-              src={item.image}
-              alt={`Image for ${item.description}`}
-              width={80}
-              height={80}
-              className="rounded-md object-cover"
-            />
-            <p className="text-sm text-gray-600">{item.description}</p>
+            <div className="relative w-[100px] h-[60px] flex-shrink-0">
+              <Image
+                src={item.image}
+                alt={`Image for ${item.description}`}
+                fill
+                className="rounded-md object-cover"
+                sizes="80px"
+              />
+            </div>
+            <p className="text-sm text-gray-600 flex-1">{item.description}</p>
           </a>
         ))}
       </aside>

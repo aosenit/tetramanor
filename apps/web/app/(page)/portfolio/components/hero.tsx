@@ -4,6 +4,7 @@ import Header from "./header";
 import Image from "next/image";
 import { CiLocationOn } from "react-icons/ci";
 import { motion } from "framer-motion";
+import one from "@/assets/portfolio/one.webp"
 import Modal from "../view-property/sections/modal";
 
 const HomeHero = () => {
@@ -13,7 +14,7 @@ const HomeHero = () => {
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
       <Image
-        src="/portfolio.webp"
+        src={one}
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
         fill

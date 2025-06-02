@@ -3,25 +3,29 @@ import React from "react";
 import Image from "next/image";
 import { FaCheck } from "react-icons/fa";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
-
+import a from "@/assets/investment/icons/a.webp"
+import b from "@/assets/investment/icons/b.webp"
+import c from "@/assets/investment/icons/c.webp"
+import d from "@/assets/investment/icons/d.webp"
+import four from "@/assets/investment/four.webp"
 const steps = [
   {
-    icon: "/investment/cash.png",
+    icon: a,
     title: "Partner Provides Starting Capital",
     description: "Partner funds the initial project phase.",
   },
   {
-    icon: "/investment/hand.png",
+    icon: b,
     title: "Tetramanor Funds Through Sales",
     description: "Sales proceeds are used to cover remaining project costs.",
   },
   {
-    icon: "/investment/check.png",
+    icon: c,
     title: "Project Completed & Profits Shared",
     description: "Upon completion, Tetramanor and Partners share profits.",
   },
   {
-    icon: "/investment/afuniloke.png",
+    icon: d,
     title: "Partners Earns Based on Actual Profits",
     description:
       "Returns depend on the real profit achieved, not a fixed rate.",
@@ -37,7 +41,7 @@ function TabTwo() {
             <div className="flex items-center justify-center">
               <div className="bg-amber-100 rounded-xl  w-full">
                 <Image
-                  src="/investment/shakehands.png"
+                  src={four}
                   alt="Fixed ROI illustration showing houses and guaranteed returns"
                   className="w-full"
                 />

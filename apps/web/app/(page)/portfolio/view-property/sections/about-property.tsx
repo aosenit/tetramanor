@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import two from "@/assets/portfolio/two.webp"
 import {
   FaCheck,
   FaWifi,
@@ -70,7 +71,7 @@ export default function PropertyListing() {
 
         <div className="relative h-[400px] lg:h-auto rounded-lg overflow-hidden">
           <Image
-            src="/portfolio/hill.png"
+            src={two}
             alt="TM HighGardens luxury residential building"
             fill
             className="object-cover"

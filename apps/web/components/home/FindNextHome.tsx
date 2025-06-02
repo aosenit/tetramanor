@@ -1,5 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import Image from "next/image";
+import tmHighGardens from "@/assets/home/three.webp";
 
 export default function FindNextHome() {
   return (
@@ -25,12 +26,14 @@ export default function FindNextHome() {
           </Button>
         </div>
         {/* Image with Overlay Card */}
-        <div className="relative w-full max-w-full rounded-[5px] overflow-hidden ">
+        <div className="relative w-full max-w-full h-[500px] lg:h-[600px] rounded-[5px] overflow-hidden">
           <Image
-            src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1000&q=80"
+            src={tmHighGardens}
             alt="TM Meadows"
-            className="w-full  object-cover rounded-xl"
+            className="object-cover rounded-xl"
             fill
+            sizes="100vw"
+            priority
           />
           {/* Badge */}
           <div className="absolute top-6 left-2 lg:left-6 bg-[#8B8B8B] bg-opacity-80 text-white text-sm px-5 py-2 rounded-full">

@@ -10,8 +10,10 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
+    "file-loader": "^6.2.0",
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
+    "sharp": "^0.34.2",
     "tailwindcss": "^4.1.5",
     "turbo": "^2.5.2",
     "typescript": "5.8.2"

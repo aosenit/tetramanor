@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import logo from "@/assets/home/logo.webp"
 import React from "react";
 import {
   FaFacebookF,
@@ -17,7 +18,7 @@ export default function Footer() {
         <div className="flex-1 flex flex-col gap-6">
           <div>
             <Image
-              src="/logo.svg"
+              src={logo}
               alt="TM Logo"
               className="h-10 w-auto mb-2"
               width={100}

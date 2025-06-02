@@ -4,7 +4,7 @@ import React from "react";
 import { useState } from "react";
 import Image from "next/image";
 import { FaPhone, FaEnvelope, FaCalendarAlt } from "react-icons/fa";
-
+import ten from "@/assets/portfolio/ten.webp"
 export default function ScheduleInspection() {
   const [formData, setFormData] = useState({
     name: "",
@@ -30,7 +30,7 @@ export default function ScheduleInspection() {
   return (
     <div className="relative w-full bg-[#2c3e50] text-white">
       <Image
-        src="/hilltop.jpg"
+        src={ten}
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
         fill

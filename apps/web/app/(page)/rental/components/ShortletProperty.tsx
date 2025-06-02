@@ -8,9 +8,16 @@ import {
   FaShieldAlt,
   FaMapMarkerAlt,
 } from "react-icons/fa";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { MdBed } from "react-icons/md";
+import two from "@/assets/rental/two.webp"
+import three from "@/assets/rental/three.webp"
+import four from "@/assets/rental/four.webp"
+import five from "@/assets/rental/five.webp"
+import six from "@/assets/rental/six.webp"
+import seven from "@/assets/rental/seven.webp"
+
 
 const properties = [
   {
@@ -21,7 +28,7 @@ const properties = [
     period: "year",
     beds: 3,
     features: ["Balcony", "Walk-In Closets", "CCTV"],
-    imageUrl: "/rental/one.jpg",
+    imageUrl: two,
   },
   {
     id: "2",
@@ -31,7 +38,7 @@ const properties = [
     period: "year",
     beds: 3,
     features: ["Balcony", "Walk-In Closets", "CCTV"],
-    imageUrl: "/rental/two.jpg",
+    imageUrl: three,
   },
   {
     id: "3",
@@ -41,7 +48,7 @@ const properties = [
     period: "year",
     beds: 4,
     features: ["Sea View", "Smart Home", "Security"],
-    imageUrl: "/rental/three.png",
+    imageUrl: four,
   },
   {
     id: "4",
@@ -51,7 +58,7 @@ const properties = [
     period: "year",
     beds: 2,
     features: ["Garden", "Walk-In Closets", "Security"],
-    imageUrl: "/rental/four.png",
+    imageUrl: five,
   },
   {
     id: "5",
@@ -61,7 +68,7 @@ const properties = [
     period: "year",
     beds: 3,
     features: ["Garage", "Balcony", "CCTV"],
-    imageUrl: "/rental/five.png",
+    imageUrl: six,
   },
   {
     id: "6",
@@ -71,7 +78,7 @@ const properties = [
     period: "year",
     beds: 4,
     features: ["Gym", "Smart Home", "24/7 Security"],
-    imageUrl: "/rental/six.png",
+    imageUrl: seven,
   },
 ];
 
@@ -125,7 +132,7 @@ interface PropertyCardProps {
   period: string;
   beds: number;
   features: string[];
-  imageUrl: string;
+  imageUrl: StaticImageData;
 }
 
 function PropertyCard({

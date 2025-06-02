@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import {
   FaDoorOpen,
   FaExpand,
@@ -8,7 +8,9 @@ import {
 } from "react-icons/fa";
 import { MdBed } from "react-icons/md";
 import Link from "next/link";
-
+import three from "@/assets/rental/three.webp"
+import four from "@/assets/rental/four.webp"
+import five from "@/assets/rental/five.webp"
 const properties = [
   {
     id: "1",
@@ -18,7 +20,7 @@ const properties = [
     period: "year",
     beds: 3,
     features: ["Balcony", "Walk-In Closets", "CCTV"],
-    imageUrl: "/rental/one.jpg",
+    imageUrl: three,
   },
   {
     id: "2",
@@ -28,7 +30,7 @@ const properties = [
     period: "year",
     beds: 3,
     features: ["Balcony", "Walk-In Closets", "CCTV"],
-    imageUrl: "/rental/two.jpg",
+    imageUrl: four,
   },
   {
     id: "3",
@@ -38,7 +40,7 @@ const properties = [
     period: "year",
     beds: 4,
     features: ["Sea View", "Smart Home", "Security"],
-    imageUrl: "/rental/three.png",
+    imageUrl: five,
   },
 ];
 
@@ -50,7 +52,7 @@ interface PropertyCardProps {
   period: string;
   beds: number;
   features: string[];
-  imageUrl: string;
+  imageUrl: StaticImageData;
 }
 
 function PropertyCard({

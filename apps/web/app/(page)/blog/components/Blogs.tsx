@@ -5,7 +5,10 @@ import { IoIosBriefcase } from "react-icons/io";
 import { FaTag } from "react-icons/fa";
 import Pagination from "./Pagination";
 import Link from "next/link";
-
+import two from "@/assets/blog/two.webp"
+import three from "@/assets/blog/three.webp"
+import four from "@/assets/blog/four.webp"
+import five from "@/assets/blog/five.webp"
 interface PropertyCardProps {
   slug: string;
 }
@@ -17,7 +20,7 @@ const blogPosts = [
     title: "Blog Title",
     description:
       "Lorem ipsum dolor sit amet consectetur. Dictum consectetur nulla duis sed sed augue pulvinar...",
-    image: "/portfolio/queenmary.png",
+    image:two,
     date: "Feb 10, 2025",
     tag: "Main story",
   },
@@ -27,7 +30,7 @@ const blogPosts = [
     title: "Blog Title",
     description:
       "Egestas facilisi elit pellentesque porttitor euismod. Amet scelerisque velit lectus a sed malesuada amet...",
-    image: "/blog/benefit.png",
+    image: three,
     date: "Feb 12, 2025",
     tag: "Fashion",
   },
@@ -37,7 +40,7 @@ const blogPosts = [
     title: "Blog Title",
     description:
       "Aliquam facilisi feugiat ut dictum vivamus gravida. Placerat a posuere curabitur platea et sed eget...",
-    image: "/blog/facts.png",
+    image: four,
     date: "Feb 15, 2025",
     tag: "Events",
   },
@@ -47,7 +50,7 @@ const blogPosts = [
     title: "Blog Title",
     description:
       "Nisl iaculis sit imperdiet quis fringilla. Amet scelerisque velit lectus a sed malesuada amet...",
-    image: "/blog/maryland.png",
+    image: five,
     date: "Feb 20, 2025",
     tag: "History",
   },

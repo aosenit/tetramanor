@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import Header from "../../portfolio/components/header";
+import one from "@/assets/services/one.webp"
 import Image from "next/image";
 const Hero = () => {
   return (
@@ -9,7 +10,7 @@ const Hero = () => {
 
       {/* change the Background image */}
       <Image
-        src="/services.webp"
+        src={one}
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
         fill
