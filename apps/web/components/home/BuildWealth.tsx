@@ -1,12 +1,13 @@
 import { Button } from "@chakra-ui/react";
 import Image from "next/image";
 import { FaCheck } from "react-icons/fa";
+import buildWealth from "@/assets/home/four.webp";
 
 export default function BuildWealth() {
   return (
     <section className="relative w-full min-h-[340px]">
       <Image
-        src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1000&q=80"
+        src={buildWealth}
         alt="Build Wealth"
         className="absolute inset-0 w-full h-full object-cover"
         fill

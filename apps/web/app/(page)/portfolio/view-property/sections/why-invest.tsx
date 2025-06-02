@@ -2,7 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import { FaCheck } from "react-icons/fa";
-
+import nine from "@/assets/portfolio/nine.webp"
 export default function WhyInvest() {
   return (
     <div className="bg-[#f3f7f3]">
@@ -10,7 +10,7 @@ export default function WhyInvest() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div className="relative h-[400px] lg:h-[500px] rounded-lg overflow-hidden">
             <Image
-              src="/portfolio/highgards.png"
+              src={nine}
               alt="TM HighGardens luxury residential building"
               fill
               className="object-cover"

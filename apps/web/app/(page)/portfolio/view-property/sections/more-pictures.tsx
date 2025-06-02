@@ -1,11 +1,13 @@
 import Image from "next/image";
 import React from "react";
+import more from "@/assets/portfolio/more.webp"
+
 
 function MorePictures() {
   return (
     <div>
       <Image
-        src="/assets/more-pictures.png"
+        src={more}
         alt="More Pictures"
         className="w-full"
         width={1200}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { IoIosArrowDown } from "react-icons/io";
+import logo from "@/assets/home/logo.webp"
 
 const navItems = [
   {
@@ -33,7 +34,7 @@ const Header = () => {
           <Link href="/" className="flex items-center">
             <Image
               alt="logo"
-              src={"/logo.svg"}
+              src={logo}
               className="h-10 w-auto"
               width={100}
               height={100}

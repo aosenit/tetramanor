@@ -1,12 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
+import twelve from "@/assets/services/twelve.webp"
 
 export default function ContactSection() {
   return (
     <section className="relative w-full h-[337px] overflow-hidden">
       {/* Background Image */}
       <Image
-        src="/services/contact.jpg"
+        src={twelve}
         alt="Aerial view of residential development"
         fill
         className="object-cover brightness-75"

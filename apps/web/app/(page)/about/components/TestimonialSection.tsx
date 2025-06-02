@@ -83,7 +83,7 @@ export default function TestimonialsSection() {
   }, [currentIndex, visibleCount])
 
   return (
-    <section className="pl-4 md:pl-16 lg:pl-40 py-12">
+    <section className="px-4  md:pl-8 lg:pl-16 xl:pl-44 py-12">
       <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
         <div>
           <p className="text-[#EB8A43] font-semibold text-sm mb-2">TESTIMONIALS</p>
@@ -110,7 +110,7 @@ export default function TestimonialsSection() {
       <div className="relative overflow-hidden">
         <div
           ref={testimonialsRef}
-          className="flex transition-transform duration-500 ease-in-out"
+          className="grid grid-flow-col auto-cols-[100%] md:auto-cols-[50%] lg:auto-cols-[33.33%] transition-transform duration-500 ease-in-out"
           style={{
             width: `${(testimonials.length * 100) / visibleCount}%`,
           }}
@@ -118,8 +118,7 @@ export default function TestimonialsSection() {
           {testimonials.map((testimonial) => (
             <div
               key={testimonial.id}
-              className="pl-2 w-full"
-        
+              className="px-4"
             >
               <div className="bg-[#f5f5f5] rounded-lg h-full">
                 <div className="p-6">

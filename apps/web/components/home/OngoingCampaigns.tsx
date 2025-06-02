@@ -1,12 +1,17 @@
 import Image from "next/image";
 import React from "react";
+import five from "@/assets/home/five.webp";
+import six from "@/assets/home/six.webp";
+import seven from "@/assets/home/seven.webp";
+import eight from "@/assets/home/eight.webp";
+import nine from "@/assets/home/nine.webp";
 
 const campaigns = [
-  { img: "/campaign-one.png", alt: "Campaign 1" },
-  { img: "/campaign-two.png", alt: "Campaign 2" },
-  { img: "/campaign-three.png", alt: "Campaign 3" },
-  { img: "/campaign-four.png", alt: "Campaign 4" },
-  { img: "/campaign-five.png", alt: "Campaign 5" },
+  { img: five, alt: "Campaign 1" },
+  { img: six, alt: "Campaign 2" },
+  { img: seven, alt: "Campaign 3" },
+  { img: eight, alt: "Campaign 4" },
+  { img: nine, alt: "Campaign 5" },
 ];
 
 export default function OngoingCampaigns() {
@@ -20,15 +25,17 @@ export default function OngoingCampaigns() {
           Lorem ipsum dolor sit amet consectetur. Et sit egestas sagittis
           facilisi.
         </div>
-        <div className="grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-5 justify-center gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
           {campaigns.map((c, i) => (
-            <Image
-              fill
-              key={i}
-              src={c.img}
-              alt={c.alt}
-              className="rounded-lg w-[220px] h-[320px] object-cover"
-            />
+            <div key={i} className="relative w-full aspect-[3/4]">
+              <Image
+                src={c.img}
+                alt={c.alt}
+                className="rounded-lg object-cover"
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
+              />
+            </div>
           ))}
         </div>
       </div>

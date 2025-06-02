@@ -2,96 +2,109 @@
 import Image from "next/image";
 import { useState } from "react";
 import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
+import a from "@/assets/about/a.webp"
+import b from "@/assets/about/b.webp"
+import d from "@/assets/about/d.webp"
+import e from "@/assets/about/e.webp"
+import f from "@/assets/about/f.webp"
+import g from "@/assets/about/g.webp"
+import h from "@/assets/about/h.webp"
+import i from "@/assets/about/i.webp"
+import k from "@/assets/about/k.webp"
+import l from "@/assets/about/l.webp"
+import m from "@/assets/about/m.webp"
+import n from "@/assets/about/n.webp"
+import o from "@/assets/about/o.webp"
 
 export default function MeetTheTeam() {
   const teams = [
     {
       id: 1,
-      image: "/about/eleven.png",
+      image: a,
       name: "John Beecroft",
       position: "MD",
     },
     {
       id: 2,
-      image: "/about/twelve.png",
+      image: b,
       name: "Chuka Atuchukwu",
       position: "Director/Accountant",
     },
     {
       id: 3,
-      image: "/about/thirteen.png",
+      image: f,
       name: "Olumide Obasemo",
       position: "Project Manager",
     },
     {
       id: 4,
-      image: "/about/fourteen.png",
+      image: d,
       name: "Jerry Onojemete",
       position: "Construction Engineer",
     },
     {
       id: 5,
-      image: "/about/fifteen.png",
+      image: e,
       name: "Stephen Nnenji",
       position: "Construction Engineer",
     },
     {
       id: 6,
-      image: "/about/sixteen.png",
+      image: f,
       name: "Jamiu Yakub",
       position: "Asst. Construction Engineer",
     },
     {
       id: 7,
-      image: "/about/seventeen.png",
+      image: g,
       name: "Tega Ezemiefe",
       position: "Senior Architect",
     },
     {
       id: 8,
-      image: "/about/eighteen.png",
+      image: h,
       name: "Lydia Oluwapelumi",
       position: "Intern Construction Engineer",
     },
     {
       id: 9,
-      image: "/about/nineteen.png",
+      image: i,
       name: "Peter Okenla",
       position: "Site Security Officer",
     },
     {
       id: 10,
-      image: "/about/twenty.png",
+      image: i,
       name: "Judith obiekezie ",
       position: "Client Service Officer",
     },
     {
       id: 11,
-      image: "/about/twoone.png",
+      image: k,
       name: "Ugonna Nwafulume",
       position: "Graphics Artist ",
     },
     {
       id: 12,
-      image: "/about/twotwo.png",
+      image: l,
       name: "Seun Oni",
       position: "Digital Marketing strategist",
     },
     {
       id: 13,
-      image: "/about/twothree.png",
+      image: m,
       name: "Sunday Chukwunalu",
       position: "Maintenance Officer",
     },
     {
       id: 14,
-      image: "/about/fourteen.png",
+      image: n,
       name: "Peter Blessing",
       position: "Administrative Officer",
     },
     {
       id: 15,
-      image: "/about/eighteen.png",
+      image: o,
       name: "Jamiu Adeyemi",
       position: "Driver",
     },
@@ -112,55 +125,66 @@ export default function MeetTheTeam() {
   const visibleTeams = teams.slice(currentIndex, currentIndex + visibleCount);
 
   return (
-    <section className="pl-4 md:pl-16 lg:pl-44 py-12 overflow-hidden">
-      <div className="flex justify-between items-center mb-8 flex-wrap">
-        <div>
-          <h3 className="text-[#EB8A43] font-semibold text-sm mb-2">
-            MEET THE TEAM
-          </h3>
-          <h2 className="text-3xl text-[#000000] font-semibold">
-            Tetramanor's Visionaries, Inventors, Builders.
-          </h2>
-        </div>
-        <div className="flex">
-          <button
-            onClick={handlePrev}
-            className="p-2 rounded-full border hover:bg-gray-100 transition-colors"
-            aria-label="Previous"
-            disabled={currentIndex === 0}
-          >
-            <BsArrowLeft />
-          </button>
-          <button
-            onClick={handleNext}
-            className="p-2 rounded-full border hover:bg-gray-100 transition-colors ml-2"
-            aria-label="Next"
-            disabled={currentIndex === maxIndex}
-          >
-            <BsArrowRight />
-          </button>
-        </div>
-      </div>
-
-      <div className="flex overflow-x-auto">
-        {visibleTeams.map((team) => (
-          <div key={team.id} className="mr-6 last:mr-0">
-            {" "}
-            {/* Only right margin for spacing */}
-            <Image
-              src={team.image}
-              alt={team.name}
-              width={200}
-              height={200}
-              className="object-cover"
-            />
-            <h3 className="text-lg font-semibold text-black mt-2">
-              {team.name}
+    <>
+      <style jsx global>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+      <section className="px-4  md:pl-8 lg:pl-16 xl:pl-44 py-12 overflow-hidden">
+        <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+          <div className="w-full md:w-auto">
+            <h3 className="text-[#EB8A43] font-semibold text-sm mb-2">
+              MEET THE TEAM
             </h3>
-            <p className="text-sm text-gray-600">{team.position}</p>
+            <h2 className="text-2xl md:text-3xl text-[#000000] font-semibold">
+              Tetramanor's Visionaries, Inventors, Builders.
+            </h2>
           </div>
-        ))}
-      </div>
-    </section>
+          <div className="flex">
+            <button
+              onClick={handlePrev}
+              className="p-2 rounded-full border hover:bg-gray-100 transition-colors"
+              aria-label="Previous"
+              disabled={currentIndex === 0}
+            >
+              <BsArrowLeft />
+            </button>
+            <button
+              onClick={handleNext}
+              className="p-2 rounded-full border hover:bg-gray-100 transition-colors ml-2"
+              aria-label="Next"
+              disabled={currentIndex === maxIndex}
+            >
+              <BsArrowRight />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex overflow-x-auto pb-6 -mx-4 md:mx-0 no-scrollbar">
+          {visibleTeams.map((team) => (
+            <div key={team.id} className="flex-none px-4 w-[280px] md:w-[300px]">
+              <div className="aspect-square relative overflow-hidden rounded-lg">
+                <Image
+                  src={team.image}
+                  alt={team.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 280px, 300px"
+                />
+              </div>
+              <h3 className="text-lg font-semibold text-black mt-4">
+                {team.name}
+              </h3>
+              <p className="text-sm text-gray-600">{team.position}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
   );
 }

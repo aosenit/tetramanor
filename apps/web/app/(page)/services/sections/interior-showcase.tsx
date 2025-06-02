@@ -1,5 +1,9 @@
 import Image from "next/image";
-
+import seven from "@/assets/services/seven.webp"
+import eight from "@/assets/services/eight.webp"
+import nine from "@/assets/services/nine.webp"
+import ten from "@/assets/services/ten.webp"
+import eleven from "@/assets/services/eleven.webp"
 export default function InteriorShowcase() {
   return (
     <section className="py-16 bg-[#f3f7f3]">
@@ -16,7 +20,7 @@ export default function InteriorShowcase() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src="/services/shelf.png"
+              src={seven}
               alt="Modern bookshelf and cabinet design"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
               width={400}
@@ -25,7 +29,7 @@ export default function InteriorShowcase() {
           </div>
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src="/services/balcony.png"
+              src={eight}
               alt="Glass wall living space with outdoor views"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
               width={400}
@@ -34,7 +38,7 @@ export default function InteriorShowcase() {
           </div>
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src="/services/sittingroom.png"
+              src={nine}
               alt="Living room with yellow sofa and large windows"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
               width={400}
@@ -43,7 +47,7 @@ export default function InteriorShowcase() {
           </div>
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src="/services/dining.png"
+              src={ten}
               alt="Dining area with framed artwork gallery wall"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
               width={400}
@@ -52,7 +56,7 @@ export default function InteriorShowcase() {
           </div>
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src="/services/sidetable.png"
+              src={eleven}
               alt="Green console table with botanical prints"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
               width={400}

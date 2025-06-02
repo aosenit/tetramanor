@@ -1,15 +1,27 @@
 "use client";
 import React from "react";
-import Image from "next/image";
+import  { StaticImageData } from "next/image";
 import PropertyCard from "../components/property-card";
+import twoo from "@/assets/portfolio/twoo.webp"
+import three from "@/assets/portfolio/three.webp"
+import four from "@/assets/portfolio/four.webp"
 
+ 
+interface Project {
+  id: number;
+  title: string;
+  description: string;
+  image: StaticImageData;
+  location: string;
+  status: string;
+}
 function Ongoing() {
-  const projects = [
+  const projects: Project[] = [
     {
       id: 1,
       title: "TM Gardens",
       description: "A modern residential development with premium amenities.",
-      image: "/portfolio/tmgardens.png",
+      image: twoo,
       location: "Surulere, Lagos, Nigeria.",
       status: "In Progress",
     },
@@ -17,7 +29,7 @@ function Ongoing() {
       id: 2,
       title: "Mary's Court",
       description: "An exclusive residential estate in a prime location.",
-      image: "/portfolio/mary.jpg",
+      image: three,
       location: "Maryland, Lagos, Nigeria.",
       status: "In Progress",
     },
@@ -26,7 +38,7 @@ function Ongoing() {
       title: "King's Palace",
       description:
         "A luxury residential project with state-of-the-art facilities.",
-      image: "/portfolio/kings.jpg",
+      image: four,
       location: "Ikoyi, Lagos, Nigeria.",
       status: "In Progress",
     },
@@ -40,7 +52,7 @@ function Ongoing() {
           <PropertyCard
             key={project.id}
             slug={project.title.toLowerCase().replace(/\s+/g, "-")}
-            image={project.image}
+            image={project.image.src}
             title={project.title}
             location={project.location}
             status={project.status}

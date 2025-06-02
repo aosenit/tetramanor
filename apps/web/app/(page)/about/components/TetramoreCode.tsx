@@ -1,25 +1,31 @@
 import React from "react";
 import Image from "next/image";
+import six from "@/assets/about/icons/six.webp"
+import seven from "@/assets/about/icons/seven.webp"
+import eight from "@/assets/about/icons/eight.webp"
+import nine from "@/assets/about/icons/nine.webp"
+import ten from "@/assets/about/icons/ten.webp"
+import eleven from "@/assets/about/icons/eleven.webp"
 
 const features = [
   {
-    icon: "/about/one.png",
+    icon: eight,
     label: "Reasonable prices",
   },
   {
-    icon: "/about/two.png",
+    icon: nine,
     label: "Flexible payment",
   },
   {
-    icon: "/about/three.png",
+    icon: ten,
     label: "Verified listings",
   },
   {
-    icon: "/about/four.png",
+    icon: eleven,
     label: "24/7 support",
   },
   {
-    icon: "/about/five.png",
+    icon: ten,
     label: "Seamless onboarding",
   },
 ];
@@ -37,11 +43,11 @@ function TetramoreCode() {
       </div>
       <div className="mt-10 space-y-6">
         <Image
-          src="/about/eight.png"
+          src={six}
           alt="icon"
           className="text-black"
-          width={700}
-          height={700}
+          width={20}
+          height={20}
         />
         <p className="text-sm text-[#202020]">
           We will not compromise our standards for any reason whatsoever.
@@ -54,15 +60,15 @@ function TetramoreCode() {
           ourselves.
         </p>
         <Image
-          src="/about/seven.png"
+          src={seven}
           alt="icon"
-          className="mr-10"
-          width={700}
-          height={700}
+          className="ml-[340px] md:ml-[450px]"
+          width={20}
+          height={20}
         />
       </div>
 
-      <div className="flex flex-wrap gap-4 mt-6">
+      <div className="grid  sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-6">
         {features.map((item, index) => (
           <button
             key={index}

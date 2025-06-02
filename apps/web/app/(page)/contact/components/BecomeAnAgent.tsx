@@ -1,25 +1,29 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import a from "@/assets/investment/icons/a.webp"
+import b from "@/assets/investment/icons/b.webp"
+import c from "@/assets/investment/icons/c.webp"
+import d from "@/assets/investment/icons/d.webp"
 const steps = [
   {
-    icon: "/investment/cash.png",
+    icon: a,
     title: "Unmatched Support",
     description: "Ongoing guidance and mentorship from seasoned professionals.",
   },
   {
-    icon: "/investment/hand.png",
+    icon: b,
     title: "Commission Advantage",
     description: "Earn more with a performance-driven commission structure.",
   },
   {
-    icon: "/investment/check.png",
+    icon: c,
     title: "Exclusive Listings",
     description:
       "Access premium properties, from luxury homes to top investments.",
   },
   {
-    icon: "/investment/afuniloke.png",
+    icon: d,
     title: "Strong Brand Reputation",
     description:
       "Represent a reputable and respected real estate name in Nigeria.",
@@ -42,7 +46,7 @@ function BecomeAnAgent() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 mt-8 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 mt-16 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {steps.map((step, index) => (
           <div key={index} className="space-y-4">
             <div className="max-w-[200px]">

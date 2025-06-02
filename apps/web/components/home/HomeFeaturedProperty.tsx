@@ -5,20 +5,22 @@ import { Button } from "@chakra-ui/react";
 import Image from "next/image";
 import { useState } from "react";
 import { IoLocationOutline } from "react-icons/io5";
+import tmHighGardens from "@/assets/home/two.webp";
 
-export default function HomeFeaturedProperty() {
+export default function  HomeFeaturedProperty() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <section className="w-full container mx-auto px-4 lg:px-16 py-12">
       <div className="flex flex-col lg:flex-row gap-12 items-center">
         {/* Left: Image with Overlay */}
-        <div className="relative w-full lg:w-[55%]">
-          <Image
-            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80"
-            alt="TM HighGardens"
-            className="rounded-xl w-full h-[400px] sm:h-[500px] lg:h-[610px] object-cover"
-            fill
-            priority
+        <div className="relative w-full lg:w-[55%] h-[400px] sm:h-[500px] lg:h-[610px]">
+              <Image
+                src={tmHighGardens}
+                alt="TM HighGardens"
+                className="rounded-xl object-cover"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 55vw"
+                priority
           />
           {/* Overlay Card */}
           <div className="absolute left-1/2 -translate-x-1/2 bottom-6 w-[95%] sm:w-[90%] bg-black/50 rounded-xl p-6 sm:p-8 flex flex-col gap-6 sm:gap-8 shadow-lg">
@@ -71,7 +73,7 @@ export default function HomeFeaturedProperty() {
             <p>
               A marvel, seamlessly blending commercial spaces, residential
               units, and office suites into one harmonious entity. Designed for
-              the elite, this high-rise masterpiece isn’t just a home, it’s a
+              the elite, this high-rise masterpiece isn't just a home, it's a
               landmark. Rising as one of the{" "}
               <b>30 tallest buildings in Nigeria</b>, TM HighGardens redefines
               luxury with its <b>striking parametric facade</b>, making it an

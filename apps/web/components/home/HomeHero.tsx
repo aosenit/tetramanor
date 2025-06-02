@@ -1,16 +1,13 @@
 import Header from "@/app/(page)/portfolio/components/header";
-// import Image from "next/image";
 import React from "react";
+import home from "@/assets/home/home.mp4";
 
 const HomeHero = () => {
   return (
     <section className="relative h-[80vh] ">
       <Header />
-
-      {/* should be a video
-       */}
       <video
-        src="/home.mp4"
+        src={home}
         autoPlay
         loop
         muted

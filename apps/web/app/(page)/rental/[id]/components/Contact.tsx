@@ -2,6 +2,7 @@
 import Image from "next/image";
 import type React from "react";
 import { useState } from "react";
+import ten from "@/assets/rental/ten.webp"
 
 export default function PropertyEnquiryForm() {
   const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ export default function PropertyEnquiryForm() {
   return (
     <div className="relative w-full min-h-screen bg-gradient-to-r from-slate-800 to-slate-900 flex items-center justify-center p-4 md:p-8">
       <Image
-        src="/investment/skyscrapper.jpg"
+        src={ten}
         alt="Skyscraper"
         className="object-cover"
         fill

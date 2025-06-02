@@ -1,5 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import Image from "next/image";
+import tmHighGardens from "@/assets/home/two.webp";
 
 export default function HomeKeyFeatures() {
   return (
@@ -93,7 +94,7 @@ export default function HomeKeyFeatures() {
             <div className="relative mt-6 rounded-xl overflow-hidden shadow-lg lg:w-1/3 img-hover-zoom">
               <Image
                 fill
-                src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
+                src={tmHighGardens}
                 alt="TM HighGardens"
                 className="w-full h-48 object-cover"
               />

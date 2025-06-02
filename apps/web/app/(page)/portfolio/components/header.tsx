@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { IoIosArrowDown } from "react-icons/io";
+import logo from "@/assets/home/logo.webp";
 
 const navItems = [
   {
@@ -50,7 +51,7 @@ const Header = () => {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
-              src="/logo.svg"
+              src={logo}
               alt="Tetramanor Logo"
               width={80}
               height={20}

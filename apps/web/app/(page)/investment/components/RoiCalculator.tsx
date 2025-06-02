@@ -2,6 +2,8 @@
 import Image from "next/image";
 import { useState } from "react";
 import { FaPhoneAlt, FaEnvelope } from "react-icons/fa";
+import three from "@/assets/investment/three.webp"
+
 
 export default function RoiCalculator() {
   const [interestRate, setInterestRate] = useState(25);
@@ -13,7 +15,7 @@ export default function RoiCalculator() {
     <div className="relative w-full min-h-screen bg-gradient-to-r from-slate-800 to-slate-900 flex items-center justify-center p-4 md:p-8">
       {/* Background */}
       <Image
-        src="/investment/skyscrapper.jpg"
+        src={three}
         alt="Skyscraper"
         className="object-cover"
         fill

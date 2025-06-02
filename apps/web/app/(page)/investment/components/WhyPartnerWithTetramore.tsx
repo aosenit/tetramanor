@@ -1,26 +1,31 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import a from "@/assets/investment/icons/a.webp"
+import b from "@/assets/investment/icons/b.webp"
+import c from "@/assets/investment/icons/c.webp"
+import d from "@/assets/investment/icons/d.webp"
+
 
 const features = [
   {
-    icon: "/investment/people.png",
+    icon: a,
     title: "Proven Track Record",
     description: "Completed projects in high-demand locations.",
   },
   {
-    icon: "/investment/badge.png",
+    icon: b,
     title: "High ROI",
     description: "Structured investment models with strong returns.",
   },
   {
-    icon: "/investment/hike.png",
+    icon: c,
     title: "Risk Management",
     description:
       "Tetramanor handles all operational and financial complexities.",
   },
   {
-    icon: "/investment/bank.png",
+    icon: d,
     title: "Market Expertise",
     description: "Extensive knowledge of Lagos and Abuja real estate markets.",
   },
