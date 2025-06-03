@@ -44,7 +44,7 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-colors duration-300 ${
+      className={`fixed top-0 w-full z-50 transition-colors duration-300  ${
         isScrolled ? "bg-white shadow-md" : "bg-transparent"
       }`}
     >
@@ -113,15 +113,9 @@ const Header = () => {
             className="xl:hidden inline-flex items-center justify-center p-2 rounded-md text-black hover:text-black focus:outline-none"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? (
-              <X className="text-5xl text-white" />
-            ) : (
-              <Menu
-                className={`text-5xl ${
-                  isScrolled ? "text-black" : "text-white"
-                }`}
-              />
-            )}
+            <Menu
+              className={`text-5xl ${isScrolled ? "text-black" : "text-white"}`}
+            />
           </button>
         </div>
 
@@ -129,6 +123,10 @@ const Header = () => {
         {isMenuOpen && (
           <div className="xl:hidden bg-white h-screen block mt-4 pb-4 space-y-6 fixed top-0 left-0 w-full z-50 p-5">
             <div className="flex flex-col space-y-4 py-10 gap-5 justify-between h-full">
+              <X
+                className="text-5xl text-red-500 fixed top-10 right-10"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              />
               <div className="flex flex-col gap-8">
                 {navItems.map((item) =>
                   item.name === "Solutions" ? (
