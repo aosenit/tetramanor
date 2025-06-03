@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { IoIosArrowDown } from "react-icons/io";
+import { Menu, X } from "lucide-react";
 
 const navItems = [
   { name: "Meet Tetramanor", href: "/" },
@@ -67,10 +68,14 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="xl:hidden inline-flex items-center justify-center p-2 rounded-md text-black hover:text-black focus:outline-none"
+            className="xl:hidden inline-flex items-center justify-center p-2 rounded-md text-black hover:text-black focus:outline-none "
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? "✖" : "☰"}
+            {isMenuOpen ? (
+              <X className="text-4xl text-red-500" />
+            ) : (
+              <Menu className="text-4xl" />
+            )}
           </button>
         </div>
 
@@ -94,7 +99,7 @@ const Header = () => {
                 href="/dashboard"
                 className="px-4 py-4 w-full text-white bg-black border border-primary-500 rounded-xl text-sm font-medium hover:bg-gray-800 text-center"
               >
-                View Dashboard
+                View Dashboardnnnnnnnnnnnn
               </Link>
             </div>
           </div>

@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Header from "../../portfolio/components/header";
-import one from "@/assets/blog/one.webp"
+import one from "@/assets/blog/one.webp";
 
 const HomeHero = () => {
   return (

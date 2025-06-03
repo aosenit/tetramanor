@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Pagination from "./Pagination";
-import two from "@/assets/blog/two.webp"
+import two from "@/assets/blog/two.webp";
 export default function SingleBlog() {
   return (
     <div>
@@ -11,8 +11,8 @@ export default function SingleBlog() {
             src={two}
             alt="queen"
             className="w-full object-cover"
-            width={1000}
-            height={1000}
+            fill
+            priority
           />
           <div className="space-y-4 py-12">
             <h5 className="text-xl font-semibold">Equity-Based Model</h5>
