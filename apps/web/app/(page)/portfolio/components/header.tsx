@@ -114,17 +114,17 @@ const Header = () => {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <Menu
-              className={`text-5xl ${isScrolled ? "text-black" : "text-white"}`}
+              className={`size-8 ${isScrolled ? "text-black" : "text-white"}`}
             />
           </button>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="xl:hidden bg-white h-screen block mt-4 pb-4 space-y-6 fixed top-0 left-0 w-full z-50 p-5">
+          <div className="xl:hidden bg-white h-screen block  pb-4 space-y-6 fixed top-0 left-0 w-full z-50 p-5">
             <div className="flex flex-col space-y-4 py-10 gap-5 justify-between h-full">
               <X
-                className="text-5xl text-red-500 fixed top-10 right-10"
+                className="size-8 text-red-500 fixed top-5 right-5"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               />
               <div className="flex flex-col gap-8">
