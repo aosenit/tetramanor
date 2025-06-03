@@ -5,13 +5,14 @@ import { motion } from "framer-motion";
 import { IoIosBriefcase } from "react-icons/io";
 import { FaTag } from "react-icons/fa";
 import Header from "@/components/Header";
+import one from "@/assets/blog/one.webp"
 
 const HomeHero = () => {
   return (
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
       <Image
-        src="/blog/blog.jpg"
+        src={one}
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
         fill
