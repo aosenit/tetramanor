@@ -4,7 +4,7 @@ import { FiClock } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { IoIosBriefcase } from "react-icons/io";
 import { FaTag } from "react-icons/fa";
-import Header from "@/app/(page)/portfolio/components/header";
+import Header from "@/components/Header";
 
 const HomeHero = () => {
   return (

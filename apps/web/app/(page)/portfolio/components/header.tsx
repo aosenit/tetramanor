@@ -113,9 +113,7 @@ const Header = () => {
             className="xl:hidden inline-flex items-center justify-center p-2 rounded-md text-black hover:text-black focus:outline-none"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            <Menu
-              className={`size-8 ${isScrolled ? "text-black" : "text-white"}`}
-            />
+            <Menu className={`size-8 text-[var(--primary-green)]`} />
           </button>
         </div>
 

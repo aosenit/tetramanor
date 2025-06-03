@@ -1,8 +1,8 @@
 "use client";
 import { motion } from "framer-motion";
-import Header from "../../portfolio/components/header";
-import one from "@/assets/services/one.webp"
+import one from "@/assets/services/one.webp";
 import Image from "next/image";
+import Header from "@/components/Header";
 const Hero = () => {
   return (
     <section className="relative h-[60vh] overflow-hidden">

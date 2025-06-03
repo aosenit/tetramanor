@@ -1,8 +1,8 @@
 "use client";
 import Image from "next/image";
-import two from "@/assets/rental/two.webp"
-import three from "@/assets/rental/three.webp"
-import four from "@/assets/rental/four.webp"
+import two from "@/assets/rental/two.webp";
+import three from "@/assets/rental/three.webp";
+import four from "@/assets/rental/four.webp";
 import {
   FaDog,
   FaParking,
@@ -17,8 +17,8 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { MdLocationOn } from "react-icons/md";
-import Header from "./Header";
 import { FiShare2 } from "react-icons/fi";
+import Header from "@/app/(page)/portfolio/components/header";
 
 export default function PropertyDetails() {
   return (

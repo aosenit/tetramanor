@@ -11,8 +11,8 @@ export default function SingleBlog() {
             src={two}
             alt="queen"
             className="w-full object-cover"
-            fill
-            priority
+            width={1000}
+            height={1000}
           />
           <div className="space-y-4 py-12">
             <h5 className="text-xl font-semibold">Equity-Based Model</h5>
