@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { StaticImageData } from "next/image";
 import PropertyCard from "../components/property-card";
 import five from "@/assets/portfolio/five.webp"
 import six from "@/assets/portfolio/six.webp"
