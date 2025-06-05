@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import two from "@/assets/portfolio/two.webp"
 import {
   FaCheck,
   FaWifi,
@@ -20,24 +19,34 @@ import {
   FaEye,
 } from "react-icons/fa";
 
-export default function PropertyListing() {
+interface AboutPropertyProps {
+  title?: string;
+  location?: string;
+  image?: string;
+}
+
+export default function PropertyListing({ 
+  title = "TM HighGardens", 
+  location = "the heart of Eko Atlantic City",
+  image = "/assets/portfolio/two.webp"
+}: AboutPropertyProps) {
   return (
     <div className="container mx-auto px-4 lg:px-16 py-12 bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
         <div>
           <h1 className="text-3xl font-bold mb-4 text-[#0b0a0a]">
-            About the property
+            About {title}
           </h1>
           <p className="text-[#0c0c0c] mb-6">
-            TM HighGardens is an ultra-luxurious residential masterpiece
+            {title} is an ultra-luxurious residential masterpiece
             designed for the 1% who appreciate the pinnacle of elegance,
-            affluence, and opulence. Nestled in the heart of Eko Atlantic City,
-            Africa's premier real estate destination, TM HighGardens offers an
+            affluence, and opulence. Nestled in {location},
+            Africa's premier real estate destination, {title} offers an
             exclusive lifestyle and a prime investment opportunity.
           </p>
 
           <p className="text-[#0c0c0c] mb-4">
-            This 30-floor architectural marvel boasts an exquisite selection of
+            This architectural marvel boasts an exquisite selection of
             luxury apartments, including:
           </p>
 
@@ -71,8 +80,8 @@ export default function PropertyListing() {
 
         <div className="relative h-[400px] lg:h-auto rounded-lg overflow-hidden">
           <Image
-            src={two}
-            alt="TM HighGardens luxury residential building"
+            src={image}
+            alt={`${title} luxury residential building`}
             fill
             className="object-cover"
           />
@@ -82,7 +91,7 @@ export default function PropertyListing() {
       <div className="mb-16">
         <h2 className="text-2xl font-bold mb-4 text-[#0b0a0a]">Key Features</h2>
         <p className="text-[#0c0c0c] mb-6">
-          TM HighGardens blends sophisticated aesthetics with superior
+          {title} blends sophisticated aesthetics with superior
           craftsmanship, featuring:
         </p>
 
@@ -127,7 +136,7 @@ export default function PropertyListing() {
           World-Class Amenities
         </h2>
         <p className="text-[#0c0c0c] mb-6">
-          Residents of TM High Gardens enjoy exclusive access to
+          Residents of {title} enjoy exclusive access to
           state-of-the-art facilities, including
         </p>
 

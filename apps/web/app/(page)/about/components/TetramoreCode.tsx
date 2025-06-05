@@ -33,7 +33,7 @@ const features = [
 function TetramoreCode() {
   return (
     <div className="container mx-auto px-4 md:px-8 lg:px-16 py-12">
-      <div>
+      <div className="text-center">
         <h1 className="text-3xl text-[#CD6115] font-semibold">
           The Tetramanor Code
         </h1>
@@ -41,34 +41,34 @@ function TetramoreCode() {
           This is the promise we make to our clients:
         </p>
       </div>
-      <div className="mt-10 space-y-6">
-        <Image
+      <div className="mt-6 space-y-2 text-center">
+        {/* <Image
           src={six}
           alt="icon"
           className="text-black"
           width={20}
           height={20}
-        />
+        /> */}
         <p className="text-sm text-[#202020]">
-          We will not compromise our standards for any reason whatsoever.
+        " We will not compromise our standards for any reason whatsoever.
         </p>
         <p className="text-sm text-[#202020]">
           We will not extort our clients to make a profit.
         </p>
         <p className="text-sm text-[#202020]">
           We will not sell to our clients spaces we are not willing to live in
-          ourselves.
+          ourselves."
         </p>
-        <Image
+        {/* <Image
           src={seven}
           alt="icon"
           className="ml-[340px] md:ml-[450px]"
           width={20}
           height={20}
-        />
+        /> */}
       </div>
 
-      <div className="grid  sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-6">
+      <div className="grid  sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-10">
         {features.map((item, index) => (
           <button
             key={index}

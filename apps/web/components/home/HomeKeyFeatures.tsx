@@ -1,6 +1,8 @@
 import { Button } from "@chakra-ui/react";
 import Image from "next/image";
 import tmHighGardens from "@/assets/home/two.webp";
+import React from 'react';
+import CountUp from 'react-countup';
 
 export default function HomeKeyFeatures() {
   return (
@@ -28,7 +30,7 @@ export default function HomeKeyFeatures() {
             </div>
             <div className="bg-[#202020] rounded-xl p-6 flex flex-col justify-center min-h-[120px]">
               <div className="text-3xl font-extrabold text-white mb-2">
-                100+
+               <CountUp end={100} duration={2.5} suffix="+" />
               </div>
               <div className="text-white text-base font-medium">
                 Years of Combined Experience
@@ -39,7 +41,7 @@ export default function HomeKeyFeatures() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-[#F5F5F5] rounded-xl p-6 flex flex-col justify-center min-h-[90px]">
               <div className="text-2xl font-extrabold text-black mb-1">
-                100+
+                <CountUp end={100} duration={2.5} suffix="+" />
               </div>
               <div className="text-gray-700 text-sm font-medium">
                 Families Housed
@@ -47,7 +49,7 @@ export default function HomeKeyFeatures() {
             </div>
             <div className="bg-[#F5F5F5] rounded-xl p-6 flex flex-col justify-center min-h-[90px]">
               <div className="text-2xl font-extrabold text-black mb-1">
-                300+
+                <CountUp end={300} duration={2.5} suffix="+" />
               </div>
               <div className="text-gray-700 text-sm font-medium">
                 Customers Served
@@ -55,7 +57,7 @@ export default function HomeKeyFeatures() {
             </div>
             <div className="bg-[#F5F5F5] rounded-xl p-6 flex flex-col justify-center min-h-[90px]">
               <div className="text-2xl font-extrabold text-black mb-1">
-                100+
+                <CountUp end={100} duration={2.5} suffix="+" />
               </div>
               <div className="text-gray-700 text-sm font-medium">
                 Job Opportunities Created

@@ -5,12 +5,18 @@ import { useState } from "react";
 import Image from "next/image";
 import { FaPhone, FaEnvelope, FaCalendarAlt } from "react-icons/fa";
 import ten from "@/assets/portfolio/ten.webp"
-export default function ScheduleInspection() {
+
+interface ScheduleInspectionProps {
+  propertyTitle?: string;
+}
+
+export default function ScheduleInspection({ propertyTitle = "TM HighGardens" }: ScheduleInspectionProps) {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
     date: "",
+    property: propertyTitle,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,9 +28,9 @@ export default function ScheduleInspection() {
     e.preventDefault();
     console.log("Form submitted:", formData);
     alert(
-      "Thank you! Your inspection has been scheduled. We'll contact you shortly to confirm."
+      `Thank you! Your inspection for ${propertyTitle} has been scheduled. We'll contact you shortly to confirm.`
     );
-    setFormData({ name: "", phone: "", email: "", date: "" });
+    setFormData({ name: "", phone: "", email: "", date: "", property: propertyTitle });
   };
 
   return (
@@ -41,8 +47,8 @@ export default function ScheduleInspection() {
           <div>
             <h2 className="text-4xl font-bold mb-6">Schedule an inspection</h2>
             <p className="text-lg text-gray-300">
-              Experience the luxury for yourself. Book a personalized tour of TM
-              HighGardens and explore our model apartments, premium finishes,
+              Experience the luxury for yourself. Book a personalized tour of {propertyTitle} 
+              and explore our model apartments, premium finishes,
               and world-class amenities.
             </p>
           </div>
@@ -51,7 +57,7 @@ export default function ScheduleInspection() {
 
           <div>
             <h3 className="text-2xl font-bold mb-6">
-              Want to talk about this property?
+              Want to talk about {propertyTitle}?
             </h3>
             <div className="space-y-4">
               <div className="flex items-center">

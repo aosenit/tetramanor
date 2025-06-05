@@ -17,67 +17,92 @@ import four from "@/assets/rental/four.webp"
 import five from "@/assets/rental/five.webp"
 import six from "@/assets/rental/six.webp"
 import seven from "@/assets/rental/seven.webp"
+import eleven from "@/assets/rental/eleven.jpg"
+import twelve from "@/assets/rental/twelve.jpg"
+import thirteen from "@/assets/rental/thirteen.jpg"
+import fourteen from "@/assets/rental/fourteen.jpg"
+import fifteen from "@/assets/rental/fifteen.jpg"
+import sixteen from "@/assets/rental/sixteen.jpg"
 
+// Image mapping based on furnishing status
+const furnishingImages = {
+  UNFURNISHED: [two, three, four],
+  'LUXURY FURNISHED': [eleven, twelve, thirteen],
+  'STANDARD FURNISHED': [fourteen, fifteen, sixteen],
+  FURNISHED: [five, six, seven],
+};
 
-const properties = [
+export const properties = [
   {
     id: "1",
     title: "TM Meadows",
-    location: "Lekki, Lagos, Nigeria",
+    location: "Ebutte Metta, Lagos",
     price: "₦3.5m",
     period: "year",
     beds: 3,
-    features: ["Balcony", "Walk-In Closets", "CCTV"],
+    description: "3 Bedroom Apartment with bq",
+    features: ["Agency Fee: ₦350,000", "Caution Fee: ₦300,000", "Service Charge: ₦1m"],
+    totalPackage: "₦5,150,000",
     imageUrl: two,
   },
   {
     id: "2",
     title: "TM Meadows",
-    location: "Lekki, Lagos, Nigeria",
-    price: "₦3.5m",
+    location: "Ebutte Metta, Lagos",
+    price: "₦2m",
     period: "year",
     beds: 3,
-    features: ["Balcony", "Walk-In Closets", "CCTV"],
+    description: "1 Bedroom Apartment",
+    features: ["Agency Fee: ₦200,000", "Caution Fee: ₦200,000", "Service Charge: ₦1m"],
+    totalPackage: "₦3,400,000",
     imageUrl: three,
   },
   {
     id: "3",
-    title: "Oceanview Homes",
-    location: "Victoria Island, Lagos",
-    price: "₦5m",
-    period: "year",
-    beds: 4,
-    features: ["Sea View", "Smart Home", "Security"],
+    title: "Comfy Burrows",
+    location: "Lagos",
+    price: "₦176,500",
+    period: "month",
+    beds: 3,
+    description: "Luxury Furnished 1 Bedroom Apartment",
+    features: ["Agency Fee: ₦36,000", "Caution Fee: ₦150,000", "Service Charge: ₦325,000 (inclusive)"],
+    totalPackage: "₦362,500",
     imageUrl: four,
   },
   {
     id: "4",
-    title: "Green Estate",
-    location: "Ajah, Lagos",
-    price: "₦2.8m",
-    period: "year",
-    beds: 2,
-    features: ["Garden", "Walk-In Closets", "Security"],
+    title: "Comfy Burrows",
+    location: "Lagos",
+    price: "₦136,500",
+    period: "month",
+    beds: 3,
+    description: "Luxury Furnished Studio Apartment",
+    features: ["Agency Fee: ₦28,000", "Caution Fee: ₦100,000", "Service Charge: ₦325,000 (inclusive)"],
+    totalPackage: "₦264,500",
     imageUrl: five,
   },
   {
     id: "5",
-    title: "Hilltop Villas",
-    location: "Magodo, Lagos",
-    price: "₦4.2m",
-    period: "year",
+    title: "Comfy Burrows",
+    location: "Akoka, Yaba, Lagos",
+    price: "₦116,500",
+    period: "month",
     beds: 3,
-    features: ["Garage", "Balcony", "CCTV"],
+    description: "Standard Furnished Studio Apartment",
+    features: ["Agency Fee: ₦24,000", "Caution Fee: ₦100,000", "Service Charge: ₦325,000 (inclusive)"],
+    totalPackage: "₦240,500",
     imageUrl: six,
   },
   {
     id: "6",
-    title: "Sunset Apartments",
-    location: "Ikoyi, Lagos",
-    price: "₦6m",
-    period: "year",
-    beds: 4,
-    features: ["Gym", "Smart Home", "24/7 Security"],
+    title: "Comfy Burrows",
+    location: "Akoka, Yaba, Lagos",
+    price: "₦106,500",
+    period: "month",
+    beds: 3,
+    description: "Unfurnished Studio Apartment",
+    features: ["Agency Fee: ₦22,000", "Caution Fee: ₦100,000", "Service Charge: ₦325,000 (inclusive)"],
+    totalPackage: "₦228,500",
     imageUrl: seven,
   },
 ];
@@ -114,7 +139,7 @@ export default function PropertyListing() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2  gap-6">
           {properties.map((property) => (
             <PropertyCard key={property.id} {...property} />
           ))}
@@ -131,7 +156,9 @@ interface PropertyCardProps {
   price: string;
   period: string;
   beds: number;
+  description: string;
   features: string[];
+  totalPackage: string;
   imageUrl: StaticImageData;
 }
 
@@ -142,14 +169,26 @@ function PropertyCard({
   price,
   period,
   beds,
+  description,
   features,
   imageUrl,
 }: PropertyCardProps) {
+  // Extract furnishing status from description
+  const getFurnishingStatus = (desc: string) => {
+    if (desc.toLowerCase().includes('unfurnished')) return 'UNFURNISHED';
+    if (desc.toLowerCase().includes('luxury furnished')) return 'LUXURY FURNISHED';
+    if (desc.toLowerCase().includes('standard furnished')) return 'STANDARD FURNISHED';
+    if (desc.toLowerCase().includes('furnished')) return 'FURNISHED';
+    return 'UNFURNISHED';
+  };
+
+  const furnishingStatus = getFurnishingStatus(description);
+
   return (
     <div className="overflow-hidden rounded-sm border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
       <div className="relative">
         <div className="absolute left-4 top-4 z-10 rounded-lg bg-gray-800/80 px-2 py-1 text-xs font-medium text-white">
-          UNFURNISHED
+          {furnishingStatus}
         </div>
         <Image
           src={imageUrl || "/placeholder.svg"}

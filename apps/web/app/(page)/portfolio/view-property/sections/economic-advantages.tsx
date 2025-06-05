@@ -7,12 +7,19 @@ import {
   FaKey,
 } from "react-icons/fa";
 
-export default function EconomicAdvantages() {
+interface EconomicAdvantagesProps {
+  location?: string;
+}
+
+export default function EconomicAdvantages({ location = "Eko Atlantic, Lagos, Nigeria" }: EconomicAdvantagesProps) {
+  // Extract the main location (e.g., "Eko Atlantic" from "Eko Atlantic, Lagos, Nigeria")
+  const mainLocation = location.split(',')[0];
+  
   return (
     <div className="container mx-auto px-4 lg:px-16 py-12 bg-white">
       <div className="mb-16">
         <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#0b0a0a]">
-          Eko Atlantic City Economic Free Zone Offers
+          {mainLocation} Economic Free Zone Offers
           <br className="hidden md:block" />
           Unmatched Investment Advantages
         </h2>
