@@ -11,6 +11,7 @@ interface PropertyCardProps {
   location: string;
   status: string;
   className?: string;
+  slug: any;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -19,6 +20,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   location,
   status,
   className = "",
+  slug,
 }) => {
   return (
     <div
@@ -42,16 +44,16 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         <p className="text-sm mt-1">{location}</p>
       </div>
 
-      <Link 
+      <Link
         href={{
-          pathname: '/portfolio/view-property',
-          query: { 
+          pathname: "/portfolio/view-property",
+          query: {
             title,
             location,
             status,
-            image: typeof image === 'string' ? image : image.src
-          }
-        }} 
+            image: typeof image === "string" ? image : image.src,
+          },
+        }}
         className="absolute bottom-4 right-4"
       >
         <button className="bg-white text-black text-sm px-4 py-2 rounded-full font-medium shadow hover:bg-gray-200 transition-colors">

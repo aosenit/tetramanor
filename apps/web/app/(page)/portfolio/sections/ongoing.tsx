@@ -1,5 +1,5 @@
-import React from 'react'
-import PropertyCard from '../components/property-card';
+import React from "react";
+import PropertyCard from "../components/property-card";
 import two from "@/assets/portfolio/two.webp";
 import three from "@/assets/portfolio/three.webp";
 import four from "@/assets/portfolio/four.webp";
@@ -15,11 +15,12 @@ function Ongoing() {
         {/* Left Card: Spans full height of right column */}
         <div className="w-full h-full">
           <PropertyCard
-            image={two  }
+            image={two}
             title="TM HighGardens"
             location="Eko Atlantic, Lagos, Nigeria."
             status="Ongoing"
             className="h-full min-h-[700px]"
+            slug="tm-highgardens"
           />
         </div>
 
@@ -31,6 +32,7 @@ function Ongoing() {
             location="Mende, Maryland, Lagos, Nigeria."
             status="Ongoing"
             className="flex-1"
+            slug="queen-mary"
           />
           <PropertyCard
             image={four}
@@ -38,6 +40,7 @@ function Ongoing() {
             location="Mende, Maryland, Lagos, Nigeria."
             status="Ongoing"
             className="flex-1"
+            slug="kings-landing"
           />
         </div>
       </div>
@@ -45,4 +48,4 @@ function Ongoing() {
   );
 }
 
-export default Ongoing
+export default Ongoing;
