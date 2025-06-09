@@ -33,7 +33,6 @@ function Ongoing() {
             location="Mende, Maryland, Lagos, Nigeria."
             status="Ongoing"
             className="flex-1"
-            slug="queen-mary"
           />
           <PropertyCard
             slug="kings-landing"
@@ -42,7 +41,6 @@ function Ongoing() {
             location="Mende, Maryland, Lagos, Nigeria."
             status="Ongoing"
             className="flex-1"
-            slug="kings-landing"
           />
         </div>
       </div>
