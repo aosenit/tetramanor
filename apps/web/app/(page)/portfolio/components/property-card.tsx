@@ -1,27 +1,25 @@
 // components/PropertyCard.tsx
-import { FC } from "react";
-// import { MapPin } from "lucide-react";
 import { StaticImageData } from "next/image";
 import Image from "next/image";
 import Link from "next/link";
 
-interface PropertyCardProps {
+export type PropertyCardProps = {
   image: string | StaticImageData;
   title: string;
   location: string;
   status: string;
   className?: string;
-  slug: any;
-}
+  slug: string;
+};
 
-const PropertyCard: React.FC<PropertyCardProps> = ({
+export default function PropertyCard({
   image,
   title,
   location,
   status,
   className = "",
   slug,
-}) => {
+}: PropertyCardProps) {
   return (
     <div
       className={`relative rounded-xl overflow-hidden shadow-md group ${className}`}
@@ -51,9 +49,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             title,
             location,
             status,
-            image: typeof image === "string" ? image : image.src,
-          },
-        }}
+            image: typeof image === 'string' ? image : image.src,
+            slug
+          }
+        }} 
         className="absolute bottom-4 right-4"
       >
         <button className="bg-white text-black text-sm px-4 py-2 rounded-full font-medium shadow hover:bg-gray-200 transition-colors">
@@ -62,6 +61,4 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       </Link>
     </div>
   );
-};
-
-export default PropertyCard;
+}

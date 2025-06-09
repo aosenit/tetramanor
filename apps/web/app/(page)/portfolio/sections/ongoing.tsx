@@ -15,7 +15,7 @@ function Ongoing() {
         {/* Left Card: Spans full height of right column */}
         <div className="w-full h-full">
           <PropertyCard
-            image={two}
+            image={two  }
             title="TM HighGardens"
             location="Eko Atlantic, Lagos, Nigeria."
             status="Ongoing"
@@ -27,20 +27,20 @@ function Ongoing() {
         {/* Right Column: Stack of two cards */}
         <div className="flex flex-col gap-6">
           <PropertyCard
+            slug="queen-mary"
             image={three}
             title="Queen Mary"
             location="Mende, Maryland, Lagos, Nigeria."
             status="Ongoing"
             className="flex-1"
-            slug="queen-mary"
           />
           <PropertyCard
+            slug="kings-landing"
             image={four}
             title="King's Landing"
             location="Mende, Maryland, Lagos, Nigeria."
             status="Ongoing"
             className="flex-1"
-            slug="kings-landing"
           />
         </div>
       </div>
