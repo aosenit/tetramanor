@@ -42,10 +42,10 @@ export default function PropertyCard({
         <p className="text-sm mt-1">{location}</p>
       </div>
 
-      <Link 
+      <Link
         href={{
-          pathname: '/portfolio/view-property',
-          query: { 
+          pathname: "/portfolio/view-property",
+          query: {
             title,
             location,
             status,
