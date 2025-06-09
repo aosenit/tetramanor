@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
+import placeholder from "@/assets/placeholder.svg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,7 +45,7 @@ export function ActiveProperties() {
     {
       id: "1",
       name: "TM HighGardens",
-      image: "/placeholder.svg?height=60&width=80",
+      image: placeholder,
       location: "Lekki Phase 1",
       price: {
         naira: "₦3.5M",
@@ -60,7 +61,7 @@ export function ActiveProperties() {
     {
       id: "2",
       name: "Comfy Burrows",
-      image: "/placeholder.svg?height=60&width=80",
+      image: placeholder,
       location: "Akoka, Yaba, Lagos",
       price: {
         naira: "₦3.5M",
@@ -76,7 +77,7 @@ export function ActiveProperties() {
     {
       id: "3",
       name: "King's Landing",
-      image: "/placeholder.svg?height=60&width=80",
+      image: placeholder,
       location: "Mende, Maryland, Lagos",
       price: {
         naira: "₦3.5M",
@@ -92,7 +93,7 @@ export function ActiveProperties() {
     {
       id: "4",
       name: "TM Meadows",
-      image: "/placeholder.svg?height=60&width=80",
+      image: placeholder,
       location: "Ebutte Metta, Lagos",
       price: {
         naira: "₦3.5M",
@@ -108,7 +109,7 @@ export function ActiveProperties() {
     {
       id: "5",
       name: "TM Gardens",
-      image: "/placeholder.svg?height=60&width=80",
+      image: placeholder,
       location: "Surulere, Lagos",
       price: {
         naira: "₦3.5M",
@@ -124,19 +125,19 @@ export function ActiveProperties() {
   ]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 bg-white rounded-lg border divide-y">
+      <div className="flex justify-between items-center px-4 pt-4">
         <h2 className="text-xl font-semibold">Active Properties</h2>
         <Button variant="outline" size="sm" asChild>
           <Link href="#">View all</Link>
         </Button>
       </div>
-      <div className="bg-white rounded-lg border overflow-hidden">
+      <div className=" overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-gray-100 ">
               <TableRow>
-                <TableHead className="w-[40px]">
+                <TableHead className="w-[40px] ">
                   <Checkbox />
                 </TableHead>
                 <TableHead>Property</TableHead>
@@ -160,9 +161,9 @@ export function ActiveProperties() {
                         <Image
                           src={property.image || "/placeholder.svg"}
                           alt={property.name}
-                          className="h-full w-full object-cover"
-                          priority
-                          fill
+                          className="h-8 w-8 object-cover"
+                          width={60}
+                          height={60}
                         />
                       </div>
                       <span className="font-medium">{property.name}</span>

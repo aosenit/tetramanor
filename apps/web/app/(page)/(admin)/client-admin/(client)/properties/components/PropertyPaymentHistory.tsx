@@ -3,7 +3,7 @@ import React from "react";
 
 const PropertyPaymentHistory = () => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-white rounded-lg border p-4">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold">Payment History</h2>

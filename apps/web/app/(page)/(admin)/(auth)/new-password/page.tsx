@@ -3,20 +3,21 @@
 import type React from "react";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Eye, EyeOff, UserPlus } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
+import icon from "@/assets/createnewpassword.png";
+import Image from "next/image";
 
-export default function RegisterPage() {
+export default function NewPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
     password: "",
+    confirmPassword: "",
   });
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,9 +34,13 @@ export default function RegisterPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-center">
-        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-          <UserPlus className="h-6 w-6 text-gray-600" />
-        </div>
+        <Image
+          src={icon}
+          alt="icon"
+          className="h-[38px] w-[48px] text-gray-600"
+          width={14}
+          height={14}
+        />
       </div>
 
       <div className="text-center space-y-2">
@@ -46,32 +51,6 @@ export default function RegisterPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="fullName">Full Name</Label>
-          <Input
-            id="fullName"
-            name="fullName"
-            type="text"
-            placeholder="Enter your full name"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="email">Email address</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="Enter your email address"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
           <div className="relative">
@@ -98,25 +77,39 @@ export default function RegisterPage() {
           </div>
         </div>
 
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <div className="relative">
+            <Input
+              id="confirmPassword"
+              name="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm your password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+        </div>
+
         <Button
           type="submit"
-          className="w-full bg-green-800 hover:bg-green-700"
+          className="w-full bg-[var(--primary-green)] hover:bg-green-700 rounded-sm text-white"
         >
-          Create account
+          Reset Password
         </Button>
       </form>
-
-      <div className="text-center">
-        <p className="text-sm text-gray-500">
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="text-green-800 hover:text-green-700 font-medium"
-          >
-            Sign in
-          </Link>
-        </p>
-      </div>
     </div>
   );
 }

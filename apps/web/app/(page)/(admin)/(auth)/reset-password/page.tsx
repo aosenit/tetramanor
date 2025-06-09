@@ -4,10 +4,11 @@ import type React from "react";
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Mail } from "lucide-react";
+import icon from "@/assets/passwordreset.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function ResetCodePage() {
   const router = useRouter();
@@ -51,9 +52,13 @@ export default function ResetCodePage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-center">
-        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-          <Mail className="h-6 w-6 text-gray-600" />
-        </div>
+        <Image
+          src={icon}
+          alt="icon"
+          className="h-[38px] w-[48px] text-gray-600"
+          width={14}
+          height={14}
+        />
       </div>
 
       <div className="text-center space-y-2">
@@ -64,7 +69,7 @@ export default function ResetCodePage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="flex justify-between gap-2">
+        <div className="flex justify-center gap-4">
           {code.map((digit, index) => (
             <Input
               key={index}
@@ -74,10 +79,11 @@ export default function ResetCodePage() {
               type="text"
               inputMode="numeric"
               maxLength={1}
-              className="w-14 h-14 text-center text-xl"
+              className="size-12 lg:size-14 text-center text-xl"
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
+              placeholder="*"
               required
             />
           ))}
@@ -85,7 +91,7 @@ export default function ResetCodePage() {
 
         <Button
           type="submit"
-          className="w-full bg-green-800 hover:bg-green-700"
+          className="w-full bg-[var(--primary-green)] hover:bg-green-700 rounded-sm text-white"
         >
           Continue
         </Button>
@@ -96,7 +102,7 @@ export default function ResetCodePage() {
           Didn&apos;t receive the code?{" "}
           <Link
             href="/client-admin/forgot-password"
-            className="text-green-800 hover:text-green-700 font-medium"
+            className="text-[var(--primary-green)] hover:text-green-700 font-medium"
           >
             Resend code
           </Link>

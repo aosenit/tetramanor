@@ -96,7 +96,7 @@ const Header = () => {
           {/* Desktop Auth Button */}
           <div className="hidden xl:flex">
             <Link
-              href="/dashboard"
+              href="/login"
               className={`px-6 py-2 text-sm font-medium rounded ${
                 isScrolled
                   ? "bg-[#116114] text-white hover:bg-green-700"
@@ -171,7 +171,7 @@ const Header = () => {
                 )}
               </div>
               <Link
-                href="/dashboard"
+                href="/login"
                 className="px-4 py-4 w-full text-white bg-green-600 border border-primary-500 rounded-xl  font-medium hover:bg-green-700 text-center"
               >
                 View Dashboard

@@ -3,7 +3,7 @@ import React from "react";
 
 const PropertyDocument = () => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-white rounded-lg border p-4">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold">Documents</h2>
@@ -57,7 +57,10 @@ const PropertyDocument = () => {
           <Button variant="outline" size="sm">
             Export
           </Button>
-          <Button className="bg-green-600 hover:bg-green-700 text-white">
+          <Button
+            className="bg-[var(--primary-green)] hover:bg-green-700 text-white rounded-sm"
+            size="sm"
+          >
             Upload document
           </Button>
         </div>

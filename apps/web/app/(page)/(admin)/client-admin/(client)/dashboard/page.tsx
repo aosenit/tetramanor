@@ -7,7 +7,7 @@ import { RecentActivity } from "./RecentActivity";
 
 export default function DashboardPage() {
   return (
-    <div className="bg-gray-50">
+    <div className="bg-[#FAFAFA] ">
       <section className="p-4 md:p-6 mx-auto space-y-6">
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold text-gray-900">

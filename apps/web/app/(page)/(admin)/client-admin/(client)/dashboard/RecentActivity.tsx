@@ -48,14 +48,14 @@ export function RecentActivity() {
   ];
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 bg-white rounded-lg border divide-y h-fit">
+      <div className="flex justify-between items-center px-4 pt-4">
         <h2 className="text-xl font-semibold">Recent Activity</h2>
         <Button variant="outline" size="sm" asChild>
           <Link href="#">View all</Link>
         </Button>
       </div>
-      <div className="bg-white rounded-lg border overflow-hidden">
+      <div className=" overflow-hidden">
         <div className="divide-y">
           {activities.map((activity) => (
             <div key={activity.id} className="p-4 flex gap-4">

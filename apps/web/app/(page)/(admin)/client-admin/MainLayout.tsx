@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import NotificationModal from "./(client)/notifications/NotificationModal";
 import Image from "next/image";
+import logo from "@/assets/full-logo.png";
+import LogoutModal from "@/components/LogoutModal";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -38,6 +40,14 @@ export function MainLayout({ children }: MainLayoutProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [open, setOpen] = useState(false);
+  const isActive = (href: string) => {
+    const currentPath = pathname?.replace("/client-admin", "") || "";
+    return (
+      currentPath === href ||
+      (href !== "/dashboard" && currentPath.startsWith(href))
+    );
+  };
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -105,7 +115,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out lg:translate-x-0 h-screen",
+          "fixed inset-y-0 left-0 z-40 w-64 bg-[#323539] text-white transition-transform duration-300 ease-in-out lg:translate-x-0 h-screen",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -113,15 +123,16 @@ export function MainLayout({ children }: MainLayoutProps) {
           {/* Logo */}
           <div className="flex items-center p-4 h-16 border-b border-gray-700">
             <Image
-              src="/logo.svg"
+              src={logo}
               alt="Tetramanor Logo"
-              width={32}
-              height={32}
+              width={100}
+              height={100}
+              className="w-40 object-contain"
             />
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 py-6 px-4 space-y-1 overflow-y-auto">
+          <nav className="flex-1 py-6 px-4 space-y-3 overflow-y-auto">
             {navItems.map((item) => {
               // if notfication return notifcation modal
               if (item.name === "Notifications") {
@@ -134,7 +145,9 @@ export function MainLayout({ children }: MainLayoutProps) {
                   href={`/client-admin/${item.href}`}
                   className={cn(
                     "flex items-center px-4 py-3 text-sm rounded-lg transition-colors",
-                    pathname === `/client-admin/${item.href}`
+                    isActive(item.href)
+                      ? "bg-[#2B2D2F] text-white font-semibold shadow-md"
+                      : "hover:bg-[#404346] text-gray-300"
                   )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -146,15 +159,34 @@ export function MainLayout({ children }: MainLayoutProps) {
           </nav>
 
           {/* Bottom navigation */}
-          <div className="py-6 px-4 space-y-1 border-t border-gray-700">
+          <div className="py-6 px-4 space-y-3 border-t border-gray-700">
             {bottomNavItems.map((item) => {
+              if (item.name === "Sign Out") {
+                return (
+                  <Button
+                    key={item.name}
+                    onClick={() => {
+                      setOpen(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={cn(
+                      "flex items-center px-4 py-3 text-sm rounded-lg justify-start  bg-transparent text-white w-full"
+                    )}
+                  >
+                    {item.icon}
+                    <span className="ml-3">{item.name}</span>
+                  </Button>
+                );
+              }
               return (
                 <Link
                   key={item.name}
                   href={`/client-admin/${item.href}`}
                   className={cn(
                     "flex items-center px-4 py-3 text-sm rounded-lg transition-colors",
-                    pathname === `/client-admin/${item.href}`
+                    isActive(item.href)
+                      ? "bg-[#2B2D2F] text-white font-semibold shadow-md"
+                      : "hover:bg-[#404346] text-gray-300"
                   )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -212,7 +244,9 @@ export function MainLayout({ children }: MainLayoutProps) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Sign out</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setOpen(true)}>
+                  Sign out
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <span className="hidden md:inline-block">Damian Price</span>
@@ -220,10 +254,17 @@ export function MainLayout({ children }: MainLayoutProps) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6 h-[100vdh] overflow-x-hidden">
+        <main className="flex-1 overflow-y-scroll p-4 lg:p-6 h-[100vdh] overflow-x-hidden ">
           {children}
         </main>
       </div>
+      <LogoutModal
+        onLogout={() => {
+          console.log("logout");
+        }}
+        open={open}
+        setOpen={setOpen}
+      />
     </div>
   );
 }

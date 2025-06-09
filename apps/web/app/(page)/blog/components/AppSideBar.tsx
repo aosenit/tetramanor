@@ -1,11 +1,11 @@
 "use client";
 import React, { ReactNode } from "react";
 import Image, { StaticImageData } from "next/image";
-import a from "@/assets/blog/a.webp"
-import b from "@/assets/blog/b.webp"
-import c from "@/assets/blog/c.webp"
-import d from "@/assets/blog/d.webp"
-import e from "@/assets/blog/e.webp"
+import a from "@/assets/blog/a.webp";
+import b from "@/assets/blog/b.webp";
+import c from "@/assets/blog/c.webp";
+import d from "@/assets/blog/d.webp";
+import e from "@/assets/blog/e.webp";
 interface SidebarItem {
   id: number;
   image: StaticImageData;

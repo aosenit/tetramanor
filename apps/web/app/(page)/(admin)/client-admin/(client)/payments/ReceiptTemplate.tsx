@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
+import Image from "next/image";
+import logo from "@/assets/full-logo.png";
 
 interface ReceiptTemplateProps {
   receiptId: string;
@@ -29,15 +31,18 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
 
   return (
     <div className="max-w-3xl mx-auto p-4 py-8">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="bg-white  shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="bg-gray-800 text-white p-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="text-3xl font-bold">TM</div>
-            <div className="text-xl">Tetramanor</div>
-          </div>
+        <div className="bg-[#323539] text-white p-4 flex justify-between items-center">
+          <Image
+            src={logo}
+            alt="logo"
+            width={100}
+            height={100}
+            className="w-40 h-10 object-contain"
+          />
           <div>
-            <QRCodeSVG value={`receipt-${receiptId}`} size={80} />
+            <QRCodeSVG value={`receipt-${receiptId}`} size={60} />
           </div>
         </div>
 
@@ -45,26 +50,26 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
         <div className="p-6 space-y-8">
           {/* Receipt Info */}
           <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <div className="text-gray-600">Payment Date:</div>
-                <div className="font-medium">{receiptData.paymentDate}</div>
+            <div className="grid grid-cols-1  gap-4">
+              <div className="flex flex-col gap-2 lg:flex-row">
+                <div className="font-semibold">Payment Date:</div>
+                <div className="">{receiptData.paymentDate}</div>
               </div>
-              <div>
-                <div className="text-gray-600">Receipt Number:</div>
-                <div className="font-medium">{receiptData.receiptNumber}</div>
+              <div className="flex flex-col gap-2 lg:flex-row">
+                <div className="font-semibold">Receipt Number:</div>
+                <div className="">{receiptData.receiptNumber}</div>
               </div>
             </div>
-            <div>
-              <div className="text-gray-600">Property Name:</div>
-              <div className="font-medium">{receiptData.propertyName}</div>
+            <div className="flex flex-col gap-2 lg:flex-row">
+              <div className="font-semibold">Property Name:</div>
+              <div className="">{receiptData.propertyName}</div>
             </div>
           </div>
 
           {/* Payment Details Table */}
           <div className="border rounded-lg overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-[#F5F5F5]">
                 <tr>
                   <th
                     scope="col"
@@ -129,7 +134,7 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
             <p className="text-lg font-medium text-gray-700">
               Thank you for your payment!
             </p>
-            <Button className="gap-2">
+            <Button className="gap-2 bg-white text-black border">
               <Download className="h-4 w-4" />
               Download
             </Button>
