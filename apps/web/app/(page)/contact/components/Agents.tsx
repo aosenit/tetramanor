@@ -11,7 +11,7 @@ import burrows from "./portfolio/burrows.jpg";
 import meadow from "./portfolio/meadows.jpg";
 import queenmary from "./portfolio/queenmary.png";
 
-const agents = [
+export const agents = [
   {
     name: "Comfy Burrows",
     image: burrows,
