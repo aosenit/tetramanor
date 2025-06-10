@@ -1,9 +1,9 @@
 import Image from "next/image";
-import seven from "@/assets/services/seven.webp"
-import eight from "@/assets/services/eight.webp"
-import nine from "@/assets/services/nine.webp"
-import ten from "@/assets/services/ten.webp"
-import eleven from "@/assets/services/eleven.webp"
+import q from "@/assets/rental/q.jpg"
+import u from "@/assets/rental/u.png"
+import e from "@/assets/rental/e.jpg"
+import n from "@/assets/rental/n.jpg"
+import s from "@/assets/services/s.png"
 export default function InteriorShowcase() {
   return (
     <section className="py-16 bg-[#f3f7f3]">
@@ -20,7 +20,7 @@ export default function InteriorShowcase() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src={seven}
+              src={q}
               alt="Modern bookshelf and cabinet design"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
               width={400}
@@ -29,7 +29,7 @@ export default function InteriorShowcase() {
           </div>
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src={eight}
+              src={u}
               alt="Glass wall living space with outdoor views"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
               width={400}
@@ -38,7 +38,7 @@ export default function InteriorShowcase() {
           </div>
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src={nine}
+              src={e}
               alt="Living room with yellow sofa and large windows"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
               width={400}
@@ -47,7 +47,7 @@ export default function InteriorShowcase() {
           </div>
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src={ten}
+              src={n}
               alt="Dining area with framed artwork gallery wall"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
               width={400}
@@ -56,7 +56,7 @@ export default function InteriorShowcase() {
           </div>
           <div className="overflow-hidden rounded-lg shadow-md">
             <Image
-              src={eleven}
+              src={s}
               alt="Green console table with botanical prints"
               className="w-full h-80 object-cover transition-transform duration-300 hover:scale-105"
               width={400}
