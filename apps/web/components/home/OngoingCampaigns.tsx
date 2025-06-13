@@ -22,8 +22,8 @@ export default function OngoingCampaigns() {
           Ongoing Campaigns
         </h2>
         <div className="text-gray-700 text-base mb-10 text-center">
-          Lorem ipsum dolor sit amet consectetur. Et sit egestas sagittis
-          facilisi.
+          Stay informed with our latest updates, announcements, and
+          opportunities.
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
           {campaigns.map((c, i) => (

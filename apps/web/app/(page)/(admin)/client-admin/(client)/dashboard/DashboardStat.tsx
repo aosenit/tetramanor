@@ -1,22 +1,22 @@
 import { Building, Building2, CreditCard } from "lucide-react";
 
-export function DashboardStats() {
+export function DashboardStats({ data }: { data: any }) {
   const stats = [
     {
       title: "Total Properties",
-      value: "36",
+      value: data?.totalProperties,
       icon: Building,
       color: "bg-green-100 text-green-600",
     },
     {
       title: "Rented Properties",
-      value: "04",
+      value: data?.rented,
       icon: Building2,
       color: "bg-blue-100 text-blue-600",
     },
     {
       title: "Pending Payments",
-      value: "08",
+      value: data?.pending,
       icon: CreditCard,
       color: "bg-orange-100 text-orange-600",
     },
@@ -24,9 +24,9 @@ export function DashboardStats() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {stats.map((stat, index) => (
+      {stats.map((stat) => (
         <div
-          key={index}
+          key={stat.title}
           className="bg-white rounded-lg border p-6 flex justify-between items-center"
         >
           <div>

@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Home,
@@ -12,25 +12,17 @@ import {
   Bell,
   Settings,
   LogOut,
-  Search,
   Menu,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import NotificationModal from "./(client)/notifications/NotificationModal";
 import Image from "next/image";
 import logo from "@/assets/full-logo.png";
 import LogoutModal from "@/components/LogoutModal";
+import Header from "./(client)/component/Header";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -41,6 +33,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const isActive = (href: string) => {
     const currentPath = pathname?.replace("/client-admin", "") || "";
     return (
@@ -202,56 +195,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Main content */}
       <div className="flex flex-col flex-1 lg:ml-64">
         {/* Header */}
-        <header className="sticky top-0 z-30 bg-white border-b h-16 flex items-center justify-between px-4 lg:px-6">
-          <div className="flex-1 flex justify-center lg:justify-start ">
-            <div className="relative lg:w-full max-w-md w-[60%]">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  1
-                </span>
-              </Button>
-            </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-8 w-8 rounded-full"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-green-500 text-white">
-                      DP
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Damian Price</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setOpen(true)}>
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <span className="hidden md:inline-block">Damian Price</span>
-          </div>
-        </header>
+        <Header setOpen={setOpen} />
 
         {/* Page content */}
         <main className="flex-1 overflow-y-scroll p-4 lg:p-6 h-[100vdh] overflow-x-hidden ">
@@ -261,6 +205,9 @@ export function MainLayout({ children }: MainLayoutProps) {
       <LogoutModal
         onLogout={() => {
           console.log("logout");
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          router.push("/login");
         }}
         open={open}
         setOpen={setOpen}

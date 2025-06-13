@@ -40,89 +40,8 @@ type Property = {
   unitsOwned: string;
 };
 
-export function ActiveProperties() {
-  const [properties] = useState<Property[]>([
-    {
-      id: "1",
-      name: "TM HighGardens",
-      image: placeholder,
-      location: "Lekki Phase 1",
-      price: {
-        naira: "₦3.5M",
-        dollar: "$6,500",
-      },
-      status: "Paid",
-      accountOfficer: {
-        name: "John D. Patkins",
-        avatar: "/placeholder.svg?height=32&width=32",
-      },
-      unitsOwned: "12",
-    },
-    {
-      id: "2",
-      name: "Comfy Burrows",
-      image: placeholder,
-      location: "Akoka, Yaba, Lagos",
-      price: {
-        naira: "₦3.5M",
-        dollar: "$6,500",
-      },
-      status: "Paid",
-      accountOfficer: {
-        name: "John D. Patkins",
-        avatar: "/placeholder.svg?height=32&width=32",
-      },
-      unitsOwned: "06",
-    },
-    {
-      id: "3",
-      name: "King's Landing",
-      image: placeholder,
-      location: "Mende, Maryland, Lagos",
-      price: {
-        naira: "₦3.5M",
-        dollar: "$6,500",
-      },
-      status: "Paid",
-      accountOfficer: {
-        name: "John D. Patkins",
-        avatar: "/placeholder.svg?height=32&width=32",
-      },
-      unitsOwned: "08",
-    },
-    {
-      id: "4",
-      name: "TM Meadows",
-      image: placeholder,
-      location: "Ebutte Metta, Lagos",
-      price: {
-        naira: "₦3.5M",
-        dollar: "$6,500",
-      },
-      status: "Paid",
-      accountOfficer: {
-        name: "John D. Patkins",
-        avatar: "/placeholder.svg?height=32&width=32",
-      },
-      unitsOwned: "02",
-    },
-    {
-      id: "5",
-      name: "TM Gardens",
-      image: placeholder,
-      location: "Surulere, Lagos",
-      price: {
-        naira: "₦3.5M",
-        dollar: "$6,500",
-      },
-      status: "Paid",
-      accountOfficer: {
-        name: "John D. Patkins",
-        avatar: "/placeholder.svg?height=32&width=32",
-      },
-      unitsOwned: "05",
-    },
-  ]);
+export function ActiveProperties({ data }: { data: any }) {
+  const properties = data?.activeProperties;
 
   return (
     <div className="space-y-4 bg-white rounded-lg border divide-y">
@@ -150,74 +69,86 @@ export function ActiveProperties() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {properties.map((property) => (
-                <TableRow key={property.id}>
-                  <TableCell>
-                    <Checkbox />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="h-12 w-16 rounded overflow-hidden">
-                        <Image
-                          src={property.image || "/placeholder.svg"}
-                          alt={property.name}
-                          className="h-8 w-8 object-cover"
-                          width={60}
-                          height={60}
-                        />
-                      </div>
-                      <span className="font-medium">{property.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{property.location}</TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{property.price.naira}</div>
-                      <div className="text-gray-500 text-sm">
-                        {property.price.dollar}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-sm font-medium text-green-800">
-                      {property.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage
-                          src={
-                            property.accountOfficer.avatar || "/placeholder.svg"
-                          }
-                          alt={property.accountOfficer.name}
-                        />
-                        <AvatarFallback>JP</AvatarFallback>
-                      </Avatar>
-                      <span>{property.accountOfficer.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{property.unitsOwned}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="h-8 w-8 p-0"
-                          aria-label="Open menu"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View Details</DropdownMenuItem>
-                        <DropdownMenuItem>Payment History</DropdownMenuItem>
-                        <DropdownMenuItem>Documents</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+              {/* if properties is empty, show a message */}
+              {properties?.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={10} className="text-center py-10">
+                    No properties found
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
+              {properties?.length > 0 &&
+                properties?.map((property) => (
+                  <TableRow key={property?.id}>
+                    <TableCell>
+                      <Checkbox />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="h-12 w-16 rounded overflow-hidden">
+                          <Image
+                            src={property?.image || "/placeholder.svg"}
+                            alt={property?.name}
+                            className="h-8 w-8 object-cover"
+                            width={60}
+                            height={60}
+                          />
+                        </div>
+                        <span className="font-medium">{property?.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{property?.location}</TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">
+                          {property?.price?.naira}
+                        </div>
+                        <div className="text-gray-500 text-sm">
+                          {property?.price?.dollar}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-sm font-medium text-green-800">
+                        {property?.status}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage
+                            src={
+                              property?.accountOfficer?.avatar ||
+                              "/placeholder.svg"
+                            }
+                            alt={property?.accountOfficer?.name}
+                          />
+                          <AvatarFallback>JP</AvatarFallback>
+                        </Avatar>
+                        <span>{property?.accountOfficer?.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{property?.unitsOwned}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0"
+                            aria-label="Open menu"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>View Details</DropdownMenuItem>
+                          <DropdownMenuItem>Payment History</DropdownMenuItem>
+                          <DropdownMenuItem>Documents</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </div>

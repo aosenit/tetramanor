@@ -1,8 +1,8 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../services/axiosInstance";
 
-// Create Data
-export const useCreateData = (url: string) => {
+// Post Data
+export const usePostData = (url: string) => {
   return useMutation({
     mutationFn: async (arg: any) => {
       const response = await axiosInstance.post(url, arg);
@@ -11,7 +11,7 @@ export const useCreateData = (url: string) => {
   });
 };
 
-export const useCreateExportData = (url: string) => {
+export const usePostExportData = (url: string) => {
   return useMutation({
     mutationFn: async (arg: any) => {
       const response = await axiosInstance.post(url, arg, {

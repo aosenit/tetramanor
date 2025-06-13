@@ -7,26 +7,66 @@ import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 import icon from "@/assets/key.png";
 import Image from "next/image";
+import { usePostData } from "@/hooks/useApi";
+
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { mutateAsync: login, isPending } = usePostData("auth/login");
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, you would authenticate the user here
-    router.push("/client-admin/dashboard");
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
+    try {
+      const response = await login(data);
+      if (response) {
+        const { token, ...user } = response.data;
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        router.push("/client-admin/dashboard");
+        // if (user.type === "client") {
+        //   router.push("/client-admin/dashboard");
+        // } else {
+        //   router.push("/main-admin");
+        // }
+      }
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
-    <div className="space-y-6  w-full">
+    <div className="space-y-6 w-full">
       <div className="flex justify-center">
         <Image
           src={icon}
@@ -44,60 +84,75 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 pt-6">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email address</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="Enter your email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-6">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email address</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter your email address"
+                    type="email"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <div className="relative">
-            <Input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-              onClick={() => setShowPassword(!showPassword)}
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      {...field}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="text-right">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-gray-600 hover:text-gray-900"
             >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </button>
+              Forgot password?
+            </Link>
           </div>
-        </div>
 
-        <div className="text-right">
-          <Link
-            href="/forgot-password"
-            className="text-sm text-gray-600 hover:text-gray-900"
+          <Button
+            type="submit"
+            className="w-full bg-[var(--primary-green)] hover:bg-green-700 rounded-sm text-white"
+            disabled={isPending}
           >
-            Forgot password?
-          </Link>
-        </div>
-
-        <Button
-          type="submit"
-          className="w-full bg-[var(--primary-green)] hover:bg-green-700 rounded-sm text-white"
-        >
-          Sign in
-        </Button>
-      </form>
+            {isPending ? "Signing in..." : "Sign in"}
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 }
