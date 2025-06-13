@@ -12,9 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@chakra-ui/react";
-import { Upload, ChevronLeft } from "lucide-react";
 import { BsCloudArrowUp } from "react-icons/bs";
+import { useEffect } from "react";
 
 export default function CampaignModal({
   open,
@@ -23,7 +22,19 @@ export default function CampaignModal({
   open: boolean;
   onClose: () => void;
 }) {
-  if (!open) return null; // Don't render if not open
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [open]);
+
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 overflow-y-auto p-4">
