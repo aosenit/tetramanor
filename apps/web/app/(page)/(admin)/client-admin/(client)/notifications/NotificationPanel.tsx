@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   FileUp,
   Bell,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -21,6 +22,8 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import useNoti from "@/hooks/useNoti";
+import Loading from "../component/Loading";
 
 type NotificationType =
   | "document"
@@ -41,6 +44,7 @@ interface Notification {
 
 export function NotificationsPanel() {
   const [open, setOpen] = useState(false);
+  const { notifications: notificationsData, isLoading, refetch } = useNoti();
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: "1",
@@ -164,6 +168,14 @@ export function NotificationsPanel() {
     }
   };
 
+  useEffect(() => {
+    if (open) {
+      refetch();
+    }
+  }, [open]);
+
+  console.log(notificationsData);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -211,7 +223,8 @@ export function NotificationsPanel() {
               Mark all as read
             </Button>
           </div>
-
+          {/* add loading state */}
+          {isLoading && <Loading />}
           <TabsContent value="all" className="mt-0">
             <div className="max-h-[70vh] overflow-y-auto">
               {["today", "yesterday", "older"].map((date) => {

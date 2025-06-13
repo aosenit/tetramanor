@@ -13,8 +13,8 @@ export default function FindNextHome() {
               Find Your Next Home & Move In
             </h2>
             <div className="text-gray-700 text-base">
-              Lorem ipsum dolor sit amet consectetur. Et sit egestas sagittis
-              facilisi.
+              Browse available listings, choose your ideal space —seamlessly and
+              stress-free.
             </div>
           </div>
           <Button
