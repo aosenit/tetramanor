@@ -23,6 +23,8 @@ import {
   MessageSquare,
   Bell,
   LogOut,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -88,6 +90,8 @@ const menuItems = [
 export function AppSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [websiteOpen, setWebsiteOpen] = useState(true);
+  const [customerOpen, setCustomerOpen] = useState(true);
   return (
     <Sidebar className="border-r bg-[#323539] text-white">
       <SidebarHeader className="p-6">
@@ -100,47 +104,118 @@ export function AppSidebar() {
             className="w-40 object-contain"
           />
         </div>
-        <div className="mt-4 text-sm text-gray-400 uppercase tracking-wider">
-          ADMIN
-        </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-4">
-        <SidebarMenu>
-          {menuItems.map((item) => {
-            const isActive = pathname === item.url;
-            return (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton
-                  asChild
-                  className={`text-gray-300 hover:text-white hover:bg-gray-800 py-6 ${isActive ? "bg-[#2B2D2F] text-white" : ""}`}
-                >
-                  <Link
-                    href={item.url}
-                    className="flex items-center gap-3 px-3 py-3 rounded-md"
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            );
-          })}
-        </SidebarMenu>
+      <SidebarContent className="px-4 space-y-6">
+
+        {/* Website Section */}
+        <div>
+          <div
+            className="flex justify-between items-center px-3 mb-2 cursor-pointer"
+            onClick={() => setWebsiteOpen((prev) => !prev)}
+          >
+            <h4 className="text-xs text-gray-400 uppercase">Website</h4>
+            {websiteOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </div>
+          {websiteOpen && (
+            <SidebarMenu>
+              {[
+                { title: "Dashboard", url: route, icon: LayoutDashboard },
+                { title: "Homepage", url: `${route}/homepage`, icon: Home },
+                { title: "Properties", url: `${route}/properties`, icon: Building2 },
+                { title: "Blog posts", url: `${route}/blog-posts`, icon: FileText },
+                { title: "Media Upload", url: `${route}/media-upload`, icon: FileText },
+                { title: "Contact inquiries", url: `${route}/contact-inquiries`, icon: MessageSquare },
+              ].map((item) => {
+                const isActive = pathname === item.url;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      className={`text-gray-300 hover:text-white hover:bg-gray-800 py-6 ${isActive ? "bg-[#2B2D2F] text-white" : ""}`}
+                    >
+                      <Link href={item.url} className="flex items-center gap-3 px-3 py-3 rounded-md">
+                        <item.icon className="h-5 w-5" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          )}
+        </div>
+
+        {/* Customer Section */}
+        <div>
+          <div
+            className="flex justify-between items-center px-3 mb-2 cursor-pointer"
+            onClick={() => setCustomerOpen((prev) => !prev)}
+          >
+            <h4 className="text-xs text-gray-400 uppercase">Customer</h4>
+            {customerOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </div>
+          {customerOpen && (
+            <SidebarMenu>
+              {[
+                { title: "Users", url: `${route}/customers`, icon: Users },
+                { title: "Rentals", url: `${route}/rentals`, icon: Car },
+                { title: "Investments", url: `${route}/investments`, icon: TrendingUp },
+                { title: "Notifications", url: `${route}/notifications`, icon: Bell },
+                { title: "Payments", url: `${route}/payments`, icon: CreditCard },
+                { title: "Documents", url: `${route}/documents`, icon: FileText },
+              ].map((item) => {
+                const isActive = pathname === item.url;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      className={`text-gray-300 hover:text-white hover:bg-gray-800 py-6 ${isActive ? "bg-[#2B2D2F] text-white" : ""}`}
+                    >
+                      <Link href={item.url} className="flex items-center gap-3 px-3 py-3 rounded-md">
+                        <item.icon className="h-5 w-5" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          )}
+        </div>
       </SidebarContent>
 
-      <SidebarFooter className="p-">
+
+      <SidebarFooter className="px-4 space-y-2">
         <SidebarMenu>
+          {/* System Settings */}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               className="text-gray-300 hover:text-white hover:bg-gray-800"
             >
               <Button
-                onClick={() => {
-                  setOpen(true);
-                }}
-                className="flex items-center gap-3 px-3 py-6 rounded-md "
+                asChild
+                className="flex items-center gap-3 py-6 rounded-md w-full text-left"
+              >
+                <Link href={`${route}/settings`}>
+                  <FileText className="h-5 w-5" />
+                  <span>System Settings</span>
+                </Link>
+              </Button>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+
+          {/* Sign Out */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="text-gray-300 hover:text-white hover:bg-gray-800"
+            >
+              <Button
+                onClick={() => setOpen(true)}
+                className="flex items-center gap-3  py-6 rounded-md w-full text-left"
               >
                 <LogOut className="h-5 w-5" />
                 <span>Sign Out</span>
@@ -149,6 +224,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+
       <LogoutModal
         onLogout={() => {
           console.log("logout");
@@ -156,6 +232,7 @@ export function AppSidebar() {
         open={open}
         setOpen={setOpen}
       />
+
     </Sidebar>
   );
 }
