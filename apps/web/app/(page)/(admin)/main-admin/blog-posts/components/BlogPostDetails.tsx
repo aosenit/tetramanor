@@ -14,7 +14,7 @@ export default function CampaignModal({
   onClose,
 }: {
     open: boolean;
-  post: any;
+  post?: any;
   onClose: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +36,7 @@ export default function CampaignModal({
   const handleSelect = (value) => {
     setSelected(value);
     setIsOpen(false);
-  };
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 overflow-y-auto p-4">
@@ -173,4 +173,4 @@ export default function CampaignModal({
       </div>
     </div>
   );
-}
+};
