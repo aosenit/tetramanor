@@ -23,7 +23,7 @@ const HomeHero = () => {
           </h1>
           <p className="text-white text-center text-base md:text-lg lg:text-2xl font-normal mb-6 md:mb-10 max-w-2xl">
             Modern, sustainable homes designed for better living and stronger
-            communities
+            communities.
           </p>
           <form className="flex flex-col md:flex-row items-stretch w-full max-w-3xl bg-black/70 overflow-hidden border border-white/10">
             <div className="flex items-center px-4 md:px-6 py-3 md:py-4 border-b md:border-b-0 md:border-r border-white/30">

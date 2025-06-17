@@ -12,19 +12,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <SidebarProvider defaultOpen={true}>
-          <div className="flex min-h-screen w-full">
-            <AppSidebar />
-            <MobileNav />
-            <div className="flex-1 flex flex-col">
-              <TopHeader />
-              <main className="flex-1 p-6 bg-gray-50">{children}</main>
-            </div>
-          </div>
-        </SidebarProvider>
-      </body>
-    </html>
+    <SidebarProvider defaultOpen={true}>
+      <div className="flex min-h-screen w-full">
+        <AppSidebar />
+        <MobileNav />
+        <div className="flex-1 flex flex-col">
+          <TopHeader />
+          <main className="flex-1 p-4 bg-[#f4f4f4]">{children}</main>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 }
