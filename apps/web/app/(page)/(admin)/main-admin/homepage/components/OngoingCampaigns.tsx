@@ -5,9 +5,11 @@ import Image from "next/image";
 import two from "@/assets/admin/home/two.webp";
 import five from "@/assets/admin/home/five.svg";
 import Tooltip from "./modals/Tooltip";
+import CampaignModal from "./modals/Campain";
 
 export default function OngoingCampaigns() {
   const [openTooltipIndex, setOpenTooltipIndex] = useState<number | null>(null);
+  const [showPropertyCampaign, setShowPropertyCampaign] = useState(false);
   
 
   const toggleTooltip = (index: number) => {
@@ -41,10 +43,18 @@ export default function OngoingCampaigns() {
               Add or manage homepage promotions, investment offers, and sales
             </p>
           </div>
-          <button className="bg-[#116114] text-white flex items-center gap-1 px-3 py-2 rounded-md font-medium text-sm hover:bg-[#116114]">
+          <>
+            <button
+              onClick={() => setShowPropertyCampaign(true)}
+              className="bg-[#116114] text-white flex items-center gap-1 px-3 py-2 rounded-md font-medium text-sm hover:bg-[#116114]">
             <Plus />
             Add new campaign
-          </button>
+            </button>
+              <CampaignModal
+                          open={showPropertyCampaign}
+                          onClose={() => setShowPropertyCampaign(false)}
+                        />
+          </>
         </div>
         <div className="flex justify-between items-center bg-[#E5E5E7] text-xs font-medium text-[#181818] px-4 py-4">
           <p>Campaign title</p>
