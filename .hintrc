@@ -23,6 +23,7 @@
           "iframe[loading]"
         ]
       }
-    ]
+    ],
+    "no-inline-styles": "off"
   }
 }

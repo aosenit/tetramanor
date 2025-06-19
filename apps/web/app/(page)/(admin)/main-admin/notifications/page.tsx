@@ -1,6 +1,11 @@
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Check, Mail } from "lucide-react"
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import unreadIcon from "@/assets/admin/customer/unread.svg";
+import readIcon from "@/assets/admin/customer/read.svg";
+import { RiCheckDoubleLine } from "react-icons/ri";
 
 const notifications = [
   {
@@ -15,7 +20,8 @@ const notifications = [
     id: 2,
     category: "today",
     title: "Tm Meadows-Lease expiry in 2 months",
-    description: "Grace olabayo lease for unit 3b will expire on the 24th of july",
+    description:
+      "Grace olabayo lease for unit 3b will expire on the 24th of july",
     time: "2hr ago",
     isRead: false,
   },
@@ -23,7 +29,8 @@ const notifications = [
     id: 3,
     category: "today",
     title: "Lease agreement uploaded for TM HighGardens – Unit 2A.",
-    description: "The new lease agreement of sala over has been uploaded by customer",
+    description:
+      "The new lease agreement of sala over has been uploaded by customer",
     time: "4hr ago",
     isRead: false,
   },
@@ -47,7 +54,8 @@ const notifications = [
     id: 6,
     category: "older",
     title: "Rental payment overdue for TM HighGardens – Unit 4B.",
-    description: "The lease agreement of adeola najaat has expired and is due foer renewal",
+    description:
+      "The lease agreement of adeola najaat has expired and is due foer renewal",
     time: "11:45PM",
     isRead: true,
   },
@@ -63,7 +71,8 @@ const notifications = [
     id: 8,
     category: "older",
     title: "Title Deed Uploaded",
-    description: "Your Title Deed for King's Landing has been uploaded and is now available for download.",
+    description:
+      "Your Title Deed for King's Landing has been uploaded and is now available for download.",
     time: "3:04PM",
     isRead: true,
   },
@@ -75,120 +84,96 @@ const notifications = [
     time: "8min ago",
     isRead: true,
   },
-]
+];
 
 export default function NotificationsPage() {
+  const [filter, setFilter] = useState<"all" | "unread">("all");
+
+  const filteredNotifications =
+    filter === "unread"
+      ? notifications.filter((n) => !n.isRead)
+      : notifications;
+
+  const groupByCategory = (category: string) =>
+    filteredNotifications.filter((n) => n.category === category);
+
+  const renderNotifications = (list: typeof notifications) =>
+    list.map((notification) => (
+      <div
+        key={notification.id}
+        className={`flex items-center gap-4 p-4 rounded-lg ${notification.isRead ? "bg-white" : "bg-white"}`}
+      >
+        <div className="flex-shrink-0">
+          <div>
+            <Image
+              src={notification.isRead ? readIcon : unreadIcon}
+              alt={notification.isRead ? "Read" : "Unread"}
+              className=""
+              width={40}
+              height={40}
+            />
+          </div>
+        </div>
+        <div className="flex-1">
+          <h3 className="font-medium text-[#181818] text-sm">
+            {notification.title}
+          </h3>
+          <p className="text-[#868686] text-xs mt-1">
+            {notification.description}
+          </p>
+        </div>
+        <div className="text-xs text-[#868686] whitespace-nowrap">
+          {notification.time}
+        </div>
+      </div>
+    ));
+  
+
   return (
     <div className="space-y-6">
-      {/* Breadcrumb */}
-      <div className="text-sm text-gray-600">
-        Admin / <span className="text-green-600 font-medium">Notifications</span>
+      <div className="text-sm text-[#4C5560]">
+        Admin{" "}
+        <span className="text-[#116114] text-xl font-medium">
+          / Notifications
+        </span>
       </div>
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-semibold">Notifications</h1>
+      <div className="flex justify-between items-center border-b border-gray-200 pb-4">
+        <div className="flex gap-4">
+          <button
+            className={`px-2 py-2  text-sm font-medium ${filter === "all" ? " border-b-2 border-[#116114] pb-2 text-[#000000]" : " text-[#737687]"}`}
+            onClick={() => setFilter("all")}
+          >
+            All
+          </button>
+          <button
+            className={`px-2 py-2  text-sm font-medium flex items-center gap-2 ${filter === "unread" ? "border-b-2 border-[#116114] pb-2 text-[#000000]" : "text-[#737687]"}`}
+            onClick={() => setFilter("unread")}
+          >
+            Unread
+            <span className="bg-[#116114] text-white text-xs font-medium rounded-full h-5 w-5 flex items-center justify-center">
+              {notifications.filter((n) => !n.isRead).length}
+            </span>
+          </button>
         </div>
-        <Button variant="ghost" className="text-gray-500">
-          <Check className="h-4 w-4 mr-2" />
+        <Button variant="ghost" className="text-[#737687] hover:text-[#737687]">
+          <RiCheckDoubleLine className="" />
           Mark all as read
         </Button>
       </div>
-
-      {/* Tabs */}
-      <Tabs defaultValue="all">
-        <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="unread" className="flex items-center gap-2">
-            Unread
-            <span className="bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              3
-            </span>
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
-
-      {/* Notifications List */}
       <div className="space-y-8">
-        {/* Today */}
-        <div>
-          <h2 className="text-sm font-medium text-gray-500 mb-4">TODAY</h2>
-          <div className="space-y-4">
-            {notifications
-              .filter((notification) => notification.category === "today")
-              .map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`flex gap-4 p-4 rounded-lg ${notification.isRead ? "bg-white" : "bg-green-50"}`}
-                >
-                  <div className="flex-shrink-0">
-                    <div className="bg-green-100 h-10 w-10 rounded-full flex items-center justify-center">
-                      <Mail className="h-5 w-5 text-green-600" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium">{notification.title}</h3>
-                    <p className="text-gray-600 text-sm mt-1">{notification.description}</p>
-                  </div>
-                  <div className="text-xs text-gray-500 whitespace-nowrap">{notification.time}</div>
-                </div>
-              ))}
-          </div>
-        </div>
-
-        {/* Yesterday */}
-        <div>
-          <h2 className="text-sm font-medium text-gray-500 mb-4">YESTERDAY</h2>
-          <div className="space-y-4">
-            {notifications
-              .filter((notification) => notification.category === "yesterday")
-              .map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`flex gap-4 p-4 rounded-lg ${notification.isRead ? "bg-white" : "bg-green-50"}`}
-                >
-                  <div className="flex-shrink-0">
-                    <div className="bg-green-100 h-10 w-10 rounded-full flex items-center justify-center">
-                      <Mail className="h-5 w-5 text-green-600" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium">{notification.title}</h3>
-                    <p className="text-gray-600 text-sm mt-1">{notification.description}</p>
-                  </div>
-                  <div className="text-xs text-gray-500 whitespace-nowrap">{notification.time}</div>
-                </div>
-              ))}
-          </div>
-        </div>
-
-        {/* Older */}
-        <div>
-          <h2 className="text-sm font-medium text-gray-500 mb-4">OLDER</h2>
-          <div className="space-y-4">
-            {notifications
-              .filter((notification) => notification.category === "older")
-              .map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`flex gap-4 p-4 rounded-lg ${notification.isRead ? "bg-white" : "bg-green-50"}`}
-                >
-                  <div className="flex-shrink-0">
-                    <div className="bg-green-100 h-10 w-10 rounded-full flex items-center justify-center">
-                      <Mail className="h-5 w-5 text-green-600" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium">{notification.title}</h3>
-                    <p className="text-gray-600 text-sm mt-1">{notification.description}</p>
-                  </div>
-                  <div className="text-xs text-gray-500 whitespace-nowrap">{notification.time}</div>
-                </div>
-              ))}
-          </div>
-        </div>
+        {["today", "yesterday", "older"].map((category) => {
+          const list = groupByCategory(category);
+          if (list.length === 0) return null;
+          return (
+            <div key={category}>
+              <h2 className="text-sm font-medium text-gray-500 mb-4 uppercase">
+                {category}
+              </h2>
+              <div className="space-y-4">{renderNotifications(list)}</div>
+            </div>
+          );
+        })}
       </div>
     </div>
-  )
+  );
 }
