@@ -1,9 +1,41 @@
+"use client";
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Download, DollarSign, TrendingDown } from "lucide-react"
+import { HiArrowTurnDownLeft } from "react-icons/hi2";
+import { TbCurrencyNaira } from "react-icons/tb";
+import { Search, Download, DollarSign, Plus } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react"
+import Image from "next/image"
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import four from "@/assets/admin/customer/four.png"
+import icon from "@/assets/admin/home/five.svg"
+import five from "@/assets/admin/customer/five.svg"
+import Link from "next/link"
+import { FaAngleDown } from "react-icons/fa6";
+import { PiArrowArcLeftThin } from "react-icons/pi";
+import PaymentModal from "./components/RecieptModal";
+import PaymentSummaryModal from "./components/PaymentSummaryModal";
+const cards = [
+  {
+    id: 0,
+    title: "Total amount paid",
+    icon:<PiArrowArcLeftThin />,
+    count:400000,
+    subtitle: "April",
+    image: four,
+  },
+  {
+    id: 1,
+    title: "Total amount outstanding",
+    count: 150000,
+    icon:<HiArrowTurnDownLeft />,
+    subtitle: "April",
+    image: five,
+  },
+];
 
 const payments = [
   {
@@ -65,173 +97,175 @@ const payments = [
 ]
 
 export default function PaymentsPage() {
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+
+    const [activeCard, setActiveCard] = useState<number | null>(0);
   return (
-    <div className="space-y-6">
-      {/* Breadcrumb */}
-      <div className="text-sm text-gray-600">
-        Home / <span className="text-green-600 font-medium">Payment overview</span>
-      </div>
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-semibold">Payment overview</h1>
+    <div className="min-h-screen space-y-6">
+      <div className="">
+        <div className="flex border-b border-[#E5E5E7] pb-4 items-center justify-between">
+          <div className="flex items-center space-x-1  text-[#858C95]">
+            <span>Home</span>
+            <span className="text-xl text-[#858C95]">/</span>
+            <span className="font-medium text-xl text-[#116114]">
+              Payment Overview
+            </span>
+          </div>
+          <Link href="/main-admin/rentals/edit-rentals">
+            <Button
+              variant="outline"
+              className="bg-white flex items-center gap-2 text-sm hover:bg-green-800"
+            >
+              <Plus className="" />
+              Export CSV
+            </Button>
+          </Link>
         </div>
-        <Button variant="outline">
-          <Download className="h-4 w-4 mr-2" />
-          Export CSV
-        </Button>
       </div>
+      <div className="space-y-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#858C95] w-4 h-4" />
+          <Input
+            placeholder="Search  by name / payment reference/Project"
+            className="pl-10 bg-[#E5E5E7] border-0"
+          />
+        </div>
 
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-        <Input placeholder="Search by name / payment reference/Project" className="pl-10" />
-      </div>
+        {/* Tabs */}
+        <Tabs defaultValue="property">
+          <TabsList>
+            <TabsTrigger value="property">Property</TabsTrigger>
+            <TabsTrigger value="rental">Rental</TabsTrigger>
+          </TabsList>
+        </Tabs>
 
-      {/* Tabs */}
-      <Tabs defaultValue="property">
-        <TabsList>
-          <TabsTrigger value="property">Property</TabsTrigger>
-          <TabsTrigger value="rental">Rental</TabsTrigger>
-        </TabsList>
-      </Tabs>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Total amount Paid</p>
-                <h3 className="text-3xl font-bold text-green-600 mt-1">$400,000</h3>
-                <div className="flex items-center mt-2">
-                  <Button variant="ghost" size="sm" className="h-8 px-2 text-gray-500">
-                    April{" "}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-4 w-4 ml-1"
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </Button>
-                </div>
-              </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <DollarSign className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Total amount outstanding</p>
-                <h3 className="text-3xl font-bold text-green-600 mt-1">$150,000</h3>
-                <div className="flex items-center mt-2">
-                  <Button variant="ghost" size="sm" className="h-8 px-2 text-gray-500">
-                    April{" "}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-4 w-4 ml-1"
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </Button>
-                </div>
-              </div>
-              <div className="bg-orange-100 p-3 rounded-full">
-                <TrendingDown className="h-6 w-6 text-orange-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Payments Breakdown */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-medium">Payments breakdown</h2>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="h-8 px-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-4 w-4"
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {cards.map((card) => (
+            <Card key={card.id} onClick={() => setActiveCard(card.id)}>
+              <CardContent
+                className={`p-6 rounded-md cursor-pointer ${
+                  activeCard === card.id
+                    ? "border border-[#116114]"
+                    : "border border-transparent"
+                }`}
               >
-                <path d="M3 16h12M3 8h18M3 12h18" />
-              </svg>
-            </Button>
-            <Button variant="outline" size="sm" className="h-8 px-2">
-              <DollarSign className="h-4 w-4" />
-            </Button>
+                <div className="space-y-2">
+                  {/* Top Section with border-bottom */}
+                  <div className="flex items-center justify-between border-b border-[#E5E5E7] pb-2">
+                    <div className="flex items-center gap-2">
+                      <Image
+                        src={card.image}
+                        alt="logo"
+                        className="h-10 w-10"
+                      />
+                      <p className="text-[#323539] font-medium">{card.title}</p>
+                    </div>
+                    <span>{card.icon}</span>
+                  </div>
+
+                  {/* Bottom Section */}
+                  <div className="flex items-center justify-between mt-4 pt-2">
+                    <h3 className="text-2xl ml-1 font-semibold text-[#116114]">
+                      ${card.count}
+                    </h3>
+                    <p className="text-xs flex gap-2 items-center text-[#858C95]">
+                      {card.subtitle}
+                      <FaAngleDown />
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Payments Breakdown */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-lg font-medium">Payments breakdown</h2>
+            <div className="flex items-center gap-2 rounded-full border border-gray-300 p-2 w-fit">
+              <TbCurrencyNaira className="w-5 h-5 text-[#116114]" />
+              <DollarSign className="w-5 h-5 text-[#116114]" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-md shadow overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Details</TableHead>
+                  <TableHead>Payment type</TableHead>
+                  <TableHead>Project unit</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Date paid</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {payments.map((payment) => (
+                  <TableRow key={payment.id}>
+                    <TableCell className="font-medium">
+                      {payment.details}
+                    </TableCell>
+                    <TableCell>{payment.paymentType}</TableCell>
+                    <TableCell>{payment.projectUnit}</TableCell>
+                    <TableCell>{payment.amount}</TableCell>
+                    <TableCell>{payment.datePaid}</TableCell>
+                    <TableCell>
+                      <DropdownMenu.Root>
+                        <DropdownMenu.Trigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
+                            <span className="sr-only">Open menu</span>
+                            <Image
+                              src={icon}
+                              alt="Action menu"
+                              width={16}
+                              height={16}
+                              className="object-contain"
+                            />
+                          </Button>
+                        </DropdownMenu.Trigger>
+
+                        <DropdownMenu.Content
+                          sideOffset={4}
+                          className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md"
+                        >
+                          <DropdownMenu.Item
+                            className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
+                            onClick={() => setShowReceiptModal(true)}
+                          >
+                            View receipt
+                          </DropdownMenu.Item>
+
+                          <DropdownMenu.Item
+                            className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
+                            onClick={() => setShowSummary(true)}
+                          >
+                            Payment details
+                          </DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                      </DropdownMenu.Root>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </div>
-
-        <div className="bg-white rounded-md shadow overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Details</TableHead>
-                <TableHead>Payment type</TableHead>
-                <TableHead>Project unit</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Date paid</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {payments.map((payment) => (
-                <TableRow key={payment.id}>
-                  <TableCell className="font-medium">{payment.details}</TableCell>
-                  <TableCell>{payment.paymentType}</TableCell>
-                  <TableCell>{payment.projectUnit}</TableCell>
-                  <TableCell>{payment.amount}</TableCell>
-                  <TableCell>{payment.datePaid}</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <span className="sr-only">Open menu</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4"
-                      >
-                        <circle cx="12" cy="12" r="1" />
-                        <circle cx="12" cy="5" r="1" />
-                        <circle cx="12" cy="19" r="1" />
-                      </svg>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
       </div>
+      <PaymentModal
+        open={showReceiptModal}
+        onClose={() => setShowReceiptModal(false)}
+      />
+      {showSummary && (
+       <PaymentSummaryModal open={showSummary} onClose={() => setShowSummary(false)} />
+      )}
     </div>
-  )
+  );
 }
