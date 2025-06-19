@@ -52,12 +52,12 @@ export default function LoginPage() {
         const { token, ...user } = response.data;
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-        router.push("/client-admin/dashboard");
-        // if (user.type === "client") {
-        //   router.push("/client-admin/dashboard");
-        // } else {
-        //   router.push("/main-admin");
-        // }
+
+        if (user.email.includes("admin")) {
+          router.push("/main-admin");
+        } else {
+          router.push("/client-admin/dashboard");
+        }
       }
       console.log(response);
     } catch (error) {

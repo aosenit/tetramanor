@@ -86,9 +86,9 @@ const handleError = async (error: any) => {
       originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
       return axiosInstance(originalRequest);
     } catch (refreshError) {
-      if (!originalRequest.url.includes("auth/login")) {
+      if (!originalRequest.url.includes("login")) {
         localStorage.clear();
-        window.location.href = "/auth/login";
+        window.location.href = "/login";
         toast.error("Session expired. Please login again.");
       }
       return Promise.reject(refreshError);
