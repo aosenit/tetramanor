@@ -1,10 +1,18 @@
+"use client";
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import five from "@/assets/admin/home/five.svg";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import three from "@/assets/admin/three.svg"
+import Image from "next/image"
+import two from "@/assets/admin/two.svg"
+import one from "@/assets/admin/one.svg"
 import { Input } from "@/components/ui/input"
-import { Search, Plus, Users } from "lucide-react"
+import { Search, Plus} from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import Link from "next/link"
+import { useState } from "react"
 
 const customers = [
   {
@@ -72,162 +80,185 @@ const customers = [
     engagement: "Lease Tm meadows 3BR",
   },
 ]
+const stats = [
+  {
+    title: "Total Customers",
+    value: 300,
+ icon:one,
+  },
+  {
+    title: "Verified Customers",
+    value: 250,
+  icon:two,
+  },
+  {
+    title: "Unverified customers",
+    value: 50,
+ icon:three,
+  },
+];
+
 
 export default function CustomersPage() {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   return (
-    <div className="space-y-6">
-      {/* Breadcrumb */}
-      <div className="text-sm text-gray-600">
-        Admin / <span className="text-green-600 font-medium">Customer management</span>
-      </div>
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-semibold">Customer management</h1>
+    <div className="min-h-screen space-y-6">
+      <div className="">
+        <div className="flex border-b border-[#E5E5E7] pb-4 items-center justify-between">
+          <div className="flex items-center space-x-1  text-[#858C95]">
+            <span>Home</span>
+            <span className="text-xl text-[#858C95]">/</span>
+            <span className="font-medium text-xl text-[#116114]">
+              Customer management
+            </span>
+          </div>
+          <Link href="/main-admin/customers/add-customers">
+            <Button className="bg-[#116114] flex items-center gap-2 text-sm hover:bg-green-800">
+              <Plus className="" />
+              Add New Customer
+            </Button>
+          </Link>
         </div>
-        <Button className="bg-green-600 hover:bg-green-700">
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Customer
-        </Button>
       </div>
+      <div className="space-y-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#858C95] w-4 h-4" />
+          <Input
+            placeholder="Search  by name / email / ID "
+            className="pl-10 bg-[#E5E5E7] border-0"
+          />
+        </div>
 
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-        <Input placeholder="Search by name / email / ID" className="pl-10" />
-      </div>
+        {/* Filters */}
+        <div className="flex flex-wrap gap-4">
+          <Button variant="outline" className="bg-white text-[#858C95]">
+            All
+          </Button>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4">
-        <Button variant="outline" className="bg-gray-100">
-          All
-        </Button>
+          <Select>
+            <SelectTrigger className="w-[180px] bg-white text-[#858C95]">
+              <SelectValue placeholder="Role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="investor">Investor</SelectItem>
+              <SelectItem value="tenant">Tenant</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="buyer">Buyer</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="investor">Investor</SelectItem>
-            <SelectItem value="tenant">Tenant</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="buyer">Buyer</SelectItem>
-          </SelectContent>
-        </Select>
+          <Select>
+            <SelectTrigger className="w-[180px] bg-white text-[#858C95]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="verified">Verified</SelectItem>
+              <SelectItem value="unverified">Unverified</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="verified">Verified</SelectItem>
-            <SelectItem value="unverified">Unverified</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Total Customers</p>
-                <h3 className="text-3xl font-bold text-green-600 mt-1">300</h3>
-              </div>
-              <div className="bg-orange-100 p-3 rounded-full">
-                <Users className="h-6 w-6 text-orange-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Verified Customers</p>
-                <h3 className="text-3xl font-bold text-green-600 mt-1">250</h3>
-              </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <Users className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Unverified customers</p>
-                <h3 className="text-3xl font-bold text-orange-600 mt-1">50</h3>
-              </div>
-              <div className="bg-orange-100 p-3 rounded-full">
-                <Users className="h-6 w-6 text-orange-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Customers Table */}
-      <div className="bg-white rounded-md shadow overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Kyc status</TableHead>
-              <TableHead>Engagement</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {customers.map((customer) => (
-              <TableRow key={customer.id}>
-                <TableCell className="font-medium">{customer.name}</TableCell>
-                <TableCell>{customer.email}</TableCell>
-                <TableCell>{customer.role}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={
-                      customer.kycStatus === "Verified"
-                        ? "bg-green-100 text-green-800 border-green-200"
-                        : "bg-orange-100 text-orange-800 border-orange-200"
-                    }
-                  >
-                    {customer.kycStatus}
-                  </Badge>
-                </TableCell>
-                <TableCell>{customer.engagement}</TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <span className="sr-only">Open menu</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-4 w-4"
-                    >
-                      <circle cx="12" cy="12" r="1" />
-                      <circle cx="12" cy="5" r="1" />
-                      <circle cx="12" cy="19" r="1" />
-                    </svg>
-                  </Button>
-                </TableCell>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {stats.map((stat, index) => (
+            <Card
+              key={index}
+              onClick={() => setActiveIndex(index)}
+              className={`cursor-pointer ${
+                activeIndex === index
+                  ? "border border-[#116114]"
+                  : "border-none"
+              }`}
+            >
+              <CardContent className="p-6">
+                <div>
+                  <div className="flex items-center gap-10">
+                    <p className="text-sm font-medium text-[#323539]">
+                      {stat.title}
+                    </p>
+                    <Image src={stat.icon} alt={stat.title} />
+                  </div>
+                  <p className="font-medium text-xl text-[#116114]">
+                    {stat.value}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        {/* Customers Table */}
+        <div className="bg-white rounded-md shadow overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Kyc status</TableHead>
+                <TableHead>Engagement</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {customers.map((customer) => (
+                <TableRow key={customer.id}>
+                  <TableCell className="text-[#181818]">
+                    {customer.name}
+                  </TableCell>
+                  <TableCell className="text-[#181818]">
+                    {customer.email}
+                  </TableCell>
+                  <TableCell className="text-[#181818]">
+                    {customer.role}
+                  </TableCell>
+                  <TableCell className="text-[#116114] font-medium">
+                    {customer.kycStatus}
+                  </TableCell>
+                  <TableCell className="text-[#181818]">
+                    {customer.engagement}
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                        >
+                          <span className="sr-only">Open menu</span>
+                          <Image
+                            src={five}
+                            alt="Action menu"
+                            width={16}
+                            height={16}
+                            className="object-contain"
+                          />
+                        </Button>
+                      </DropdownMenu.Trigger>
+
+                      <DropdownMenu.Content
+                        sideOffset={4}
+                        className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md"
+                      >
+                        <Link href="/main-admin/customers/view-profile">
+                          <DropdownMenu.Item className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer">
+                            View Profile
+                          </DropdownMenu.Item>
+                        </Link>
+                        <Link href="/main-admin/customers/add-customers">
+                          <DropdownMenu.Item className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer">
+                            Edit Profile
+                          </DropdownMenu.Item>
+                        </Link>
+                      </DropdownMenu.Content>
+                    </DropdownMenu.Root>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
-  )
+  );
 }
