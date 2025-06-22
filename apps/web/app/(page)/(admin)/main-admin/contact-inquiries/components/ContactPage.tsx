@@ -10,7 +10,7 @@ import {
   DialogOverlay,
   DialogPortal,
 } from "@/components/ui/dialog";
-  
+
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { MdArrowBackIosNew } from "react-icons/md";
@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import Socials from "./SocialLinkForm";
 
 export default function ContactPage() {
-    const [socialOpen, setSocialOpen] = useState(false);
+  const [socialOpen, setSocialOpen] = useState(false);
   const router = useRouter();
   const [selected, setSelected] = useState<"embed" | "address">("address");
   const [editMode, setEditMode] = useState(false);
@@ -130,9 +130,7 @@ export default function ContactPage() {
           <Dialog open={socialOpen} onOpenChange={setSocialOpen}>
             <DialogPortal>
               <DialogOverlay className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50" />
-              <DialogContent
-                className="max-w-md w-full p-0 bg-white rounded-md z-50 shadow-lg border-none"
-              >
+              <DialogContent className="max-w-md w-full p-0 bg-white rounded-md z-50 shadow-lg border-none">
                 <Socials />
               </DialogContent>
             </DialogPortal>

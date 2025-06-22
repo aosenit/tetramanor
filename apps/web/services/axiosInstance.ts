@@ -87,19 +87,15 @@ const handleError = async (error: any) => {
       return axiosInstance(originalRequest);
     } catch (refreshError) {
       if (!originalRequest.url.includes("login")) {
-        localStorage.clear();
-        window.location.href = "/login";
-        toast.error("Session expired. Please login again.");
+        // localStorage.clear();
+        // window.location.href = "/login";
+        toast.error("Unauthorized: Please log in again.");
       }
       return Promise.reject(refreshError);
     }
   }
 
   const messages: Record<number, string> = {
-    400: "Bad Request: Please check your input.",
-    401: "Unauthorized: Please log in again.",
-    403: "Forbidden: You do not have access to this resource.",
-    404: "Not Found: The resource was not found.",
     500: "Internal Server Error: Please try again later.",
   };
 

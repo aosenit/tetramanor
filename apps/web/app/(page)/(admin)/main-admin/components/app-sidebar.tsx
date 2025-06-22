@@ -27,10 +27,11 @@ import {
   ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import LogoutModal from "@/components/LogoutModal";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export const route = "/main-admin";
 
@@ -92,6 +93,7 @@ export function AppSidebar() {
   const [open, setOpen] = useState(false);
   const [websiteOpen, setWebsiteOpen] = useState(true);
   const [customerOpen, setCustomerOpen] = useState(true);
+  const router = useRouter();
   return (
     <Sidebar className="border-r bg-[#323539] text-white">
       <SidebarHeader className="p-6">
@@ -107,7 +109,6 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-4 space-y-6">
-
         {/* Website Section */}
         <div>
           <div
@@ -122,10 +123,26 @@ export function AppSidebar() {
               {[
                 { title: "Dashboard", url: route, icon: LayoutDashboard },
                 { title: "Homepage", url: `${route}/homepage`, icon: Home },
-                { title: "Properties", url: `${route}/properties`, icon: Building2 },
-                { title: "Blog posts", url: `${route}/blog-posts`, icon: FileText },
-                { title: "Media Upload", url: `${route}/media-upload`, icon: FileText },
-                { title: "Contact inquiries", url: `${route}/contact-inquiries`, icon: MessageSquare },
+                {
+                  title: "Properties",
+                  url: `${route}/properties`,
+                  icon: Building2,
+                },
+                {
+                  title: "Blog posts",
+                  url: `${route}/blog-posts`,
+                  icon: FileText,
+                },
+                {
+                  title: "Media Upload",
+                  url: `${route}/media-upload`,
+                  icon: FileText,
+                },
+                {
+                  title: "Contact inquiries",
+                  url: `${route}/contact-inquiries`,
+                  icon: MessageSquare,
+                },
               ].map((item) => {
                 const isActive = pathname === item.url;
                 return (
@@ -134,7 +151,10 @@ export function AppSidebar() {
                       asChild
                       className={`text-gray-300 hover:text-white hover:bg-gray-800 py-6 ${isActive ? "bg-[#2B2D2F] text-white" : ""}`}
                     >
-                      <Link href={item.url} className="flex items-center gap-3 px-3 py-3 rounded-md">
+                      <Link
+                        href={item.url}
+                        className="flex items-center gap-3 px-3 py-3 rounded-md"
+                      >
                         <item.icon className="h-5 w-5" />
                         <span>{item.title}</span>
                       </Link>
@@ -160,10 +180,26 @@ export function AppSidebar() {
               {[
                 { title: "Users", url: `${route}/customers`, icon: Users },
                 { title: "Rentals", url: `${route}/rentals`, icon: Car },
-                { title: "Investments", url: `${route}/investments`, icon: TrendingUp },
-                { title: "Notifications", url: `${route}/notifications`, icon: Bell },
-                { title: "Payments", url: `${route}/payments`, icon: CreditCard },
-                { title: "Documents", url: `${route}/documents`, icon: FileText },
+                {
+                  title: "Investments",
+                  url: `${route}/investments`,
+                  icon: TrendingUp,
+                },
+                {
+                  title: "Notifications",
+                  url: `${route}/notifications`,
+                  icon: Bell,
+                },
+                {
+                  title: "Payments",
+                  url: `${route}/payments`,
+                  icon: CreditCard,
+                },
+                {
+                  title: "Documents",
+                  url: `${route}/documents`,
+                  icon: FileText,
+                },
               ].map((item) => {
                 const isActive = pathname === item.url;
                 return (
@@ -172,7 +208,10 @@ export function AppSidebar() {
                       asChild
                       className={`text-gray-300 hover:text-white hover:bg-gray-800 py-6 ${isActive ? "bg-[#2B2D2F] text-white" : ""}`}
                     >
-                      <Link href={item.url} className="flex items-center gap-3 px-3 py-3 rounded-md">
+                      <Link
+                        href={item.url}
+                        className="flex items-center gap-3 px-3 py-3 rounded-md"
+                      >
                         <item.icon className="h-5 w-5" />
                         <span>{item.title}</span>
                       </Link>
@@ -184,7 +223,6 @@ export function AppSidebar() {
           )}
         </div>
       </SidebarContent>
-
 
       <SidebarFooter className="px-4 space-y-2">
         <SidebarMenu>
@@ -206,7 +244,6 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-
           {/* Sign Out */}
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -227,12 +264,15 @@ export function AppSidebar() {
 
       <LogoutModal
         onLogout={() => {
-          console.log("logout");
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          router.push("/login");
+          setOpen(false);
+          toast.success("Logged out successfully");
         }}
         open={open}
         setOpen={setOpen}
       />
-
     </Sidebar>
   );
 }
