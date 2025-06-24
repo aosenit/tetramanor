@@ -12,10 +12,28 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MdArrowBackIosNew } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import Socials from "./SocialLinkForm";
+import { useFetchData, usePutData } from "@/hooks/useApi";
+
+interface ContactData {
+  id: string;
+  companyEmail: string;
+  phoneNumber: string;
+  whatsappNumber: string;
+  socialMedia: Array<{ url: string; platform: string }>;
+  mapEmbedCode: string;
+  officeAddress: string;
+  createdAt: string;
+  updatedAt: string;
+  agentInquiry: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+}
 
 export default function ContactPage() {
   const [socialOpen, setSocialOpen] = useState(false);
@@ -24,12 +42,137 @@ export default function ContactPage() {
   const [editMode, setEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState("account-officers");
 
-  const handleClick = (tab) => {
+  const [error, setError] = useState<string | null>(null);
+
+  // Form state
+  const [formData, setFormData] = useState<ContactData>({
+    id: "",
+    companyEmail: "",
+    phoneNumber: "",
+    whatsappNumber: "",
+    socialMedia: [],
+    mapEmbedCode: "",
+    officeAddress: "",
+    createdAt: "",
+    updatedAt: "",
+    agentInquiry: {
+      name: "",
+      email: "",
+      phone: "",
+    },
+  });
+
+  const { data, isLoading: isDataLoading, refetch } = useFetchData("contact");
+  const { mutateAsync: updateContact, isPending: isUpdating } =
+    usePutData("contact");
+
+  // Update form data when API data is loaded
+  useEffect(() => {
+    if (data && data.success) {
+      setFormData(data.data);
+    }
+  }, [data]);
+
+  const handleInputChange = (field: string, value: string) => {
+    if (field.includes(".")) {
+      const [parent, child] = field.split(".");
+      setFormData((prev) => ({
+        ...prev,
+        [parent]: {
+          ...(prev[parent as keyof ContactData] as Record<string, any>),
+          [child]: value,
+        },
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    }
+  };
+
+  const handleSave = async () => {
+    setError(null);
+
+    try {
+      const response = await updateContact(formData);
+
+      if (response) {
+        setEditMode(false);
+        refetch();
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    }
+  };
+
+  const handleClick = (tab: string) => {
     setActiveTab(tab);
     if (tab === "account-officers") {
       router.push("/main-admin/contact-inquiries/account-officer");
     }
   };
+
+  // Loading state
+  if (isDataLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="border-b-2 border-gray-200 pb-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-1 text-[#858C95]">
+              <span>Admin</span>
+              <span className="text-xl text-[#858C95]">/</span>
+              <span className="font-medium text-xl text-[#116114]">
+                Contact Page
+              </span>
+            </div>
+            <div className="h-10 w-20 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+        </div>
+
+        <div className="p-6 bg-white space-y-8">
+          <div className="h-6 w-48 bg-gray-200 rounded animate-pulse"></div>
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="space-y-2">
+              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error && !isDataLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="border-b-2 border-gray-200 pb-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-1 text-[#858C95]">
+              <span>Admin</span>
+              <span className="text-xl text-[#858C95]">/</span>
+              <span className="font-medium text-xl text-[#116114]">
+                Contact Page
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <p className="text-red-600 mb-4">{error}</p>
+            <Button
+              onClick={() => window.location.reload()}
+              className="bg-[#116114] hover:bg-green-800"
+            >
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -77,7 +220,7 @@ export default function ContactPage() {
             <p
               onClick={() => handleClick("account-officers")}
               className={`px-6 py-2 rounded text-center text-[#4C5560] cursor-pointer font-medium ${
-                activeTab === "account-officers" ? "bg-white" : ""
+                activeTab === "account-officers" ? "bg-white" : "text-primary"
               }`}
             >
               Account officers
@@ -94,8 +237,10 @@ export default function ContactPage() {
           <Label htmlFor="email">Company Email</Label>
           <Input
             id="email"
-            defaultValue="Contact@tetramanor.com"
-            className={editMode ? "bg-[#D9D9D9]" : ""}
+            value={formData.companyEmail}
+            onChange={(e) => handleInputChange("companyEmail", e.target.value)}
+            disabled={!editMode}
+            className={editMode ? "bg-white" : "bg-[#D9D9D9]"}
           />
         </div>
 
@@ -103,8 +248,10 @@ export default function ContactPage() {
           <Label htmlFor="phone">Phone number</Label>
           <Input
             id="phone"
-            defaultValue="+ 234 7890666654"
-            className={editMode ? "bg-[#D9D9D9]" : ""}
+            value={formData.phoneNumber}
+            onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+            disabled={!editMode}
+            className={editMode ? "bg-white" : "bg-[#D9D9D9]"}
           />
         </div>
 
@@ -112,8 +259,12 @@ export default function ContactPage() {
           <Label htmlFor="whatsapp">Whatsapp number</Label>
           <Input
             id="whatsapp"
-            defaultValue="+ 234 7890666654"
-            className={editMode ? "bg-[#D9D9D9]" : ""}
+            value={formData.whatsappNumber}
+            onChange={(e) =>
+              handleInputChange("whatsappNumber", e.target.value)
+            }
+            disabled={!editMode}
+            className={editMode ? "bg-white" : "bg-[#D9D9D9]"}
           />
         </div>
 
@@ -162,18 +313,27 @@ export default function ContactPage() {
           <Label htmlFor="office-address">Office address</Label>
           <Input
             id="office-address"
-            defaultValue="123 Street Name"
-            className={editMode ? "bg-[#D9D9D9]" : ""}
+            value={formData.officeAddress}
+            onChange={(e) => handleInputChange("officeAddress", e.target.value)}
+            disabled={!editMode}
+            className={editMode ? "bg-white" : "bg-[#D9D9D9]"}
           />
         </div>
 
         {/* Map Preview */}
         <div
           className={`border h-64 rounded-lg flex items-center justify-center ${
-            editMode ? "bg-[#D9D9D9]" : "border-gray-200"
+            editMode ? "bg-white" : "bg-[#D9D9D9]"
           }`}
         >
-          <span className="text-gray-500">Map preview</span>
+          {selected === "embed" && formData.mapEmbedCode ? (
+            <div
+              className="w-full h-full"
+              dangerouslySetInnerHTML={{ __html: formData.mapEmbedCode }}
+            />
+          ) : (
+            <span className="text-gray-500">Map preview</span>
+          )}
         </div>
 
         {/* Agent Inquiry */}
@@ -183,16 +343,26 @@ export default function ContactPage() {
           </h2>
 
           <div className="space-y-4">
-            {["name", "email", "phone"].map((field) => (
-              <div className="space-y-2" key={field}>
-                <Label htmlFor={field}>
-                  {field === "name"
-                    ? "Full name"
-                    : field === "email"
-                      ? "Email address"
-                      : "Phone number"}
-                </Label>
-                <Input id={field} className={editMode ? "bg-[#D9D9D9]" : ""} />
+            {[
+              { key: "agentInquiry.name", label: "Full name" },
+              { key: "agentInquiry.email", label: "Email address" },
+              { key: "agentInquiry.phone", label: "Phone number" },
+            ].map(({ key, label }) => (
+              <div className="space-y-2" key={key}>
+                <Label htmlFor={key}>{label}</Label>
+                <Input
+                  id={key}
+                  value={
+                    key.includes(".")
+                      ? formData[key.split(".")[0] as keyof ContactData]?.[
+                          key.split(".")[1] as keyof any
+                        ] || ""
+                      : formData[key as keyof ContactData] || ""
+                  }
+                  onChange={(e) => handleInputChange(key, e.target.value)}
+                  disabled={!editMode}
+                  className={editMode ? "bg-white" : "bg-[#D9D9D9]"}
+                />
               </div>
             ))}
           </div>
@@ -200,9 +370,15 @@ export default function ContactPage() {
 
         {/* Save/Back Buttons */}
         <div className="flex justify-between items-center py-4">
-          <button className="bg-[#116114] hover:bg-[#116114] text-white text-sm px-8 py-2 rounded">
-            Save changes
-          </button>
+          {editMode && (
+            <Button
+              onClick={handleSave}
+              disabled={isUpdating}
+              className="bg-[#116114] hover:bg-[#116114] text-white text-sm px-8 py-2 rounded disabled:opacity-50"
+            >
+              {isUpdating ? "Saving..." : "Save changes"}
+            </Button>
+          )}
           <button
             onClick={() => setEditMode(false)}
             className="text-[#323539] flex items-center gap-2 hover:text-[#323539] text-sm"

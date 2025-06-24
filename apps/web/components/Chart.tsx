@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import dynamic from "next/dynamic"
-import { Suspense } from "react"
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 
 // Import the chart component with no SSR
 const DoughnutChart = dynamic(() => import("./DoughnutChart"), {
   ssr: false,
-})
+});
 
 interface PropertyStatisticsChartProps {
-  total: number
-  forSale: number
-  forRent: number
-  rentedOut: number
+  total: number;
+  forSale: number;
+  forRent: number;
+  rentedOut: number;
 }
 
 function ChartFallback() {
@@ -20,14 +20,21 @@ function ChartFallback() {
     <div className="w-full h-full flex items-center justify-center">
       <div className="w-[80%] h-[80%] rounded-full bg-gray-100" />
     </div>
-  )
+  );
 }
 
-export default function PropertyStatisticsChart({ total, forSale, forRent, rentedOut }: PropertyStatisticsChartProps) {
+export default function PropertyStatisticsChart({
+  total,
+  forSale,
+  forRent,
+  rentedOut,
+}: PropertyStatisticsChartProps) {
   // Validate that percentages add up to 100
-  const totalPercentage = forSale + forRent + rentedOut
+  const totalPercentage = forSale + forRent + rentedOut;
   if (totalPercentage !== 100) {
-    console.warn(`Property percentages should add up to 100%. Current total: ${totalPercentage}%`)
+    console.warn(
+      `Property percentages should add up to 100%. Current total: ${totalPercentage}%`
+    );
   }
 
   return (
@@ -74,6 +81,5 @@ export default function PropertyStatisticsChart({ total, forSale, forRent, rente
         </div>
       </div>
     </div>
-  )
+  );
 }
-

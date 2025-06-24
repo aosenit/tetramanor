@@ -1,32 +1,37 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { Chart, type ChartData, type ChartOptions } from "chart.js/auto"
+import { useEffect, useRef, useState } from "react";
+import { Chart, type ChartData, type ChartOptions } from "chart.js/auto";
 
 interface DoughnutChartProps {
-  data: number[]
-  labels: string[]
-  colors: string[]
-  cutout?: string
+  data: number[];
+  labels: string[];
+  colors: string[];
+  cutout?: string;
 }
 
-export default function DoughnutChart({ data, labels, colors, cutout }: DoughnutChartProps) {
-  const chartRef = useRef<HTMLCanvasElement>(null)
-  const chartInstance = useRef<Chart | null>(null)
-  const [isClient, setIsClient] = useState(false)
+export default function DoughnutChart({
+  data,
+  labels,
+  colors,
+  cutout,
+}: DoughnutChartProps) {
+  const chartRef = useRef<HTMLCanvasElement>(null);
+  const chartInstance = useRef<Chart | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true)
-  }, [])
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
-    if (!chartRef.current || !isClient) return
+    if (!chartRef.current || !isClient) return;
     if (chartInstance.current) {
-      chartInstance.current.destroy()
+      chartInstance.current.destroy();
     }
 
-    const ctx = chartRef.current.getContext("2d")
-    if (!ctx) return
+    const ctx = chartRef.current.getContext("2d");
+    if (!ctx) return;
 
     const chartData: ChartData = {
       labels: labels,
@@ -37,9 +42,9 @@ export default function DoughnutChart({ data, labels, colors, cutout }: Doughnut
           borderWidth: 0,
         },
       ],
-    }
+    };
 
-    const options: ChartOptions<'doughnut'> = {
+    const options: ChartOptions<"doughnut"> = {
       responsive: true,
       maintainAspectRatio: true,
       cutout: cutout,
@@ -53,33 +58,32 @@ export default function DoughnutChart({ data, labels, colors, cutout }: Doughnut
           },
         },
       },
-    }
+    };
 
     chartInstance.current = new Chart(ctx, {
       type: "doughnut",
       data: chartData,
       options: options,
-    })
+    });
 
     const handleResize = () => {
       if (chartInstance.current) {
-        chartInstance.current.resize()
+        chartInstance.current.resize();
       }
-    }
+    };
 
-    window.addEventListener("resize", handleResize)
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener("resize", handleResize)
+      window.removeEventListener("resize", handleResize);
       if (chartInstance.current) {
-        chartInstance.current.destroy()
+        chartInstance.current.destroy();
       }
-    }
-  }, [data, labels, colors, isClient])
+    };
+  }, [data, labels, colors, isClient]);
 
   if (!isClient) {
-    return <div className="w-full h-full" />
+    return <div className="w-full h-full" />;
   }
-
-  return <canvas ref={chartRef} className="w-full h-full" />
-} 
+  return <canvas ref={chartRef} className="w-full h-full" />;
+}

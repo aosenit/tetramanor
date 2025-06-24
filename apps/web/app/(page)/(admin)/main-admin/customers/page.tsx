@@ -412,22 +412,40 @@ export default function CustomersPage() {
 
                           <DropdownMenu.Content
                             sideOffset={4}
-                            className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md"
+                            className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md flex flex-col gap-2"
                           >
-                            <Link
-                              href={`/main-admin/customers/view-profile/${user.id}`}
+                            {/* change to click */}
+                            <button
+                              className=""
+                              onClick={() =>
+                                router.push(
+                                  `/main-admin/customers/view-profile?id=${user.id}`,
+                                  {
+                                    state: { user },
+                                  } as any
+                                )
+                              }
                             >
                               <DropdownMenu.Item className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer">
                                 View Profile
                               </DropdownMenu.Item>
-                            </Link>
-                            <Link
-                              href={`/main-admin/customers/edit/${user.id}`}
+                            </button>
+
+                            <button
+                              className=""
+                              onClick={() =>
+                                router.push(
+                                  `/main-admin/customers/edit?id=${user.id}`,
+                                  {
+                                    state: { user },
+                                  } as any
+                                )
+                              }
                             >
                               <DropdownMenu.Item className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer">
                                 Edit Profile
                               </DropdownMenu.Item>
-                            </Link>
+                            </button>
                           </DropdownMenu.Content>
                         </DropdownMenu.Root>
                       </TableCell>

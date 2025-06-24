@@ -1,22 +1,28 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const [loading, setLoading] = useState(true);
 
-  if (!user.email) {
-    // remove token and user from local storage
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const user = storedUser ? JSON.parse(storedUser) : null;
 
-    // redirect to login page
-    router.push("/login");
-  }
+    if (!user?.email) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      router.push("/login");
+    } else {
+      setLoading(false);
+    }
+  }, [router]);
 
-  return children;
+  if (loading) return <div>Loading...</div>;
+
+  return <>{children}</>;
 };
 
 export default AuthWrapper;

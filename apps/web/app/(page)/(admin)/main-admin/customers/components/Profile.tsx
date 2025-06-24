@@ -1,17 +1,19 @@
 "use client";
 import { useState } from "react";
-import { Button } from '@chakra-ui/react';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
-import four from '@/assets/admin/home/four.webp';
-import React from 'react'
-import { RiEditLine } from 'react-icons/ri';
-import { MdArrowBackIosNew } from 'react-icons/md';
+import { Button } from "@chakra-ui/react";
+import { Plus } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import four from "@/assets/admin/home/four.webp";
+import { RiEditLine } from "react-icons/ri";
+import { MdArrowBackIosNew } from "react-icons/md";
 import AddUnitModal from "./UnitModal";
+import { useRouter } from "next/navigation";
 
 export default function Profile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
+
   return (
     <div className="min-h-screen space-y-6">
       <div className=" border-b border-[#E5E5E7] pb-4 ">
