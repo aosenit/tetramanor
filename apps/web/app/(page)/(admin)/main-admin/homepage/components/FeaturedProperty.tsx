@@ -8,10 +8,9 @@ import one from "@/assets/admin/home/one.webp";
 import OngoingCampaigns from "./OngoingCampaigns";
 import PropertySelector from "./modals/PropertySelector";
 
-
-
 export default function FeaturedProperty() {
   const [showModal, setShowModal] = React.useState(false);
+  const [showRentalModal, setShowRentalModal] = React.useState(false);
   return (
     <div className="bg-white space-y-10 p-4">
       <div className="grid grid-cols-1  lg:grid-cols-2 gap-6">
@@ -69,6 +68,7 @@ export default function FeaturedProperty() {
             <PropertySelector
               open={showModal}
               onClose={() => setShowModal(false)}
+              type="property"
             />
           </div>
         </div>
@@ -115,10 +115,18 @@ export default function FeaturedProperty() {
             </div>
           </div>
           <div>
-            <button className="flex items-center gap-1 bg-[#116114] hover:bg-[#116114] text-white text-sm font-medium px-4 py-2 rounded-md">
+            <button
+              onClick={() => setShowRentalModal(true)}
+              className="flex items-center gap-1 bg-[#116114] hover:bg-[#116114] text-white text-sm font-medium px-4 py-2 rounded-md"
+            >
               Select new property
               <MdOutlineKeyboardArrowDown />
             </button>
+            <PropertySelector
+              open={showRentalModal}
+              onClose={() => setShowRentalModal(false)}
+              type="rental"
+            />
           </div>
         </div>
       </div>

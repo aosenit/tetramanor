@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import { IoMdArrowRoundForward } from "react-icons/io";
 import CampaignModal from "./modals/Campain";
+import { useFetchData } from "@/hooks/useApi";
 
 export default function QuickActions() {
   const [showModal, setShowModal] = useState(false);
+
+  const { refetch } = useFetchData("campaigns");
   return (
     <div className="flex items-center gap-4">
       <Button
@@ -29,18 +32,21 @@ export default function QuickActions() {
         Add new rental
         <IoMdArrowRoundForward className="h-4 w-4 mr-2" />
       </Button>
-      <>
-        <Button
-          onClick={() => setShowModal(true)}
-          variant="outline"
-          className="h-12 text-sm w-fit text-[#858C95] rounded-lg justify-start"
-        >
-          Add new Campaign
-          <IoMdArrowRoundForward className="h-4 w-4 mr-2" />
-        </Button>
 
-        <CampaignModal open={showModal} onClose={() => setShowModal(false)} />
-      </>
+      <Button
+        onClick={() => setShowModal(true)}
+        variant="outline"
+        className="h-12 text-sm w-fit text-[#858C95] rounded-lg justify-start"
+      >
+        Add new Campaign
+        <IoMdArrowRoundForward className="h-4 w-4 mr-2" />
+      </Button>
+
+      <CampaignModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        refetch={refetch}
+      />
     </div>
   );
 }

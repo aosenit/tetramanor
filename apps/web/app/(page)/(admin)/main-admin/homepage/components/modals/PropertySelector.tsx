@@ -7,71 +7,28 @@ import { Input } from "@/components/ui/input";
 import logo from "@/assets/home/logo.webp";
 import PropertyCard from "../cards/Property";
 import four from "@/assets/admin/home/four.webp";
-
-const properties = [
-  {
-    id: 1,
-    name: "TM Meadows",
-    location: "Ebute meta",
-    rooms: "3BR+BQ",
-    status: "Available",
-    furnished: true,
-    image: four,
-  },
-  {
-    id: 2,
-    name: "TM Highgarden",
-    location: "Ebute meta",
-    rooms: "3BR+BQ",
-    status: "Available",
-    furnished: true,
-    image: four,
-  },
-  {
-    id: 3,
-    name: "Queen mary",
-    location: "Ebute meta",
-    rooms: "3BR+BQ",
-    status: "Sold",
-    furnished: true,
-    image: four,
-  },
-  {
-    id: 4,
-    name: "Comfy burrows",
-    location: "Ebute meta",
-    rooms: "3BR+BQ",
-    status: "Rented",
-    furnished: false,
-    image: four,
-  },
-  {
-    id: 5,
-    name: "Comfy burrows",
-    location: "Ebute meta",
-    rooms: "3BR+BQ",
-    status: "Rented",
-    furnished: false,
-    image: four,
-  },
-  {
-    id: 6,
-    name: "Comfy burrows",
-    location: "Ebute meta",
-    rooms: "3BR+BQ",
-    status: "Rented",
-    furnished: false,
-    image: four,
-  },
-];
+import { useFetchData } from "@/hooks/useApi";
 
 export default function PropertySelector({
   open,
   onClose,
+  type = "property",
 }: {
   open: boolean;
   onClose: () => void;
+  type?: "property" | "rental" | "investment";
 }) {
+  const {
+    data: response,
+    isLoading,
+    error,
+  } = useFetchData(
+    open
+      ? type === "property"
+        ? "admin/properties/featured"
+        : "rentals"
+      : null
+  );
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -86,14 +43,17 @@ export default function PropertySelector({
     };
   }, [open]);
 
-  if (!open) return null;
+  // Get properties from API response
+  const properties = response?.data || [];
 
-  // Filter properties
-  const filtered = properties.filter((p) =>
-    `${p.name} ${p.location} ${p.status}`
+  // Filter properties based on search term
+  const filtered = properties.filter((property) =>
+    `${property.name} ${property.address} ${property.status}`
       .toLowerCase()
       .includes(searchTerm.toLowerCase())
   );
+
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 overflow-y-auto p-4">
@@ -125,18 +85,77 @@ export default function PropertySelector({
             />
           </div>
 
+          {/* Loading State */}
+          {isLoading && (
+            <div className="space-y-4">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white border border-gray-200 rounded-lg p-4 animate-pulse"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="h-16 w-16 bg-gray-200 rounded-lg"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                    </div>
+                    <div className="h-8 w-20 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && !isLoading && (
+            <div className="text-center py-12">
+              <p className="text-red-600 mb-4">Failed to load properties</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-[#116114] text-white px-4 py-2 rounded text-sm"
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+
           {/* Properties List */}
-          <div className="space-y-4">
-            {filtered.length > 0 ? (
-              filtered.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))
-            ) : (
-              <p className="text-center text-sm text-gray-500">
-                No properties found.
-              </p>
-            )}
-          </div>
+          {!isLoading && !error && (
+            <div className="space-y-4">
+              {filtered.length > 0 ? (
+                filtered.map((property) => (
+                  <PropertyCard
+                    key={property.id}
+                    property={{
+                      name: property.name,
+                      location: property.address,
+                      rooms: property.unitTypes.join(", ") || "N/A",
+                      status: property.status,
+                      furnished: property.features.includes("FURNISHED"),
+                      image: four, // Using fallback image since PropertyCard expects StaticImageData
+                    }}
+                  />
+                ))
+              ) : searchTerm ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 mb-2">
+                    No properties found matching "{searchTerm}"
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Try adjusting your search terms
+                  </p>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 mb-2">No properties available</p>
+                  <p className="text-sm text-gray-400">
+                    Add some properties to get started
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
