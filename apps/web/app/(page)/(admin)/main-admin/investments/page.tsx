@@ -1,112 +1,331 @@
 "use client";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import five from "@/assets/admin/home/five.svg";
 import Image from "next/image";
-import { Input } from "@/components/ui/input"
-import { Search, Plus } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import Link from "next/link"
+import { Input } from "@/components/ui/input";
+import { Search, Plus, Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import Link from "next/link";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import InvestmentModal from "./add-investment/components/Modal";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import ConfirmationModal from "./components/ConfirmationModal";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useFetchData, useDeleteData, usePutData } from "@/hooks/useApi";
+import { toast } from "sonner";
+import { axiosInstance } from "@/services/axiosInstance";
 
+interface Investment {
+  id: string;
+  projectName: string;
+  investmentType: "FIXED_ROI" | "EQUITY_SHARE";
+  estimatedROI: number;
+  minAmount: number;
+  duration: string;
+  status: "PUBLISHED" | "UNPUBLISHED";
+  currency: string;
+  description: string;
+  contractPDF: string;
+  brochurePDF: string;
+  featuredImage: string;
+  offerEndDate: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
-const investments = [
-  {
-    id: 1,
-    projectName: "Queen mary",
-    investmentType: "Fixed ROI",
-    estRoi: "18%",
-    minAmount: "₦10M",
-    duration: "12 months",
-    status: "Published",
-  },
-  {
-    id: 2,
-    projectName: "TM highgardens",
-    investmentType: "Equity share",
-    estRoi: "60%",
-    minAmount: "₦10M",
-    duration: "Flexible Exit",
-    status: "Published",
-  },
-  {
-    id: 3,
-    projectName: "TM meadows",
-    investmentType: "Fixed ROI",
-    estRoi: "20%",
-    minAmount: "₦10M",
-    duration: "8 months",
-    status: "Published",
-  },
-  {
-    id: 4,
-    projectName: "Kings landing",
-    investmentType: "Fixed ROI",
-    estRoi: "22%",
-    minAmount: "₦15M",
-    duration: "10 months",
-    status: "Unpublished",
-  },
-  {
-    id: 5,
-    projectName: "Kings landing",
-    investmentType: "Fixed ROI",
-    estRoi: "22%",
-    minAmount: "₦15M",
-    duration: "10 months",
-    status: "Unpublished",
-  },
-  {
-    id: 6,
-    projectName: "TM highgardens",
-    investmentType: "Equity share",
-    estRoi: "60%",
-    minAmount: "₦10M",
-    duration: "Flexible Exit",
-    status: "Published",
-  },
-  {
-    id: 7,
-    projectName: "Queen mary",
-    investmentType: "Fixed ROI",
-    estRoi: "18%",
-    minAmount: "₦10M",
-    duration: "12 months",
-    status: "Published",
-  },
-  {
-    id: 8,
-    projectName: "TM highgardens",
-    investmentType: "Equity share",
-    estRoi: "60%",
-    minAmount: "₦10M",
-    duration: "Flexible Exit",
-    status: "Published",
-  },
-  {
-    id: 9,
-    projectName: "TM meadows",
-    investmentType: "Fixed ROI",
-    estRoi: "20%",
-    minAmount: "₦10M",
-    duration: "8 months",
-    status: "Published",
-  },
-]
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  data: Investment[];
+  statusCode: number;
+}
 
 export default function InvestmentsPage() {
-  
-const router = useRouter();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedInvestment, setSelectedInvestment] =
+    useState<Investment | null>(null);
+  const [confirmationModal, setConfirmationModal] = useState<{
+    open: boolean;
+    action: "delete" | "unpublish";
+    investment: Investment | null;
+  }>({ open: false, action: "delete", investment: null });
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
+  // Get current URL parameters
+  const currentSearch = searchParams.get("search") || "";
+  const currentPageParam = parseInt(searchParams.get("page") || "1");
+  const currentLimit = parseInt(searchParams.get("limit") || "10");
+  const currentSortOrder = searchParams.get("sortOrder") || "desc";
+  const currentInvestmentType = searchParams.get("investmentType") || "";
+  const currentStatus = searchParams.get("status") || "";
+  const currentRoiRange = searchParams.get("roiRange") || "";
+
+  // Build query string for API
+  const buildQueryString = () => {
+    const params = new URLSearchParams({
+      page: currentPageParam.toString(),
+      limit: currentLimit.toString(),
+      sortOrder: currentSortOrder,
+    });
+
+    if (currentSearch) params.append("search", currentSearch);
+    if (currentInvestmentType)
+      params.append("investmentType", currentInvestmentType.toUpperCase());
+    if (currentStatus) params.append("status", currentStatus.toUpperCase());
+    if (currentRoiRange) params.append("roiRange", currentRoiRange);
+
+    return params.toString();
+  };
+
+  // Use the useFetchData hook
+  const {
+    data: investmentResponse,
+    isLoading,
+    error,
+    refetch,
+  } = useFetchData(`investments?${buildQueryString()}`);
+
+  // Extract data from response
+  const investments = investmentResponse?.data || [];
+  const totalItems = investmentResponse?.data?.length || 0;
+  const totalPages = Math.ceil(totalItems / currentLimit);
+  const currentPage = currentPageParam;
+
+  // Update URL parameters
+  const updateURLParams = (params: Record<string, string>) => {
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        newSearchParams.set(key, value);
+      } else {
+        newSearchParams.delete(key);
+      }
+    });
+
+    router.replace(`?${newSearchParams.toString()}`);
+  };
+
+  // Handle search
+  const handleSearch = (value: string) => {
+    updateURLParams({ search: value, page: "1" });
+  };
+
+  // Handle investment type filter
+  const handleInvestmentTypeChange = (value: string) => {
+    const filterValue = value === "all" ? "" : value;
+    updateURLParams({ investmentType: filterValue, page: "1" });
+  };
+
+  // Handle status filter
+  const handleStatusChange = (value: string) => {
+    const filterValue = value === "all" ? "" : value;
+    updateURLParams({ status: filterValue, page: "1" });
+  };
+
+  // Handle ROI range filter
+  const handleRoiRangeChange = (value: string) => {
+    const filterValue = value === "all" ? "" : value;
+    updateURLParams({ roiRange: filterValue, page: "1" });
+  };
+
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    updateURLParams({ page: page.toString() });
+  };
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    router.replace("/main-admin/investments");
+  };
+
+  // Handle confirmation modal actions
+  const handleConfirmAction = async () => {
+    const { action, investment } = confirmationModal;
+
+    if (!investment) return;
+
+    if (action === "delete") {
+      setIsDeleting(true);
+      try {
+        await axiosInstance.delete(`investments/${investment.id}`);
+        toast.success("Investment deleted successfully");
+        refetch();
+        setConfirmationModal({
+          open: false,
+          action: "delete",
+          investment: null,
+        });
+      } catch (error) {
+        toast.error("Failed to delete investment");
+      } finally {
+        setIsDeleting(false);
+      }
+    } else if (action === "unpublish") {
+      setIsUpdatingStatus(true);
+      try {
+        const newStatus =
+          investment.status === "PUBLISHED" ? "UNPUBLISHED" : "PUBLISHED";
+        const updateData = {
+          ...investment,
+          status: newStatus,
+        };
+
+        await axiosInstance.put(`investments/${investment.id}`, updateData);
+        const actionText =
+          newStatus === "PUBLISHED" ? "published" : "unpublished";
+        toast.success(`Investment ${actionText} successfully`);
+        refetch();
+        setConfirmationModal({
+          open: false,
+          action: "unpublish",
+          investment: null,
+        });
+      } catch (error) {
+        toast.error("Failed to update investment status");
+      } finally {
+        setIsUpdatingStatus(false);
+      }
+    }
+  };
+
+  const handleCloseConfirmation = () => {
+    setConfirmationModal({ open: false, action: "delete", investment: null });
+  };
+
+  // Get investment type display name
+  const getInvestmentTypeDisplayName = (type: string) => {
+    switch (type) {
+      case "FIXED_ROI":
+        return "Fixed ROI";
+      case "EQUITY_SHARE":
+        return "Equity Share";
+      default:
+        return type.replace("_", " ");
+    }
+  };
+
+  // Get status display name
+  const getStatusDisplayName = (status: string) => {
+    switch (status) {
+      case "PUBLISHED":
+        return "Published";
+      case "UNPUBLISHED":
+        return "Unpublished";
+      default:
+        return status;
+    }
+  };
+
+  // Format currency
+  const formatCurrency = (amount: number, currency: string) => {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: currency || "NGN",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  // Refetch data when URL parameters change
+  useEffect(() => {
+    refetch();
+  }, [
+    currentPageParam,
+    currentLimit,
+    currentSortOrder,
+    currentSearch,
+    currentInvestmentType,
+    currentStatus,
+    currentRoiRange,
+    refetch,
+  ]);
+
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <div className="min-h-screen space-y-6">
+        <div className="">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center space-x-1 text-[#858C95]">
+                <span>Admin</span>
+                <span className="text-xl text-[#858C95]">/</span>
+                <span className="font-medium text-xl text-[#116114]">
+                  Investment
+                </span>
+              </div>
+              <p className="text-[#454D56] text-sm mt-1">
+                Manage all investment opportunities{" "}
+              </p>
+            </div>
+            <div className="h-10 w-40 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+          <div className="flex items-center space-x-4">
+            <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-8 w-28 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="h-6 w-48 bg-gray-200 rounded animate-pulse"></div>
+          <div className="bg-white rounded-lg border">
+            <div className="h-12 bg-gray-200 animate-pulse"></div>
+            {Array.from({ length: 5 }, (_, i) => (
+              <div
+                key={i}
+                className="h-16 bg-gray-100 animate-pulse border-t"
+              ></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error loading investments</p>
+          <Button onClick={() => refetch()} variant="outline">
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen space-y-6">
       <div className="">
         <div className="flex items-center justify-between">
           <div>
-            <div className="flex items-center space-x-1  text-[#858C95]">
+            <div className="flex items-center space-x-1 text-[#858C95]">
               <span>Admin</span>
               <span className="text-xl text-[#858C95]">/</span>
               <span className="font-medium text-xl text-[#116114]">
@@ -125,45 +344,65 @@ const router = useRouter();
           </Link>
         </div>
       </div>
+
       <div className="space-y-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#858C95] w-4 h-4" />
           <Input
             placeholder="Search investments"
             className="pl-10 bg-[#E5E5E7] border-0"
+            value={currentSearch}
+            onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
+
         {/* Filters */}
         <div className="flex flex-wrap gap-4">
-          <Button variant="outline" className="bg-white text-[#858C95]">
+          <Button
+            variant="outline"
+            className="bg-white text-[#858C95]"
+            onClick={clearAllFilters}
+          >
             All
           </Button>
 
-          <Select>
+          <Select
+            value={currentInvestmentType || "all"}
+            onValueChange={handleInvestmentTypeChange}
+          >
             <SelectTrigger className="w-[180px] bg-white text-[#858C95]">
               <SelectValue placeholder="Investment type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="fixed-roi">Fixed ROI</SelectItem>
-              <SelectItem value="equity-share">Equity share</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="FIXED_ROI">Fixed ROI</SelectItem>
+              <SelectItem value="EQUITY_SHARE">Equity Share</SelectItem>
             </SelectContent>
           </Select>
 
-          <Select>
+          <Select
+            value={currentStatus || "all"}
+            onValueChange={handleStatusChange}
+          >
             <SelectTrigger className="w-[180px] bg-white text-[#858C95]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="published">Published</SelectItem>
-              <SelectItem value="unpublished">Unpublished</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="PUBLISHED">Published</SelectItem>
+              <SelectItem value="UNPUBLISHED">Unpublished</SelectItem>
             </SelectContent>
           </Select>
 
-          <Select>
+          <Select
+            value={currentRoiRange || "all"}
+            onValueChange={handleRoiRangeChange}
+          >
             <SelectTrigger className="w-[180px] bg-white text-[#858C95]">
               <SelectValue placeholder="ROI range" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="all">All ROI</SelectItem>
               <SelectItem value="0-20">0-20%</SelectItem>
               <SelectItem value="21-40">21-40%</SelectItem>
               <SelectItem value="41-60">41-60%</SelectItem>
@@ -171,149 +410,256 @@ const router = useRouter();
             </SelectContent>
           </Select>
 
-          <Select>
-            <SelectTrigger className="w-[180px] bg-white text-[#858C95]">
-              <SelectValue placeholder="Date range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="this-month">This month</SelectItem>
-              <SelectItem value="last-month">Last month</SelectItem>
-              <SelectItem value="this-year">This year</SelectItem>
-            </SelectContent>
-          </Select>
+          <Button
+            variant="link"
+            className="text-[#858C95] text-sm p-0"
+            onClick={clearAllFilters}
+          >
+            Clear all
+          </Button>
         </div>
 
         {/* Investments Table */}
         <div>
-          <h2 className="text-[#116114] font-medium mb-4">
-            Investments opportunities overview
-          </h2>
-          <div className="bg-white  overflow-hidden">
-            <Table>
-              <TableHeader className="border bg-[#E5E5E7] border-[#E5E5E7]">
-                <TableRow>
-                  <TableHead className="text-[#181818] text-sm">
-                    Project Name
-                  </TableHead>
-                  <TableHead className="text-[#181818] text-sm">
-                    Investment Type
-                  </TableHead>
-                  <TableHead className="text-[#181818] text-sm">
-                    Est ROI
-                  </TableHead>
-                  <TableHead className="text-[#181818] text-sm">
-                    Min amount
-                  </TableHead>
-                  <TableHead className="text-[#181818] text-sm">
-                    Duration
-                  </TableHead>
-                  <TableHead className="text-[#181818] text-sm">
-                    Status
-                  </TableHead>
-                  <TableHead className="text-[#181818] text-sm">
-                    Actions
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                {investments.map((investment) => {
-                  const isUnpublished =
-                    investment.status.toLowerCase() === "unpublished";
-                  const isPublished =
-                    investment.status.toLowerCase() === "published";
-
-                  const cellTextColor = isUnpublished ? "#858C95" : "#292D32";
-                  const statusColor = isPublished ? "#116114" : "#858C95";
-
-                  return (
-                    <TableRow key={investment.id}>
-                      <TableCell
-                        className="font-medium"
-                        style={{ color: cellTextColor }}
-                      >
-                        {investment.projectName}
-                      </TableCell>
-                      <TableCell style={{ color: cellTextColor }}>
-                        {investment.investmentType}
-                      </TableCell>
-                      <TableCell style={{ color: cellTextColor }}>
-                        {investment.estRoi}
-                      </TableCell>
-                      <TableCell style={{ color: cellTextColor }}>
-                        {investment.minAmount}
-                      </TableCell>
-                      <TableCell style={{ color: cellTextColor }}>
-                        {investment.duration}
-                      </TableCell>
-                      <TableCell style={{ color: statusColor }}>
-                        {investment.status}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu.Root>
-                          <DropdownMenu.Trigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                            >
-                              <Image
-                                src={five}
-                                alt="action"
-                                className="h-6 w-6 object-contain"
-                              />
-                            </Button>
-                          </DropdownMenu.Trigger>
-
-                          <DropdownMenu.Content
-                            side="bottom"
-                            align="end"
-                            className="min-w-[150px] bg-white border rounded-md shadow-md p-1 z-50"
-                          >
-                            <DropdownMenu.Item
-                              className="px-3 py-2 hover:bg-gray-100 text-sm text-[#292D32] cursor-pointer"
-                              onSelect={() =>
-                                router.push(
-                                  "/main-admin/investments/add-investment"
-                                )
-                              }
-                            >
-                              Edit
-                            </DropdownMenu.Item>
-                            <>
-                              <DropdownMenu.Item
-                                onSelect={() => setIsModalOpen(true)}
-                                className="px-3 py-2 hover:bg-gray-100 text-sm text-[#292D32] cursor-pointer"
-                              >
-                                View
-                              </DropdownMenu.Item>
-                            </>
-                            <DropdownMenu.Item
-                              className="px-3 py-2 hover:bg-gray-100 text-sm text-[#292D32] cursor-pointer"
-                              onSelect={() => console.log("Unpublish")}
-                            >
-                              Unpublish
-                            </DropdownMenu.Item>
-                            <DropdownMenu.Item
-                              className="px-3 py-2 hover:bg-gray-100 text-sm text-red-600 cursor-pointer"
-                              onSelect={() => console.log("Delete")}
-                            >
-                              Delete
-                            </DropdownMenu.Item>
-                          </DropdownMenu.Content>
-                        </DropdownMenu.Root>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-[#116114] font-medium">
+              Investments opportunities overview ({totalItems})
+            </h2>
+            {isLoading && (
+              <div className="flex items-center gap-2 text-sm text-[#858C95]">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Loading...
+              </div>
+            )}
           </div>
+
+          {investments.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="text-gray-500 mb-4">
+                <p className="text-lg font-medium">No investments found</p>
+                <p className="text-sm">Try adjusting your search or filters</p>
+              </div>
+              <Button onClick={clearAllFilters} variant="outline">
+                Clear Filters
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="bg-white overflow-hidden">
+                <Table>
+                  <TableHeader className="border bg-[#E5E5E7] border-[#E5E5E7]">
+                    <TableRow>
+                      <TableHead className="text-[#181818] text-sm">
+                        Project Name
+                      </TableHead>
+                      <TableHead className="text-[#181818] text-sm">
+                        Investment Type
+                      </TableHead>
+                      <TableHead className="text-[#181818] text-sm">
+                        Est ROI
+                      </TableHead>
+                      <TableHead className="text-[#181818] text-sm">
+                        Min amount
+                      </TableHead>
+                      <TableHead className="text-[#181818] text-sm">
+                        Duration
+                      </TableHead>
+                      <TableHead className="text-[#181818] text-sm">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-[#181818] text-sm">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+
+                  <TableBody>
+                    {investments.map((investment) => {
+                      const isUnpublished = investment.status === "UNPUBLISHED";
+                      const isPublished = investment.status === "PUBLISHED";
+
+                      const cellTextColor = isUnpublished
+                        ? "#858C95"
+                        : "#292D32";
+                      const statusColor = isPublished ? "#116114" : "#858C95";
+
+                      return (
+                        <TableRow key={investment.id}>
+                          <TableCell
+                            className="font-medium"
+                            style={{ color: cellTextColor }}
+                          >
+                            {investment.projectName}
+                          </TableCell>
+                          <TableCell style={{ color: cellTextColor }}>
+                            {getInvestmentTypeDisplayName(
+                              investment.investmentType
+                            )}
+                          </TableCell>
+                          <TableCell style={{ color: cellTextColor }}>
+                            {investment.estimatedROI}%
+                          </TableCell>
+                          <TableCell style={{ color: cellTextColor }}>
+                            {formatCurrency(
+                              investment.minAmount,
+                              investment.currency
+                            )}
+                          </TableCell>
+                          <TableCell style={{ color: cellTextColor }}>
+                            {investment.duration}
+                          </TableCell>
+                          <TableCell style={{ color: statusColor }}>
+                            {getStatusDisplayName(investment.status)}
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu.Root>
+                              <DropdownMenu.Trigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0"
+                                >
+                                  <Image
+                                    src={five}
+                                    alt="action"
+                                    className="h-6 w-6 object-contain"
+                                  />
+                                </Button>
+                              </DropdownMenu.Trigger>
+
+                              <DropdownMenu.Content
+                                side="bottom"
+                                align="end"
+                                className="min-w-[150px] bg-white border rounded-md shadow-md p-1 z-50"
+                              >
+                                <DropdownMenu.Item
+                                  className="px-3 py-2 hover:bg-gray-100 text-sm text-[#292D32] cursor-pointer"
+                                  onSelect={() =>
+                                    router.push(
+                                      `/main-admin/investments/add-investment?id=${investment.id}`
+                                    )
+                                  }
+                                >
+                                  Edit
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                  onSelect={() => {
+                                    setSelectedInvestment(investment);
+                                    setIsModalOpen(true);
+                                  }}
+                                  className="px-3 py-2 hover:bg-gray-100 text-sm text-[#292D32] cursor-pointer"
+                                >
+                                  View
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                  className="px-3 py-2 hover:bg-gray-100 text-sm text-[#292D32] cursor-pointer"
+                                  onSelect={() => {
+                                    setConfirmationModal({
+                                      open: true,
+                                      action: "unpublish",
+                                      investment: investment,
+                                    });
+                                  }}
+                                >
+                                  {investment.status === "PUBLISHED"
+                                    ? "Unpublish"
+                                    : "Publish"}
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                  className="px-3 py-2 hover:bg-gray-100 text-sm text-red-600 cursor-pointer"
+                                  onSelect={() => {
+                                    setConfirmationModal({
+                                      open: true,
+                                      action: "delete",
+                                      investment: investment,
+                                    });
+                                  }}
+                                >
+                                  Delete
+                                </DropdownMenu.Item>
+                              </DropdownMenu.Content>
+                            </DropdownMenu.Root>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center space-x-2 mt-8">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={
+                          currentPage === pageNum ? "default" : "outline"
+                        }
+                        size="sm"
+                        onClick={() => handlePageChange(pageNum)}
+                        className={
+                          currentPage === pageNum
+                            ? "bg-[#116114] text-white"
+                            : ""
+                        }
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
+
       <InvestmentModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        refetch={refetch}
+        post={selectedInvestment}
+      />
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        open={confirmationModal.open}
+        onClose={handleCloseConfirmation}
+        onConfirm={handleConfirmAction}
+        action={confirmationModal.action}
+        investmentName={confirmationModal.investment?.projectName}
+        isLoading={isDeleting || isUpdatingStatus}
       />
     </div>
   );

@@ -48,6 +48,19 @@ export const useUploadData = (url: string) => {
   });
 };
 
+export const useUploadPatchData = (url: string) => {
+  return useMutation({
+    mutationFn: async (arg: any) => {
+      const response = await axiosInstance.patch(url, arg, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    },
+  });
+};
+
 // Update (PUT) Data
 export const usePutData = (url: string) => {
   return useMutation({
