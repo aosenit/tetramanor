@@ -13,15 +13,47 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BsCloudArrowUp } from "react-icons/bs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { usePostData } from "@/hooks/useApi";
+import { toast } from "sonner";
+
+interface CampaignFormData {
+  title: string;
+  type: "INVESTMENT" | "SALE" | "PROMOTION";
+  description: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  images: string[];
+  documentId: string;
+}
 
 export default function CampaignModal({
   open,
   onClose,
+  refetch,
 }: {
   open: boolean;
   onClose: () => void;
+  refetch: () => void;
 }) {
+  const [formData, setFormData] = useState<CampaignFormData>({
+    title: "",
+    type: "INVESTMENT",
+    description: "",
+    startDate: "",
+    endDate: "",
+    isActive: true,
+    images: [],
+    documentId: "",
+  });
+
+  const [errors, setErrors] = useState<Partial<CampaignFormData>>({});
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  const { mutateAsync: createCampaign, isPending: isCreatingCampaign } =
+    usePostData("campaigns");
+
   useEffect(() => {
     if (open) {
       document.body.classList.add("overflow-hidden");
@@ -33,6 +65,111 @@ export default function CampaignModal({
       document.body.classList.remove("overflow-hidden");
     };
   }, [open]);
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        title: "",
+        type: "INVESTMENT",
+        description: "",
+        startDate: "",
+        endDate: "",
+        isActive: true,
+        images: [],
+        documentId: "",
+      });
+      setErrors({});
+      setSelectedFiles([]);
+    }
+  }, [open]);
+
+  const handleInputChange = (
+    field: keyof CampaignFormData,
+    value: string | boolean
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: undefined,
+      }));
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    setSelectedFiles(files);
+    const fileIds = files.map((file) => file.name); // This should be actual file IDs from upload
+    setFormData((prev) => ({
+      ...prev,
+      images: fileIds,
+    }));
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<CampaignFormData> = {};
+
+    if (!formData.title.trim()) {
+      newErrors.title = "Campaign title is required";
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = "Description is required";
+    }
+
+    if (!formData.startDate) {
+      newErrors.startDate = "Start date is required";
+    }
+
+    if (!formData.endDate) {
+      newErrors.endDate = "End date is required";
+    }
+
+    if (formData.startDate && formData.endDate) {
+      const startDate = new Date(formData.startDate);
+      const endDate = new Date(formData.endDate);
+
+      if (endDate <= startDate) {
+        newErrors.endDate = "End date must be after start date";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      // Prepare the payload
+      const payload = {
+        ...formData,
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
+      };
+
+      const response = await createCampaign(payload);
+
+      if (response) {
+        toast.success("Campaign created successfully");
+        onClose();
+        refetch();
+      }
+    } catch (error) {
+      console.error("Failed to create campaign:", error);
+    }
+  };
 
   if (!open) return null;
 
@@ -59,36 +196,42 @@ export default function CampaignModal({
             Create a new promotional campaign to feature on the homepage.
           </p>
 
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label className="text-[#323539] text-sm font-medium">
                 Campaign Title
               </Label>
-              <Select defaultValue="tm-highstandard-promo">
-                <SelectTrigger className="bg-[#E5E5E7] text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="tm-highstandard-promo">
-                    TM HighStandard Promo
-                  </SelectItem>
-                  <SelectItem value="other-campaign">Other Campaign</SelectItem>
-                </SelectContent>
-              </Select>
+              <Input
+                value={formData.title}
+                onChange={(e) => handleInputChange("title", e.target.value)}
+                className={`bg-[#E5E5E7] text-xs ${errors.title ? "border-red-500" : ""}`}
+                placeholder="Enter campaign title"
+              />
+              {errors.title && (
+                <p className="text-red-500 text-xs">{errors.title}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label className="text-[#323539] text-sm font-medium">
                 Campaign Type
               </Label>
-              <Select defaultValue="investment">
+              <Select
+                value={formData.type}
+                onValueChange={(value) =>
+                  handleInputChange(
+                    "type",
+                    value as "INVESTMENT" | "SALE" | "PROMOTION"
+                  )
+                }
+              >
                 <SelectTrigger className="bg-[#E5E5E7] text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="investment">Investment</SelectItem>
-                  <SelectItem value="promotion">Promotion</SelectItem>
-                  <SelectItem value="announcement">Announcement</SelectItem>
+                  <SelectItem value="INVESTMENT">Investment</SelectItem>
+                  <SelectItem value="SALE">Sale</SelectItem>
+                  <SelectItem value="PROMOTION">Promotion</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -98,20 +241,56 @@ export default function CampaignModal({
                 <Label className="text-[#323539] text-sm font-medium">
                   Start date
                 </Label>
-                <Input type="date" className="bg-[#E5E5E7] text-xs" />
+                <Input
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) =>
+                    handleInputChange("startDate", e.target.value)
+                  }
+                  className={`bg-[#E5E5E7] text-xs ${errors.startDate ? "border-red-500" : ""}`}
+                />
+                {errors.startDate && (
+                  <p className="text-red-500 text-xs">{errors.startDate}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label className="text-[#323539] text-sm font-medium">
                   End date
                 </Label>
-                <Input type="date" className="bg-[#E5E5E7] text-xs" />
+                <Input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) => handleInputChange("endDate", e.target.value)}
+                  className={`bg-[#E5E5E7] text-xs ${errors.endDate ? "border-red-500" : ""}`}
+                />
+                {errors.endDate && (
+                  <p className="text-red-500 text-xs">{errors.endDate}</p>
+                )}
               </div>
             </div>
 
             <div className="space-y-2">
-              <div className="border  border-gray-300 rounded-lg p-8 text-center bg-white transition-colors cursor-pointer">
-                <p className="text-sm text-[#292D32]">Upload banner images</p>
-                <BsCloudArrowUp className="mx-auto h-8 w-8 text-[#798088] mt-2" />
+              <Label className="text-[#323539] text-sm font-medium">
+                Banner Images
+              </Label>
+              <div className="border border-gray-300 rounded-lg p-8 text-center bg-white transition-colors cursor-pointer hover:bg-gray-50">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="file-upload"
+                />
+                <label htmlFor="file-upload" className="cursor-pointer">
+                  <p className="text-sm text-[#292D32]">Upload banner images</p>
+                  <BsCloudArrowUp className="mx-auto h-8 w-8 text-[#798088] mt-2" />
+                  {selectedFiles.length > 0 && (
+                    <p className="text-xs text-green-600 mt-2">
+                      {selectedFiles.length} file(s) selected
+                    </p>
+                  )}
+                </label>
               </div>
             </div>
 
@@ -120,23 +299,47 @@ export default function CampaignModal({
                 Description
               </Label>
               <Input
-                className="bg-[#E5E5E7] text-xs text-[#323539] placeholder:text-xs"
+                value={formData.description}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
+                className={`bg-[#E5E5E7] text-xs text-[#323539] placeholder:text-xs ${errors.description ? "border-red-500" : ""}`}
                 placeholder="Get 10% ROI with TM HighStandards Investment offer"
                 type="text"
               />
+              {errors.description && (
+                <p className="text-red-500 text-xs">{errors.description}</p>
+              )}
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isActive"
+                checked={formData.isActive}
+                onChange={(e) =>
+                  handleInputChange("isActive", e.target.checked)
+                }
+                className="rounded"
+              />
+              <Label htmlFor="isActive" className="text-[#323539] text-sm">
+                Active Campaign
+              </Label>
             </div>
 
             <div className="flex flex-col sm:flex-row justify-between pt-4">
               <Button
                 type="submit"
-                className="bg-[#116114] font-medium text-sm hover:bg-[#116114] text-white"
+                disabled={isCreatingCampaign}
+                className="bg-[#116114] font-medium text-sm hover:bg-[#116114] text-white disabled:opacity-50"
               >
-                Save campaign
+                {isCreatingCampaign ? "Creating..." : "Save campaign"}
               </Button>
               <Button
                 type="button"
                 variant="ghost"
                 onClick={onClose}
+                disabled={isCreatingCampaign}
                 className="text-[#323539]"
               >
                 Back to homepage
