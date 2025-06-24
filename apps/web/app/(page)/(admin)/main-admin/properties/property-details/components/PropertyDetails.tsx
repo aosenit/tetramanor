@@ -1,20 +1,34 @@
+"use client";
 import Image from "next/image";
-import { ChevronUp, Download } from "lucide-react";
-import React from "react";
+import { ChevronUp, Download, Save, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
 import { GrLocation } from "react-icons/gr";
+import { useSearchParams } from "next/navigation";
 import four from "@/assets/admin/home/four.webp";
 import c from "@/assets/investment/icons/c.webp";
 import h from "@/assets/investment/icons/h.svg";
 import g from "@/assets/investment/icons/g.svg";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@chakra-ui/react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import Contact from "./Contact";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useFetchData, usePutData } from "@/hooks/useApi";
 
-const features = [
+import { MdArrowBackIosNew } from "react-icons/md";
+import Link from "next/link";
+
+const defaultFeatures = [
   "High-Quality Kitchen Cabinets & Wardrobes",
   "Walk-in Closets",
   "POP Ceilings",
@@ -26,7 +40,8 @@ const features = [
   "Backup Power Supply",
   "24/7 Concierge Services",
 ];
-const amenities = [
+
+const defaultAmenities = [
   "Fiber Optic Connectivity",
   "Fully Equipped Gym",
   "Stunning Sea View",
@@ -37,7 +52,8 @@ const amenities = [
   "24/7 Concierge Services",
   "State of the art interior decor",
 ];
-const advantages = [
+
+const defaultAdvantages = [
   {
     icon: c,
     title: "High Returns",
@@ -60,13 +76,282 @@ const advantages = [
     description: "Choose between Fixed ROI or Equity-Based Profit Sharing",
   },
 ];
-export default function PropertyDetails () {
+
+export default function PropertyDetails() {
+  const searchParams = useSearchParams();
+  const propertyId = searchParams.get("id");
+  const edit = searchParams.get("edit");
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    address: "",
+    about: "",
+    unitAmount: 0,
+    inquiryOptions: ["INQUIRY_FORM"],
+    unitTypes: ["THREE_BEDROOM_APARTMENT"],
+    whyInvest: {
+      title: "",
+      description: "",
+      advantages: [
+        {
+          title: "",
+          description: "",
+        },
+      ],
+    },
+    features: defaultFeatures,
+    amenities: defaultAmenities,
+    images: [] as string[],
+    documentId: "",
+    constructionStatus: "ONGOING",
+    accountOfficer: {
+      fullName: "",
+      email: "",
+      phone: "",
+    },
+  });
+
+  // Fetch property data
+  const {
+    data: propertyResponse,
+    isLoading,
+    error,
+    refetch,
+  } = useFetchData(propertyId ? `admin/properties/${propertyId}` : "");
+
+  // Update property mutation
+  const {
+    mutate: updateProperty,
+    isPending: isUpdating,
+    error: updateError,
+  } = usePutData(`admin/properties/${propertyId}`);
+
+  // Load property data into form
+  useEffect(() => {
+    if (propertyResponse?.data) {
+      const property = propertyResponse.data;
+      setFormData({
+        name: property.name || "",
+        address: property.address || "",
+        about: property.about || "",
+        unitAmount: property.unitAmount || 0,
+        inquiryOptions: property.inquiryOptions || ["INQUIRY_FORM"],
+        unitTypes: property.unitTypes || ["THREE_BEDROOM_APARTMENT"],
+        whyInvest: {
+          title: property.whyInvest?.title || "",
+          description: property.whyInvest?.description || "",
+          advantages: property.whyInvest?.advantages || [
+            {
+              title: "",
+              description: "",
+            },
+          ],
+        },
+        features: property.features || defaultFeatures,
+        amenities: property.amenities || defaultAmenities,
+        images: property.images || [],
+        documentId: property.document?.[0] || "",
+        constructionStatus: property.constructionStatus || "ONGOING",
+        accountOfficer: {
+          fullName: "",
+          email: "",
+          phone: "",
+        },
+      });
+    }
+  }, [propertyResponse]);
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleWhyInvestChange = (field: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      whyInvest: {
+        ...prev.whyInvest,
+        [field]: value,
+      },
+    }));
+  };
+
+  const handleAdvantageChange = (
+    index: number,
+    field: string,
+    value: string
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      whyInvest: {
+        ...prev.whyInvest,
+        advantages: prev.whyInvest.advantages.map((adv, i) =>
+          i === index ? { ...adv, [field]: value } : adv
+        ),
+      },
+    }));
+  };
+
+  const addAdvantage = () => {
+    setFormData((prev) => ({
+      ...prev,
+      whyInvest: {
+        ...prev.whyInvest,
+        advantages: [
+          ...prev.whyInvest.advantages,
+          { title: "", description: "" },
+        ],
+      },
+    }));
+  };
+
+  const removeAdvantage = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      whyInvest: {
+        ...prev.whyInvest,
+        advantages: prev.whyInvest.advantages.filter((_, i) => i !== index),
+      },
+    }));
+  };
+
+  const handleFeatureChange = (index: number, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      features: prev.features.map((feature, i) =>
+        i === index ? value : feature
+      ),
+    }));
+  };
+
+  const addFeature = () => {
+    setFormData((prev) => ({
+      ...prev,
+      features: [...prev.features, ""],
+    }));
+  };
+
+  const removeFeature = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      features: prev.features.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleAmenityChange = (index: number, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      amenities: prev.amenities.map((amenity, i) =>
+        i === index ? value : amenity
+      ),
+    }));
+  };
+
+  const addAmenity = () => {
+    setFormData((prev) => ({
+      ...prev,
+      amenities: [...prev.amenities, ""],
+    }));
+  };
+
+  const removeAmenity = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      amenities: prev.amenities.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSave = () => {
+    updateProperty(formData, {
+      onSuccess: () => {
+        setIsEditing(false);
+        refetch();
+      },
+    });
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    // Reset form data to original values
+    if (propertyResponse?.data) {
+      const property = propertyResponse.data;
+      setFormData({
+        name: property.name || "",
+        address: property.address || "",
+        about: property.about || "",
+        unitAmount: property.unitAmount || 0,
+        inquiryOptions: property.inquiryOptions || ["INQUIRY_FORM"],
+        unitTypes: property.unitTypes || ["THREE_BEDROOM_APARTMENT"],
+        whyInvest: {
+          title: property.whyInvest?.title || "",
+          description: property.whyInvest?.description || "",
+          advantages: property.whyInvest?.advantages || [
+            {
+              title: "",
+              description: "",
+            },
+          ],
+        },
+        features: property.features || defaultFeatures,
+        amenities: property.amenities || defaultAmenities,
+        images: property.images || [],
+        documentId: property.document?.[0] || "",
+        constructionStatus: property.constructionStatus || "ONGOING",
+        accountOfficer: {
+          fullName: "",
+          email: "",
+          phone: "",
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (edit) {
+      setIsEditing(true);
+    }
+  }, [edit]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen px-4">
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <p className="text-gray-600 mb-4">Loading property details...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen px-4">
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <p className="text-red-600 mb-4">Error loading property details</p>
+            <Button onClick={() => refetch()} variant="outline">
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const property = propertyResponse?.data;
+
   return (
     <div className="min-h-screen px-4">
       <div className="border-b">
         <div className="py-2">
           <nav className="">
-            <span className="text-[#858C95]">Home</span>
+            <Link href="/main-admin/properties">
+              <span className="text-[#858C95]">Home</span>
+            </Link>
             <span className="mx-2 text-xl text-[#116114]">/</span>
             <span className="font-medium text-xl text-[#116114]">
               property overview
@@ -86,11 +371,19 @@ export default function PropertyDetails () {
             <h2 className="text-sm font-medium text-[#116114]">
               View property details
             </h2>
-            <Button className="bg-[#116114] text-white">
-              <Download className="w-4 h-4 mr-2" />
-              Download brochure
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button className="bg-[#116114] text-white">
+                <Download className="w-4 h-4 mr-2" />
+                Download brochure
+              </Button>
+            </div>
           </div>
+
+          {updateError && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              Error updating property: {updateError?.message || "Unknown error"}
+            </div>
+          )}
 
           {/* Property Images */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
@@ -124,49 +417,153 @@ export default function PropertyDetails () {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-4">
               <div className="flex items-center gap-12">
-                <label className="text-xs font-medium text-[#181818] block ">
+                <label className="text-xs font-medium text-[#181818] block min-w-[100px]">
                   Property name
                 </label>
-                <p className="text-[#116114] font-medium text-sm">Tm meadows</p>
+                {isEditing ? (
+                  <Input
+                    value={formData.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    className="flex-1"
+                    placeholder="Enter property name"
+                  />
+                ) : (
+                  <p className="text-[#116114] font-medium text-sm">
+                    {property?.name}
+                  </p>
+                )}
               </div>
 
               <div className="flex gap-4 items-start">
-                {/* Label on the left */}
                 <label className="text-xs font-medium text-[#181818] min-w-[100px] pt-2">
                   Property units
                 </label>
-
-                {/* Collapsible on the right */}
-                <Collapsible className="flex-1 mt-1">
-                  <CollapsibleTrigger className="flex items-center gap-2 w-full text-left">
-                    <span className="text-[#116114] font-medium text-sm">
-                      8 Units
-                    </span>
-                    <ChevronUp className="text-[#4C5560]" />
-                  </CollapsibleTrigger>
-
-                  <CollapsibleContent className="mt-2 space-y-2 text-sm text-gray-600">
-                    <div className="text-sm text-[#4C5560] space-y-1">
-                      <p>2 bedroom condo</p>
-                      <p>Studio apartment (3)</p>
-                      <p>4 bedroom Maisonettes (2)</p>
-                      <p>3 bedroom Apartment</p>
-                      <p>4 bedroom + BQ Semi-Detached Duplexes</p>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+                {isEditing ? (
+                  <div className="flex-1">
+                    <Input
+                      type="number"
+                      value={formData.unitAmount}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "unitAmount",
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      className="mb-2"
+                      placeholder="Number of units"
+                    />
+                    <Collapsible>
+                      <CollapsibleTrigger className="flex items-center gap-2 w-full text-left">
+                        <span className="text-[#116114] font-medium text-sm">
+                          {formData.unitAmount} Units
+                        </span>
+                        <ChevronUp className="text-[#4C5560]" />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="mt-2 space-y-2 text-sm text-gray-600">
+                        <div className="text-sm text-[#4C5560] space-y-1">
+                          {formData.unitTypes.map((type, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-2"
+                            >
+                              <Input
+                                value={type}
+                                onChange={(e) => {
+                                  const newTypes = [...formData.unitTypes];
+                                  newTypes[index] = e.target.value;
+                                  handleInputChange("unitTypes", newTypes);
+                                }}
+                                placeholder="Unit type"
+                              />
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const newTypes = formData.unitTypes.filter(
+                                    (_, i) => i !== index
+                                  );
+                                  handleInputChange("unitTypes", newTypes);
+                                }}
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              handleInputChange("unitTypes", [
+                                ...formData.unitTypes,
+                                "",
+                              ]);
+                            }}
+                          >
+                            Add Unit Type
+                          </Button>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+                ) : (
+                  <Collapsible className="flex-1 mt-1">
+                    <CollapsibleTrigger className="flex items-center gap-2 w-full text-left">
+                      <span className="text-[#116114] font-medium text-sm">
+                        {property?.unitAmount} Units
+                      </span>
+                      <ChevronUp className="text-[#4C5560]" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-2 space-y-2 text-sm text-gray-600">
+                      <div className="text-sm text-[#4C5560] space-y-1">
+                        {property?.unitTypes?.map((type, index) => (
+                          <p key={index}>{type}</p>
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
               </div>
             </div>
 
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-[#116114] flex  gap-2 items-center">
-                  <GrLocation />
-                  Ebute meta lagos
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-[#4C5560]">Ongoing</p>
+                {isEditing ? (
+                  <div className="space-y-2">
+                    <Input
+                      value={formData.address}
+                      onChange={(e) =>
+                        handleInputChange("address", e.target.value)
+                      }
+                      placeholder="Property address"
+                      className="flex items-center gap-2"
+                    />
+                    <Select
+                      value={formData.constructionStatus}
+                      onValueChange={(value) =>
+                        handleInputChange("constructionStatus", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Construction Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ONGOING">Ongoing</SelectItem>
+                        <SelectItem value="COMPLETED">Completed</SelectItem>
+                        <SelectItem value="PLANNED">Planned</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm text-[#116114] flex gap-2 items-center">
+                      <GrLocation />
+                      {property?.address}
+                    </p>
+                    <p className="text-sm text-[#4C5560]">
+                      {property?.constructionStatus}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -176,75 +573,245 @@ export default function PropertyDetails () {
         <h2 className="text-sm font-medium text-[#181818] mb-4">
           Why invest:{" "}
         </h2>
-        <p className="text-[#116114] text-sm font-medium">
-          Exceptional Location, Guaranteed Returns
-        </p>
-        <p className="text-sm leading-relaxed text-[#181818] mt-2">
-          Positioned in the heart of Victoria Island, this stunning apartment
-          complex is designed for both luxury and high returns. Investors
-          benefit from its prime location, which is just minutes away from
-          Lagos’ financial district, major shopping centers, and vibrant
-          nightlife. The property is designed with modern architecture and
-          offers 24/7 power supply, dedicated parking, and top-tier security,
-          ensuring tenant satisfaction and retention. With steady market
-          appreciation and a growing demand for upscale living, this investment
-          is set to yield substantial returns.
-        </p>
+        {isEditing ? (
+          <div className="space-y-4">
+            <Input
+              value={formData.whyInvest.title}
+              onChange={(e) => handleWhyInvestChange("title", e.target.value)}
+              placeholder="Investment title"
+              className="font-medium text-[#116114]"
+            />
+            <Textarea
+              value={formData.whyInvest.description}
+              onChange={(e) =>
+                handleWhyInvestChange("description", e.target.value)
+              }
+              placeholder="Investment description"
+              className="text-sm leading-relaxed text-[#181818]"
+              rows={4}
+            />
+          </div>
+        ) : (
+          <>
+            <p className="text-[#116114] text-sm font-medium">
+              {property?.whyInvest?.title}
+            </p>
+            <p className="text-sm leading-relaxed text-[#181818] mt-2">
+              {property?.whyInvest?.description}
+            </p>
+          </>
+        )}
       </div>
       <div className="bg-white mt-4 p-8">
         <h2 className="text-sm font-medium text-[#181818] mb-4">
           Advantage of investment{" "}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {advantages.map((adv, idx) => (
-            <div key={idx} className="flex items-center gap-4">
-              <Image
-                src={adv.icon}
-                alt="Investment advantage icon"
-                width={40}
-                height={40}
-              />
-              <div>
-                <h4 className="text-[#116114] font-semibold">{adv.title}</h4>
-                <p className="text-sm text-[#202020]">{adv.description}</p>
-              </div>
+        {isEditing ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {formData.whyInvest.advantages.map((adv, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-4 p-4 border rounded"
+                >
+                  <Image
+                    src={
+                      defaultAdvantages[idx % defaultAdvantages.length]?.icon ||
+                      c
+                    }
+                    alt="Investment advantage icon"
+                    width={40}
+                    height={40}
+                  />
+                  <div className="flex-1 space-y-2">
+                    <Input
+                      value={adv.title}
+                      onChange={(e) =>
+                        handleAdvantageChange(idx, "title", e.target.value)
+                      }
+                      placeholder="Advantage title"
+                      className="text-[#116114] font-semibold"
+                    />
+                    <Textarea
+                      value={adv.description}
+                      onChange={(e) =>
+                        handleAdvantageChange(
+                          idx,
+                          "description",
+                          e.target.value
+                        )
+                      }
+                      placeholder="Advantage description"
+                      className="text-sm text-[#202020]"
+                      rows={2}
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removeAdvantage(idx)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+            <Button variant="outline" onClick={addAdvantage} className="mt-4">
+              Add Advantage
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {property?.whyInvest?.advantages?.map((adv, idx) => (
+              <div key={idx} className="flex items-center gap-4">
+                <Image
+                  src={
+                    defaultAdvantages[idx % defaultAdvantages.length]?.icon || c
+                  }
+                  alt="Investment advantage icon"
+                  width={40}
+                  height={40}
+                />
+                <div>
+                  <h4 className="text-[#116114] font-semibold">{adv.title}</h4>
+                  <p className="text-sm text-[#202020]">{adv.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <div className="bg-white mt-4 p-8 space-y-6">
-        <h2 className="text-sm font-medium text-[#181818]  mb-6">Features</h2>
+        <h2 className="text-sm font-medium text-[#181818] mb-6">Features</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
-            >
-              <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
-              <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden  w-full">
-                {feature}
-              </span>
+        {isEditing ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {formData.features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
+                >
+                  <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
+                  <Input
+                    value={feature}
+                    onChange={(e) => handleFeatureChange(index, e.target.value)}
+                    className="text-[#323539] text-sm border-none p-0"
+                    placeholder="Enter feature"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removeFeature(index)}
+                    className="ml-2"
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+            <Button variant="outline" onClick={addFeature} className="mt-4">
+              Add Feature
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {property?.features?.map((feature, index) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
+              >
+                <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
+                <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden w-full">
+                  {feature}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
         <h2 className="text-sm font-medium text-[#181818] mb-6">Amenities </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {amenities.map((amenity, index) => (
-            <div
-              key={index}
-              className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
-            >
-              <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
-              <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden  w-full">
-                {amenity}
-              </span>
+        {isEditing ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {formData.amenities.map((amenity, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
+                >
+                  <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
+                  <Input
+                    value={amenity}
+                    onChange={(e) => handleAmenityChange(index, e.target.value)}
+                    className="text-[#323539] text-sm border-none p-0"
+                    placeholder="Enter amenity"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removeAmenity(index)}
+                    className="ml-2"
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+            <Button variant="outline" onClick={addAmenity} className="mt-4">
+              Add Amenity
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {property?.amenities?.map((amenity, index) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
+              >
+                <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
+                <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden w-full">
+                  {amenity}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-        <Contact/>
+      <div className="flex justify-between px-3 items-center py-12">
+        {!isEditing ? (
+          <Button
+            className="bg-[#116114] text-white"
+            onClick={() => setIsEditing(true)}
+          >
+            Edit Property
+          </Button>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Button
+              className="bg-green-600 text-white"
+              onClick={handleSave}
+              disabled={isUpdating}
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {isUpdating ? "Saving..." : "Save"}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isUpdating}
+            >
+              <X className="w-4 h-4 mr-2" />
+              Cancel
+            </Button>
+          </div>
+        )}
+        <Link href="/main-admin/properties">
+          <button className="text-[#323539] flex items-center gap-2 hover:text-[#323539] text-sm">
+            <MdArrowBackIosNew /> Back
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }
