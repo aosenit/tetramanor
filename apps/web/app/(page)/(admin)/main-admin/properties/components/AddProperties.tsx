@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronRight, Save, Loader2 } from "lucide-react";
+import { ChevronRight, Save, Loader2, Upload, X } from "lucide-react";
 import { Textarea } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,34 +13,68 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
-import { usePostData } from "@/hooks/useApi";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import {
+  usePostData,
+  usePutData,
+  useFetchData,
+  useUploadData,
+} from "@/hooks/useApi";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
+import { z } from "zod";
 
-interface FormData {
+// Validation schema
+const propertySchema = z.object({
+  name: z.string().min(1, "Property name is required"),
+  address: z.string().min(1, "Address is required"),
+  about: z.string().min(1, "About property is required"),
+  unitAmount: z.number().min(1, "Number of units must be at least 1"),
+  inquiryOptions: z
+    .array(z.string())
+    .min(1, "At least one inquiry option is required"),
+  unitTypes: z.array(z.string()).min(1, "At least one unit type is required"),
+  whyInvest: z.object({
+    title: z.string().min(1, "Investment title is required"),
+    description: z.string().min(1, "Investment description is required"),
+    advantages: z
+      .array(
+        z.object({
+          title: z.string().min(1, "Advantage title is required"),
+          description: z.string().min(1, "Advantage description is required"),
+        })
+      )
+      .min(1, "At least one advantage is required"),
+  }),
+  features: z.array(z.string()),
+  amenities: z.array(z.string()),
+  images: z.array(z.string()),
+  documentId: z.string().optional(),
+  constructionStatus: z.enum(["ONGOING", "COMPLETED", "PLANNED"]),
+});
+
+type PropertyFormData = z.infer<typeof propertySchema>;
+
+interface UploadedImage {
+  id: string;
+  imageUrl: string;
   name: string;
-  address: string;
-  about: string;
-  unitAmount: number;
-  inquiryOptions: string[];
-  unitTypes: string[];
-  whyInvest: {
-    title: string;
-    description: string;
-    advantages: Array<{
-      title: string;
-      description: string;
-    }>;
-  };
-  features: string[];
-  amenities: string[];
-  images: string[];
-  documentId: string;
-  constructionStatus: string;
+  publicId: string;
+  createdAt: string;
+  isPrimary: boolean;
 }
 
-const defaultFormData: FormData = {
+interface UploadedDocument {
+  id: string;
+  imageUrl: string;
+  name: string;
+  publicId: string;
+  createdAt: string;
+  docType: string;
+}
+
+const defaultFormData: PropertyFormData = {
   name: "",
   address: "",
   about: "",
@@ -81,21 +115,80 @@ const inquiryOptions = [
 
 export default function AddProperties() {
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData>(defaultFormData);
-  const [activeTab, setActiveTab] = useState("personal");
+  const searchParams = useSearchParams();
+  const propertyId = searchParams.get("id");
+  const isEditMode = !!propertyId;
 
-  // Create property mutation
-  const {
-    mutate: createProperty,
-    isPending: isCreating,
-    error: createError,
-  } = usePostData("admin/properties");
+  const [formData, setFormData] = useState<PropertyFormData>(defaultFormData);
+  const [activeTab, setActiveTab] = useState("personal");
+  const [errors, setErrors] = useState<Partial<PropertyFormData>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [uploadedDocument, setUploadedDocument] =
+    useState<UploadedDocument | null>(null);
+
+  // Fetch property data if in edit mode
+  const { data: propertyData, isLoading: isLoadingProperty } = useFetchData(
+    propertyId ? `admin/properties/${propertyId}` : null
+  );
+
+  // API mutations
+  const { mutateAsync: createProperty, isPending: isCreating } =
+    usePostData("admin/properties");
+  const { mutateAsync: updateProperty, isPending: isUpdating } = usePutData(
+    propertyId ? `admin/properties/${propertyId}` : null
+  );
+
+  // File upload mutations
+  const { mutateAsync: uploadImages, isPending: isUploadingImages } =
+    useUploadData("upload/images");
+  const { mutateAsync: uploadDocument, isPending: isUploadingDocument } =
+    useUploadData("upload/document");
+
+  // Load property data when editing
+  useEffect(() => {
+    if (propertyData && isEditMode) {
+      console.log("Property data:", propertyData);
+      setFormData({
+        name: propertyData?.data?.name || "",
+        address: propertyData?.data?.address || "",
+        about: propertyData?.data?.about || "",
+        unitAmount: propertyData?.data?.unitAmount || 0,
+        inquiryOptions: propertyData?.data?.inquiryOptions || ["INQUIRY_FORM"],
+        unitTypes: propertyData?.data?.unitTypes || [],
+        whyInvest: propertyData?.data?.whyInvest || {
+          title: "",
+          description: "",
+          advantages: [{ title: "", description: "" }],
+        },
+        features: propertyData?.data?.features || [],
+        amenities: propertyData?.data?.amenities || [],
+        images: propertyData?.data?.images || [],
+        documentId: propertyData?.data?.documentId || "",
+        constructionStatus: propertyData?.data?.constructionStatus || "ONGOING",
+      });
+
+      // Load existing images if any
+      if (propertyData?.data?.images) {
+        setUploadedImages(propertyData.data.images);
+      }
+
+      // Load existing document if any
+      if (propertyData?.data?.document) {
+        setUploadedDocument(propertyData.data.document);
+      }
+    }
+  }, [propertyData, isEditMode]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
+    // Clear error when user starts typing
+    if (errors[field as keyof PropertyFormData]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
   };
 
   const handleWhyInvestChange = (field: string, value: string) => {
@@ -211,8 +304,118 @@ export default function AddProperties() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handle image upload
+  const handleImageUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const formData = new FormData();
+
+    Array.from(files).forEach((file) => {
+      formData.append("images", file);
+    });
+
+    try {
+      const response = await uploadImages(formData);
+
+      if (response.success) {
+        setUploadedImages((prev) => [...prev, ...response.data]);
+        setFormData((prev) => ({
+          ...prev,
+          images: [
+            ...prev.images,
+            ...response.data.map((img: UploadedImage) => img.id),
+          ],
+        }));
+        toast.success("Images uploaded successfully");
+      }
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload images");
+    }
+  };
+
+  // Handle document upload
+  const handleDocumentUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const formData = new FormData();
+    formData.append("document", files[0]);
+
+    try {
+      const response = await uploadDocument(formData);
+
+      if (response.success) {
+        setUploadedDocument(response?.data);
+        setFormData((prev) => ({
+          ...prev,
+          documentId: response?.data?.id,
+        }));
+        toast.success("Document uploaded successfully");
+      }
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload document");
+    }
+  };
+
+  // Remove uploaded image
+  const removeImage = (imageId: string) => {
+    setUploadedImages((prev) => prev.filter((img) => img.id !== imageId));
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((id) => id !== imageId),
+    }));
+  };
+
+  // Remove uploaded document
+  const removeDocument = () => {
+    setUploadedDocument(null);
+    setFormData((prev) => ({
+      ...prev,
+      documentId: "",
+    }));
+  };
+
+  // Validate form data
+  const validateForm = (): boolean => {
+    try {
+      propertySchema.parse(formData);
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: Partial<PropertyFormData> = {};
+        const errorMessages: string[] = [];
+
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            const fieldName = err.path[0] as string;
+            if (fieldName in formData) {
+              (newErrors as any)[fieldName] = err.message;
+              errorMessages.push(err.message);
+            }
+          }
+        });
+
+        setErrors(newErrors);
+
+        // Show the first validation error in toast
+        if (errorMessages.length > 0) {
+          toast.error(errorMessages[0]);
+        }
+      }
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return; // Validation errors are already shown in validateForm
+    }
+
+    setIsSubmitting(true);
 
     // Filter out empty features and amenities
     const cleanedFormData = {
@@ -227,12 +430,40 @@ export default function AddProperties() {
       },
     };
 
-    createProperty(cleanedFormData, {
-      onSuccess: () => {
-        router.push("/main-admin/properties");
-      },
-    });
+    try {
+      if (isEditMode) {
+        await updateProperty(cleanedFormData);
+        toast.success("Property updated successfully");
+      } else {
+        await createProperty(cleanedFormData);
+        toast.success("Property created successfully");
+      }
+
+      router.push("/main-admin/properties");
+    } catch (error: any) {
+      console.error("Error:", error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        (isEditMode
+          ? "Failed to update property"
+          : "Failed to create property");
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // Loading state for edit mode
+  if (isEditMode && isLoadingProperty) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span>Loading property data...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -243,12 +474,16 @@ export default function AddProperties() {
             <span className="flex items-center text-[#858C95] space-x-[2px]">
               <ChevronRight className="" />
             </span>
-            <span className="text-[#858C95]">Add Property</span>
+            <span className="text-[#858C95]">
+              {isEditMode ? "Edit Property" : "Add Property"}
+            </span>
           </div>
         </div>
         <div className="">
           <div className="flex items-center justify-between px-6 py-4">
-            <h1 className="font-semibold text-[#116114]">Add New Property</h1>
+            <h1 className="font-semibold text-[#116114]">
+              {isEditMode ? "Edit Property" : "Add New Property"}
+            </h1>
             <Tabs
               value={activeTab}
               onValueChange={setActiveTab}
@@ -272,12 +507,6 @@ export default function AddProperties() {
           </div>
         </div>
 
-        {createError && (
-          <div className="mx-6 mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-            Error creating property: {createError?.message || "Unknown error"}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="p-6 bg-white">
             <div className="space-y-6">
@@ -289,21 +518,26 @@ export default function AddProperties() {
                   htmlFor="property-name"
                   className="text-sm font-medium text-[#323539]"
                 >
-                  Property Name
+                  Property Name *
                 </Label>
                 <Input
                   id="property-name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
-                  className="w-full border border-[#116114] bg-[#E5E5E7] py-4"
+                  className={`w-full border bg-[#E5E5E7] py-4 ${
+                    errors.name ? "border-red-500" : "border-[#116114]"
+                  }`}
                   required
                 />
+                {errors.name && (
+                  <p className="text-red-500 text-sm">{errors.name}</p>
+                )}
               </div>
 
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-[#323539]">
-                  Inquiry Options
+                  Inquiry Options *
                 </Label>
                 <div className="space-y-3">
                   {inquiryOptions.map((option) => (
@@ -330,6 +564,11 @@ export default function AddProperties() {
                     </div>
                   ))}
                 </div>
+                {errors.inquiryOptions && (
+                  <p className="text-red-500 text-sm">
+                    {errors.inquiryOptions}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -337,16 +576,21 @@ export default function AddProperties() {
                   htmlFor="address"
                   className="text-sm font-medium text-[#323539]"
                 >
-                  Address
+                  Address *
                 </Label>
                 <Input
                   id="address"
                   type="text"
                   value={formData.address}
                   onChange={(e) => handleInputChange("address", e.target.value)}
-                  className="w-full border-none bg-[#E5E5E7] py-4"
+                  className={`w-full border bg-[#E5E5E7] py-4 ${
+                    errors.address ? "border-red-500" : "border-[#116114]"
+                  }`}
                   required
                 />
+                {errors.address && (
+                  <p className="text-red-500 text-sm">{errors.address}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -354,15 +598,20 @@ export default function AddProperties() {
                   htmlFor="about-property"
                   className="text-sm font-medium text-[#323539]"
                 >
-                  About Property
+                  About Property *
                 </Label>
                 <Textarea
                   id="about-property"
                   value={formData.about}
                   onChange={(e) => handleInputChange("about", e.target.value)}
-                  className="min-h-[80px] !bg-[#E5E5E7] !border-none"
+                  className={`min-h-[80px] bg-[#E5E5E7] border ${
+                    errors.about ? "border-red-500" : "border-[#116114]"
+                  }`}
                   required
                 />
+                {errors.about && (
+                  <p className="text-red-500 text-sm">{errors.about}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -378,7 +627,7 @@ export default function AddProperties() {
                     handleInputChange("constructionStatus", value)
                   }
                 >
-                  <SelectTrigger className="w-full bg-[#E5E5E7] border-none">
+                  <SelectTrigger className="w-full bg-[#E5E5E7] border border-[#116114]">
                     <SelectValue placeholder="Select construction status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -402,7 +651,7 @@ export default function AddProperties() {
                   htmlFor="no-of-units"
                   className="text-sm font-medium text-[#323539]"
                 >
-                  Number of Units
+                  Number of Units *
                 </Label>
                 <Input
                   id="no-of-units"
@@ -414,15 +663,20 @@ export default function AddProperties() {
                       parseInt(e.target.value) || 0
                     )
                   }
-                  className="w-full bg-[#e5e5e7] border-none"
+                  className={`w-full bg-[#e5e5e7] border ${
+                    errors.unitAmount ? "border-red-500" : "border-[#116114]"
+                  }`}
                   min="0"
                   required
                 />
+                {errors.unitAmount && (
+                  <p className="text-red-500 text-sm">{errors.unitAmount}</p>
+                )}
               </div>
 
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-[#323539]">
-                  Unit Types
+                  Unit Types *
                 </Label>
                 <div className="grid grid-cols-2 gap-3">
                   {unitTypeOptions.map((type) => (
@@ -440,6 +694,9 @@ export default function AddProperties() {
                     </div>
                   ))}
                 </div>
+                {errors.unitTypes && (
+                  <p className="text-red-500 text-sm">{errors.unitTypes}</p>
+                )}
               </div>
             </div>
 
@@ -452,36 +709,54 @@ export default function AddProperties() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-[#323539]">
-                    Investment Title
+                    Investment Title *
                   </Label>
                   <Input
                     value={formData.whyInvest.title}
                     onChange={(e) =>
                       handleWhyInvestChange("title", e.target.value)
                     }
-                    className="w-full bg-[#E5E5E7] border-none py-4"
+                    className={`w-full bg-[#E5E5E7] border py-4 ${
+                      errors.whyInvest?.title
+                        ? "border-red-500"
+                        : "border-[#116114]"
+                    }`}
                     placeholder="Enter investment title"
                   />
+                  {errors.whyInvest?.title && (
+                    <p className="text-red-500 text-sm">
+                      {errors.whyInvest.title}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-[#323539]">
-                    Investment Description
+                    Investment Description *
                   </Label>
                   <Textarea
                     value={formData.whyInvest.description}
                     onChange={(e) =>
                       handleWhyInvestChange("description", e.target.value)
                     }
-                    className="min-h-[80px] !bg-[#E5E5E7] !border-none"
+                    className={`min-h-[80px] bg-[#E5E5E7] border ${
+                      errors.whyInvest?.description
+                        ? "border-red-500"
+                        : "border-[#116114]"
+                    }`}
                     placeholder="Enter investment description"
                   />
+                  {errors.whyInvest?.description && (
+                    <p className="text-red-500 text-sm">
+                      {errors.whyInvest.description}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <Label className="text-sm font-medium text-[#323539]">
-                      Investment Advantages
+                      Investment Advantages *
                     </Label>
                     <Button
                       type="button"
@@ -523,7 +798,7 @@ export default function AddProperties() {
                             )
                           }
                           placeholder="Advantage title"
-                          className="bg-[#E5E5E7] border-none"
+                          className="bg-[#E5E5E7] border border-[#116114]"
                         />
                         <Textarea
                           value={advantage.description}
@@ -535,11 +810,16 @@ export default function AddProperties() {
                             )
                           }
                           placeholder="Advantage description"
-                          className="min-h-[60px] !bg-[#E5E5E7] !border-none"
+                          className="min-h-[60px] bg-[#E5E5E7] border border-[#116114]"
                         />
                       </div>
                     </div>
                   ))}
+                  {errors.whyInvest?.advantages && (
+                    <p className="text-red-500 text-sm">
+                      Please fill in all advantage fields
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -575,7 +855,7 @@ export default function AddProperties() {
                           handleFeatureChange(index, e.target.value)
                         }
                         placeholder="Enter feature"
-                        className="flex-1 bg-[#E5E5E7] border-none"
+                        className="flex-1 bg-[#E5E5E7] border border-[#116114]"
                       />
                       <Button
                         type="button"
@@ -615,7 +895,7 @@ export default function AddProperties() {
                           handleAmenityChange(index, e.target.value)
                         }
                         placeholder="Enter amenity"
-                        className="flex-1 bg-[#E5E5E7] border-none"
+                        className="flex-1 bg-[#E5E5E7] border border-[#116114]"
                       />
                       <Button
                         type="button"
@@ -631,27 +911,123 @@ export default function AddProperties() {
               </div>
             </div>
 
-            {/* File Upload Placeholder */}
+            {/* File Upload Section */}
             <div className="mt-8 space-y-4">
               <h3 className="text-base font-medium text-[#116114]">
                 Property Media
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                  <p className="text-sm text-gray-600">
-                    Property Images Upload
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    (To be implemented)
-                  </p>
+                {/* Property Images Upload */}
+                <div className="space-y-4">
+                  <Label className="text-sm font-medium text-[#323539]">
+                    Property Images
+                  </Label>
+                  <div className="border-2 border-dashed border-[#116114] rounded-lg p-6 text-center">
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e.target.files)}
+                      className="hidden"
+                      id="image-upload"
+                      disabled={isUploadingImages}
+                    />
+                    <label
+                      htmlFor="image-upload"
+                      className="cursor-pointer flex flex-col items-center gap-2"
+                    >
+                      <Upload className="w-8 h-8 text-[#116114]" />
+                      <span className="text-[#116114] font-medium">
+                        {isUploadingImages
+                          ? "Uploading..."
+                          : "Click to upload images"}
+                      </span>
+                      <span className="text-sm text-[#858C95]">
+                        PNG, JPG, WEBP up to 10MB each
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Display uploaded images */}
+                  {uploadedImages.length > 0 && (
+                    <div className="grid grid-cols-2 gap-2">
+                      {uploadedImages.map((image) => (
+                        <div key={image.id} className="relative group">
+                          <img
+                            src={image.imageUrl}
+                            alt={image.name}
+                            className="w-full h-24 object-cover rounded-lg"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(image.id)}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                  <p className="text-sm text-gray-600">
-                    Property Brochure Upload
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    (To be implemented)
-                  </p>
+
+                {/* Property Document Upload */}
+                <div className="space-y-4">
+                  <Label className="text-sm font-medium text-[#323539]">
+                    Property Brochure
+                  </Label>
+                  <div className="border-2 border-dashed border-[#116114] rounded-lg p-6 text-center">
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={(e) => handleDocumentUpload(e.target.files)}
+                      className="hidden"
+                      id="document-upload"
+                      disabled={isUploadingDocument}
+                    />
+                    <label
+                      htmlFor="document-upload"
+                      className="cursor-pointer flex flex-col items-center gap-2"
+                    >
+                      <Upload className="w-8 h-8 text-[#116114]" />
+                      <span className="text-[#116114] font-medium">
+                        {isUploadingDocument
+                          ? "Uploading..."
+                          : "Click to upload document"}
+                      </span>
+                      <span className="text-sm text-[#858C95]">
+                        PDF, DOC, DOCX up to 10MB
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Display uploaded document */}
+                  {uploadedDocument && (
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <a
+                            href={uploadedDocument.imageUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-green-700 font-medium hover:text-green-900 underline"
+                          >
+                            {uploadedDocument.name}
+                          </a>
+                          <p className="text-xs text-green-600 mt-1">
+                            {uploadedDocument.docType}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={removeDocument}
+                          className="text-red-500 hover:text-red-700 ml-2"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -663,17 +1039,23 @@ export default function AddProperties() {
               <Button
                 type="submit"
                 className="bg-[#116114] hover:bg-[#116114] text-white text-sm px-8 py-2 rounded"
-                disabled={isCreating}
+                disabled={
+                  isSubmitting ||
+                  isCreating ||
+                  isUpdating ||
+                  isUploadingImages ||
+                  isUploadingDocument
+                }
               >
-                {isCreating ? (
+                {isSubmitting || isCreating || isUpdating ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating...
+                    {isEditMode ? "Updating..." : "Creating..."}
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
-                    Create Property
+                    {isEditMode ? "Update Property" : "Create Property"}
                   </>
                 )}
               </Button>

@@ -399,7 +399,7 @@ export default function PropertyManagement() {
                     <Image
                       src={
                         property.images && property.images.length > 0
-                          ? property.images[0]
+                          ? property.images[0]?.imageUrl
                           : four
                       }
                       alt={property.name}
