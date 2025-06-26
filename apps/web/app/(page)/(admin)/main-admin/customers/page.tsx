@@ -419,10 +419,7 @@ export default function CustomersPage() {
                               className=""
                               onClick={() =>
                                 router.push(
-                                  `/main-admin/customers/view-profile?id=${user.id}`,
-                                  {
-                                    state: { user },
-                                  } as any
+                                  `/main-admin/customers/view-profile?id=${user.id}`
                                 )
                               }
                             >
@@ -435,10 +432,7 @@ export default function CustomersPage() {
                               className=""
                               onClick={() =>
                                 router.push(
-                                  `/main-admin/customers/edit?id=${user.id}`,
-                                  {
-                                    state: { user },
-                                  } as any
+                                  `/main-admin/customers/add-customers?id=${user.id}`
                                 )
                               }
                             >
