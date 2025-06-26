@@ -145,7 +145,10 @@ export function AppSidebar() {
                 },
               ].map((item) => {
                 // check if the pathname includes the item.url, except for when item.url ends with main-admin
-                const isActive = pathname.includes(item.url);
+                const isActive =
+                  item.url === "/main-admin"
+                    ? pathname === item.url
+                    : pathname.includes(item.url);
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
@@ -202,7 +205,10 @@ export function AppSidebar() {
                   icon: FileText,
                 },
               ].map((item) => {
-                const isActive = pathname.includes(item.url);
+                const isActive =
+                  item.url === "/main-admin"
+                    ? pathname === item.url
+                    : pathname.includes(item.url);
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
