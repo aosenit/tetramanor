@@ -5,9 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useSidebar } from "./sidebar";
+import { useFetchData } from "@/hooks/useApi";
 
 export function TopHeader() {
   const { toggleSidebar, setOpenMobile } = useSidebar();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const { data: notifications } = useFetchData("notifications");
+  console.log(notifications);
 
   return (
     <header className="bg-[#323539] border-b border-gray-700 px-6 py-4">
@@ -22,7 +27,9 @@ export function TopHeader() {
             <Menu className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-semibold text-white">Hello Adeola</h1>
+            <h1 className="text-2xl font-semibold text-white">
+              Hello {user?.name},
+            </h1>
             <p className="text-gray-300">Welcome back</p>
           </div>
         </div>
@@ -42,9 +49,11 @@ export function TopHeader() {
             className="relative text-white hover:bg-gray-700"
           >
             <Bell className="h-5 w-5" />
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
-              1
-            </Badge>
+            {notifications?.length > 0 && (
+              <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+                {notifications?.length}
+              </Badge>
+            )}
           </Button>
         </div>
       </div>
