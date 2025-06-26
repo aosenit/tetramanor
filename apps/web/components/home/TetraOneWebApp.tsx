@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React from "react";
-import tetrawebone from "@/assets/home/ten.webp";
+import tm from "@/assets/home/tm.webp";
 import lofive from "@/assets/home/lofive.webp";
 import eleven from "@/assets/home/eleven.webp";
 import twelve from "@/assets/home/twelve.webp";
@@ -21,7 +21,7 @@ export default function TetraOneWebApp() {
             </div>
             <div className="relative w-full h-full">
               <Image
-                src={tetrawebone}
+                src={tm}
                 alt="TetraManor Exclusive"
                 className="rounded-xl object-cover"
                 fill

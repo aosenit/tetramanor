@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import Image from "next/image";
-import tmHighGardens from "@/assets/home/two.webp";
+import bedone from "@/assets/home/bedone.webp";
 import React from 'react';
 import CountUp from 'react-countup';
 
@@ -96,12 +96,12 @@ export default function HomeKeyFeatures() {
             <div className="relative mt-6 rounded-xl overflow-hidden shadow-lg lg:w-1/3 img-hover-zoom">
               <Image
                 fill
-                src={tmHighGardens}
+                src={bedone}
                 alt="TM HighGardens"
                 className="w-full h-48 object-cover"
               />
               <div className="absolute top-4 left-4 bg-[#202020] bg-opacity-80 text-white text-xs px-3 py-1 rounded-full">
-                Studio apartment
+                3 Bedroom (TMHG)
               </div>
               <div className="absolute bottom-0 left-0 w-full bg-[#202020] bg-opacity-90 p-4">
                 <div className="font-bold text-lg text-white mb-1">
