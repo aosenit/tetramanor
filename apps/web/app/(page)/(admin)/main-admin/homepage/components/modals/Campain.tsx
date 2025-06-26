@@ -13,8 +13,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BsCloudArrowUp } from "react-icons/bs";
+import { X, Upload, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { usePostData } from "@/hooks/useApi";
+import { usePostData, useUploadData } from "@/hooks/useApi";
 import { toast } from "sonner";
 
 interface CampaignFormData {
@@ -25,7 +26,15 @@ interface CampaignFormData {
   endDate: string;
   isActive: boolean;
   images: string[];
-  documentId: string;
+}
+
+interface UploadedImage {
+  id: string;
+  imageUrl: string;
+  name: string;
+  publicId: string;
+  createdAt: string;
+  isPrimary: boolean;
 }
 
 export default function CampaignModal({
@@ -45,14 +54,17 @@ export default function CampaignModal({
     endDate: "",
     isActive: true,
     images: [],
-    documentId: "",
   });
 
   const [errors, setErrors] = useState<Partial<CampaignFormData>>({});
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
 
   const { mutateAsync: createCampaign, isPending: isCreatingCampaign } =
     usePostData("campaigns");
+
+  // File upload mutations
+  const { mutateAsync: uploadImages, isPending: isUploadingImages } =
+    useUploadData("upload/images");
 
   useEffect(() => {
     if (open) {
@@ -77,10 +89,9 @@ export default function CampaignModal({
         endDate: "",
         isActive: true,
         images: [],
-        documentId: "",
       });
       setErrors({});
-      setSelectedFiles([]);
+      setUploadedImages([]);
     }
   }, [open]);
 
@@ -102,13 +113,42 @@ export default function CampaignModal({
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    setSelectedFiles(files);
-    const fileIds = files.map((file) => file.name); // This should be actual file IDs from upload
+  // Handle image upload
+  const handleImageUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const formData = new FormData();
+
+    Array.from(files).forEach((file) => {
+      formData.append("images", file);
+    });
+
+    try {
+      const response = await uploadImages(formData);
+
+      if (response.success) {
+        setUploadedImages((prev) => [...prev, ...response.data]);
+        setFormData((prev) => ({
+          ...prev,
+          images: [
+            ...prev.images,
+            ...response.data.map((img: UploadedImage) => img.id),
+          ],
+        }));
+        toast.success("Images uploaded successfully");
+      }
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload images");
+    }
+  };
+
+  // Remove uploaded image
+  const removeImage = (imageId: string) => {
+    setUploadedImages((prev) => prev.filter((img) => img.id !== imageId));
     setFormData((prev) => ({
       ...prev,
-      images: fileIds,
+      images: prev.images.filter((id) => id !== imageId),
     }));
   };
 
@@ -141,6 +181,13 @@ export default function CampaignModal({
     }
 
     setErrors(newErrors);
+
+    // Show first error in toast
+    const errorMessages = Object.values(newErrors);
+    if (errorMessages.length > 0) {
+      toast.error(errorMessages[0]);
+    }
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -166,8 +213,11 @@ export default function CampaignModal({
         onClose();
         refetch();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to create campaign:", error);
+      const errorMessage =
+        error?.response?.data?.message || "Failed to create campaign";
+      toast.error(errorMessage);
     }
   };
 
@@ -278,20 +328,51 @@ export default function CampaignModal({
                   type="file"
                   multiple
                   accept="image/*"
-                  onChange={handleFileChange}
+                  onChange={(e) => handleImageUpload(e.target.files)}
                   className="hidden"
-                  id="file-upload"
+                  id="image-upload"
+                  disabled={isUploadingImages}
                 />
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <p className="text-sm text-[#292D32]">Upload banner images</p>
-                  <BsCloudArrowUp className="mx-auto h-8 w-8 text-[#798088] mt-2" />
-                  {selectedFiles.length > 0 && (
+                <label htmlFor="image-upload" className="cursor-pointer">
+                  <p className="text-sm text-[#292D32]">
+                    {isUploadingImages
+                      ? "Uploading..."
+                      : "Upload banner images"}
+                  </p>
+                  {isUploadingImages ? (
+                    <Loader2 className="mx-auto h-8 w-8 text-[#798088] mt-2 animate-spin" />
+                  ) : (
+                    <Upload className="mx-auto h-8 w-8 text-[#798088] mt-2" />
+                  )}
+                  {uploadedImages.length > 0 && (
                     <p className="text-xs text-green-600 mt-2">
-                      {selectedFiles.length} file(s) selected
+                      {uploadedImages.length} image(s) uploaded
                     </p>
                   )}
                 </label>
               </div>
+
+              {/* Display uploaded images */}
+              {uploadedImages.length > 0 && (
+                <div className="grid grid-cols-2 gap-2">
+                  {uploadedImages.map((image) => (
+                    <div key={image.id} className="relative group">
+                      <img
+                        src={image.imageUrl}
+                        alt={image.name}
+                        className="w-full h-24 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(image.id)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -330,7 +411,7 @@ export default function CampaignModal({
             <div className="flex flex-col sm:flex-row justify-between pt-4">
               <Button
                 type="submit"
-                disabled={isCreatingCampaign}
+                disabled={isCreatingCampaign || isUploadingImages}
                 className="bg-[#116114] font-medium text-sm hover:bg-[#116114] text-white disabled:opacity-50"
               >
                 {isCreatingCampaign ? "Creating..." : "Save campaign"}
@@ -339,7 +420,7 @@ export default function CampaignModal({
                 type="button"
                 variant="ghost"
                 onClick={onClose}
-                disabled={isCreatingCampaign}
+                disabled={isCreatingCampaign || isUploadingImages}
                 className="text-[#323539]"
               >
                 Back to homepage
