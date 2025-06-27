@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import five from "@/assets/admin/home/five.svg";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Loader2 } from "lucide-react";
+import { Search, Plus, Loader2, Eye, Trash2, Edit } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -20,6 +20,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import Link from "next/link";
 import Image from "next/image";
 import one from "@/assets/admin/customer/one.svg";
@@ -27,6 +35,8 @@ import two from "@/assets/admin/customer/two.svg";
 import three from "@/assets/admin/customer/three.svg";
 import { useState } from "react";
 import { useFetchData } from "@/hooks/useApi";
+import { toast } from "sonner";
+import DeleteRentalModal from "./components/DeleteRentalModal";
 
 interface Rental {
   id: string;
@@ -69,25 +79,52 @@ interface Rental {
   };
 }
 
+interface RentalStats {
+  total: number;
+  rented: number;
+  available: number;
+}
+
 export default function RentalsPage() {
   const [activeCard, setActiveCard] = useState<number | null>(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [propertyFilter, setPropertyFilter] = useState("all");
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [rentalToDelete, setRentalToDelete] = useState<Rental | null>(null);
 
   // Fetch rentals data
-  const { data: rentalsResponse, isLoading, refetch } = useFetchData("rentals");
+  const {
+    data: rentalsResponse,
+    isLoading: rentalsLoading,
+    refetch: refetchRentals,
+  } = useFetchData("rentals");
+
+  // Fetch stats data
+  const {
+    data: statsResponse,
+    isLoading: statsLoading,
+    refetch: refetchStats,
+  } = useFetchData("rentals/stats");
 
   const rentals: Rental[] = rentalsResponse?.data || [];
+  const stats: RentalStats = statsResponse?.data || {
+    total: 0,
+    rented: 0,
+    available: 0,
+  };
 
-  // Calculate stats from real data
-  const totalProperties = rentals.length;
-  const rentedProperties = rentals.filter(
-    (rental) => rental.status === "RENTED"
-  ).length;
-  const notRentedProperties = rentals.filter(
-    (rental) => rental.status === "NOT_RENTED"
-  ).length;
+  // Open delete confirmation modal
+  const openDeleteModal = (rental: Rental) => {
+    setRentalToDelete(rental);
+    setDeleteModalOpen(true);
+  };
+
+  // Handle successful deletion
+  const handleDeleteSuccess = () => {
+    refetchRentals();
+    refetchStats();
+  };
 
   // Filter rentals based on search and filters
   const filteredRentals = rentals.filter((rental) => {
@@ -140,27 +177,27 @@ export default function RentalsPage() {
     {
       id: 0,
       title: "Total properties for rent",
-      count: totalProperties,
+      count: stats.total,
       subtitle: "For rent",
       image: one,
     },
     {
       id: 1,
       title: "Rented properties",
-      count: rentedProperties,
+      count: stats.rented,
       subtitle: "properties rented",
       image: three,
     },
     {
       id: 2,
       title: "Not rented properties",
-      count: notRentedProperties,
+      count: stats.available,
       subtitle: "Available for rent",
       image: two,
     },
   ];
 
-  if (isLoading) {
+  if (rentalsLoading || statsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex items-center gap-2">
@@ -361,15 +398,24 @@ export default function RentalsPage() {
                             <DropdownMenu.Item className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer">
                               <Link
                                 href={`/main-admin/rentals/edit-rentals?id=${rental.id}`}
+                                className="w-full"
                               >
                                 Edit
                               </Link>
                             </DropdownMenu.Item>
-                            <DropdownMenu.Item className="px-2 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded cursor-pointer">
+                            <DropdownMenu.Item
+                              className="px-2 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded cursor-pointer"
+                              onClick={() => openDeleteModal(rental)}
+                            >
                               Delete
                             </DropdownMenu.Item>
                             <DropdownMenu.Item className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer">
-                              View details
+                              <Link
+                                href={`/main-admin/rentals/rental-details?id=${rental.id}`}
+                                className="w-full"
+                              >
+                                View details
+                              </Link>
                             </DropdownMenu.Item>
                           </DropdownMenu.Content>
                         </DropdownMenu.Root>
@@ -382,6 +428,14 @@ export default function RentalsPage() {
           </div>
         </div>
       </div>
+
+      {/* Delete Rental Modal */}
+      <DeleteRentalModal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        rental={rentalToDelete}
+        onSuccess={handleDeleteSuccess}
+      />
     </div>
   );
 }
