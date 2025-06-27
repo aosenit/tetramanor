@@ -216,13 +216,19 @@ export default function OngoingCampaigns() {
                     alt="options"
                     width={35}
                     height={35}
-                    onClick={() => toggleTooltip(index)}
+                    onClick={() => {
+                      toggleTooltip(index);
+                    }}
                   />
                 </div>
 
                 {openTooltipIndex === index && (
                   <div className="absolute right-4 top-full z-10 mt-1">
-                    <Tooltip />
+                    <Tooltip
+                      campaign={campaign}
+                      refetch={refetch}
+                      closeTooltip={() => toggleTooltip(null)}
+                    />
                   </div>
                 )}
               </div>
