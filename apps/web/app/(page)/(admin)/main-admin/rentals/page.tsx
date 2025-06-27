@@ -1,96 +1,176 @@
 "use client";
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import five from "@/assets/admin/home/five.svg"
-import { Input } from "@/components/ui/input"
-import { Search, Plus, Building2 } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import Link from "next/link"
-import Image from "next/image"
-import one from "@/assets/admin/customer/one.svg"
-import two from "@/assets/admin/customer/two.svg"
-import three from "@/assets/admin/customer/three.svg"
-import { useState } from "react"
+import five from "@/assets/admin/home/five.svg";
+import { Input } from "@/components/ui/input";
+import { Search, Plus, Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import Link from "next/link";
+import Image from "next/image";
+import one from "@/assets/admin/customer/one.svg";
+import two from "@/assets/admin/customer/two.svg";
+import three from "@/assets/admin/customer/three.svg";
+import { useState } from "react";
+import { useFetchData } from "@/hooks/useApi";
 
-const rentalProperties = [
-  {
-    id: 1,
-    name: "TM meadows",
-    type: "3BR + BQ",
-    location: "Ebute metta",
-    rent: "₦3.5m/Year",
-    status: "Not rented",
-  },
-  {
-    id: 2,
-    name: "Queen mary",
-    type: "2BR",
-    location: "Maryland",
-    rent: "₦2M/year",
-    status: "Not rented",
-  },
-  {
-    id: 3,
-    name: "Comfy burrows",
-    type: "Studio apartment",
-    location: "Akoka yaba",
-    rent: "₦140,500/Mth",
-    status: "Rented",
-  },
-  {
-    id: 4,
-    name: "TM meadows",
-    type: "3BR + BQ",
-    location: "Ebute metta",
-    rent: "₦3.5m/Year",
-    status: "Not rented",
-  },
-  {
-    id: 5,
-    name: "Queen mary",
-    type: "2BR",
-    location: "Maryland",
-    rent: "₦2M/year",
-    status: "Not rented",
-  },
-  {
-    id: 6,
-    name: "Comfy burrows",
-    type: "Studio apartment",
-    location: "Akoka yaba",
-    rent: "₦140,500/Mth",
-    status: "Rented",
-  },
-]
+interface Rental {
+  id: string;
+  propertyId: string;
+  apartmentType: string;
+  location: string;
+  rent: number;
+  frequency: string;
+  agencyFee: number;
+  cautionFee: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  property: {
+    id: string;
+    name: string;
+    address: string;
+    about: string;
+    featured: boolean;
+    featuredAt: string | null;
+    inquiryOptions: string[];
+    whyInvest: {
+      title: string;
+      advantages: Array<{
+        title: string;
+        description: string;
+      }>;
+      description: string;
+    };
+    features: string[];
+    amenities: string[];
+    createdAt: string;
+    brochure: string | null;
+    constructionStatus: string;
+    accountOfficerId: string | null;
+    createdById: string | null;
+    status: string;
+    unitAmount: number;
+    unitTypes: string[];
+  };
+}
 
 export default function RentalsPage() {
   const [activeCard, setActiveCard] = useState<number | null>(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [propertyFilter, setPropertyFilter] = useState("all");
+
+  // Fetch rentals data
+  const { data: rentalsResponse, isLoading, refetch } = useFetchData("rentals");
+
+  const rentals: Rental[] = rentalsResponse?.data || [];
+
+  // Calculate stats from real data
+  const totalProperties = rentals.length;
+  const rentedProperties = rentals.filter(
+    (rental) => rental.status === "RENTED"
+  ).length;
+  const notRentedProperties = rentals.filter(
+    (rental) => rental.status === "NOT_RENTED"
+  ).length;
+
+  // Filter rentals based on search and filters
+  const filteredRentals = rentals.filter((rental) => {
+    const matchesSearch =
+      rental.property.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rental.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rental.apartmentType.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      rental.status.toLowerCase() === statusFilter.toLowerCase();
+    const matchesProperty =
+      propertyFilter === "all" || rental.property.name === propertyFilter;
+
+    return matchesSearch && matchesStatus && matchesProperty;
+  });
+
+  // Get unique property names for filter
+  const propertyNames = [
+    ...new Set(rentals.map((rental) => rental.property.name)),
+  ];
+
+  // Format rent amount
+  const formatRent = (rent: number, frequency: string) => {
+    const formattedRent = rent.toLocaleString("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+
+    switch (frequency) {
+      case "MONTHLY":
+        return `${formattedRent}/Month`;
+      case "YEARLY":
+        return `${formattedRent}/Year`;
+      case "QUARTERLY":
+        return `${formattedRent}/Quarter`;
+      default:
+        return formattedRent;
+    }
+  };
+
+  // Format apartment type
+  const formatApartmentType = (type: string) => {
+    return type.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  };
 
   const cards = [
     {
       id: 0,
       title: "Total properties for rent",
-      count: 150,
+      count: totalProperties,
       subtitle: "For rent",
       image: one,
     },
     {
       id: 1,
       title: "Rented properties",
-      count: 100,
+      count: rentedProperties,
       subtitle: "properties rented",
       image: three,
     },
     {
       id: 2,
       title: "Not rented properties",
-      count: 100,
+      count: notRentedProperties,
       subtitle: "Available for rent",
       image: two,
     },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span>Loading rentals...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen space-y-6">
       <div className="">
@@ -114,8 +194,10 @@ export default function RentalsPage() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#858C95] w-4 h-4" />
           <Input
-            placeholder="Search  by name / email / ID "
+            placeholder="Search by property name / location / apartment type"
             className="pl-10 bg-[#E5E5E7] border-0"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
@@ -123,43 +205,38 @@ export default function RentalsPage() {
         <div className="flex flex-wrap gap-4">
           <Button
             variant="outline"
-            className="bg-white text-[#858C95] font-medium"
+            className={`font-medium ${
+              statusFilter === "all"
+                ? "bg-[#116114] text-white"
+                : "bg-white text-[#858C95]"
+            }`}
+            onClick={() => setStatusFilter("all")}
           >
             All
           </Button>
 
-          <Select>
+          <Select value={propertyFilter} onValueChange={setPropertyFilter}>
             <SelectTrigger className="w-[180px] bg-white text-[#858C95] font-medium">
               <SelectValue placeholder="Property name" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="tm-meadows">TM Meadows</SelectItem>
-              <SelectItem value="tm-high-gardens">TM High gardens</SelectItem>
-              <SelectItem value="queen-mary">Queen Mary</SelectItem>
-              <SelectItem value="kings-landing">Kings Landing</SelectItem>
+              <SelectItem value="all">All Properties</SelectItem>
+              {propertyNames.map((name) => (
+                <SelectItem key={name} value={name}>
+                  {name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
-          <Select>
-            <SelectTrigger className="w-[180px] bg-white text-[#858C95] font-medium">
-              <SelectValue placeholder="Apartment type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="3br">3BR + BQ</SelectItem>
-              <SelectItem value="bungalow">Bungalow</SelectItem>
-              <SelectItem value="duplex">Duplex</SelectItem>
-              <SelectItem value="bq">BQ</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[180px] bg-white text-[#858C95] font-medium">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="available">Available</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="rented">Rented</SelectItem>
-              <SelectItem value="not-rented">Not rented</SelectItem>
+              <SelectItem value="not_rented">Not Rented</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -223,68 +300,83 @@ export default function RentalsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rentalProperties.map((property) => (
-                  <TableRow key={property.id}>
-                    <TableCell className="text-[#181818] text-xs">
-                      {property.name}
-                    </TableCell>
-                    <TableCell className="text-[#181818] text-xs">
-                      {property.type}
-                    </TableCell>
-                    <TableCell className="text-[#181818] text-xs">
-                      {property.location}
-                    </TableCell>
-                    <TableCell className="text-[#181818] text-xs">
-                      {property.rent}
-                    </TableCell>
-
+                {filteredRentals.length === 0 ? (
+                  <TableRow>
                     <TableCell
-                      className={`text-xs font-medium ${
-                        property.status === "Rented"
-                          ? "text-[#858C95]"
-                          : "text-[#116114]"
-                      }`}
+                      colSpan={6}
+                      className="text-center py-8 text-[#858C95]"
                     >
-                      {property.status}
-                    </TableCell>
-
-                    <TableCell>
-                      <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                          >
-                            <span className="sr-only">Open menu</span>
-                            <Image
-                              src={five}
-                              alt="Action menu"
-                              width={16}
-                              height={16}
-                              className="object-contain"
-                            />
-                          </Button>
-                        </DropdownMenu.Trigger>
-
-                        <DropdownMenu.Content
-                          sideOffset={4}
-                          className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md"
-                        >
-                          <DropdownMenu.Item className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer">
-                            Edit
-                          </DropdownMenu.Item>
-                          <DropdownMenu.Item className="px-2 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded cursor-pointer">
-                            Delete
-                          </DropdownMenu.Item>
-                          <DropdownMenu.Item className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer">
-                            View details
-                          </DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Root>
+                      No rentals found
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  filteredRentals.map((rental) => (
+                    <TableRow key={rental.id}>
+                      <TableCell className="text-[#181818] text-xs">
+                        {rental.property.name}
+                      </TableCell>
+                      <TableCell className="text-[#181818] text-xs">
+                        {formatApartmentType(rental.apartmentType)}
+                      </TableCell>
+                      <TableCell className="text-[#181818] text-xs">
+                        {rental.location}
+                      </TableCell>
+                      <TableCell className="text-[#181818] text-xs">
+                        {formatRent(rental.rent, rental.frequency)}
+                      </TableCell>
+
+                      <TableCell
+                        className={`text-xs font-medium ${
+                          rental.status === "RENTED"
+                            ? "text-[#858C95]"
+                            : "text-[#116114]"
+                        }`}
+                      >
+                        {rental.status === "RENTED" ? "Rented" : "Not Rented"}
+                      </TableCell>
+
+                      <TableCell>
+                        <DropdownMenu.Root>
+                          <DropdownMenu.Trigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
+                              <span className="sr-only">Open menu</span>
+                              <Image
+                                src={five}
+                                alt="Action menu"
+                                width={16}
+                                height={16}
+                                className="object-contain"
+                              />
+                            </Button>
+                          </DropdownMenu.Trigger>
+
+                          <DropdownMenu.Content
+                            sideOffset={4}
+                            className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md"
+                          >
+                            <DropdownMenu.Item className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer">
+                              <Link
+                                href={`/main-admin/rentals/edit-rentals?id=${rental.id}`}
+                              >
+                                Edit
+                              </Link>
+                            </DropdownMenu.Item>
+                            <DropdownMenu.Item className="px-2 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded cursor-pointer">
+                              Delete
+                            </DropdownMenu.Item>
+                            <DropdownMenu.Item className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer">
+                              View details
+                            </DropdownMenu.Item>
+                          </DropdownMenu.Content>
+                        </DropdownMenu.Root>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>

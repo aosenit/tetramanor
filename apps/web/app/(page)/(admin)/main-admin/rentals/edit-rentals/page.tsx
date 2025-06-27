@@ -204,26 +204,37 @@ export default function EditRental() {
     setIsSubmitting(true);
 
     try {
-      const submitData = {
-        ...formData,
-        ...(isEditMode && { id: rentalId }),
-      };
+      // Create FormData for multipart/form-data submission
+      const formDataToSubmit = new FormData();
+
+      // Add all form fields
+      formDataToSubmit.append("propertyId", formData.propertyId);
+      formDataToSubmit.append("apartmentType", formData.apartmentType);
+      formDataToSubmit.append("location", formData.location);
+      formDataToSubmit.append("rent", formData.rent.toString());
+      formDataToSubmit.append("frequency", formData.frequency);
+      formDataToSubmit.append("agencyFee", formData.agencyFee.toString());
+      formDataToSubmit.append("cautionFee", formData.countryFee.toString()); // Map countryFee to cautionFee
+      formDataToSubmit.append("status", formData.status);
+
+      // Add images if any
+      if (uploadedImages.length > 0) {
+        uploadedImages.forEach((image) => {
+          formDataToSubmit.append("images", image.id);
+        });
+      }
 
       if (isEditMode) {
-        await updateRental(submitData);
+        await updateRental(formDataToSubmit);
         toast.success("Rental updated successfully");
       } else {
-        await createRental(submitData);
+        await createRental(formDataToSubmit);
         toast.success("Rental created successfully");
       }
 
       router.push("/main-admin/rentals");
     } catch (error: any) {
       console.error("Error:", error);
-      const errorMessage =
-        error?.response?.data?.message ||
-        (isEditMode ? "Failed to update rental" : "Failed to create rental");
-      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
