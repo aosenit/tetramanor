@@ -12,10 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BsCloudArrowUp } from "react-icons/bs";
 import { X, Upload, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { usePostData, useUploadData } from "@/hooks/useApi";
+import {
+  usePostData,
+  usePutData,
+  useFetchData,
+  useUploadData,
+} from "@/hooks/useApi";
 import { toast } from "sonner";
 
 interface CampaignFormData {
@@ -41,11 +45,15 @@ export default function CampaignModal({
   open,
   onClose,
   refetch,
+  campaignId,
 }: {
   open: boolean;
   onClose: () => void;
   refetch: () => void;
+  campaignId?: string;
 }) {
+  const isEditMode = !!campaignId;
+
   const [formData, setFormData] = useState<CampaignFormData>({
     title: "",
     type: "INVESTMENT",
@@ -59,8 +67,16 @@ export default function CampaignModal({
   const [errors, setErrors] = useState<Partial<CampaignFormData>>({});
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
 
+  // Fetch campaign data if in edit mode
+  const { data: campaignData, isLoading: isLoadingCampaign } = useFetchData(
+    campaignId && open ? `campaigns/${campaignId}` : null
+  );
+
+  // API mutations
   const { mutateAsync: createCampaign, isPending: isCreatingCampaign } =
     usePostData("campaigns");
+  const { mutateAsync: updateCampaign, isPending: isUpdatingCampaign } =
+    usePutData(campaignId ? `campaigns/${campaignId}` : null);
 
   // File upload mutations
   const { mutateAsync: uploadImages, isPending: isUploadingImages } =
@@ -78,9 +94,33 @@ export default function CampaignModal({
     };
   }, [open]);
 
-  // Reset form when modal opens
+  // Load campaign data when editing
   useEffect(() => {
-    if (open) {
+    if (campaignData && isEditMode) {
+      setFormData({
+        title: campaignData?.data?.title || "",
+        type: campaignData?.data?.type || "INVESTMENT",
+        description: campaignData?.data?.description || "",
+        startDate: campaignData?.data?.startDate
+          ? new Date(campaignData.data.startDate).toISOString().split("T")[0]
+          : "",
+        endDate: campaignData?.data?.endDate
+          ? new Date(campaignData.data.endDate).toISOString().split("T")[0]
+          : "",
+        isActive: campaignData?.data?.isActive ?? true,
+        images: campaignData?.data?.images || [],
+      });
+
+      // Load existing images if any
+      if (campaignData?.data?.images) {
+        setUploadedImages(campaignData.data.images);
+      }
+    }
+  }, [campaignData, isEditMode]);
+
+  // Reset form when modal opens in create mode
+  useEffect(() => {
+    if (open && !isEditMode) {
       setFormData({
         title: "",
         type: "INVESTMENT",
@@ -93,7 +133,7 @@ export default function CampaignModal({
       setErrors({});
       setUploadedImages([]);
     }
-  }, [open]);
+  }, [open, isEditMode]);
 
   const handleInputChange = (
     field: keyof CampaignFormData,
@@ -206,20 +246,38 @@ export default function CampaignModal({
         endDate: new Date(formData.endDate).toISOString(),
       };
 
-      const response = await createCampaign(payload);
-
-      if (response) {
+      if (isEditMode) {
+        await updateCampaign(payload);
+        toast.success("Campaign updated successfully");
+      } else {
+        await createCampaign(payload);
         toast.success("Campaign created successfully");
-        onClose();
-        refetch();
       }
+
+      onClose();
+      refetch();
     } catch (error: any) {
-      console.error("Failed to create campaign:", error);
+      console.error("Failed to save campaign:", error);
       const errorMessage =
-        error?.response?.data?.message || "Failed to create campaign";
+        error?.response?.data?.message ||
+        (isEditMode
+          ? "Failed to update campaign"
+          : "Failed to create campaign");
       toast.error(errorMessage);
     }
   };
+
+  // Loading state for edit mode
+  if (isEditMode && isLoadingCampaign) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="flex items-center gap-2 bg-white p-6 rounded-lg">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span>Loading campaign data...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (!open) return null;
 
@@ -236,14 +294,16 @@ export default function CampaignModal({
           <div className="flex items-center gap-2 ">
             <span className="text-[#4C5560] text-sm">Admin</span>
             <span className="text-[#116114]  text-sm font-medium">
-              / Add New Campaign
+              / {isEditMode ? "Edit Campaign" : "Add New Campaign"}
             </span>
           </div>
         </div>
 
         <div className="px-6 pb-6 pt-2 space-y-6 bg-white">
           <p className="text-[#4C5560] text-xs">
-            Create a new promotional campaign to feature on the homepage.
+            {isEditMode
+              ? "Update your campaign details and settings."
+              : "Create a new promotional campaign to feature on the homepage."}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -411,16 +471,26 @@ export default function CampaignModal({
             <div className="flex flex-col sm:flex-row justify-between pt-4">
               <Button
                 type="submit"
-                disabled={isCreatingCampaign || isUploadingImages}
+                disabled={
+                  isCreatingCampaign || isUpdatingCampaign || isUploadingImages
+                }
                 className="bg-[#116114] font-medium text-sm hover:bg-[#116114] text-white disabled:opacity-50"
               >
-                {isCreatingCampaign ? "Creating..." : "Save campaign"}
+                {isCreatingCampaign || isUpdatingCampaign
+                  ? isEditMode
+                    ? "Updating..."
+                    : "Creating..."
+                  : isEditMode
+                    ? "Update campaign"
+                    : "Save campaign"}
               </Button>
               <Button
                 type="button"
                 variant="ghost"
                 onClick={onClose}
-                disabled={isCreatingCampaign || isUploadingImages}
+                disabled={
+                  isCreatingCampaign || isUpdatingCampaign || isUploadingImages
+                }
                 className="text-[#323539]"
               >
                 Back to homepage
