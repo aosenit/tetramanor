@@ -160,7 +160,7 @@ export default function CustomersPage() {
     ...(currentKycStatus && { kycStatus: currentKycStatus }),
   });
 
-  const { data, isLoading, error } = useFetchData(
+  const { data, isLoading, error, refetch } = useFetchData(
     `users?${queryParams.toString()}`
   );
 
@@ -223,6 +223,9 @@ export default function CustomersPage() {
     if (role === "SUPER_ADMIN" || role === "ADMIN") return "Internal user";
     return "No activity";
   };
+  useEffect(() => {
+    refetch();
+  }, []);
 
   return (
     <div className="min-h-screen space-y-6">

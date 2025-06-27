@@ -54,7 +54,6 @@ export default function AddNewCustomers() {
 
   // Load user data when editing
   useEffect(() => {
-    console.log(userData);
     if (userData && isEditMode) {
       setFormData({
         name: userData?.data?.name || "",
@@ -131,16 +130,16 @@ export default function AddNewCustomers() {
         await createUser(createData);
         toast.success("Customer created successfully");
       }
-
+      // clear form data and refetch data
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        password: "",
+      });
       router.push("/main-admin/customers");
     } catch (error: any) {
       console.error("Error:", error);
-      const errorMessage =
-        error?.response?.data?.message ||
-        (isEditMode
-          ? "Failed to update customer"
-          : "Failed to create customer");
-      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

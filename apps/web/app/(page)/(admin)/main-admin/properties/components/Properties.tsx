@@ -20,48 +20,6 @@ import { FiEdit3 } from "react-icons/fi";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
 
-interface Property {
-  id: string;
-  name: string;
-  address: string;
-  about: string;
-  featured: boolean;
-  featuredAt: string;
-  inquiryOptions: string[];
-  whyInvest: {
-    title: string;
-    advantages: Array<{
-      title: string;
-      description: string;
-    }>;
-    description: string;
-  };
-  features: string[];
-  amenities: string[];
-  createdAt: string;
-  brochure: string;
-  constructionStatus: string;
-  accountOfficerId: string | null;
-  createdById: string;
-  status: string;
-  unitAmount: number;
-  unitTypes: string[];
-  images: string[];
-  document: string[];
-}
-
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data: {
-    items: Property[];
-    page: number;
-    total: number;
-    limit: number;
-  };
-  statusCode: number;
-}
-
 export default function PropertyManagement() {
   const router = useRouter();
   const searchParams = useSearchParams();
