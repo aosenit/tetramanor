@@ -1,33 +1,80 @@
 "use client";
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import four from "@/assets/admin/home/four.webp"
-import { Input } from "@/components/ui/input"
-import { Search, Plus, ChevronDown } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import Image from "next/image"
-import Link from "next/link"
-import CampaignModal from "./components/BlogPostDetails"
-import { useState } from "react"
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import four from "@/assets/admin/home/four.webp";
+import { Input } from "@/components/ui/input";
+import { Search, Plus, ChevronDown, Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Image from "next/image";
+import Link from "next/link";
+import BlogPostDetails from "./components/BlogPostDetails";
+import { useState, useEffect } from "react";
+import { useFetchData } from "@/hooks/useApi";
 
-const blogPosts = Array.from({ length: 8 }, (_, i) => ({
-  id: i + 1,
-  title: "Inside tm gardens",
-  author: "John ade",
-  date: "April 20 2025",
-  status: "Published",
-  image: four,
-}))
+interface BlogPost {
+  id: string;
+  title: string;
+  content: string;
+  coverImages: string[];
+  galleryImages: string[];
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function BlogPostsPage() {
   const [openModal, setOpenModal] = useState(false);
-  const [selectedPost, setSelectedPost] = useState(null);
+  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [authorFilter, setAuthorFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("all");
 
-  const handleViewClick = (post) => {
+  // Fetch blog posts data
+  const { data: blogPostsResponse, isLoading, refetch } = useFetchData("blogs");
+
+  const blogPosts: BlogPost[] = blogPostsResponse?.data || [];
+
+  // Filter blog posts based on search
+  const filteredBlogPosts = blogPosts.filter((post) =>
+    post.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const handleViewClick = (post: BlogPost) => {
     setSelectedPost(post);
     setOpenModal(true);
   };
+
+  // Refetch data when component mounts or when returning from create/edit
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span>Loading blog posts...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen space-y-8">
       <div className="">
@@ -44,7 +91,7 @@ export default function BlogPostsPage() {
               Manage all articles and updates shared with the public
             </p>
           </div>
-          <Link href="/main-admin/properties/add-properties">
+          <Link href="/main-admin/blog-posts/edit-blog">
             <Button className="bg-[#116114] flex items-center gap-2 text-sm hover:bg-green-800">
               <Plus className="" />
               Add New post
@@ -58,12 +105,14 @@ export default function BlogPostsPage() {
           <Input
             placeholder="Search by blog title"
             className="pl-10 bg-[#E5E5E7] border-0"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
         {/* Filters */}
         <div className="flex py-4 mt-2 gap-4">
-          <Select defaultValue="all">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-32 text-[#858C95] hover:text-[#858C95]">
               <SelectValue placeholder="All" />
             </SelectTrigger>
@@ -74,33 +123,22 @@ export default function BlogPostsPage() {
             </SelectContent>
           </Select>
 
-          <Select>
-            <SelectTrigger className="w-48 text-[#858C95] hover:text-[#858C95]">
-              <SelectValue placeholder="Filter by Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="published">Published</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="archived">Archived</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select>
+          <Select value={authorFilter} onValueChange={setAuthorFilter}>
             <SelectTrigger className="w-48 text-[#858C95] hover:text-[#858C95]">
               <SelectValue placeholder="Filter by Author" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="john-ade">John ade</SelectItem>
-              <SelectItem value="jane-doe">Jane Doe</SelectItem>
+              <SelectItem value="all">All Authors</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
             </SelectContent>
           </Select>
 
-          <Select>
+          <Select value={dateFilter} onValueChange={setDateFilter}>
             <SelectTrigger className="w-48 text-[#858C95] hover:text-[#858C95]">
               <SelectValue placeholder="Filter by Date" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="all">All Dates</SelectItem>
               <SelectItem value="newest">Newest first</SelectItem>
               <SelectItem value="oldest">Oldest first</SelectItem>
               <SelectItem value="this-week">This week</SelectItem>
@@ -108,13 +146,20 @@ export default function BlogPostsPage() {
             </SelectContent>
           </Select>
         </div>
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {blogPosts.map((post) => (
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredBlogPosts.length === 0 ? (
+            <div className="col-span-full text-center py-12 text-[#858C95]">
+              {searchTerm
+                ? "No blog posts found matching your search"
+                : "No blog posts available"}
+            </div>
+          ) : (
+            filteredBlogPosts.map((post) => (
               <Card key={post.id} className="overflow-hidden bg-[#F4F4F4]">
                 <div className="relative">
                   <Image
-                    src={post.image || "/placeholder.svg"}
+                    src={post.coverImages?.[0] || four}
                     alt={post.title}
                     width={300}
                     height={200}
@@ -126,11 +171,13 @@ export default function BlogPostsPage() {
                     {post.title}
                   </h3>
                   <div className="flex justify-between items-center text-[#000000] mb-3">
-                    <span className="text-sm">{post.author}</span>
-                    <span className="text-xs">{post.date}</span>
+                    <span className="text-sm">Admin</span>
+                    <span className="text-xs">
+                      {formatDate(post.createdAt)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-black items-center">
-                    <p className="text-sm">{post.status}</p>
+                    <p className="text-sm">Published</p>
                     <Button
                       onClick={() => handleViewClick(post)}
                       className="text-[#858C95] hover:text-[#858C95] flex items-center gap-1"
@@ -143,17 +190,18 @@ export default function BlogPostsPage() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-
-          {selectedPost && (
-            <CampaignModal
-              open={openModal}
-              onClose={() => setOpenModal(false)}
-              post={selectedPost} // you'll use this inside modal
-            />
+            ))
           )}
-        </>
+        </div>
+
+        {selectedPost && (
+          <BlogPostDetails
+            open={openModal}
+            onClose={() => setOpenModal(false)}
+            post={selectedPost}
+            onUpdate={refetch}
+          />
+        )}
       </div>
     </div>
   );
