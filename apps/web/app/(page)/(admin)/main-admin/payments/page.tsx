@@ -1,106 +1,142 @@
 "use client";
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { HiArrowTurnDownLeft } from "react-icons/hi2";
 import { TbCurrencyNaira } from "react-icons/tb";
-import { Search, Download, DollarSign, Plus } from "lucide-react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useState } from "react"
-import Image from "next/image"
+import { Search, Download, DollarSign, Plus, Loader2 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState, useEffect } from "react";
+import Image from "next/image";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import four from "@/assets/admin/customer/four.png"
-import icon from "@/assets/admin/home/five.svg"
-import five from "@/assets/admin/customer/five.svg"
-import Link from "next/link"
+import four from "@/assets/admin/customer/four.png";
+import icon from "@/assets/admin/home/five.svg";
+import five from "@/assets/admin/customer/five.svg";
+import Link from "next/link";
 import { FaAngleDown } from "react-icons/fa6";
 import { PiArrowArcLeftThin } from "react-icons/pi";
 import PaymentModal from "./components/RecieptModal";
 import PaymentSummaryModal from "./components/PaymentSummaryModal";
-const cards = [
-  {
-    id: 0,
-    title: "Total amount paid",
-    icon:<PiArrowArcLeftThin />,
-    count:400000,
-    subtitle: "April",
-    image: four,
-  },
-  {
-    id: 1,
-    title: "Total amount outstanding",
-    count: 150000,
-    icon:<HiArrowTurnDownLeft />,
-    subtitle: "April",
-    image: five,
-  },
-];
+import { useFetchData } from "@/hooks/useApi";
+import { toast } from "sonner";
 
-const payments = [
-  {
-    id: 1,
-    details: "Adebayo seun",
-    paymentType: "Investment",
-    projectUnit: "Queen mary",
-    amount: "₦50M",
-    datePaid: "April 21, 2025",
-  },
-  {
-    id: 2,
-    details: "Ajao Thomas",
-    paymentType: "Investment",
-    projectUnit: "TM meadows",
-    amount: "₦3.5M",
-    datePaid: "April 23 2025",
-  },
-  {
-    id: 3,
-    details: "Gloria Houve",
-    paymentType: "Investment",
-    projectUnit: "Queen mary",
-    amount: "₦50M",
-    datePaid: "April 20, 2025",
-  },
-  {
-    id: 4,
-    details: "Toby paul",
-    paymentType: "Investment",
-    projectUnit: "TM highGardens",
-    amount: "₦50M",
-    datePaid: "April 20, 2025",
-  },
-  {
-    id: 5,
-    details: "Adebayo seun",
-    paymentType: "Investment",
-    projectUnit: "Queen mary",
-    amount: "₦50M",
-    datePaid: "April 21, 2025",
-  },
-  {
-    id: 6,
-    details: "Ajao Thomas",
-    paymentType: "Investment",
-    projectUnit: "TM meadows",
-    amount: "₦3.5M",
-    datePaid: "April 23 2025",
-  },
-  {
-    id: 7,
-    details: "Gloria Houve",
-    paymentType: "Investment",
-    projectUnit: "Queen mary",
-    amount: "₦50M",
-    datePaid: "April 20, 2025",
-  },
-]
+interface Payment {
+  paymentDate: string;
+  amountPaid: number;
+  paymentType: string;
+  paymentMode: string | null;
+  customer: {
+    name: string;
+    email: string;
+  };
+  property: {
+    name: string;
+  };
+  purchase: {
+    name: string;
+    price: number;
+  };
+}
 
 export default function PaymentsPage() {
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
+  const [activeCard, setActiveCard] = useState<number | null>(0);
+  const [search, setSearch] = useState("");
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
 
-    const [activeCard, setActiveCard] = useState<number | null>(0);
+  // Fetch payments data
+  const {
+    data: paymentsResponse,
+    isLoading,
+    error,
+  } = useFetchData("admin/payments");
+
+  const payments: Payment[] = paymentsResponse?.data || [];
+
+  // Calculate totals
+  const totalAmountPaid = payments.reduce(
+    (sum, payment) => sum + payment.amountPaid,
+    0
+  );
+  const totalOutstanding = payments.reduce(
+    (sum, payment) => sum + (payment.purchase.price - payment.amountPaid),
+    0
+  );
+
+  const cards = [
+    {
+      id: 0,
+      title: "Total amount paid",
+      icon: <PiArrowArcLeftThin />,
+      count: totalAmountPaid,
+      subtitle: "All time",
+      image: four,
+    },
+    {
+      id: 1,
+      title: "Total amount outstanding",
+      count: totalOutstanding,
+      icon: <HiArrowTurnDownLeft />,
+      subtitle: "All time",
+      image: five,
+    },
+  ];
+
+  // Filter payments based on search
+  const filteredPayments = payments.filter(
+    (payment) =>
+      payment.customer.name.toLowerCase().includes(search.toLowerCase()) ||
+      payment.property.name.toLowerCase().includes(search.toLowerCase()) ||
+      payment.paymentType.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const handleViewReceipt = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setShowReceiptModal(true);
+  };
+
+  const handleViewDetails = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setShowSummary(true);
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Failed to load payments</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen space-y-6">
       <div className="">
@@ -112,23 +148,24 @@ export default function PaymentsPage() {
               Payment Overview
             </span>
           </div>
-          <Link href="/main-admin/rentals/edit-rentals">
-            <Button
-              variant="outline"
-              className="bg-white flex items-center gap-2 text-sm hover:bg-green-800"
-            >
-              <Plus className="" />
-              Export CSV
-            </Button>
-          </Link>
+          <Button
+            variant="outline"
+            className="bg-white flex items-center gap-2 text-sm hover:bg-green-800"
+            onClick={() => toast.info("Export feature coming soon")}
+          >
+            <Plus className="" />
+            Export CSV
+          </Button>
         </div>
       </div>
       <div className="space-y-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#858C95] w-4 h-4" />
           <Input
-            placeholder="Search  by name / payment reference/Project"
+            placeholder="Search by name / payment type / property"
             className="pl-10 bg-[#E5E5E7] border-0"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
@@ -168,7 +205,7 @@ export default function PaymentsPage() {
                   {/* Bottom Section */}
                   <div className="flex items-center justify-between mt-4 pt-2">
                     <h3 className="text-2xl ml-1 font-semibold text-[#116114]">
-                      ${card.count}
+                      {formatCurrency(card.count)}
                     </h3>
                     <p className="text-xs flex gap-2 items-center text-[#858C95]">
                       {card.subtitle}
@@ -192,79 +229,121 @@ export default function PaymentsPage() {
           </div>
 
           <div className="bg-white rounded-md shadow overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Details</TableHead>
-                  <TableHead>Payment type</TableHead>
-                  <TableHead>Project unit</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Date paid</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {payments.map((payment) => (
-                  <TableRow key={payment.id}>
-                    <TableCell className="font-medium">
-                      {payment.details}
-                    </TableCell>
-                    <TableCell>{payment.paymentType}</TableCell>
-                    <TableCell>{payment.projectUnit}</TableCell>
-                    <TableCell>{payment.amount}</TableCell>
-                    <TableCell>{payment.datePaid}</TableCell>
-                    <TableCell>
-                      <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                          >
-                            <span className="sr-only">Open menu</span>
-                            <Image
-                              src={icon}
-                              alt="Action menu"
-                              width={16}
-                              height={16}
-                              className="object-contain"
-                            />
-                          </Button>
-                        </DropdownMenu.Trigger>
-
-                        <DropdownMenu.Content
-                          sideOffset={4}
-                          className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md"
-                        >
-                          <DropdownMenu.Item
-                            className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
-                            onClick={() => setShowReceiptModal(true)}
-                          >
-                            View receipt
-                          </DropdownMenu.Item>
-
-                          <DropdownMenu.Item
-                            className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
-                            onClick={() => setShowSummary(true)}
-                          >
-                            Payment details
-                          </DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Root>
-                    </TableCell>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <span>Loading payments...</span>
+                </div>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Payment type</TableHead>
+                    <TableHead>Property</TableHead>
+                    <TableHead>Amount paid</TableHead>
+                    <TableHead>Total price</TableHead>
+                    <TableHead>Date paid</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredPayments.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={7}
+                        className="text-center py-8 text-gray-500"
+                      >
+                        {search
+                          ? "No payments found matching your search"
+                          : "No payments found"}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredPayments.map((payment, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">
+                          <div>
+                            <div className="font-medium">
+                              {payment.customer.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {payment.customer.email}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="capitalize">
+                          {payment.paymentType.toLowerCase()}
+                        </TableCell>
+                        <TableCell>{payment.property.name}</TableCell>
+                        <TableCell className="font-medium text-green-600">
+                          {formatCurrency(payment.amountPaid)}
+                        </TableCell>
+                        <TableCell>
+                          {formatCurrency(payment.purchase.price)}
+                        </TableCell>
+                        <TableCell>{formatDate(payment.paymentDate)}</TableCell>
+                        <TableCell>
+                          <DropdownMenu.Root>
+                            <DropdownMenu.Trigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                              >
+                                <span className="sr-only">Open menu</span>
+                                <Image
+                                  src={icon}
+                                  alt="Action menu"
+                                  width={16}
+                                  height={16}
+                                  className="object-contain"
+                                />
+                              </Button>
+                            </DropdownMenu.Trigger>
+
+                            <DropdownMenu.Content
+                              sideOffset={4}
+                              className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md"
+                            >
+                              <DropdownMenu.Item
+                                className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
+                                onClick={() => handleViewReceipt(payment)}
+                              >
+                                View receipt
+                              </DropdownMenu.Item>
+
+                              <DropdownMenu.Item
+                                className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
+                                onClick={() => handleViewDetails(payment)}
+                              >
+                                Payment details
+                              </DropdownMenu.Item>
+                            </DropdownMenu.Content>
+                          </DropdownMenu.Root>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            )}
           </div>
         </div>
       </div>
       <PaymentModal
         open={showReceiptModal}
         onClose={() => setShowReceiptModal(false)}
+        payment={selectedPayment}
       />
       {showSummary && (
-       <PaymentSummaryModal open={showSummary} onClose={() => setShowSummary(false)} />
+        <PaymentSummaryModal
+          open={showSummary}
+          onClose={() => setShowSummary(false)}
+          payment={selectedPayment}
+        />
       )}
     </div>
   );

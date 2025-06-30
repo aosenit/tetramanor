@@ -35,7 +35,8 @@ export default function NotificationsPage() {
     isLoading,
     refetch,
   } = useFetchData(
-    `notifications?page=${page}&limit=${limit}${filter === "unread" ? "&status=UNREAD" : ""}${search ? `&search=${search}` : ""}`
+    `notifications?page=${page}&limit=${limit}${filter === "unread" ? "&status=UNREAD" : ""}${search ? `&search=${search}` : ""}`,
+    { page, filter, search } // Add dependencies to trigger re-fetch
   );
 
   const { mutateAsync: markAllAsRead, isPending: isMarkingAll } = usePutData(
@@ -48,7 +49,13 @@ export default function NotificationsPage() {
   const totalPages = Math.ceil(
     (notificationsResponse?.data?.total || 0) / limit
   );
-  const currentPage = notificationsResponse?.data?.page || 1;
+  const currentPage = page; // Use local state instead of API response
+
+  // Reset page when filter changes
+  const handleFilterChange = (newFilter: "all" | "unread") => {
+    setFilter(newFilter);
+    setPage(1);
+  };
 
   // Group notifications by date
   const groupNotificationsByDate = (notifications: Notification[]) => {
@@ -153,8 +160,15 @@ export default function NotificationsPage() {
   };
 
   const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
   };
+
+  // Reset page when filter or search changes
+  useEffect(() => {
+    setPage(1);
+  }, [filter, search]);
 
   const groupedNotifications = groupNotificationsByDate(notifications);
 
@@ -247,13 +261,13 @@ export default function NotificationsPage() {
         <div className="flex gap-4">
           <button
             className={`px-2 py-2  text-sm font-medium ${filter === "all" ? " border-b-2 border-[#116114] pb-2 text-[#000000]" : " text-[#737687]"}`}
-            onClick={() => setFilter("all")}
+            onClick={() => handleFilterChange("all")}
           >
             All
           </button>
           <button
             className={`px-2 py-2  text-sm font-medium flex items-center gap-2 ${filter === "unread" ? "border-b-2 border-[#116114] pb-2 text-[#000000]" : "text-[#737687]"}`}
-            onClick={() => setFilter("unread")}
+            onClick={() => handleFilterChange("unread")}
           >
             Unread
             <span className="bg-[#116114] text-white text-xs font-medium rounded-full h-5 w-5 flex items-center justify-center">
@@ -301,23 +315,25 @@ export default function NotificationsPage() {
       {totalPages > 1 && (
         <div className="flex items-center justify-between border-t border-gray-200 pt-4">
           <div className="text-sm text-gray-500">
-            Page {currentPage} of {totalPages}
+            Page {currentPage} of {totalPages} •{" "}
+            {notificationsResponse?.data?.total || 0} total notifications
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage <= 1}
+              disabled={currentPage <= 1 || isLoading}
             >
               <ChevronLeft className="w-4 h-4" />
               Previous
             </Button>
+            <span className="text-sm text-gray-500 px-2">{currentPage}</span>
             <Button
               variant="outline"
               size="sm"
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage >= totalPages}
+              disabled={currentPage >= totalPages || isLoading}
             >
               Next
               <ChevronRight className="w-4 h-4" />
