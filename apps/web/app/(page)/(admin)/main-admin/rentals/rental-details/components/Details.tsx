@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import four from "@/assets/admin/home/four.webp"
-import React from 'react'
-import { MdArrowBackIosNew } from 'react-icons/md';
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import four from "@/assets/admin/home/four.webp";
+import React from "react";
+import { MdArrowBackIosNew } from "react-icons/md";
 const features = [
   "High-Quality Kitchen Cabinets & Wardrobes",
   "Walk-in Closets",
@@ -47,7 +47,9 @@ function Details() {
             </Button>
           </Link>
         </div>
-        <h3 className="text-[#4C5560] font-medium text-lg">Property overview</h3>
+        <h3 className="text-[#4C5560] font-medium text-lg">
+          Property overview
+        </h3>
         <div className="bg-white mt-4 space-y-4 p-6">
           <p className="text-xl font-medium text-[#181818]">Rental detail</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -147,7 +149,7 @@ function Details() {
           </div>
         </div>
         <div className="bg-white mt-4 space-y-4 p-6">
-          <h1 className='text-[#116114] font-medium text-sm'>Attachments</h1>
+          <h1 className="text-[#116114] font-medium text-sm">Attachments</h1>
           <div className="flex items-center text-sm text-[#323539] gap-4 mt-4">
             <Button variant="outline">Contract pdf</Button>
             <Button variant="outline">Reciept pdf</Button>
@@ -162,4 +164,4 @@ function Details() {
   );
 }
 
-export default Details
+export default Details;

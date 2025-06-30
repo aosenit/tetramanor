@@ -31,8 +31,20 @@ interface BlogPost {
   id: string;
   title: string;
   content: string;
-  coverImages: string[];
-  galleryImages: string[];
+  coverImage?: {
+    id: string;
+    imageUrl: string;
+    name: string;
+    publicId: string;
+    createdAt: string;
+  };
+  images?: {
+    id: string;
+    imageUrl: string;
+    name: string;
+    publicId: string;
+    createdAt: string;
+  }[];
   createdAt: string;
   updatedAt: string;
   status?: string;
@@ -73,28 +85,30 @@ export default function EditBlog() {
       setTitle(blogPost.title || "");
       setContent(blogPost.content || "");
 
-      // Convert image URLs to UploadedImage format for display
-      const coverImagesData = (blogPost.coverImages || []).map(
-        (url, index) => ({
-          id: `cover-${index}`,
-          imageUrl: url,
-          name: `Cover Image ${index + 1}`,
-          publicId: `cover-${index}`,
-          createdAt: new Date().toISOString(),
-          isPrimary: index === 0,
-        })
-      );
+      // Handle coverImage (single object)
+      const coverImagesData = blogPost.coverImage
+        ? [
+            {
+              id: blogPost.coverImage.id,
+              imageUrl: blogPost.coverImage.imageUrl,
+              name: blogPost.coverImage.name,
+              publicId: blogPost.coverImage.publicId,
+              createdAt:
+                blogPost.coverImage.createdAt || new Date().toISOString(),
+              isPrimary: true,
+            },
+          ]
+        : [];
 
-      const galleryImagesData = (blogPost.galleryImages || []).map(
-        (url, index) => ({
-          id: `gallery-${index}`,
-          imageUrl: url,
-          name: `Gallery Image ${index + 1}`,
-          publicId: `gallery-${index}`,
-          createdAt: new Date().toISOString(),
-          isPrimary: false,
-        })
-      );
+      // Handle images array (gallery images)
+      const galleryImagesData = (blogPost.images || []).map((image) => ({
+        id: image.id,
+        imageUrl: image.imageUrl,
+        name: image.name,
+        publicId: image.publicId,
+        createdAt: image.createdAt || new Date().toISOString(),
+        isPrimary: false,
+      }));
 
       setCoverImages(coverImagesData);
       setGalleryImages(galleryImagesData);
@@ -111,8 +125,8 @@ export default function EditBlog() {
       const payload = {
         title: title.trim(),
         content: content.trim(),
-        // coverImages: coverImages.map((img) => img.id),
-        // galleryImages: galleryImages.map((img) => img.id),
+        coverImage: coverImages.length > 0 ? coverImages[0].id : null,
+        images: galleryImages.map((img) => img.id),
       };
 
       if (isEditing) {
@@ -134,8 +148,8 @@ export default function EditBlog() {
       const payload = {
         title: title.trim() || "Untitled Draft",
         content: content.trim() || "",
-        // coverImages: coverImages.map((img) => img.id),
-        // galleryImages: galleryImages.map((img) => img.id),
+        coverImage: coverImages.length > 0 ? coverImages[0].id : null,
+        images: galleryImages.map((img) => img.id),
         status: "DRAFT",
       };
 
