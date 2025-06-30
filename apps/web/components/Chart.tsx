@@ -2,11 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
-
-// Import the chart component with no SSR
-const DoughnutChart = dynamic(() => import("./DoughnutChart"), {
-  ssr: false,
-});
+import DoughnutChart from "./DoughnutChart";
 
 interface PropertyStatisticsChartProps {
   total: number;
@@ -31,11 +27,6 @@ export default function PropertyStatisticsChart({
 }: PropertyStatisticsChartProps) {
   // Validate that percentages add up to 100
   const totalPercentage = forSale + forRent + rentedOut;
-  if (totalPercentage !== 100) {
-    console.warn(
-      `Property percentages should add up to 100%. Current total: ${totalPercentage}%`
-    );
-  }
 
   return (
     <div className="relative">
