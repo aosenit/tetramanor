@@ -1,35 +1,67 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
-import { Search, X } from "lucide-react";
+import { Search, X, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import logo from "@/assets/home/logo.webp";
 import PropertyCard from "../cards/Property";
 import four from "@/assets/admin/home/four.webp";
-import { useFetchData } from "@/hooks/useApi";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { axiosInstance } from "@/services/axiosInstance";
+import { usePatchData } from "@/hooks/useApi";
+import { toast } from "sonner";
 
 export default function PropertySelector({
   open,
   onClose,
   type = "property",
+  onPropertySelect,
 }: {
   open: boolean;
   onClose: () => void;
   type?: "property" | "rental" | "investment";
+  onPropertySelect?: (property: any) => void;
 }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const {
-    data: response,
+    mutate: updateFeaturedProperty,
+    isPending: isUpdatingFeaturedProperty,
+  } = usePatchData("admin/properties/featured");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch properties using infinite query
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     isLoading,
     error,
-  } = useFetchData(
-    open
-      ? type === "property"
-        ? "admin/properties/featured"
-        : "rentals"
-      : null
-  );
-  const [searchTerm, setSearchTerm] = useState("");
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: ["properties", type, searchTerm],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await axiosInstance.get(
+        `${type === "property" ? "admin/properties" : "rentals"}?page=${pageParam}&limit=10${searchTerm ? `&search=${searchTerm}` : ""}`
+      );
+      return response.data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: any, allPages) => {
+      // If we got less than 10 items, we've reached the end
+      if (
+        type === "property"
+          ? lastPage.data.items.length < 10
+          : lastPage.data.length < 10
+      )
+        return undefined;
+      return allPages.length + 1;
+    },
+    enabled: open,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   useEffect(() => {
     if (open) {
@@ -43,21 +75,84 @@ export default function PropertySelector({
     };
   }, [open]);
 
-  // Get properties from API response
-  const properties = response?.data || [];
+  // Reset selection when modal opens
+  useEffect(() => {
+    if (open) {
+      setSelectedProperty(null);
+    }
+  }, [open]);
 
-  // Filter properties based on search term
-  const filtered = properties.filter((property) =>
-    `${property.name} ${property.address} ${property.status}`
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
+  // Flatten all pages into a single array
+  const allProperties =
+    data?.pages.flatMap((page) =>
+      type === "property" ? page.data.items : page.data
+    ) || [];
+
+  // Intersection Observer for infinite scrolling
+  const lastElementRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (isFetchingNextPage) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        },
+        {
+          root: scrollContainerRef.current,
+          rootMargin: "100px",
+        }
+      );
+
+      if (node) observer.observe(node);
+
+      return () => observer.disconnect();
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
   );
+
+  const handlePropertySelect = (property: any) => {
+    // Prevent duplicate calls for the same property
+    const propertyId = type === "property" ? property.id : property.propertyId;
+    if (
+      selectedProperty &&
+      (type === "property"
+        ? selectedProperty.id === propertyId
+        : selectedProperty.propertyId === propertyId)
+    ) {
+      return;
+    }
+
+    setSelectedProperty(property);
+    onPropertySelect?.(property);
+    if (type === "property") {
+      updateFeaturedProperty(
+        {
+          id: property.id,
+          featured: true,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Featured property updated successfully");
+          },
+        }
+      );
+    }
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+  };
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 overflow-y-auto p-4">
-      <div className="w-full max-w-4xl bg-white overflow-hidden">
+      <div
+        className="w-full max-w-4xl bg-white overflow-hidden"
+        style={{ height: "95vh" }}
+      >
         <header className="bg-[#323539] rounded-b-md text-white px-6 py-4 flex justify-between items-center">
           <div className="flex justify-center items-center gap-3">
             <Image src={logo} alt="Logo" width={40} height={40} />
@@ -68,7 +163,7 @@ export default function PropertySelector({
         </header>
 
         {/* Main Content */}
-        <div className="px-4 py-8">
+        <div className="px-4 pt-5 pb-[60px] h-full flex flex-col">
           <div className="text-sm font-medium text-[#116114] mb-4">
             Select for featured property
           </div>
@@ -80,82 +175,158 @@ export default function PropertySelector({
               type="text"
               placeholder="Search Properties"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               className="pl-10 bg-gray-200 border-0 text-gray-600 placeholder:text-gray-500"
             />
           </div>
 
-          {/* Loading State */}
-          {isLoading && (
-            <div className="space-y-4">
-              {[...Array(4)].map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white border border-gray-200 rounded-lg p-4 animate-pulse"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="h-16 w-16 bg-gray-200 rounded-lg"></div>
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+          {/* Properties List - Scrollable Area */}
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 overflow-y-auto space-y-4 pr-2"
+            style={{
+              scrollbarWidth: "thin",
+              scrollbarColor: "#CBD5E0 #F7FAFC",
+            }}
+          >
+            {/* Loading State for initial load */}
+            {isLoading && (
+              <div className="space-y-4">
+                {[...Array(4)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-white border border-gray-200 rounded-lg p-4 animate-pulse"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="h-16 w-16 bg-gray-200 rounded-lg"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                      </div>
+                      <div className="h-8 w-20 bg-gray-200 rounded"></div>
                     </div>
-                    <div className="h-8 w-20 bg-gray-200 rounded"></div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
 
-          {/* Error State */}
-          {error && !isLoading && (
-            <div className="text-center py-12">
-              <p className="text-red-600 mb-4">Failed to load properties</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="bg-[#116114] text-white px-4 py-2 rounded text-sm"
-              >
-                Try Again
-              </button>
-            </div>
-          )}
+            {/* Error State */}
+            {error && !isLoading && (
+              <div className="text-center py-12">
+                <p className="text-red-600 mb-4">Failed to load properties</p>
+                <button
+                  onClick={() => refetch()}
+                  className="bg-[#116114] text-white px-4 py-2 rounded text-sm"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
 
-          {/* Properties List */}
-          {!isLoading && !error && (
-            <div className="space-y-4">
-              {filtered.length > 0 ? (
-                filtered.map((property) => (
-                  <PropertyCard
-                    key={property.id}
-                    property={{
-                      name: property.name,
-                      location: property.address,
-                      rooms: property.unitTypes.join(", ") || "N/A",
-                      status: property.status,
-                      furnished: property.features.includes("FURNISHED"),
-                      image: four, // Using fallback image since PropertyCard expects StaticImageData
-                    }}
-                  />
-                ))
-              ) : searchTerm ? (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 mb-2">
-                    No properties found matching "{searchTerm}"
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    Try adjusting your search terms
-                  </p>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 mb-2">No properties available</p>
-                  <p className="text-sm text-gray-400">
-                    Add some properties to get started
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
+            {/* Properties List */}
+            {!isLoading && !error && (
+              <>
+                {allProperties.length > 0 ? (
+                  allProperties.map((property, index) => {
+                    const isLast = index === allProperties.length - 1;
+                    return (
+                      <div
+                        key={
+                          type === "property"
+                            ? property.id
+                            : property.propertyId
+                        }
+                        ref={isLast ? lastElementRef : null}
+                      >
+                        <PropertyCard
+                          property={{
+                            id:
+                              type === "property"
+                                ? property.id
+                                : property.propertyId,
+                            name:
+                              type === "property"
+                                ? property.name
+                                : property.property.name,
+                            location:
+                              type === "property"
+                                ? property.address
+                                : property.property.address,
+                            rooms:
+                              type === "property"
+                                ? property.unitTypes.join(", ") || "N/A"
+                                : property.property.unitTypes.join(", ") ||
+                                  "N/A",
+                            status:
+                              type === "property"
+                                ? property.status
+                                : property.status,
+                            furnished:
+                              type === "property"
+                                ? property.features.includes("FURNISHED")
+                                : property.property.features.includes(
+                                    "FURNISHED"
+                                  ),
+                            image: four,
+                          }}
+                          isSelected={
+                            type === "property"
+                              ? selectedProperty?.id === property.id
+                              : selectedProperty?.propertyId ===
+                                property.propertyId
+                          }
+                          onSelect={() => handlePropertySelect(property)}
+                          type={type}
+                          isLoading={
+                            type === "property" &&
+                            isUpdatingFeaturedProperty &&
+                            selectedProperty?.id === property.id
+                          }
+                        />
+                      </div>
+                    );
+                  })
+                ) : searchTerm ? (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500 mb-2">
+                      No properties found matching "{searchTerm}"
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      Try adjusting your search terms
+                    </p>
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500 mb-2">
+                      No properties available
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      Add some properties to get started
+                    </p>
+                  </div>
+                )}
+
+                {/* Loading indicator for pagination */}
+                {isFetchingNextPage && (
+                  <div className="flex justify-center items-center py-6 space-x-2">
+                    <Loader2 className="w-5 h-5 animate-spin text-[#116114]" />
+                    <span className="text-sm text-gray-600">
+                      Loading more properties...
+                    </span>
+                  </div>
+                )}
+
+                {/* End of list indicator */}
+                {!hasNextPage && allProperties.length > 0 && (
+                  <div className="text-center py-6 text-gray-500 text-sm border-t border-gray-200 mt-4">
+                    <p>You've reached the end of the list</p>
+                    <p className="text-xs mt-1">No more properties to load</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

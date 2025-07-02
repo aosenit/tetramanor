@@ -1,6 +1,8 @@
 import Image, { StaticImageData } from "next/image";
+import { Loader2 } from "lucide-react";
 
 type Property = {
+  id?: string;
   name: string;
   rooms: string;
   location: string;
@@ -9,9 +11,26 @@ type Property = {
   image: StaticImageData;
 };
 
-export default function PropertyCard({ property }: { property: Property }) {
+export default function PropertyCard({
+  property,
+  isSelected = false,
+  onSelect,
+  type,
+  isLoading = false,
+}: {
+  property: Property;
+  isSelected?: boolean;
+  onSelect?: () => void;
+  type?: "property" | "rental" | "investment";
+  isLoading?: boolean;
+}) {
   return (
-    <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm w-full max-w-6xl mb-4">
+    <div
+      className={`flex items-center justify-between bg-white p-4 rounded-xl shadow-sm w-full max-w-6xl mb-4 cursor-pointer transition-all duration-200 ${
+        isSelected ? "opacity-80" : "hover:bg-gray-50"
+      }`}
+      onClick={onSelect}
+    >
       <div className="flex items-center gap-4">
         <Image
           src={property.image}
@@ -52,10 +71,26 @@ export default function PropertyCard({ property }: { property: Property }) {
       </div>
 
       <div className="w-px h-12 bg-gray-200 mx-4" />
-      <input
-        type="checkbox"
-        className="h-5 w-5 text-green-700 border-green-700 rounded focus:ring-green-500"
-      />
+      {isLoading ? (
+        <div className="flex items-center space-x-2">
+          <Loader2 className="w-5 h-5 animate-spin text-[#116114]" />
+          <span className="text-sm text-[#116114]">Updating...</span>
+        </div>
+      ) : (
+        <input
+          type="radio"
+          name="property-selection"
+          checked={isSelected}
+          onChange={(e) => {
+            e.stopPropagation();
+            onSelect?.();
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          className="h-5 w-5 text-[#116114] border-[#116114] focus:ring-[#116114]"
+        />
+      )}
     </div>
   );
 }

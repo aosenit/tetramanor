@@ -62,7 +62,7 @@ export default function FeaturedProperty() {
               onClick={() => setShowModal(true)}
               className="flex items-center gap-1 bg-[#116114] hover:bg-[#116114] text-white text-sm font-medium px-4 py-2 rounded-md"
             >
-              Select new property
+              Select new featured property
               <MdOutlineKeyboardArrowDown />
             </button>
             <PropertySelector
@@ -119,7 +119,7 @@ export default function FeaturedProperty() {
               onClick={() => setShowRentalModal(true)}
               className="flex items-center gap-1 bg-[#116114] hover:bg-[#116114] text-white text-sm font-medium px-4 py-2 rounded-md"
             >
-              Select new property
+              Select new rental highlight
               <MdOutlineKeyboardArrowDown />
             </button>
             <PropertySelector
