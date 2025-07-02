@@ -7,28 +7,114 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import icon from "@/assets/createnewpassword.png";
 import Image from "next/image";
+import { axiosInstance } from "@/services/axiosInstance";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export default function NewPasswordPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     password: "",
     confirmPassword: "",
   });
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({
+    password: "",
+    confirmPassword: "",
+  });
+
+  const urlCode = searchParams.get("code");
+
+  const validatePassword = (password: string) => {
+    if (password.length < 8) {
+      return "Password must be at least 8 characters long";
+    }
+    if (!/(?=.*[a-z])/.test(password)) {
+      return "Password must contain at least one lowercase letter";
+    }
+    if (!/(?=.*[A-Z])/.test(password)) {
+      return "Password must contain at least one uppercase letter";
+    }
+    if (!/(?=.*\d)/.test(password)) {
+      return "Password must contain at least one number";
+    }
+    if (!/(?=.*[!@#$%^&*])/.test(password)) {
+      return "Password must contain at least one special character (!@#$%^&*)";
+    }
+    return "";
+  };
+
+  const validateForm = () => {
+    const newErrors = {
+      password: "",
+      confirmPassword: "",
+    };
+
+    // Validate password
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) {
+      newErrors.password = passwordError;
+    }
+
+    // Validate confirm password
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+    return !newErrors.password && !newErrors.confirmPassword;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Clear error when user starts typing
+    if (errors[name as keyof typeof errors]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would register the user here
-    router.push("/login?registered=true");
+
+    if (!validateForm()) {
+      return;
+    }
+
+    if (!urlCode) {
+      toast.error("Reset code not found. Please try again.");
+      router.push("/forgot-password");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await axiosInstance.post("auth/reset-password", {
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        code: urlCode,
+      });
+
+      if (response.data.success) {
+        toast.success("Password reset successfully");
+        router.push("/login");
+      }
+    } catch (error: any) {
+      console.error("Reset password error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to reset password. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -44,9 +130,9 @@ export default function NewPasswordPage() {
       </div>
 
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">Create an account</h1>
+        <h1 className="text-2xl font-bold">Create New Password</h1>
         <p className="text-gray-500">
-          Join us to start your real estate journey
+          Enter your new password to complete the reset
         </p>
       </div>
 
@@ -61,6 +147,7 @@ export default function NewPasswordPage() {
               placeholder="Create a password"
               value={formData.password}
               onChange={handleChange}
+              className={errors.password ? "border-red-500" : ""}
               required
             />
             <button
@@ -75,6 +162,9 @@ export default function NewPasswordPage() {
               )}
             </button>
           </div>
+          {errors.password && (
+            <p className="text-red-500 text-sm">{errors.password}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -87,6 +177,7 @@ export default function NewPasswordPage() {
               placeholder="Confirm your password"
               value={formData.confirmPassword}
               onChange={handleChange}
+              className={errors.confirmPassword ? "border-red-500" : ""}
               required
             />
             <button
@@ -101,13 +192,24 @@ export default function NewPasswordPage() {
               )}
             </button>
           </div>
+          {errors.confirmPassword && (
+            <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
+          )}
         </div>
 
         <Button
           type="submit"
-          className="w-full bg-[var(--primary-green)] hover:bg-green-700 rounded-sm text-white"
+          disabled={isLoading}
+          className="w-full bg-[var(--primary-green)] hover:bg-green-700 rounded-sm text-white disabled:opacity-50"
         >
-          Reset Password
+          {isLoading ? (
+            <div className="flex items-center space-x-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Resetting...</span>
+            </div>
+          ) : (
+            "Reset Password"
+          )}
         </Button>
       </form>
     </div>

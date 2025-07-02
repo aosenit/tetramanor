@@ -9,15 +9,59 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import { axiosInstance } from "@/services/axiosInstance";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      setEmailError("Email is required");
+      return false;
+    }
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address");
+      return false;
+    }
+    setEmailError("");
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would send a reset code to the email
-    router.push("/client-admin/reset-password");
+
+    if (!validateEmail(email)) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await axiosInstance.post("auth/forgot-password", {
+        email: email,
+      });
+
+      if (response.data.success) {
+        const { otp } = response.data.data;
+        toast.success("Reset code sent to your email");
+        router.push(
+          `/reset-password?code=${otp}&email=${encodeURIComponent(email)}`
+        );
+      }
+    } catch (error: any) {
+      console.error("Forgot password error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to send reset code. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -47,16 +91,29 @@ export default function ForgotPasswordPage() {
             type="email"
             placeholder="Enter your email address"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailError) validateEmail(e.target.value);
+            }}
+            className={emailError ? "border-red-500" : ""}
             required
           />
+          {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
         </div>
 
         <Button
           type="submit"
-          className="w-full bg-[var(--primary-green)] hover:bg-green-700 rounded-sm text-white"
+          disabled={isLoading}
+          className="w-full bg-[var(--primary-green)] hover:bg-green-700 rounded-sm text-white disabled:opacity-50"
         >
-          Continue
+          {isLoading ? (
+            <div className="flex items-center space-x-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Sending...</span>
+            </div>
+          ) : (
+            "Continue"
+          )}
         </Button>
       </form>
     </div>
