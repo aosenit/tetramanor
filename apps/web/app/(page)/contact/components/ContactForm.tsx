@@ -55,7 +55,7 @@ function ContactForm() {
                 <a href="tel:+23481234567" target="_blank">
                   <p className="flex items-center gap-4">
                     <FaPhone className="text-green-700" />
-                    +234 812 345 67
+                    +234 916 647 9719
                   </p>
                 </a>
                 {/* make a link to email */}

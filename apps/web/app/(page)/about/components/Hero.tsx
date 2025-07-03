@@ -3,14 +3,14 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Header from "../../portfolio/components/header";
-import about from "@/assets/about/about.webp";
+import meet from "@/assets/home/meet.webp";
 
 const HomeHero = () => {
   return (
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
       <Image
-        src={about}
+        src={meet}
         alt="Hero Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
         fill

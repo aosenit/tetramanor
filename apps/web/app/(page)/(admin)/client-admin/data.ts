@@ -51,26 +51,9 @@ export const mockData: DashboardData = {
       },
       unitsOwned: 6,
     },
+  
     {
       id: "3",
-      name: "King's Landing",
-      location: "Mende, Maryland, Lagos",
-      image:
-        "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      price: 3500000,
-      priceUSD: 6500,
-      paymentStatus: "Paid",
-      accountOfficer: {
-        id: "ao1",
-        name: "John D. Patkins",
-        avatar:
-          "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-        position: "Senior Agent",
-      },
-      unitsOwned: 8,
-    },
-    {
-      id: "4",
       name: "TM Meadows",
       location: "Ebutte Metta, Lagos",
       image:
@@ -88,7 +71,7 @@ export const mockData: DashboardData = {
       unitsOwned: 2,
     },
     {
-      id: "5",
+      id: "4",
       name: "TM Gardens",
       location: "Surulere, Lagos",
       image:
