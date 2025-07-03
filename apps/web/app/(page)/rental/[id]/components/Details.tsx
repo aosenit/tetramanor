@@ -34,6 +34,7 @@ import { useParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
 import { useState } from "react";
 import MapSection from "@/app/(page)/portfolio/view-property/sections/map";
+import { FaHome } from "react-icons/fa";
 
 // Image mapping based on construction status
 const constructionImages = {

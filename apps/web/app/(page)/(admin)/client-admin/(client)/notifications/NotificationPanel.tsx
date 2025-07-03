@@ -11,6 +11,9 @@ import {
   FileUp,
   Bell,
   Loader2,
+  Search,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -22,137 +25,174 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import useNoti from "@/hooks/useNoti";
-import Loading from "../component/Loading";
-
-type NotificationType =
-  | "document"
-  | "payment"
-  | "verification"
-  | "inspection"
-  | "reminder";
+import { Input } from "@/components/ui/input";
+import { useFetchData, usePutData } from "@/hooks/useApi";
+import { axiosInstance } from "@/services/axiosInstance";
+import { toast } from "sonner";
+import { RiCheckDoubleLine } from "react-icons/ri";
 
 interface Notification {
   id: string;
-  type: NotificationType;
   title: string;
-  description: string;
-  time: string;
-  read: boolean;
-  date: "today" | "yesterday" | "older";
+  message: string;
+  type: string;
+  status: "READ" | "UNREAD";
+  createdAt: string;
+  metadata?: any[];
 }
 
 export function NotificationsPanel() {
   const [open, setOpen] = useState(false);
-  const { notifications: notificationsData, isLoading, refetch } = useNoti();
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: "1",
-      type: "document",
-      title: "Title Deed Uploaded",
-      description:
-        "Your Title Deed for Comfy Burrows has been uploaded and is now available for download.",
-      time: "8min ago",
-      read: false,
-      date: "today",
-    },
-    {
-      id: "2",
-      type: "payment",
-      title: "Payment Receipt Available",
-      description:
-        "A new payment receipt for Unit A2 in Comfy Burrows is now available.",
-      time: "2hr ago",
-      read: false,
-      date: "today",
-    },
-    {
-      id: "3",
-      type: "verification",
-      title: "KYC Verification Complete",
-      description:
-        "Congratulations, your identity has been verified. You now have full access to all platform features.",
-      time: "10:34AM",
-      read: false,
-      date: "today",
-    },
-    {
-      id: "4",
-      type: "inspection",
-      title: "Inspection Confirmed",
-      description:
-        "Your property inspection for Unit B3 in Prime Courts has been scheduled for Oct 2, 2025 at 12:00 PM.",
-      time: "2:56PM",
-      read: false,
-      date: "yesterday",
-    },
-    {
-      id: "5",
-      type: "reminder",
-      title: "Upcoming Payment Due",
-      description:
-        "You have an outstanding rent balance of ₦250,000 for Unit C1 in Royal Terrace. Due in 3 days.",
-      time: "6:32AM",
-      read: false,
-      date: "yesterday",
-    },
-    {
-      id: "6",
-      type: "document",
-      title: "New Contract Uploaded",
-      description:
-        "Your updated lease agreement for Unit D2 in TM HighGardens is now available.",
-      time: "11:45PM",
-      read: true,
-      date: "older",
-    },
-    {
-      id: "7",
-      type: "reminder",
-      title: "Reminder: Inspection Tomorrow",
-      description:
-        "Don't forget: Your inspection for Unit F4 is scheduled for tomorrow at 10:00 AM.",
-      time: "9:25PM",
-      read: true,
-      date: "older",
-    },
-    {
-      id: "8",
-      type: "document",
-      title: "Title Deed Uploaded",
-      description:
-        "Your Title Deed for King's Landing has been uploaded and is now available for download.",
-      time: "3:04PM",
-      read: true,
-      date: "older",
-    },
-    {
-      id: "9",
-      type: "payment",
-      title: "Payment Receipt Available",
-      description:
-        "A new payment receipt for Unit A2 in TM Meadows is now available.",
-      time: "8min ago",
-      read: true,
-      date: "older",
-    },
-  ]);
+  const [filter, setFilter] = useState<"all" | "unread">("all");
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [search, setSearch] = useState("");
+  const [isMarkingOne, setIsMarkingOne] = useState(false);
 
-  const unreadCount = notifications.filter(
-    (notification) => !notification.read
-  ).length;
+  // Fetch notifications based on filter and search
+  const {
+    data: notificationsResponse,
+    isLoading,
+    error,
+    refetch,
+  } = useFetchData(
+    `notifications?page=${page}&limit=${limit}${filter === "unread" ? "&status=UNREAD" : ""}${search ? `&search=${search}` : ""}`,
+    { page, filter, search }
+  );
 
-  const markAllAsRead = () => {
-    setNotifications(
-      notifications.map((notification) => ({
-        ...notification,
-        read: true,
-      }))
+  const { mutateAsync: markAllAsRead, isPending: isMarkingAll } = usePutData(
+    "notifications/read-all"
+  );
+
+  const notifications: Notification[] =
+    notificationsResponse?.data?.items || [];
+  const totalUnread = notifications.filter((n) => n.status === "UNREAD").length;
+  const totalPages = Math.ceil(
+    (notificationsResponse?.data?.total || 0) / limit
+  );
+  const currentPage = page;
+
+  // Reset page when filter changes
+  const handleFilterChange = (newFilter: "all" | "unread") => {
+    setFilter(newFilter);
+    setPage(1);
+  };
+
+  // Group notifications by date
+  const groupNotificationsByDate = (notifications: Notification[]) => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+
+    return notifications.reduce(
+      (groups, notification) => {
+        const notificationDate = new Date(notification.createdAt);
+        const notificationDay = new Date(
+          notificationDate.getFullYear(),
+          notificationDate.getMonth(),
+          notificationDate.getDate()
+        );
+
+        let category = "older";
+        if (notificationDay.getTime() === today.getTime()) {
+          category = "today";
+        } else if (notificationDay.getTime() === yesterday.getTime()) {
+          category = "yesterday";
+        }
+
+        if (!groups[category]) {
+          groups[category] = [];
+        }
+        groups[category].push(notification);
+        return groups;
+      },
+      {} as Record<string, Notification[]>
     );
   };
 
-  const getNotificationIcon = (type: NotificationType) => {
-    switch (type) {
+  const handleMarkAllAsRead = async () => {
+    try {
+      await markAllAsRead({});
+      toast.success("All notifications marked as read");
+      refetch();
+    } catch (error) {
+      console.error("Error marking all as read:", error);
+      toast.error("Failed to mark all notifications as read");
+    }
+  };
+
+  const handleMarkAsRead = async (notificationId: string) => {
+    setIsMarkingOne(true);
+    try {
+      await axiosInstance.put(`notifications/${notificationId}/read`, {});
+      toast.success("Notification marked as read");
+      refetch();
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      toast.error("Failed to mark notification as read");
+    } finally {
+      setIsMarkingOne(false);
+    }
+  };
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    // Get the date parts for comparison
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+    const notificationDay = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+
+    // For today's notifications, show relative time
+    if (notificationDay.getTime() === today.getTime()) {
+      if (diffInSeconds < 60) return "Just now";
+      if (diffInSeconds < 3600)
+        return `${Math.floor(diffInSeconds / 60)}min ago`;
+      if (diffInSeconds < 86400)
+        return `${Math.floor(diffInSeconds / 3600)}hr ago`;
+    }
+
+    // For yesterday's notifications, show "Yesterday" with time
+    if (notificationDay.getTime() === yesterday.getTime()) {
+      return `Yesterday at ${date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })}`;
+    }
+
+    // For older notifications, show the actual date
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setPage(1); // Reset to first page when searching
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
+
+  // Reset page when filter or search changes
+  useEffect(() => {
+    setPage(1);
+  }, [filter, search]);
+
+  const getNotificationIcon = (type: string) => {
+    switch (type.toLowerCase()) {
       case "document":
         return <FileUp className="h-5 w-5 text-blue-500" />;
       case "payment":
@@ -163,6 +203,8 @@ export function NotificationsPanel() {
         return <CheckCircle className="h-5 w-5 text-green-500" />;
       case "reminder":
         return <AlertTriangle className="h-5 w-5 text-orange-500" />;
+      case "purchase_alert":
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
       default:
         return <Bell className="h-5 w-5 text-gray-500" />;
     }
@@ -172,9 +214,9 @@ export function NotificationsPanel() {
     if (open) {
       refetch();
     }
-  }, [open]);
+  }, [open, refetch]);
 
-  console.log(notificationsData);
+  const groupedNotifications = groupNotificationsByDate(notifications);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -184,7 +226,12 @@ export function NotificationsPanel() {
           className="flex items-center px-4 py-3 text-sm rounded-lg transition-colors"
         >
           <Bell />
-          <span className=" font-medium ml-3">Notifications</span>
+          <span className="font-medium ml-3">Notifications</span>
+          {totalUnread > 0 && (
+            <Badge className="ml-2 bg-red-500 hover:bg-red-600 h-5 w-5 p-0 flex items-center justify-center rounded-full text-xs">
+              {totalUnread}
+            </Badge>
+          )}
         </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] p-0 gap-0">
@@ -196,20 +243,46 @@ export function NotificationsPanel() {
             <DialogClose asChild></DialogClose>
           </div>
         </DialogHeader>
-        <Tabs defaultValue="all" className="w-full">
+
+        {/* Search Bar */}
+        <div className="px-4 pt-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              type="text"
+              placeholder="Search notifications..."
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="pl-10 pr-4"
+              disabled={isLoading}
+            />
+            {isLoading && (
+              <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 animate-spin" />
+            )}
+          </div>
+        </div>
+
+        <Tabs
+          value={filter}
+          onValueChange={(value) =>
+            handleFilterChange(value as "all" | "unread")
+          }
+          className="w-full"
+        >
           <div className="flex items-center justify-between px-4 pt-4">
             <TabsList>
-              <TabsTrigger value="all" className="px-6">
+              <TabsTrigger value="all" className="px-6" disabled={isLoading}>
                 All
               </TabsTrigger>
               <TabsTrigger
                 value="unread"
                 className="px-6 flex items-center gap-2"
+                disabled={isLoading}
               >
                 Unread
-                {unreadCount > 0 && (
+                {totalUnread > 0 && (
                   <Badge className="bg-green-600 hover:bg-green-700 h-5 w-5 p-0 flex items-center justify-center rounded-full">
-                    {unreadCount}
+                    {totalUnread}
                   </Badge>
                 )}
               </TabsTrigger>
@@ -217,119 +290,244 @@ export function NotificationsPanel() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={markAllAsRead}
+              onClick={handleMarkAllAsRead}
+              disabled={isMarkingAll || totalUnread === 0}
               className="text-sm"
             >
+              {isMarkingAll ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <RiCheckDoubleLine className="mr-2" />
+              )}
               Mark all as read
             </Button>
           </div>
-          {/* add loading state */}
-          {isLoading && <Loading />}
+
+          {/* Loading state */}
+          {isLoading && (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Loading notifications...</span>
+              </div>
+            </div>
+          )}
+
+          {/* Error state */}
+          {error && !isLoading && (
+            <div className="px-4 py-6">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Unable to load notifications
+                </h3>
+                <p className="text-gray-500 mb-4 max-w-md mx-auto">
+                  There was an error loading your notifications. Please try
+                  again.
+                </p>
+                <Button
+                  onClick={() => refetch()}
+                  variant="outline"
+                  className="flex items-center space-x-2 mx-auto"
+                >
+                  <Loader2 className="w-4 h-4" />
+                  <span>Retry</span>
+                </Button>
+              </div>
+            </div>
+          )}
+
           <TabsContent value="all" className="mt-0">
             <div className="max-h-[70vh] overflow-y-auto">
-              {["today", "yesterday", "older"].map((date) => {
-                const dateNotifications = notifications.filter(
-                  (notification) => notification.date === date
-                );
-                if (dateNotifications.length === 0) return null;
-
-                return (
-                  <div key={date} className="mt-4">
-                    <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase">
-                      {date === "today"
-                        ? "TODAY"
-                        : date === "yesterday"
-                          ? "YESTERDAY"
-                          : "OLDER"}
-                    </div>
-                    <div className="divide-y">
-                      {dateNotifications.map((notification) => (
-                        <div
-                          key={notification.id}
-                          className={cn(
-                            "px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors",
-                            !notification.read && "bg-gray-50"
-                          )}
-                        >
-                          <div className="bg-gray-100 rounded-full p-2 h-10 w-10 flex items-center justify-center flex-shrink-0">
-                            {getNotificationIcon(notification.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex justify-between">
-                              <h3 className="font-medium">
-                                {notification.title}
-                              </h3>
-                              <span className="text-sm text-gray-500">
-                                {notification.time}
-                              </span>
-                            </div>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {notification.description}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+              {!isLoading &&
+              !error &&
+              Object.keys(groupedNotifications).length === 0 ? (
+                <div className="py-12 text-center text-gray-500">
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Bell className="w-6 h-6 text-gray-400" />
                   </div>
-                );
-              })}
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No notifications found
+                  </h3>
+                  <p className="text-gray-500">
+                    {search
+                      ? `No notifications match "${search}"`
+                      : "You're all caught up! No new notifications."}
+                  </p>
+                </div>
+              ) : (
+                ["today", "yesterday", "older"].map((category) => {
+                  const list = groupedNotifications[category] || [];
+                  if (list.length === 0) return null;
+                  return (
+                    <div key={category} className="mt-4">
+                      <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase">
+                        {category}
+                      </div>
+                      <div className="divide-y">
+                        {list.map((notification) => (
+                          <div
+                            key={notification.id}
+                            className={cn(
+                              "px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors",
+                              notification.status === "UNREAD" && "bg-gray-50"
+                            )}
+                          >
+                            <div className="bg-gray-100 rounded-full p-2 h-10 w-10 flex items-center justify-center flex-shrink-0">
+                              {getNotificationIcon(notification.type)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between">
+                                <h3 className="font-medium">
+                                  {notification.title}
+                                </h3>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-gray-500">
+                                    {formatTime(notification.createdAt)}
+                                  </span>
+                                  {notification.status === "UNREAD" && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleMarkAsRead(notification.id)
+                                      }
+                                      disabled={isMarkingOne}
+                                      className="text-xs text-green-600 hover:text-green-700 h-auto p-1"
+                                    >
+                                      {isMarkingOne ? (
+                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                      ) : (
+                                        "Mark as read"
+                                      )}
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                              <p className="text-sm text-gray-600 mt-1">
+                                {notification.message}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </TabsContent>
 
           <TabsContent value="unread" className="mt-0">
             <div className="max-h-[70vh] overflow-y-auto">
-              {["today", "yesterday", "older"].map((date) => {
-                const dateNotifications = notifications.filter(
-                  (notification) =>
-                    notification.date === date && !notification.read
-                );
-                if (dateNotifications.length === 0) return null;
-
-                return (
-                  <div key={date} className="mt-4">
-                    <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase">
-                      {date === "today"
-                        ? "TODAY"
-                        : date === "yesterday"
-                          ? "YESTERDAY"
-                          : "OLDER"}
-                    </div>
-                    <div className="divide-y">
-                      {dateNotifications.map((notification) => (
-                        <div
-                          key={notification.id}
-                          className="px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors bg-gray-50"
-                        >
-                          <div className="bg-gray-100 rounded-full p-2 h-10 w-10 flex items-center justify-center flex-shrink-0">
-                            {getNotificationIcon(notification.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex justify-between">
-                              <h3 className="font-medium">
-                                {notification.title}
-                              </h3>
-                              <span className="text-sm text-gray-500">
-                                {notification.time}
-                              </span>
-                            </div>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {notification.description}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-              {notifications.filter((n) => !n.read).length === 0 && (
+              {!isLoading &&
+              !error &&
+              Object.keys(groupedNotifications).length === 0 ? (
                 <div className="py-12 text-center text-gray-500">
-                  <p>No unread notifications</p>
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle className="w-6 h-6 text-green-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    All caught up!
+                  </h3>
+                  <p className="text-gray-500">
+                    No unread notifications. You're all up to date.
+                  </p>
                 </div>
+              ) : (
+                ["today", "yesterday", "older"].map((category) => {
+                  const list =
+                    groupedNotifications[category]?.filter(
+                      (n) => n.status === "UNREAD"
+                    ) || [];
+                  if (list.length === 0) return null;
+                  return (
+                    <div key={category} className="mt-4">
+                      <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase">
+                        {category}
+                      </div>
+                      <div className="divide-y">
+                        {list.map((notification) => (
+                          <div
+                            key={notification.id}
+                            className="px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors bg-gray-50"
+                          >
+                            <div className="bg-gray-100 rounded-full p-2 h-10 w-10 flex items-center justify-center flex-shrink-0">
+                              {getNotificationIcon(notification.type)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between">
+                                <h3 className="font-medium">
+                                  {notification.title}
+                                </h3>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-gray-500">
+                                    {formatTime(notification.createdAt)}
+                                  </span>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleMarkAsRead(notification.id)
+                                    }
+                                    disabled={isMarkingOne}
+                                    className="text-xs text-green-600 hover:text-green-700 h-auto p-1"
+                                  >
+                                    {isMarkingOne ? (
+                                      <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                      "Mark as read"
+                                    )}
+                                  </Button>
+                                </div>
+                              </div>
+                              <p className="text-sm text-gray-600 mt-1">
+                                {notification.message}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Pagination */}
+        {!isLoading && !error && totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-gray-200 p-4">
+            <div className="text-sm text-gray-500">
+              Page {currentPage} of {totalPages} •{" "}
+              {notificationsResponse?.data?.total || 0} total notifications
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage <= 1 || isLoading}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Previous
+              </Button>
+              <span className="text-sm text-gray-500 px-2">{currentPage}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage >= totalPages || isLoading}
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

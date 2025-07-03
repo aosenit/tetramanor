@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import { Suspense } from "react";
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
@@ -14,7 +15,7 @@ import { axiosInstance } from "@/services/axiosInstance";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-export default function NewPasswordPage() {
+function NewPasswordPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
@@ -213,5 +214,22 @@ export default function NewPasswordPage() {
         </Button>
       </form>
     </div>
+  );
+}
+
+export default function NewPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="flex items-center space-x-2">
+            <Loader2 className="w-6 h-6 animate-spin" />
+            <span>Loading...</span>
+          </div>
+        </div>
+      }
+    >
+      <NewPasswordPageContent />
+    </Suspense>
   );
 }
