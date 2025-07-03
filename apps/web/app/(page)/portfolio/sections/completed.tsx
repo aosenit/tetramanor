@@ -10,19 +10,19 @@ function Completed() {
   const projects = [
     {
       id: 1,
-      title: "Burrows",
+      title: "Comfy Burrows",
       description: "A luxury residential development in the heart of Lagos.",
       image: five,
     },
     {
       id: 2,
-      title: "Gardens",
+      title: "TM Gardens",
       description: "An exclusive gated community with modern amenities.",
       image: six,
     },
     {
       id: 3,
-      title: "Meadows",
+      title: "TM Meadows",
       description: "A serene residential estate with beautiful landscapes.",
       image: seven,
     },

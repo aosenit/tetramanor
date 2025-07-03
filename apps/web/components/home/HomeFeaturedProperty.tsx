@@ -5,7 +5,7 @@ import { Button } from "@chakra-ui/react";
 import Image from "next/image";
 import { useState } from "react";
 import { IoLocationOutline } from "react-icons/io5";
-import tmHighGardens from "@/assets/home/two.webp";
+import reone from "@/assets/home/reone.webp";
 
 export default function  HomeFeaturedProperty() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,7 +15,7 @@ export default function  HomeFeaturedProperty() {
         {/* Left: Image with Overlay */}
         <div className="relative w-full lg:w-[55%] h-[400px] sm:h-[500px] lg:h-[610px]">
               <Image
-                src={tmHighGardens}
+                src={reone}
                 alt="TM HighGardens"
                 className="rounded-xl object-cover"
                 fill
