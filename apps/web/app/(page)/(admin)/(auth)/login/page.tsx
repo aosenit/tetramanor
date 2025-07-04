@@ -1,6 +1,6 @@
 "use client";
 
-import type React from "react";
+import { ReactNode } from "react";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -24,6 +24,7 @@ import {
 import icon from "@/assets/key.png";
 import Image from "next/image";
 import { usePostData } from "@/hooks/useApi";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -62,6 +63,7 @@ export default function LoginPage() {
       console.log(response);
     } catch (error) {
       console.log(error);
+      toast.error("Invalid email or password");
     }
   };
 

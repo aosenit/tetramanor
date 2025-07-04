@@ -8,7 +8,7 @@ import Image from "next/image";
 import two from "@/assets/admin/two.svg";
 import one from "@/assets/admin/one.svg";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Plus, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -25,9 +25,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
+import Loader from "@/components/Loader";
 
 interface User {
   id: string;
@@ -110,7 +111,7 @@ const stats = [
   },
 ];
 
-export default function CustomersPage() {
+function CustomersPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -515,5 +516,13 @@ export default function CustomersPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function CustomersPage() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <CustomersPageContent />
+    </Suspense>
   );
 }

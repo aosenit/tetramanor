@@ -1,8 +1,7 @@
 "use client";
 
-import type React from "react";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useFetchData, usePutData } from "@/hooks/useApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Upload, FileUp } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AccountSettings() {
   const [isKycModalOpen, setIsKycModalOpen] = useState(false);
@@ -23,12 +23,28 @@ export default function AccountSettings() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
+  // API hooks
+  const { data: accountData, isLoading: isLoadingAccount } =
+    useFetchData("customer/account/");
+  const updateAccountMutation = usePutData("customer/account/update");
+
   const [profileData, setProfileData] = useState({
-    firstName: "Damian",
-    lastName: "Price",
-    email: "damianprice@gmail.com",
+    name: "",
+    email: "",
     phone: "",
   });
+
+  // Update profile data when API data is loaded
+  useEffect(() => {
+    if (accountData?.data) {
+      const { name, email, phone } = accountData.data;
+      setProfileData({
+        name: name || "",
+        email: email || "",
+        phone: phone || "",
+      });
+    }
+  }, [accountData]);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -46,12 +62,12 @@ export default function AccountSettings() {
     const maxSize = 10 * 1024 * 1024; // 10MB
 
     if (!allowedTypes.includes(file.type)) {
-      alert("Please upload a PNG, JPG, DOCX, or PDF file.");
+      toast.error("Please upload a PNG, JPG, DOCX, or PDF file.");
       return;
     }
 
     if (file.size > maxSize) {
-      alert("File size must be less than 10MB.");
+      toast.error("File size must be less than 10MB.");
       return;
     }
 
@@ -84,18 +100,27 @@ export default function AccountSettings() {
     }
   };
 
-  const handleProfileSave = () => {
-    console.log("Profile saved:", profileData);
-    alert("Profile updated successfully!");
+  const handleProfileSave = async () => {
+    try {
+      await updateAccountMutation.mutateAsync({
+        name: profileData.name,
+        email: profileData.email,
+        phone: profileData.phone,
+      });
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update profile. Please try again.");
+    }
   };
 
   const handlePasswordUpdate = () => {
     if (passwordData.newPassword !== passwordData.retypePassword) {
-      alert("New passwords do not match!");
+      toast.error("New passwords do not match!");
       return;
     }
     console.log("Password updated");
-    alert("Password updated successfully!");
+    toast.success("Password updated successfully!");
     setPasswordData({
       currentPassword: "",
       newPassword: "",
@@ -105,18 +130,18 @@ export default function AccountSettings() {
 
   const handleKycVerify = () => {
     if (!ninNumber || ninNumber.length !== 11) {
-      alert("Please enter a valid 11-digit NIN number.");
+      toast.error("Please enter a valid 11-digit NIN number.");
       return;
     }
     if (!uploadedFile) {
-      alert("Please upload a document.");
+      toast.error("Please upload a document.");
       return;
     }
     console.log("KYC verification submitted:", {
       ninNumber,
       file: uploadedFile.name,
     });
-    alert("KYC verification submitted successfully!");
+    toast.success("KYC verification submitted successfully!");
     setIsKycModalOpen(false);
     setNinNumber("");
     setUploadedFile(null);
@@ -178,87 +203,104 @@ export default function AccountSettings() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6   lg:w-[60%]">
-                <div>
-                  <Label
-                    htmlFor="firstName"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    First name
-                  </Label>
-                  <Input
-                    id="firstName"
-                    value={profileData.firstName}
-                    onChange={(e) =>
-                      setProfileData({
-                        ...profileData,
-                        firstName: e.target.value,
-                      })
-                    }
-                    className="mt-1"
-                  />
+              {isLoadingAccount ? (
+                <div className="lg:w-[60%]">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                    <div>
+                      <div className="h-4 bg-gray-200 rounded w-20 mb-2 animate-pulse"></div>
+                      <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                    <div>
+                      <div className="h-4 bg-gray-200 rounded w-24 mb-2 animate-pulse"></div>
+                      <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                    <div>
+                      <div className="h-4 bg-gray-200 rounded w-28 mb-2 animate-pulse"></div>
+                      <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                    <div className="flex justify-start">
+                      <div className="h-10 bg-gray-200 rounded w-32 animate-pulse"></div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <Label
-                    htmlFor="lastName"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Last name
-                  </Label>
-                  <Input
-                    id="lastName"
-                    value={profileData.lastName}
-                    onChange={(e) =>
-                      setProfileData({
-                        ...profileData,
-                        lastName: e.target.value,
-                      })
-                    }
-                    className="mt-1"
-                  />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6  items-end  lg:w-[60%]">
+                  <div>
+                    <Label
+                      htmlFor="name"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Full name
+                    </Label>
+                    <Input
+                      id="name"
+                      value={profileData?.name}
+                      onChange={(e) =>
+                        setProfileData({
+                          ...profileData,
+                          name: e.target.value,
+                        })
+                      }
+                      disabled={isLoadingAccount}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="email"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Email address
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={profileData?.email}
+                      onChange={(e) =>
+                        setProfileData({
+                          ...profileData,
+                          email: e.target.value,
+                        })
+                      }
+                      disabled={isLoadingAccount}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="phone"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Phone number
+                    </Label>
+                    <Input
+                      id="phone"
+                      value={profileData?.phone}
+                      onChange={(e) =>
+                        setProfileData({
+                          ...profileData,
+                          phone: e.target.value,
+                        })
+                      }
+                      disabled={isLoadingAccount}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="flex justify-start">
+                    <Button
+                      onClick={handleProfileSave}
+                      disabled={
+                        updateAccountMutation.isPending || isLoadingAccount
+                      }
+                      className="bg-[var(--primary-green)] hover:bg-green-700"
+                    >
+                      {updateAccountMutation.isPending
+                        ? "Saving..."
+                        : "Save changes"}
+                    </Button>
+                  </div>
                 </div>
-                <div>
-                  <Label
-                    htmlFor="email"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Email address
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={profileData.email}
-                    onChange={(e) =>
-                      setProfileData({ ...profileData, email: e.target.value })
-                    }
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label
-                    htmlFor="phone"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Phone number
-                  </Label>
-                  <Input
-                    id="phone"
-                    value={profileData.phone}
-                    onChange={(e) =>
-                      setProfileData({ ...profileData, phone: e.target.value })
-                    }
-                    className="mt-1"
-                  />
-                </div>
-                <div className="flex justify-start">
-                  <Button
-                    onClick={handleProfileSave}
-                    className="bg-[var(--primary-green)] hover:bg-green-700"
-                  >
-                    Save changes
-                  </Button>
-                </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>

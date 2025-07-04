@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useFetchData, usePutData } from "@/hooks/useApi";
 import { axiosInstance } from "@/services/axiosInstance";
 import { Input } from "@/components/ui/input";
+import Loader from "@/components/Loader";
 
 interface Notification {
   id: string;
@@ -218,22 +219,7 @@ export default function NotificationsPage() {
     ));
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="text-sm text-[#4C5560]">
-          Admin{" "}
-          <span className="text-[#116114] text-xl font-medium">
-            / Notifications
-          </span>
-        </div>
-        <div className="flex items-center justify-center py-12">
-          <div className="flex items-center gap-2">
-            <Loader2 className="w-6 h-6 animate-spin" />
-            <span>Loading notifications...</span>
-          </div>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (

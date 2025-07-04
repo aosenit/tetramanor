@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import placeholder from "@/assets/placeholder.svg";
+import { Button } from "@chakra-ui/react";
 
 type PendingPayment = {
   id: string;
@@ -47,9 +47,11 @@ export function PendingPayments() {
     <div className="space-y-4 bg-white rounded-lg border divide-y">
       <div className="flex justify-between items-center px-4 pt-4">
         <h2 className="text-xl font-semibold">Pending Payments</h2>
-        <Button variant="outline" size="sm" asChild>
-          <Link href="#">View all</Link>
-        </Button>
+        <Link href="/client-admin/dashboard/pending-payments">
+          <Button size="sm" variant="outline">
+            View all
+          </Button>
+        </Link>
       </div>
       <div className="  overflow-hidden">
         <div className="divide-y">

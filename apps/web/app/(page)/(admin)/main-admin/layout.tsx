@@ -1,4 +1,4 @@
-import type React from "react";
+import { ReactNode } from "react";
 
 import "@/app/globals.css";
 import { TopHeader } from "./components/top-header";
@@ -7,11 +7,7 @@ import { MobileNav } from "./components/mobile-nav";
 import { SidebarProvider } from "./components/sidebar";
 import AuthWrapper from "@/app/providers/hoc/AuthWrapper";
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <AuthWrapper>
       <SidebarProvider defaultOpen={true}>

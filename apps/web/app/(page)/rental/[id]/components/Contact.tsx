@@ -1,8 +1,8 @@
 "use client";
 import Image from "next/image";
-import type React from "react";
+import { ReactNode } from "react";
 import { useState } from "react";
-import ten from "@/assets/rental/ten.webp"
+import ten from "@/assets/rental/ten.webp";
 
 export default function PropertyEnquiryForm() {
   const [formData, setFormData] = useState({
@@ -27,12 +27,7 @@ export default function PropertyEnquiryForm() {
 
   return (
     <div className="relative w-full min-h-screen bg-gradient-to-r from-slate-800 to-slate-900 flex items-center justify-center p-4 md:p-8">
-      <Image
-        src={ten}
-        alt="Skyscraper"
-        className="object-cover"
-        fill
-      />
+      <Image src={ten} alt="Skyscraper" className="object-cover" fill />
       <div className="absolute inset-0 bg-black opacity-60 z-10" />
       <div className="container mx-auto px-4 lg:px-16 z-10 relative">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">

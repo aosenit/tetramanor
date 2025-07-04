@@ -1,4 +1,4 @@
-import type React from "react";
+import { ReactNode } from "react";
 
 import type { Metadata } from "next";
 
@@ -9,11 +9,7 @@ export const metadata: Metadata = {
   description: "Authentication pages for the property management system",
 };
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}

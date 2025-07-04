@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import four from "@/assets/admin/home/four.webp";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, ChevronDown, Loader2 } from "lucide-react";
+import { Search, Plus, ChevronDown } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -16,6 +16,7 @@ import Link from "next/link";
 import BlogPostDetails from "./components/BlogPostDetails";
 import { useState, useEffect } from "react";
 import { useFetchData } from "@/hooks/useApi";
+import Loader from "@/components/Loader";
 
 interface BlogPost {
   id: string;
@@ -65,14 +66,7 @@ export default function BlogPostsPage() {
   }, [refetch]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center gap-2">
-          <Loader2 className="w-6 h-6 animate-spin" />
-          <span>Loading blog posts...</span>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (

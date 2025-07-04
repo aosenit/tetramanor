@@ -91,8 +91,7 @@ const menuItems = [
 export function AppSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [websiteOpen, setWebsiteOpen] = useState(true);
-  const [customerOpen, setCustomerOpen] = useState(true);
+
   const router = useRouter();
   return (
     <Sidebar className="border-r bg-[#323539] text-white">
@@ -111,123 +110,73 @@ export function AppSidebar() {
       <SidebarContent className="px-4 space-y-6">
         {/* Website Section */}
         <div>
-          <div
-            className="flex justify-between items-center px-3 mb-2 cursor-pointer"
-            onClick={() => setWebsiteOpen((prev) => !prev)}
-          >
-            <h4 className="text-xs text-gray-400 uppercase">Website</h4>
-            {websiteOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </div>
-          {websiteOpen && (
-            <SidebarMenu>
-              {[
-                { title: "Dashboard", url: route, icon: LayoutDashboard },
-                { title: "Homepage", url: `${route}/homepage`, icon: Home },
-                {
-                  title: "Properties",
-                  url: `${route}/properties`,
-                  icon: Building2,
-                },
-                {
-                  title: "Blog posts",
-                  url: `${route}/blog-posts`,
-                  icon: FileText,
-                },
-                {
-                  title: "Media Upload",
-                  url: `${route}/media-upload`,
-                  icon: FileText,
-                },
-                {
-                  title: "Contact inquiries",
-                  url: `${route}/contact-inquiries`,
-                  icon: MessageSquare,
-                },
-              ].map((item) => {
-                // check if the pathname includes the item.url, except for when item.url ends with main-admin
-                const isActive =
-                  item.url === "/main-admin"
-                    ? pathname === item.url
-                    : pathname.includes(item.url);
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      className={`text-gray-300 hover:text-white hover:bg-gray-800 py-6 ${isActive ? "bg-[#2B2D2F] text-white" : ""}`}
-                    >
-                      <Link
-                        href={item.url}
-                        className="flex items-center gap-3 px-3 py-3 rounded-md"
-                      >
-                        <item.icon className="h-5 w-5" />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          )}
-        </div>
+          <div className="flex justify-between items-center px-3 mb-2 cursor-pointer"></div>
 
-        {/* Customer Section */}
-        <div>
-          <div
-            className="flex justify-between items-center px-3 mb-2 cursor-pointer"
-            onClick={() => setCustomerOpen((prev) => !prev)}
-          >
-            <h4 className="text-xs text-gray-400 uppercase">Customer</h4>
-            {customerOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </div>
-          {customerOpen && (
-            <SidebarMenu>
-              {[
-                { title: "Users", url: `${route}/customers`, icon: Users },
-                { title: "Rentals", url: `${route}/rentals`, icon: Car },
-                {
-                  title: "Investments",
-                  url: `${route}/investments`,
-                  icon: TrendingUp,
-                },
-                {
-                  title: "Notifications",
-                  url: `${route}/notifications`,
-                  icon: Bell,
-                },
-                {
-                  title: "Payments",
-                  url: `${route}/payments`,
-                  icon: CreditCard,
-                },
-                {
-                  title: "Documents",
-                  url: `${route}/documents`,
-                  icon: FileText,
-                },
-              ].map((item) => {
-                const isActive =
-                  item.url === "/main-admin"
-                    ? pathname === item.url
-                    : pathname.includes(item.url);
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      className={`text-gray-300 hover:text-white hover:bg-gray-800 py-6 ${isActive ? "bg-[#2B2D2F] text-white" : ""}`}
+          <SidebarMenu>
+            {[
+              { title: "Dashboard", url: route, icon: LayoutDashboard },
+              { title: "Homepage", url: `${route}/homepage`, icon: Home },
+              {
+                title: "Properties",
+                url: `${route}/properties`,
+                icon: Building2,
+              },
+              {
+                title: "Investments",
+                url: `${route}/investments`,
+                icon: TrendingUp,
+              },
+              {
+                title: "Customers",
+                url: `${route}/customers`,
+                icon: Users,
+              },
+              { title: "Rentals", url: `${route}/rentals`, icon: Car },
+              {
+                title: "Blog posts",
+                url: `${route}/blog-posts`,
+                icon: FileText,
+              },
+              {
+                title: "Payments",
+                url: `${route}/payments`,
+                icon: CreditCard,
+              },
+              {
+                title: "Contact inquiries",
+                url: `${route}/contact-inquiries`,
+                icon: MessageSquare,
+              },
+
+              {
+                title: "Notifications",
+                url: `${route}/notifications`,
+                icon: Bell,
+              },
+            ].map((item) => {
+              // check if the pathname includes the item.url, except for when item.url ends with main-admin
+              const isActive =
+                item.url === "/main-admin"
+                  ? pathname === item.url
+                  : pathname.includes(item.url);
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    className={`text-gray-300 hover:text-white hover:bg-gray-800 py-6 ${isActive ? "bg-[#2B2D2F] text-white" : ""}`}
+                  >
+                    <Link
+                      href={item.url}
+                      className="flex items-center gap-3 px-3 py-3 rounded-md"
                     >
-                      <Link
-                        href={item.url}
-                        className="flex items-center gap-3 px-3 py-3 rounded-md"
-                      >
-                        <item.icon className="h-5 w-5" />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          )}
+                      <item.icon className="h-5 w-5" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
         </div>
       </SidebarContent>
 

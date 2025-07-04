@@ -17,6 +17,7 @@ import { MdArrowBackIosNew } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import Socials from "./SocialLinkForm";
 import { useFetchData, usePutData } from "@/hooks/useApi";
+import Loader from "@/components/Loader";
 
 interface ContactData {
   id: string;
@@ -115,32 +116,7 @@ export default function ContactPage() {
 
   // Loading state
   if (isDataLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="border-b-2 border-gray-200 pb-4 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-1 text-[#858C95]">
-              <span>Admin</span>
-              <span className="text-xl text-[#858C95]">/</span>
-              <span className="font-medium text-xl text-[#116114]">
-                Contact Page
-              </span>
-            </div>
-            <div className="h-10 w-20 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-        </div>
-
-        <div className="p-6 bg-white space-y-8">
-          <div className="h-6 w-48 bg-gray-200 rounded animate-pulse"></div>
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="space-y-2">
-              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-              <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   // Error state

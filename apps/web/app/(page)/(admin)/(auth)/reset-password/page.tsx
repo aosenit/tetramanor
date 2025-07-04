@@ -1,6 +1,6 @@
 "use client";
 
-import type React from "react";
+import { ReactNode } from "react";
 import { Suspense } from "react";
 
 import { useState, useRef, useEffect } from "react";

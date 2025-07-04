@@ -1,4 +1,4 @@
-import type React from "react";
+import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { FileText, FileUp, Receipt } from "lucide-react";
 import Link from "next/link";

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/Loader";
 
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -20,7 +21,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     }
   }, [router]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loader />;
 
   return <>{children}</>;
 };

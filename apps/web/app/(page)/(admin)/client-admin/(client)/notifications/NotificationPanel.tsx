@@ -192,7 +192,7 @@ export function NotificationsPanel() {
   }, [filter, search]);
 
   const getNotificationIcon = (type: string) => {
-    switch (type.toLowerCase()) {
+    switch (type?.toLowerCase()) {
       case "document":
         return <FileUp className="h-5 w-5 text-blue-500" />;
       case "payment":

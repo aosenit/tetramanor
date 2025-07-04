@@ -28,6 +28,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchData, useDeleteData, usePutData } from "@/hooks/useApi";
 import { toast } from "sonner";
 import { axiosInstance } from "@/services/axiosInstance";
+import React, { Suspense } from "react";
+import Loader from "@/components/Loader";
 
 interface Investment {
   id: string;
@@ -54,7 +56,7 @@ interface ApiResponse {
   statusCode: number;
 }
 
-export default function InvestmentsPage() {
+function InvestmentsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -174,7 +176,7 @@ export default function InvestmentsPage() {
           investment: null,
         });
       } catch (error) {
-        toast.error("Failed to delete investment");
+        console.log(error);
       } finally {
         setIsDeleting(false);
       }
@@ -199,7 +201,7 @@ export default function InvestmentsPage() {
           investment: null,
         });
       } catch (error) {
-        toast.error("Failed to update investment status");
+        console.log(error);
       } finally {
         setIsUpdatingStatus(false);
       }
@@ -260,50 +262,7 @@ export default function InvestmentsPage() {
 
   // Loading skeleton
   if (isLoading) {
-    return (
-      <div className="min-h-screen space-y-6">
-        <div className="">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center space-x-1 text-[#858C95]">
-                <span>Admin</span>
-                <span className="text-xl text-[#858C95]">/</span>
-                <span className="font-medium text-xl text-[#116114]">
-                  Investment
-                </span>
-              </div>
-              <p className="text-[#454D56] text-sm mt-1">
-                Manage all investment opportunities{" "}
-              </p>
-            </div>
-            <div className="h-10 w-40 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
-          <div className="flex items-center space-x-4">
-            <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-8 w-28 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="h-6 w-48 bg-gray-200 rounded animate-pulse"></div>
-          <div className="bg-white rounded-lg border">
-            <div className="h-12 bg-gray-200 animate-pulse"></div>
-            {Array.from({ length: 5 }, (_, i) => (
-              <div
-                key={i}
-                className="h-16 bg-gray-100 animate-pulse border-t"
-              ></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   // Error state
@@ -662,5 +621,22 @@ export default function InvestmentsPage() {
         isLoading={isDeleting || isUpdatingStatus}
       />
     </div>
+  );
+}
+
+export default function InvestmentsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="flex items-center space-x-2">
+            <Loader2 className="w-6 h-6 animate-spin" />
+            <span>Loading...</span>
+          </div>
+        </div>
+      }
+    >
+      <InvestmentsPageContent />
+    </Suspense>
   );
 }

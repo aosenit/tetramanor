@@ -7,7 +7,7 @@ import { DashboardStats } from "./DashboardStat";
 import { PendingPayments } from "./PendingPayment";
 import { RecentActivity } from "./RecentActivity";
 import { useFetchData } from "@/hooks/useApi";
-import Loading from "../component/Loading";
+import Loader from "@/components/Loader";
 
 export default function DashboardPage() {
   const { data, isLoading } = useFetchData("customer/dashboard");
@@ -15,7 +15,7 @@ export default function DashboardPage() {
 
   // if data is loading, show a loading state
   if (isLoading) {
-    return <Loading />;
+    return <Loader />;
   }
 
   return (

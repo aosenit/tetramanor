@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import four from "@/assets/admin/customer/four.png";
@@ -27,6 +27,7 @@ import PaymentModal from "./components/RecieptModal";
 import PaymentSummaryModal from "./components/PaymentSummaryModal";
 import { useFetchData } from "@/hooks/useApi";
 import { toast } from "sonner";
+import Loader from "@/components/Loader";
 
 interface Payment {
   paymentDate: string;
@@ -46,7 +47,80 @@ interface Payment {
   };
 }
 
-export default function PaymentsPage() {
+// Skeleton loader component
+function PaymentsSkeleton() {
+  return (
+    <div className="min-h-screen space-y-6">
+      {/* Header skeleton */}
+      <div className="">
+        <div className="flex border-b border-[#E5E5E7] pb-4 items-center justify-between">
+          <div className="flex items-center space-x-1 text-[#858C95]">
+            <div className="h-4 w-8 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+          <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {/* Search skeleton */}
+        <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+
+        {/* Tabs skeleton */}
+        <div className="flex space-x-2">
+          <div className="h-10 w-20 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-10 w-20 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+
+        {/* Stats Cards skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <Card key={index}>
+              <CardContent className="p-6">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between border-b border-[#E5E5E7] pb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="h-10 w-10 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                    <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                  <div className="flex items-center justify-between mt-4 pt-2">
+                    <div className="h-6 w-20 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-3 w-12 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Table skeleton */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+
+          <div className="bg-white rounded-md shadow overflow-hidden">
+            <div className="animate-pulse">
+              <div className="h-12 bg-gray-200"></div>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-16 bg-gray-100 border-b border-gray-200"
+                ></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PaymentsPageContent() {
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [activeCard, setActiveCard] = useState<number | null>(0);
@@ -135,6 +209,10 @@ export default function PaymentsPage() {
         </div>
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <PaymentsSkeleton />;
   }
 
   return (
@@ -229,107 +307,98 @@ export default function PaymentsPage() {
           </div>
 
           <div className="bg-white rounded-md shadow overflow-hidden">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                  <span>Loading payments...</span>
-                </div>
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Payment type</TableHead>
+                  <TableHead>Property</TableHead>
+                  <TableHead>Amount paid</TableHead>
+                  <TableHead>Total price</TableHead>
+                  <TableHead>Date paid</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredPayments.length === 0 ? (
                   <TableRow>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Payment type</TableHead>
-                    <TableHead>Property</TableHead>
-                    <TableHead>Amount paid</TableHead>
-                    <TableHead>Total price</TableHead>
-                    <TableHead>Date paid</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableCell
+                      colSpan={7}
+                      className="text-center py-8 text-gray-500"
+                    >
+                      {search
+                        ? "No payments found matching your search"
+                        : "No payments found"}
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredPayments.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={7}
-                        className="text-center py-8 text-gray-500"
-                      >
-                        {search
-                          ? "No payments found matching your search"
-                          : "No payments found"}
+                ) : (
+                  filteredPayments.map((payment, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">
+                        <div>
+                          <div className="font-medium">
+                            {payment.customer.name}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {payment.customer.email}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="capitalize">
+                        {payment.paymentType.toLowerCase()}
+                      </TableCell>
+                      <TableCell>{payment.property.name}</TableCell>
+                      <TableCell className="font-medium text-green-600">
+                        {formatCurrency(payment.amountPaid)}
+                      </TableCell>
+                      <TableCell>
+                        {formatCurrency(payment.purchase.price)}
+                      </TableCell>
+                      <TableCell>{formatDate(payment.paymentDate)}</TableCell>
+                      <TableCell>
+                        <DropdownMenu.Root>
+                          <DropdownMenu.Trigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
+                              <span className="sr-only">Open menu</span>
+                              <Image
+                                src={icon}
+                                alt="Action menu"
+                                width={16}
+                                height={16}
+                                className="object-contain"
+                              />
+                            </Button>
+                          </DropdownMenu.Trigger>
+
+                          <DropdownMenu.Content
+                            sideOffset={4}
+                            className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md"
+                          >
+                            <DropdownMenu.Item
+                              className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
+                              onClick={() => handleViewReceipt(payment)}
+                            >
+                              View receipt
+                            </DropdownMenu.Item>
+
+                            <DropdownMenu.Item
+                              className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
+                              onClick={() => handleViewDetails(payment)}
+                            >
+                              Payment details
+                            </DropdownMenu.Item>
+                          </DropdownMenu.Content>
+                        </DropdownMenu.Root>
                       </TableCell>
                     </TableRow>
-                  ) : (
-                    filteredPayments.map((payment, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-medium">
-                          <div>
-                            <div className="font-medium">
-                              {payment.customer.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {payment.customer.email}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="capitalize">
-                          {payment.paymentType.toLowerCase()}
-                        </TableCell>
-                        <TableCell>{payment.property.name}</TableCell>
-                        <TableCell className="font-medium text-green-600">
-                          {formatCurrency(payment.amountPaid)}
-                        </TableCell>
-                        <TableCell>
-                          {formatCurrency(payment.purchase.price)}
-                        </TableCell>
-                        <TableCell>{formatDate(payment.paymentDate)}</TableCell>
-                        <TableCell>
-                          <DropdownMenu.Root>
-                            <DropdownMenu.Trigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0"
-                              >
-                                <span className="sr-only">Open menu</span>
-                                <Image
-                                  src={icon}
-                                  alt="Action menu"
-                                  width={16}
-                                  height={16}
-                                  className="object-contain"
-                                />
-                              </Button>
-                            </DropdownMenu.Trigger>
-
-                            <DropdownMenu.Content
-                              sideOffset={4}
-                              className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md"
-                            >
-                              <DropdownMenu.Item
-                                className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
-                                onClick={() => handleViewReceipt(payment)}
-                              >
-                                View receipt
-                              </DropdownMenu.Item>
-
-                              <DropdownMenu.Item
-                                className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
-                                onClick={() => handleViewDetails(payment)}
-                              >
-                                Payment details
-                              </DropdownMenu.Item>
-                            </DropdownMenu.Content>
-                          </DropdownMenu.Root>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            )}
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
         </div>
       </div>
@@ -346,5 +415,13 @@ export default function PaymentsPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function PaymentsPage() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <PaymentsPageContent />
+    </Suspense>
   );
 }

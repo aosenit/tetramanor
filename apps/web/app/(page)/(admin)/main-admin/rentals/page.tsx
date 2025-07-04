@@ -37,6 +37,7 @@ import { useState } from "react";
 import { useFetchData } from "@/hooks/useApi";
 import { toast } from "sonner";
 import DeleteRentalModal from "./components/DeleteRentalModal";
+import Loader from "@/components/Loader";
 
 interface Rental {
   id: string;
@@ -198,14 +199,7 @@ export default function RentalsPage() {
   ];
 
   if (rentalsLoading || statsLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center gap-2">
-          <Loader2 className="w-6 h-6 animate-spin" />
-          <span>Loading rentals...</span>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (

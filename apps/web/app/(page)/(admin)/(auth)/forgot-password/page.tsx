@@ -1,7 +1,6 @@
 "use client";
 
-import type React from "react";
-
+import { ReactNode } from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import icon from "@/assets/passwordreset.png";

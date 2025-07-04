@@ -1,11 +1,12 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import type { ReactNode } from "react";
+import React from "react";
+import "sonner/dist/styles.css";
 import { Providers as ChakraProviders } from "./providers/ChakraProvider";
 import { Toaster } from "sonner";
 interface ProvidersProps {
-  children: ReactNode;
+  children: any;
 }
 
 const queryClient = new QueryClient({
@@ -20,7 +21,7 @@ const queryClient = new QueryClient({
 export function Providers({ children }: ProvidersProps) {
   return (
     <ChakraProviders>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" richColors />
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </ChakraProviders>
   );

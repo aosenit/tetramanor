@@ -1,7 +1,6 @@
 "use client";
 
-import type React from "react";
-
+import { ReactNode } from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -25,7 +24,7 @@ import LogoutModal from "@/components/LogoutModal";
 import Header from "./(client)/component/Header";
 
 interface MainLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
