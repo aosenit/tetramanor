@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description: "Web application",
 };
 
+export const dynamic = "force-static";
+
 export default function RootLayout({
   children,
 }: {
