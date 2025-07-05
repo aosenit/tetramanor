@@ -3,13 +3,19 @@ import { Plus } from "lucide-react";
 import React, { useState } from "react";
 import Image from "next/image";
 import two from "@/assets/admin/home/two.webp";
-import five from "@/assets/admin/home/five.svg";
-import Tooltip from "./modals/Tooltip";
 import CampaignModal from "./modals/Campain";
 import { useFetchData } from "@/hooks/useApi";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import CampaignActionsDropdown from "./modals/Tooltip";
 
 export default function OngoingCampaigns() {
-  const [openTooltipIndex, setOpenTooltipIndex] = useState<number | null>(null);
   const [showPropertyCampaign, setShowPropertyCampaign] = useState(false);
 
   const {
@@ -18,10 +24,6 @@ export default function OngoingCampaigns() {
     error,
     refetch,
   } = useFetchData("campaigns");
-
-  const toggleTooltip = (index: number) => {
-    setOpenTooltipIndex((prev) => (prev === index ? null : index));
-  };
 
   // Get campaigns from API response
   const campaigns = campaignResponse?.data || [];
@@ -179,62 +181,55 @@ export default function OngoingCampaigns() {
           />
         </div>
 
-        <div className="flex justify-between items-center bg-[#E5E5E7] text-xs font-medium text-[#181818] px-4 py-4">
-          <p>Campaign title</p>
-          <p>Type</p>
-          <p>Date</p>
-          <p>Action</p>
-        </div>
-
-        {campaigns.length === 0 ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <p className="text-gray-500 mb-2">No campaigns found</p>
-              <p className="text-sm text-gray-400">
-                Create your first campaign to get started
-              </p>
-            </div>
-          </div>
-        ) : (
-          <>
-            {campaigns.map((campaign, index) => (
-              <div key={campaign.id} className="relative">
-                <div className="flex justify-between items-center px-4 py-3 border-b border-[#E5E5E7] text-sm text-[#181818]">
-                  <div className="flex items-center gap-2">
-                    <p>{campaign.title}</p>
-                    {!campaign.isActive && (
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                        Inactive
-                      </span>
-                    )}
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-[#E5E5E7] text-xs font-medium text-[#181818]">
+              <TableHead>Campaign title</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {campaigns.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="py-12 text-center">
+                  <div>
+                    <p className="text-gray-500 mb-2">No campaigns found</p>
+                    <p className="text-sm text-gray-400">
+                      Create your first campaign to get started
+                    </p>
                   </div>
-                  <p>{getCampaignTypeDisplay(campaign.type)}</p>
-                  <p>{formatDateRange(campaign.startDate, campaign.endDate)}</p>
-                  <Image
-                    className="cursor-pointer"
-                    src={five}
-                    alt="options"
-                    width={35}
-                    height={35}
-                    onClick={() => {
-                      toggleTooltip(index);
-                    }}
-                  />
-                </div>
-
-                {openTooltipIndex === index && (
-                  <div className="absolute right-4 top-full z-10 mt-1">
-                    <Tooltip
+                </TableCell>
+              </TableRow>
+            ) : (
+              campaigns.map((campaign) => (
+                <TableRow key={campaign.id} className="text-sm text-[#181818]">
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <span>{campaign.title}</span>
+                      {!campaign.isActive && (
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                          Inactive
+                        </span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>{getCampaignTypeDisplay(campaign.type)}</TableCell>
+                  <TableCell>
+                    {formatDateRange(campaign.startDate, campaign.endDate)}
+                  </TableCell>
+                  <TableCell>
+                    <CampaignActionsDropdown
                       campaign={campaign}
                       refetch={refetch}
-                      closeTooltip={() => toggleTooltip(null)}
                     />
-                  </div>
-                )}
-              </div>
-            ))}
-          </>
-        )}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

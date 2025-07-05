@@ -46,11 +46,13 @@ export default function CampaignModal({
   onClose,
   refetch,
   campaignId,
+  campaignData,
 }: {
   open: boolean;
   onClose: () => void;
   refetch: () => void;
   campaignId?: string;
+  campaignData?: any;
 }) {
   const isEditMode = !!campaignId;
 
@@ -67,16 +69,11 @@ export default function CampaignModal({
   const [errors, setErrors] = useState<Partial<CampaignFormData>>({});
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
 
-  // Fetch campaign data if in edit mode
-  const { data: campaignData, isLoading: isLoadingCampaign } = useFetchData(
-    campaignId && open ? `campaigns/${campaignId}` : null
-  );
-
   // API mutations
   const { mutateAsync: createCampaign, isPending: isCreatingCampaign } =
     usePostData("campaigns");
   const { mutateAsync: updateCampaign, isPending: isUpdatingCampaign } =
-    usePutData(campaignId ? `campaigns/${campaignId}` : null);
+    usePutData(campaignData?.id ? `campaigns/${campaignData?.id}` : null);
 
   // File upload mutations
   const { mutateAsync: uploadImages, isPending: isUploadingImages } =
@@ -94,26 +91,27 @@ export default function CampaignModal({
     };
   }, [open]);
 
-  // Load campaign data when editing
+  // Load campaign data when editing (flat structure)
   useEffect(() => {
     if (campaignData && isEditMode) {
       setFormData({
-        title: campaignData?.data?.title || "",
-        type: campaignData?.data?.type || "INVESTMENT",
-        description: campaignData?.data?.description || "",
-        startDate: campaignData?.data?.startDate
-          ? new Date(campaignData.data.startDate).toISOString().split("T")[0]
+        title: campaignData.title || "",
+        type: campaignData.type || "INVESTMENT",
+        description: campaignData.description || "",
+        startDate: campaignData.startDate
+          ? new Date(campaignData.startDate).toISOString().split("T")[0]
           : "",
-        endDate: campaignData?.data?.endDate
-          ? new Date(campaignData.data.endDate).toISOString().split("T")[0]
+        endDate: campaignData.endDate
+          ? new Date(campaignData.endDate).toISOString().split("T")[0]
           : "",
-        isActive: campaignData?.data?.isActive ?? true,
-        images: campaignData?.data?.images || [],
+        isActive: campaignData.isActive ?? true,
+        images: Array.isArray(campaignData.images)
+          ? campaignData.images.map((img: any) => img.id)
+          : [],
       });
-
       // Load existing images if any
-      if (campaignData?.data?.images) {
-        setUploadedImages(campaignData.data.images);
+      if (Array.isArray(campaignData.images)) {
+        setUploadedImages(campaignData.images);
       }
     }
   }, [campaignData, isEditMode]);
@@ -266,18 +264,6 @@ export default function CampaignModal({
       toast.error(errorMessage);
     }
   };
-
-  // Loading state for edit mode
-  if (isEditMode && isLoadingCampaign) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="flex items-center gap-2 bg-white p-6 rounded-lg">
-          <Loader2 className="w-6 h-6 animate-spin" />
-          <span>Loading campaign data...</span>
-        </div>
-      </div>
-    );
-  }
 
   if (!open) return null;
 

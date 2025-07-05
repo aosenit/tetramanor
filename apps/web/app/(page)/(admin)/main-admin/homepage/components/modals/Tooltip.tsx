@@ -3,14 +3,19 @@ import React from "react";
 import CampaignModal from "./Campain";
 import CampaignPreview from "./CampaignPreview";
 import DeleteCampaignModal from "./DeleteCampaignModal";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
 
-function Tooltip({
+function CampaignActionsDropdown({
   campaign,
-  closeTooltip,
   refetch,
 }: {
   campaign: any;
-  closeTooltip: () => void;
   refetch: () => void;
 }) {
   const [showModal, setShowModal] = React.useState(false);
@@ -18,33 +23,35 @@ function Tooltip({
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
   return (
-    <div className="bg-[#EAEBF0] p-8 max-w-[200px] rounded-lg  cursor-pointer space-y-4 flex flex-col gap-2 justify-start text-sm">
-      <button
-        onClick={() => setShowModal(true)}
-        className="text-[#116114] font-medium"
-      >
-        Edit
-      </button>
-
-      <button
-        onClick={() => setShowPreview(true)}
-        className="text-[#116114] font-medium"
-      >
-        Preview
-      </button>
-
-      <button
-        onClick={() => setShowDeleteModal(true)}
-        className="text-[#E33B32] font-medium"
-      >
-        Delete
-      </button>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button>
+            <MoreHorizontal className="w-5 h-5" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setShowModal(true)}>
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setShowPreview(true)}>
+            Preview
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => setShowDeleteModal(true)}
+            className="text-red-600"
+          >
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <CampaignModal
         open={showModal}
         onClose={() => setShowModal(false)}
         refetch={refetch}
         campaignId={campaign.id}
+        campaignData={campaign}
       />
 
       <CampaignPreview
@@ -64,11 +71,10 @@ function Tooltip({
         campaignTitle={campaign.title}
         onSuccess={() => {
           refetch();
-          closeTooltip();
         }}
       />
-    </div>
+    </>
   );
 }
 
-export default Tooltip;
+export default CampaignActionsDropdown;
