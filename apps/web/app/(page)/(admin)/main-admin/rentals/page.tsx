@@ -108,7 +108,7 @@ export default function RentalsPage() {
     refetch: refetchStats,
   } = useFetchData("rentals/stats");
 
-  const rentals: Rental[] = rentalsResponse?.data || [];
+  const rentals: Rental[] = rentalsResponse?.data?.items || [];
   const stats: RentalStats = statsResponse?.data || {
     total: 0,
     rented: 0,

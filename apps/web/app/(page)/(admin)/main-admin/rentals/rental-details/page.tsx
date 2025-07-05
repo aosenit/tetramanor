@@ -3,7 +3,7 @@ import Details from './components/Details'
 
 function page() {
   return (
-    <div><Details/></div>
+    <Details/>
   )
 }
 
