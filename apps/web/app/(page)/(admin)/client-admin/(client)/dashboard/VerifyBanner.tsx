@@ -1,7 +1,11 @@
+"use client"
+
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 
 export function VerifyBanner() {
+  const router = useRouter();
   return (
     <div className="bg-[#EB8A43]/10 border border-orange-100 rounded-lg p-4 flex items-center justify-between flex-wrap gap-4">
       <div className="flex items-center gap-3">
@@ -12,7 +16,7 @@ export function VerifyBanner() {
           Verify your identity to unlock full access to your account features.
         </p>
       </div>
-      <Button className="bg-[var(--primary-green)] hover:bg-[var(--primary-green)]/90 text-white min-w-[100px] rounded-sm">
+      <Button className="bg-[var(--primary-green)] hover:bg-[var(--primary-green)]/50 text-white min-w-[100px] rounded-sm" onClick={() => router.push('/client-admin/settings')}>
         Start KYC
       </Button>
     </div>
