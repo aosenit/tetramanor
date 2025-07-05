@@ -197,7 +197,7 @@ export default function NotificationsPage() {
           <p className="text-[#868686] text-xs mt-1">{notification.message}</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="text-xs text-[#868686] whitespace-nowrap">
+        <div className="text-xs text-[#868686] whitespace-nowrap">
             {formatTime(notification.createdAt)}
           </div>
           {notification.status === "UNREAD" && (
@@ -217,7 +217,7 @@ export default function NotificationsPage() {
         </div>
       </div>
     ));
-
+  
   if (isLoading) {
     return <Loader />;
   }
@@ -284,15 +284,15 @@ export default function NotificationsPage() {
         ) : (
           ["today", "yesterday", "older"].map((category) => {
             const list = groupedNotifications[category] || [];
-            if (list.length === 0) return null;
-            return (
-              <div key={category}>
-                <h2 className="text-sm font-medium text-gray-500 mb-4 uppercase">
-                  {category}
-                </h2>
-                <div className="space-y-4">{renderNotifications(list)}</div>
-              </div>
-            );
+          if (list.length === 0) return null;
+          return (
+            <div key={category}>
+              <h2 className="text-sm font-medium text-gray-500 mb-4 uppercase">
+                {category}
+              </h2>
+              <div className="space-y-4">{renderNotifications(list)}</div>
+            </div>
+          );
           })
         )}
       </div>

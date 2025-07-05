@@ -361,32 +361,32 @@ export function NotificationsPanel() {
                 ["today", "yesterday", "older"].map((category) => {
                   const list = groupedNotifications[category] || [];
                   if (list.length === 0) return null;
-                  return (
+                return (
                     <div key={category} className="mt-4">
-                      <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase">
+                    <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase">
                         {category}
-                      </div>
-                      <div className="divide-y">
+                    </div>
+                    <div className="divide-y">
                         {list.map((notification) => (
-                          <div
-                            key={notification.id}
-                            className={cn(
-                              "px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors",
+                        <div
+                          key={notification.id}
+                          className={cn(
+                            "px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors",
                               notification.status === "UNREAD" && "bg-gray-50"
-                            )}
-                          >
-                            <div className="bg-gray-100 rounded-full p-2 h-10 w-10 flex items-center justify-center flex-shrink-0">
-                              {getNotificationIcon(notification.type)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex justify-between">
-                                <h3 className="font-medium">
-                                  {notification.title}
-                                </h3>
+                          )}
+                        >
+                          <div className="bg-gray-100 rounded-full p-2 h-10 w-10 flex items-center justify-center flex-shrink-0">
+                            {getNotificationIcon(notification.type)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between">
+                              <h3 className="font-medium">
+                                {notification.title}
+                              </h3>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm text-gray-500">
+                              <span className="text-sm text-gray-500">
                                     {formatTime(notification.createdAt)}
-                                  </span>
+                              </span>
                                   {notification.status === "UNREAD" && (
                                     <Button
                                       variant="ghost"
@@ -409,12 +409,12 @@ export function NotificationsPanel() {
                               <p className="text-sm text-gray-600 mt-1">
                                 {notification.message}
                               </p>
-                            </div>
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
-                  );
+                  </div>
+                );
                 })
               )}
             </div>
@@ -443,29 +443,29 @@ export function NotificationsPanel() {
                       (n) => n.status === "UNREAD"
                     ) || [];
                   if (list.length === 0) return null;
-                  return (
+                return (
                     <div key={category} className="mt-4">
-                      <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase">
+                    <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase">
                         {category}
-                      </div>
-                      <div className="divide-y">
+                    </div>
+                    <div className="divide-y">
                         {list.map((notification) => (
-                          <div
-                            key={notification.id}
-                            className="px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors bg-gray-50"
-                          >
-                            <div className="bg-gray-100 rounded-full p-2 h-10 w-10 flex items-center justify-center flex-shrink-0">
-                              {getNotificationIcon(notification.type)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex justify-between">
-                                <h3 className="font-medium">
-                                  {notification.title}
-                                </h3>
+                        <div
+                          key={notification.id}
+                          className="px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors bg-gray-50"
+                        >
+                          <div className="bg-gray-100 rounded-full p-2 h-10 w-10 flex items-center justify-center flex-shrink-0">
+                            {getNotificationIcon(notification.type)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between">
+                              <h3 className="font-medium">
+                                {notification.title}
+                              </h3>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm text-gray-500">
+                              <span className="text-sm text-gray-500">
                                     {formatTime(notification.createdAt)}
-                                  </span>
+                              </span>
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -486,12 +486,12 @@ export function NotificationsPanel() {
                               <p className="text-sm text-gray-600 mt-1">
                                 {notification.message}
                               </p>
-                            </div>
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
-                  );
+                  </div>
+                );
                 })
               )}
             </div>

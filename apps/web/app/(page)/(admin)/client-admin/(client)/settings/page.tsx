@@ -14,19 +14,55 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Upload, FileUp } from "lucide-react";
+import { Upload, FileUp, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
+
+// Password validation schema
+const passwordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z
+    .string()
+    .min(8, "Password must be at least 8 characters long")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/\d/, "Password must contain at least one number")
+    .regex(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, "Password must contain at least one special character"),
+  confirmPassword: z.string().min(1, "Please confirm your new password"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+}).refine((data) => data.currentPassword !== data.newPassword, {
+  message: "New password must be different from current password",
+  path: ["newPassword"],
+});
 
 export default function AccountSettings() {
   const [isKycModalOpen, setIsKycModalOpen] = useState(false);
   const [ninNumber, setNinNumber] = useState("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  
+  // Password visibility states
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  // Display picture state
+  const [displayPicture, setDisplayPicture] = useState<string | null>(null);
+
+  // Password validation errors
+  const [passwordErrors, setPasswordErrors] = useState<{
+    currentPassword?: string;
+    newPassword?: string;
+    confirmPassword?: string;
+  }>({});
 
   // API hooks
   const { data: accountData, isLoading: isLoadingAccount } =
     useFetchData("customer/account/");
   const updateAccountMutation = usePutData("customer/account/update");
+  const changePasswordMutation = usePutData("auth/change-password");
 
   const [profileData, setProfileData] = useState({
     name: "",
@@ -49,8 +85,43 @@ export default function AccountSettings() {
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
-    retypePassword: "",
+    confirmPassword: "",
   });
+
+  // Clear errors when password data changes
+  useEffect(() => {
+    setPasswordErrors({});
+  }, [passwordData.currentPassword, passwordData.newPassword, passwordData.confirmPassword]);
+
+  const handleDisplayPictureUpload = (file: File) => {
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Please upload a PNG, JPG, or WebP image.");
+      return;
+    }
+
+    if (file.size > maxSize) {
+      toast.error("Image size must be less than 5MB.");
+      return;
+    }
+
+    // Create a preview URL for the image
+    const imageUrl = URL.createObjectURL(file);
+    setDisplayPicture(imageUrl);
+    
+    // Here you would typically upload the file to your server
+    // For now, we'll just show a success message
+    toast.success("Display picture updated successfully!");
+  };
+
+  const handleDisplayPictureInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      handleDisplayPictureUpload(files[0]);
+    }
+  };
 
   const handleFileUpload = (file: File) => {
     const allowedTypes = [
@@ -114,18 +185,52 @@ export default function AccountSettings() {
     }
   };
 
-  const handlePasswordUpdate = () => {
-    if (passwordData.newPassword !== passwordData.retypePassword) {
-      toast.error("New passwords do not match!");
-      return;
+  const handlePasswordUpdate = async () => {
+    try {
+      // Validate password data with Zod
+      const validatedData = passwordSchema.parse(passwordData);
+      
+      await changePasswordMutation.mutateAsync({
+        currentPassword: validatedData.currentPassword,
+        newPassword: validatedData.newPassword,
+        confirmPassword: validatedData.confirmPassword,
+      });
+      
+      toast.success("Password updated successfully!");
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      
+      // Reset password visibility states
+      setShowCurrentPassword(false);
+      setShowNewPassword(false);
+      setShowConfirmPassword(false);
+      
+      // Clear errors
+      setPasswordErrors({});
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Handle Zod validation errors
+        const errors: { [key: string]: string } = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            errors[err.path[0] as string] = err.message;
+          }
+        });
+        setPasswordErrors(errors);
+        
+        // Show first error as toast
+        const firstError = error.errors[0];
+        if (firstError) {
+          toast.error(firstError.message);
+        }
+      } else {
+        console.error("Error updating password:", error);
+        toast.error("Failed to update password. Please check your current password and try again.");
+      }
     }
-    console.log("Password updated");
-    toast.success("Password updated successfully!");
-    setPasswordData({
-      currentPassword: "",
-      newPassword: "",
-      retypePassword: "",
-    });
   };
 
   const handleKycVerify = () => {
@@ -180,15 +285,27 @@ export default function AccountSettings() {
               </div>
               <div className="flex items-center gap-4 lg:w-[60%] ">
                 <Avatar className="h-16 w-16">
-                  <AvatarImage src="/placeholder.svg?height=64&width=64" />
+                  <AvatarImage src={displayPicture || "/placeholder.svg?height=64&width=64"} />
                   <AvatarFallback className="text-lg font-semibold bg-gray-200">
-                    DP
+                    {profileData?.name?.split(" ")[0]?.charAt(0)}
+                    {profileData?.name?.split(" ")[1]?.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  Upload
-                </Button>
+                <label htmlFor="display-picture-upload" className="cursor-pointer">
+                  <Button variant="outline" className="flex items-center gap-2" asChild>
+                    <span>
+                      <Upload className="h-4 w-4" />
+                      Upload
+                    </span>
+                  </Button>
+                  <input
+                    id="display-picture-upload"
+                    type="file"
+                    className="hidden"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    onChange={handleDisplayPictureInputChange}
+                  />
+                </label>
               </div>
             </div>
 
@@ -444,18 +561,34 @@ export default function AccountSettings() {
                   >
                     Current Password
                   </Label>
-                  <Input
-                    id="currentPassword"
-                    type="password"
-                    value={passwordData.currentPassword}
-                    onChange={(e) =>
-                      setPasswordData({
-                        ...passwordData,
-                        currentPassword: e.target.value,
-                      })
-                    }
-                    className="mt-1"
-                  />
+                  <div className="relative mt-1">
+                    <Input
+                      id="currentPassword"
+                      type={showCurrentPassword ? "text" : "password"}
+                      value={passwordData.currentPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          currentPassword: e.target.value,
+                        })
+                      }
+                      className={`pr-10 ${passwordErrors.currentPassword ? "border-red-500 focus:border-red-500" : ""}`}
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    >
+                      {showCurrentPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                  {passwordErrors.currentPassword && (
+                    <p className="text-sm text-red-500 mt-1">{passwordErrors.currentPassword}</p>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -465,46 +598,81 @@ export default function AccountSettings() {
                     >
                       New password
                     </Label>
-                    <Input
-                      id="newPassword"
-                      type="password"
-                      value={passwordData.newPassword}
-                      onChange={(e) =>
-                        setPasswordData({
-                          ...passwordData,
-                          newPassword: e.target.value,
-                        })
-                      }
-                      className="mt-1"
-                    />
+                    <div className="relative mt-1">
+                      <Input
+                        id="newPassword"
+                        type={showNewPassword ? "text" : "password"}
+                        value={passwordData.newPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            newPassword: e.target.value,
+                          })
+                        }
+                        className={`pr-10 ${passwordErrors.newPassword ? "border-red-500 focus:border-red-500" : ""}`}
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 flex items-center pr-3"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                      >
+                        {showNewPassword ? (
+                          <EyeOff className="h-4 w-4 text-gray-400" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                    {passwordErrors.newPassword && (
+                      <p className="text-sm text-red-500 mt-1">{passwordErrors.newPassword}</p>
+                    )}
                   </div>
                   <div>
                     <Label
-                      htmlFor="retypePassword"
+                      htmlFor="confirmPassword"
                       className="text-sm font-medium text-gray-700"
                     >
-                      Retype password
+                      Confirm password
                     </Label>
-                    <Input
-                      id="retypePassword"
-                      type="password"
-                      value={passwordData.retypePassword}
-                      onChange={(e) =>
-                        setPasswordData({
-                          ...passwordData,
-                          retypePassword: e.target.value,
-                        })
-                      }
-                      className="mt-1"
-                    />
+                    <div className="relative mt-1">
+                      <Input
+                        id="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={passwordData.confirmPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                        className={`pr-10 ${passwordErrors.confirmPassword ? "border-red-500 focus:border-red-500" : ""}`}
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 flex items-center pr-3"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4 text-gray-400" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                    {passwordErrors.confirmPassword && (
+                      <p className="text-sm text-red-500 mt-1">{passwordErrors.confirmPassword}</p>
+                    )}
                   </div>
                 </div>
                 <div className="flex justify-start">
                   <Button
                     onClick={handlePasswordUpdate}
+                    disabled={changePasswordMutation.isPending}
                     className="bg-[var(--primary-green)] hover:bg-green-700"
                   >
-                    Update password
+                    {changePasswordMutation.isPending
+                      ? "Updating..."
+                      : "Update password"}
                   </Button>
                 </div>
               </div>

@@ -142,26 +142,26 @@ function ResetCodePageContent() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
-          <div className="flex justify-center gap-4">
-            {code.map((digit, index) => (
-              <Input
-                key={index}
-                ref={(el: HTMLInputElement | null): void => {
-                  inputRefs.current[index] = el;
-                }}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
+        <div className="flex justify-center gap-4">
+          {code.map((digit, index) => (
+            <Input
+              key={index}
+              ref={(el: HTMLInputElement | null): void => {
+                inputRefs.current[index] = el;
+              }}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
                 className={`size-12 lg:size-14 text-center text-xl ${
                   codeError ? "border-red-500" : ""
                 }`}
-                value={digit}
-                onChange={(e) => handleChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                placeholder="*"
-                required
-              />
-            ))}
+              value={digit}
+              onChange={(e) => handleChange(index, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(index, e)}
+              placeholder="*"
+              required
+            />
+          ))}
           </div>
           {codeError && (
             <p className="text-red-500 text-sm text-center">{codeError}</p>

@@ -107,7 +107,7 @@ export default function EditBlog() {
         name: image.name,
         publicId: image.publicId,
         createdAt: image.createdAt || new Date().toISOString(),
-        isPrimary: false,
+          isPrimary: false,
       }));
 
       setCoverImages(coverImagesData);
