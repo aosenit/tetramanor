@@ -182,37 +182,19 @@ export function AppSidebar() {
 
       <SidebarFooter className="px-4 space-y-2">
         <SidebarMenu>
-          {/* System Settings */}
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="text-gray-300 hover:text-white hover:bg-gray-800"
-            >
-              <Button
-                asChild
-                className="flex items-center gap-3 py-6 rounded-md w-full text-left"
-              >
-                <Link href={`${route}/settings`}>
-                  <FileText className="h-5 w-5" />
-                  <span>System Settings</span>
-                </Link>
-              </Button>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
           {/* Sign Out */}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="text-gray-300 hover:text-white hover:bg-gray-800"
+              className={`text-gray-300 hover:text-white hover:bg-gray-800 py-6 `}
             >
-              <Button
+              <button
                 onClick={() => setOpen(true)}
-                className="flex items-center gap-3  py-6 rounded-md w-full text-left"
+                className="flex items-center gap-3 px-3 py-3 rounded-md"
               >
                 <LogOut className="h-5 w-5" />
                 <span>Sign Out</span>
-              </Button>
+              </button>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
