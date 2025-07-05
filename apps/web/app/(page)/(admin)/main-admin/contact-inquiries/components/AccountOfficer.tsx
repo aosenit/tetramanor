@@ -86,7 +86,7 @@ export default function AccountOfficer() {
             onClick={() => setShowAddAgent(true)}
             className="bg-[#F5F5F5] hover:bg-[#F5F5F5]  text-[#4C5560] text-sm "
           >
-            Add agent
+            Add account officer
           </Button>
         </div>
 

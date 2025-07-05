@@ -89,9 +89,8 @@ export default function FeaturedProperty() {
           <div className="space-y-2">
             <p className="text-sm text-[#000000] font-medium">
               Current -{" "}
-              <span className="text-[#116114] text-sm">Queen Mary –</span>-
+              <span className="text-[#116114] text-sm">Queen Mary – </span>-
               <span className="text-[#116114] text-sm">
-                {" "}
                 2 Bedroom Apartment
               </span>
             </p>

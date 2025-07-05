@@ -1,70 +1,118 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import Image from "next/image";
 import three from "@/assets/admin/home/three.webp";
 import one from "@/assets/admin/dashboard/one.webp";
 import two from "@/assets/admin/dashboard/two.webp";
 import four from "@/assets/admin/dashboard/four.webp";
 import PropertyStatisticsChart from "@/components/Chart";
-import PropertyActivity from "@/components/notifications";
 import {
   IoMdArrowRoundForward,
   IoMdNotificationsOutline,
 } from "react-icons/io";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import Loader from "@/components/Loader";
+import { useFetchData } from "@/hooks/useApi";
+import { atom, useAtom } from "jotai";
+import { useRouter } from "next/navigation";
 
-const properties = [
-  {
-    name: "TM HighGardens",
-    location: "Eko Atlantic",
-    status: "Ongoing",
-    statusColor: "text-green-600",
-    dateAdded: "March 21 2025",
-  },
-  {
-    name: "Queen Mary",
-    location: "Maryland",
-    status: "Sold out",
-    statusColor: "text-red-600",
-    dateAdded: "April 19 2025",
-  },
-  {
-    name: "TM HighGardens",
-    location: "Eko Atlantic",
-    status: "Ongoing",
-    statusColor: "text-green-600",
-    dateAdded: "March 21 2025",
-  },
-];
-const investments = [
-  {
-    type: "Fixed ROI",
-    projects: "4 projects",
-    roi: "60%",
-    status: "Active",
-    statusColor: "text-green-600",
-  },
-  {
-    type: "Equity share",
-    projects: "2 projects",
-    roi: "60%",
-    status: "Pending",
-    statusColor: "text-yellow-600",
-  },
-];
+// Notification atom
+const notificationsAtom = atom([]);
+
+function useNotifications() {
+  const [notifications, setNotifications] = useAtom(notificationsAtom);
+  const { data, isLoading, isError } = useFetchData("admin/notifications");
+
+  useEffect(() => {
+    if (data?.data) setNotifications(data.data);
+  }, [data, setNotifications]);
+
+  return { notifications, setNotifications, isLoading, isError };
+}
+
+function NotificationList() {
+  const { notifications, setNotifications, isLoading, isError } =
+    useNotifications();
+
+  const toggleRead = (id: string) => {
+    setNotifications((prev: any) =>
+      prev.map((n: any) => (n.id === id ? { ...n, read: !n.read } : n))
+    );
+  };
+
+  if (isLoading)
+    return <div className="p-4 text-center">Loading notifications...</div>;
+  if (isError)
+    return (
+      <div className="p-4 text-center text-red-500">
+        Failed to load notifications.
+      </div>
+    );
+  if (!notifications.length)
+    return (
+      <div className="p-4 text-center text-gray-400">No notifications.</div>
+    );
+
+  return (
+    <div className="divide-y">
+      {notifications.map((n: any) => (
+        <div key={n.id} className="flex items-center gap-3 py-2 px-1">
+          <input
+            type="checkbox"
+            checked={!!n.read}
+            onChange={() => toggleRead(n.id)}
+            className="accent-green-600"
+          />
+          <div className="flex-1">
+            <div className="font-medium text-sm text-[#181818]">{n.title}</div>
+            <div className="text-xs text-gray-500">{n.body}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function Dashboard() {
+  const { data, isLoading, isError, error } = useFetchData("admin/stats");
+  const stats = data?.data || {};
+  const router = useRouter();
+  if (isLoading) {
+    return <Loader />;
+  }
+  if (isError) {
+    return (
+      <div className="p-8 text-center text-red-500 font-medium">
+        {error?.message || "Failed to load dashboard stats."}
+      </div>
+    );
+  }
+  if (!stats || Object.keys(stats).length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <Image
+          src={three}
+          alt="empty"
+          width={64}
+          height={64}
+          className="mb-4 opacity-60"
+        />
+        <h2 className="text-lg font-semibold text-gray-700 mb-2">
+          No Data Available
+        </h2>
+        <p className="text-gray-500 mb-4 max-w-xs mx-auto">
+          There is currently no dashboard data to display. Please check back
+          later.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <Suspense fallback={<Loader />}>
       <div className="space-y-4">
@@ -82,10 +130,11 @@ export default function Dashboard() {
             className="pl-10 max-w-full bg-[#E5E5E7] rounded-lg py-6"
           />
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <Button
             variant="outline"
             className="h-12 text-sm text-[#858C95] rounded-lg w-fit justify-start"
+            onClick={() => router.push("/main-admin/properties/add-properties")}
           >
             Add new property
             <IoMdArrowRoundForward className="h-4 w-4  mr-2" />
@@ -93,6 +142,9 @@ export default function Dashboard() {
           <Button
             variant="outline"
             className="h-12 w-fit text-sm text-[#858C95] rounded-lg justify-start"
+            onClick={() =>
+              router.push("/main-admin/investments/add-investment")
+            }
           >
             Add new investment
             <IoMdArrowRoundForward className="h-4 w-4 mr-2" />
@@ -100,6 +152,7 @@ export default function Dashboard() {
           <Button
             variant="outline"
             className="h-12 w-fit text-sm text-[#858C95] rounded-lg justify-start"
+            onClick={() => router.push("/main-admin/rentals/edit-rentals")}
           >
             Add new rental
             <IoMdArrowRoundForward className="h-4 w-4 mr-2" />
@@ -107,6 +160,7 @@ export default function Dashboard() {
           <Button
             variant="outline"
             className="h-12 text-sm w-fit text-[#858C95] rounded-lg justify-start"
+            onClick={() => router.push("/main-admin/blog-posts/edit-blog")}
           >
             Add new blog post
             <IoMdArrowRoundForward className="h-4 w-4 mr-2" />
@@ -121,12 +175,16 @@ export default function Dashboard() {
               <Image src={three} alt="property" width={35} height={35} />
             </CardHeader>
             <CardContent className="flex items-center gap-2">
-              <div className="text-xl text-[#116114] font-bold">400</div>
+              <div className="text-xl text-[#116114] font-bold">
+                {stats.totalProperties ?? 0}
+              </div>
               <p className="text-xs text-muted-foreground">
-                <span className="text-[#116114] font-medium text-sm">(150</span>{" "}
+                <span className="text-[#116114] font-medium text-sm">
+                  ({stats.totalUnitPurchased ?? 0}
+                </span>{" "}
                 for rent{" "}
                 <span className="text-[#116114] font-medium text-sm ml-5">
-                  250
+                  {stats.totalRented ?? 0}
                 </span>{" "}
                 for sale{" "}
                 <span className="text-[#116114] font-medium text-sm">)</span>
@@ -142,9 +200,11 @@ export default function Dashboard() {
               <Image src={one} alt="property" width={35} height={35} />
             </CardHeader>
             <CardContent className="flex items-center gap-2">
-              <div className="text-xl text-[#116114] font-bold">45</div>
+              <div className="text-xl text-[#116114] font-bold">
+                ₦{stats.totalInvestments?.toLocaleString() ?? 0}
+              </div>
               <p className="text-xs text-[#4C5560] text-muted-foreground">
-                3 live campaigns
+                {stats.liveCampaign ?? 0} live campaigns
               </p>
             </CardContent>
           </Card>
@@ -157,7 +217,9 @@ export default function Dashboard() {
               <Image src={two} alt="property" width={35} height={35} />
             </CardHeader>
             <CardContent className="flex items-center gap-2">
-              <div className="text-xl text-[#116114] font-bold">400</div>
+              <div className="text-xl text-[#116114] font-bold">
+                {stats.totalCustomers ?? 0}
+              </div>
               <p className="text-xs text-muted-foreground">
                 Tetramanor customers
               </p>
@@ -186,21 +248,27 @@ export default function Dashboard() {
           <div className="w-full bg-white rounded-lg overflow-hidden">
             <div className="grid grid-cols-4 gap-4 bg-[#e5e5e7]  p-4 text-sm font-medium text-[#116114]">
               <p>Property</p>
-              <p>Location</p>
-              <p>Status</p>
+              <p>Price</p>
               <p>Date Added</p>
+              <p>Status</p>
             </div>
-            {properties.map((property, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-4 text-[#181818] gap-4 p-4 border-t text-xs"
-              >
-                <p className="font-medium">{property.name}</p>
-                <p>{property.location}</p>
-                <p className={property.statusColor}>{property.status}</p>
-                <p>{property.dateAdded}</p>
+            {stats.recentProperties && stats.recentProperties.length > 0 ? (
+              stats.recentProperties.map((property: any, index: number) => (
+                <div
+                  key={property.id || index}
+                  className="grid grid-cols-4 text-[#181818] gap-4 p-4 border-t text-xs"
+                >
+                  <p className="font-medium">{property.name}</p>
+                  <p>₦{property.price?.toLocaleString() ?? 0}</p>
+                  <p>{new Date(property.createdAt).toLocaleDateString()}</p>
+                  <p className="text-green-600">New</p>
+                </div>
+              ))
+            ) : (
+              <div className="p-4 text-center text-gray-400">
+                No recent properties.
               </div>
-            ))}
+            )}
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -225,23 +293,31 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="w-full border rounded-lg  bg-white ">
-              <div className="grid grid-cols-4 bg-[#e5e5e7]  p-4 text-sm font-medium text-[#116114]">
-                <p>Investment type</p>
-                <p>No of Project</p>
-                <p>Average ROI</p>
-                <p>Status</p>
+              <div className="grid grid-cols-3 bg-[#e5e5e7]  p-4 text-sm font-medium text-[#116114]">
+                <p>Property</p>
+                <p>Price</p>
+                <p>Date</p>
               </div>
-              {investments.map((item, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-4 text-[#181818] gap-4 p-4 border-t text-xs"
-                >
-                  <p className="text-xs">{item.type}</p>
-                  <p className="text-xs">{item.projects}</p>
-                  <p className="text-xs">{item.roi}</p>
-                  <p className={item.statusColor}>{item.status}</p>
+              {stats.recentInvestments && stats.recentInvestments.length > 0 ? (
+                stats.recentInvestments.map((item: any, index: number) => (
+                  <div
+                    key={item.id || index}
+                    className="grid grid-cols-3 text-[#181818] gap-4 p-4 border-t text-xs"
+                  >
+                    <p className="text-xs">{item.propertyName}</p>
+                    <p className="text-xs">
+                      ₦{item.price?.toLocaleString() ?? 0}
+                    </p>
+                    <p className="text-xs">
+                      {new Date(item.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <div className="p-4 text-center text-gray-400">
+                  No recent investments.
                 </div>
-              ))}
+              )}
             </div>
 
             <div className="flex flex-col gap-6">
@@ -261,7 +337,7 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
-              <PropertyActivity />
+              <NotificationList />
             </div>
           </div>
           <div>
@@ -276,10 +352,10 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-4 text-xs">
                 <PropertyStatisticsChart
-                  total={400}
-                  forSale={60}
-                  forRent={30}
-                  rentedOut={10}
+                  total={stats.totalProperties ?? 0}
+                  forSale={stats.inventoryBreakdown?.percentageSold ?? 0}
+                  forRent={stats.inventoryBreakdown?.percentageRentedOut ?? 0}
+                  rentedOut={stats.totalRented ?? 0}
                 />
               </CardContent>
             </Card>
