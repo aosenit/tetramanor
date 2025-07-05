@@ -22,9 +22,9 @@ const Header = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
   const { handleLogout } = useLogOut();
   const [openModal, setOpenModal] = useState(false);
   const router = useRouter();
-  const { notifications, isLoading } = useNoti();
+  const { notifications} = useNoti();
 
-  console.log(notifications);
+ 
 
   return (
     <header className="sticky top-0 z-30 bg-white border-b h-16 flex items-center justify-between px-4 lg:px-6">
@@ -46,18 +46,16 @@ const Header = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
             <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-              1
+              {notifications?.items?.filter((item) => item?.status?.toLowerCase() === "unread")?.length || 0}
             </span>
           </Button>
         </div>
 
         <Avatar className="h-8 w-8">
           <AvatarFallback className="bg-[var(--primary-green)] text-white uppercase">
-            {/* initials of the user name  */}
-            {user?.name
-              ?.split(" ")
-              .map((name) => name.charAt(0))
-              .join("")}
+            
+              {user?.name?.split(" ")[0]?.charAt(0)}
+              {user?.name?.split(" ")[1]?.charAt(0)}
           </AvatarFallback>
         </Avatar>
         <span className="hidden md:inline-block">{user?.name}</span>

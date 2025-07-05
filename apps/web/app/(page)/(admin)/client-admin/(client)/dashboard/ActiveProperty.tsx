@@ -22,27 +22,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
-type Property = {
-  id: string;
-  name: string;
-  image: string;
-  location: string;
-  price: {
-    naira: string;
-    dollar: string;
-  };
-  status: "Paid" | "Pending" | "Overdue";
-  accountOfficer: {
-    name: string;
-    avatar: string;
-  };
-  unitsOwned: string;
-};
+
 
 export function ActiveProperties({ data }: { data: any }) {
   const properties = data?.activeProperties;
-
+  const router = useRouter();
   return (
     <div className="space-y-4 bg-white rounded-lg border divide-y">
       <div className="flex justify-between items-center px-4 pt-4">
@@ -85,32 +71,28 @@ export function ActiveProperties({ data }: { data: any }) {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="h-12 w-16 rounded overflow-hidden">
-                          <Image
-                            src={property?.image || "/placeholder.svg"}
-                            alt={property?.name}
-                            className="h-8 w-8 object-cover"
-                            width={60}
-                            height={60}
-                          />
+                        <div className="">
+                         
+                          <Avatar className="size-10">
+                            <AvatarImage src={property?.images[0]} alt={property?.name} />
+                            <AvatarFallback>N/A</AvatarFallback>
+                          </Avatar>
                         </div>
                         <span className="font-medium">{property?.name}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{property?.location}</TableCell>
+                    <TableCell>{property?.address}</TableCell>
                     <TableCell>
                       <div>
                         <div className="font-medium">
-                          {property?.price?.naira}
+                          {property?.price?.toLocaleString()}
                         </div>
-                        <div className="text-gray-500 text-sm">
-                          {property?.price?.dollar}
-                        </div>
+                       
                       </div>
                     </TableCell>
                     <TableCell>
                       <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-sm font-medium text-green-800">
-                        {property?.status}
+                        {property?.status || "N/A"}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -123,12 +105,12 @@ export function ActiveProperties({ data }: { data: any }) {
                             }
                             alt={property?.accountOfficer?.name}
                           />
-                          <AvatarFallback>JP</AvatarFallback>
+                          <AvatarFallback>N/A</AvatarFallback>
                         </Avatar>
                         <span>{property?.accountOfficer?.name}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{property?.unitsOwned}</TableCell>
+                    <TableCell>{property?.totalUnitsPurchased}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -141,7 +123,7 @@ export function ActiveProperties({ data }: { data: any }) {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>View Details</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => router.push(`/client-admin/properties/property-overview?id=${property?.id}&name=${property?.name}`)}>View Details</DropdownMenuItem>
                           <DropdownMenuItem>Payment History</DropdownMenuItem>
                           <DropdownMenuItem>Documents</DropdownMenuItem>
                         </DropdownMenuContent>
