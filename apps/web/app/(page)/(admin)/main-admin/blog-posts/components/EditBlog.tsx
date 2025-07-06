@@ -5,6 +5,14 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, Upload, X, Save } from "lucide-react";
 import { MdArrowBackIosNew } from "react-icons/md";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -31,6 +39,8 @@ interface BlogPost {
   id: string;
   title: string;
   content: string;
+  featured?: boolean;
+  status?: string;
   coverImage?: {
     id: string;
     imageUrl: string;
@@ -47,7 +57,6 @@ interface BlogPost {
   }[];
   createdAt: string;
   updatedAt: string;
-  status?: string;
   author?: string;
 }
 
@@ -59,6 +68,8 @@ export default function EditBlog() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [featured, setFeatured] = useState(false);
+  const [status, setStatus] = useState("DRAFT");
   const [coverImages, setCoverImages] = useState<UploadedImage[]>([]);
   const [galleryImages, setGalleryImages] = useState<UploadedImage[]>([]);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
@@ -84,6 +95,8 @@ export default function EditBlog() {
       const blogPost: BlogPost = blogPostResponse.data;
       setTitle(blogPost.title || "");
       setContent(blogPost.content || "");
+      setFeatured(blogPost.featured || false);
+      setStatus(blogPost.status || "DRAFT");
 
       // Handle coverImage (single object)
       const coverImagesData = blogPost.coverImage
@@ -107,7 +120,7 @@ export default function EditBlog() {
         name: image.name,
         publicId: image.publicId,
         createdAt: image.createdAt || new Date().toISOString(),
-          isPrimary: false,
+        isPrimary: false,
       }));
 
       setCoverImages(coverImagesData);
@@ -125,6 +138,8 @@ export default function EditBlog() {
       const payload = {
         title: title.trim(),
         content: content.trim(),
+        featured: featured,
+        status: status,
         coverImage: coverImages.length > 0 ? coverImages[0].id : null,
         images: galleryImages.map((img) => img.id),
       };
@@ -148,9 +163,10 @@ export default function EditBlog() {
       const payload = {
         title: title.trim() || "Untitled Draft",
         content: content.trim() || "",
+        featured: featured,
+        status: "DRAFT",
         coverImage: coverImages.length > 0 ? coverImages[0].id : null,
         images: galleryImages.map((img) => img.id),
-        status: "DRAFT",
       };
 
       if (isEditing) {
@@ -285,6 +301,29 @@ export default function EditBlog() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Blog Settings */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                Featured Blog Post
+              </Label>
+
+              {/* Featured Checkbox */}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="featured"
+                  checked={featured}
+                  onCheckedChange={(checked) => setFeatured(checked as boolean)}
+                  disabled={isPending}
+                />
+                <Label
+                  htmlFor="featured"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Featured
+                </Label>
+              </div>
+            </div>
+
             {/* Cover Images */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <Label className="text-sm font-medium text-gray-700 mb-3 block">

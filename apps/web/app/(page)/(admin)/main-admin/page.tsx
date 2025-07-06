@@ -353,8 +353,13 @@ export default function Dashboard() {
               <CardContent className="space-y-4 text-xs">
                 <PropertyStatisticsChart
                   total={stats.totalProperties ?? 0}
-                  forSale={stats.inventoryBreakdown?.percentageSold ?? 0}
-                  forRent={stats.inventoryBreakdown?.percentageRentedOut ?? 0}
+                  forSale={
+                    Math.ceil(stats.inventoryBreakdown?.percentageSold) ?? 0
+                  }
+                  forRent={
+                    Math.ceil(stats.inventoryBreakdown?.percentageRentedOut) ??
+                    0
+                  }
                   rentedOut={stats.totalRented ?? 0}
                 />
               </CardContent>

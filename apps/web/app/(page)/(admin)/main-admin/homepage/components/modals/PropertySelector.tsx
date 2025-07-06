@@ -9,7 +9,7 @@ import PropertyCard from "../cards/Property";
 import four from "@/assets/admin/home/four.webp";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/services/axiosInstance";
-import { usePatchData } from "@/hooks/useApi";
+import { usePostData } from "@/hooks/useApi";
 import { toast } from "sonner";
 
 export default function PropertySelector({
@@ -26,9 +26,13 @@ export default function PropertySelector({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const {
-    mutate: updateFeaturedProperty,
+    mutateAsync: updateFeaturedProperty,
     isPending: isUpdatingFeaturedProperty,
-  } = usePatchData("admin/properties/featured");
+  } = usePostData(
+    type === "property"
+      ? "admin/properties/featured"
+      : "admin/rentals/highlight"
+  );
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Fetch properties using infinite query
@@ -50,13 +54,28 @@ export default function PropertySelector({
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage: any, allPages) => {
-      // If we got less than 10 items, we've reached the end
+      // Get total items from all pages so far
+      const totalItemsSoFar = allPages.reduce((total, page) => {
+        if (type === "property") {
+          return total + (page.data.items?.length || 0);
+        } else {
+          return total + (page.data?.length || 0);
+        }
+      }, 0);
+
+      // If we have less than 5 items total, don't load more
+      if (totalItemsSoFar < 5) {
+        return undefined;
+      }
+
+      // If we got less than 10 items in the last page, we've reached the end
       if (
         type === "property"
           ? lastPage.data.items.length < 10
           : lastPage.data.length < 10
       )
         return undefined;
+
       return allPages.length + 1;
     },
     enabled: open,
@@ -83,10 +102,7 @@ export default function PropertySelector({
   }, [open]);
 
   // Flatten all pages into a single array
-  const allProperties =
-    data?.pages.flatMap((page) =>
-      type === "property" ? page.data.items : page.data
-    ) || [];
+  const allProperties = data?.pages.flatMap((page) => page.data.items) || [];
 
   // Intersection Observer for infinite scrolling
   const lastElementRef = useCallback(
@@ -101,7 +117,8 @@ export default function PropertySelector({
         },
         {
           root: scrollContainerRef.current,
-          rootMargin: "100px",
+          rootMargin: "0px",
+          threshold: 0.1,
         }
       );
 
@@ -112,7 +129,7 @@ export default function PropertySelector({
     [fetchNextPage, hasNextPage, isFetchingNextPage]
   );
 
-  const handlePropertySelect = (property: any) => {
+  const handlePropertySelect = async (property: any) => {
     // Prevent duplicate calls for the same property
     const propertyId = type === "property" ? property.id : property.propertyId;
     if (
@@ -126,18 +143,21 @@ export default function PropertySelector({
 
     setSelectedProperty(property);
     onPropertySelect?.(property);
-    if (type === "property") {
-      updateFeaturedProperty(
-        {
-          id: property.id,
-          featured: true,
-        },
-        {
-          onSuccess: () => {
-            toast.success("Featured property updated successfully");
-          },
-        }
+
+    try {
+      await updateFeaturedProperty(
+        type === "property"
+          ? {
+              id: property.id,
+              featured: true,
+            }
+          : {
+              rentalId: property.propertyId,
+            }
       );
+      toast.success("Featured property updated successfully");
+    } catch (error: any) {
+      console.log(error);
     }
   };
 
