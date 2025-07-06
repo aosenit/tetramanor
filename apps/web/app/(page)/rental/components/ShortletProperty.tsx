@@ -2,13 +2,10 @@
 
 import {
   FaSearch,
-  FaChevronDown,
   FaExpand,
   FaDoorOpen,
-  FaShieldAlt,
   FaMapMarkerAlt,
   FaHome,
-  FaFilter,
 } from "react-icons/fa";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
@@ -16,27 +13,24 @@ import { MdBed } from "react-icons/md";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
-import two from "@/assets/rental/two.webp";
-import three from "@/assets/rental/three.webp";
-import four from "@/assets/rental/four.webp";
-import five from "@/assets/rental/five.webp";
-import six from "@/assets/rental/six.webp";
-import seven from "@/assets/rental/seven.webp";
-import eleven from "@/assets/rental/eleven.jpg";
-import twelve from "@/assets/rental/twelve.jpg";
-import thirteen from "@/assets/rental/thirteen.jpg";
-import fourteen from "@/assets/rental/fourteen.jpg";
-import fifteen from "@/assets/rental/fifteen.jpg";
-import sixteen from "@/assets/rental/sixteen.jpg";
+import placeholder from "@/assets/placeholder.svg";
+import { Input } from "@/components/ui/input";
 
 // Image mapping based on construction status
 const constructionImages = {
-  ONGOING: [two, three, four],
-  COMPLETED: [eleven, twelve, thirteen],
+  ONGOING: [placeholder, placeholder, placeholder],
+  COMPLETED: [placeholder, placeholder, placeholder],
 };
 
 // Fallback images for properties without images
-const fallbackImages = [five, six, seven, fourteen, fifteen, sixteen];
+const fallbackImages = [
+  placeholder,
+  placeholder,
+  placeholder,
+  placeholder,
+  placeholder,
+  placeholder,
+];
 
 interface Property {
   id: string;
@@ -66,18 +60,6 @@ interface Property {
   unitTypes: string[];
   images: string[];
   document: string[];
-}
-
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data: {
-    items: Property[];
-    page: number;
-    total: number;
-    limit: number;
-  };
-  statusCode: number;
 }
 
 // Loading Skeleton Component
@@ -288,37 +270,41 @@ export default function PropertyListing() {
           >
             <div className="relative w-full md:max-w-md">
               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
+              <Input
+                type="search"
                 placeholder="Search properties..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full rounded-md border bg-white border-gray-300 py-2 pl-10 pr-4 focus:border-gray-500 focus:outline-none"
               />
             </div>
-            <div className="flex items-center gap-2">
-              <select
-                value={filters.propertyStatus}
-                onChange={(e) =>
-                  handleFilterChange("propertyStatus", e.target.value)
-                }
-                className="rounded-md border bg-white border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none"
-              >
-                <option value="">All Status</option>
-                <option value="available">Available</option>
-                <option value="sold_out">Sold Out</option>
-              </select>
-              <select
-                value={filters.constructionStatus}
-                onChange={(e) =>
-                  handleFilterChange("constructionStatus", e.target.value)
-                }
-                className="rounded-md border bg-white border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none"
-              >
-                <option value="">All Construction</option>
-                <option value="ongoing">Ongoing</option>
-                <option value="completed">Completed</option>
-              </select>
+            <div className="flex items-center gap-2 ">
+              <div className="rounded-md border bg-white border-gray-300 px-5">
+                <select
+                  value={filters.propertyStatus}
+                  onChange={(e) =>
+                    handleFilterChange("propertyStatus", e.target.value)
+                  }
+                  className=" px-3 py-2 text-sm focus:border-gray-500 focus:outline-none"
+                >
+                  <option value="">All Status</option>
+                  <option value="available">Available</option>
+                  <option value="sold_out">Sold Out</option>
+                </select>
+              </div>
+              <div className="rounded-md border bg-white border-gray-300 px-5">
+                <select
+                  value={filters.constructionStatus}
+                  onChange={(e) =>
+                    handleFilterChange("constructionStatus", e.target.value)
+                  }
+                  className=" px-3 py-2 text-sm focus:border-gray-500 focus:outline-none"
+                >
+                  <option value="">All Construction</option>
+                  <option value="ongoing">Ongoing</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
               <button
                 type="button"
                 onClick={clearFilters}
@@ -427,7 +413,7 @@ function PropertyCard({
 }: PropertyCardProps) {
   const imageUrl =
     property.images.length > 0
-      ? property.images[0]
+      ? property.images[0]?.imageUrl
       : property.constructionStatus === "COMPLETED" ||
           property.constructionStatus === "ONGOING"
         ? getConstructionImage(property.constructionStatus)
