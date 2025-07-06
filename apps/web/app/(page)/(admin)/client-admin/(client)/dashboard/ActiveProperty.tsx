@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import placeholder from "@/assets/placeholder.svg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,8 +22,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-
 
 export function ActiveProperties({ data }: { data: any }) {
   const properties = data?.activeProperties;
@@ -72,9 +69,11 @@ export function ActiveProperties({ data }: { data: any }) {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="">
-                         
                           <Avatar className="size-10">
-                            <AvatarImage src={property?.images[0]} alt={property?.name} />
+                            <AvatarImage
+                              src={property?.images[0]?.imageUrl}
+                              alt={property?.name}
+                            />
                             <AvatarFallback>N/A</AvatarFallback>
                           </Avatar>
                         </div>
@@ -87,7 +86,6 @@ export function ActiveProperties({ data }: { data: any }) {
                         <div className="font-medium">
                           {property?.price?.toLocaleString()}
                         </div>
-                       
                       </div>
                     </TableCell>
                     <TableCell>
@@ -123,7 +121,15 @@ export function ActiveProperties({ data }: { data: any }) {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => router.push(`/client-admin/properties/property-overview?id=${property?.id}&name=${property?.name}`)}>View Details</DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              router.push(
+                                `/client-admin/properties/property-overview?id=${property?.id}&name=${property?.name}`
+                              )
+                            }
+                          >
+                            View Details
+                          </DropdownMenuItem>
                           <DropdownMenuItem>Payment History</DropdownMenuItem>
                           <DropdownMenuItem>Documents</DropdownMenuItem>
                         </DropdownMenuContent>

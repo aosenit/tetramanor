@@ -64,7 +64,7 @@ const AppSideBar: React.FC<Props> = ({ children }) => {
         {sidebarItems.map((item) => (
           <a
             key={item.id}
-            href={item.link}
+            href={"#"}
             className="flex gap-4 max-w-md items-start p-3 bg-[#f3f5f3] rounded-md shadow-sm hover:bg-gray-200 transition"
           >
             <div className="relative w-[100px] h-[60px] flex-shrink-0">

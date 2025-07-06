@@ -393,7 +393,7 @@ export default function EditRental() {
           </div>
           <div>
             <label className="block mb-1 text-sm text-[#323539] font-medium">
-              Country fee
+              Caution fee
             </label>
             <Input
               type="number"
