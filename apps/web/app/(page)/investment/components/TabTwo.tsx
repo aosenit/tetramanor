@@ -3,11 +3,12 @@ import React from "react";
 import Image from "next/image";
 import { FaCheck } from "react-icons/fa";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
-import a from "@/assets/investment/icons/a.webp"
-import b from "@/assets/investment/icons/b.webp"
-import c from "@/assets/investment/icons/c.webp"
-import d from "@/assets/investment/icons/d.webp"
-import four from "@/assets/investment/four.webp"
+import a from "@/assets/investment/icons/a.webp";
+import b from "@/assets/investment/icons/b.webp";
+import c from "@/assets/investment/icons/c.webp";
+import d from "@/assets/investment/icons/d.webp";
+import four from "@/assets/investment/four.webp";
+
 const steps = [
   {
     icon: a,
@@ -32,17 +33,19 @@ const steps = [
   },
 ];
 
-function TabTwo() {
+function TabTwo({ investments }: { investments: any[] }) {
+  const investment = investments[0];
+
   return (
     <div>
       <div className="space-y-12">
         <div className="bg-[#f9f4f0] rounded-xl p-2 md:p-4">
           <div className="grid md:grid-cols-2 gap-8">
             <div className="flex items-center justify-center">
-              <div className="bg-amber-100 rounded-xl  w-full">
+              <div className="bg-amber-100 rounded-xl w-full">
                 <Image
                   src={four}
-                  alt="Fixed ROI illustration showing houses and guaranteed returns"
+                  alt="Equity-Based investment illustration"
                   className="w-full"
                 />
               </div>
@@ -52,44 +55,55 @@ function TabTwo() {
                 <FaMoneyBillTrendUp className="text-[#116114]" />
               </div>
 
-              <h2 className="text-xl my-3 font-semibold">Equity-Based Model</h2>
+              <h2 className="text-xl my-3 font-semibold">
+                {investment?.projectName || "Equity-Based Model"}
+              </h2>
 
               <p className="text-[#0B0A0A] text-sm">
-                Investors share in the actual profits for larger, long-term
-                projects instead of receiving a fixed return.
+                {investment?.description ||
+                  "Investors share in the actual profits for larger, long-term projects instead of receiving a fixed return."}
               </p>
 
               <ul className="space-y-3 mt-10">
                 <li className="flex items-start gap-2">
                   <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
                   <div className="text-sm font-medium text-[#0B0A0A]">
-                    <span className="text-sm font-semibold">Project Size:</span>{" "}
-                    1,000 - 2,000 sqm (5 - 15 homes)
+                    <span className="text-sm font-semibold">
+                      Estimated ROI:
+                    </span>{" "}
+                    {investment?.estimatedROI || "Up to"}% on invested capital
                   </div>
                 </li>
                 <li className="flex items-start gap-2">
                   <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
                   <div className="text-sm font-medium text-[#0B0A0A]">
                     <span className="font-semibold text-sm">
-                      Investment Required:
+                      Minimum Investment:
                     </span>{" "}
-                    Minimum ₦50M per investor
+                    ₦{investment?.minAmount?.toLocaleString() || "50M"}{" "}
+                    {investment?.currency || "NGN"}
                   </div>
                 </li>
                 <li className="flex items-start gap-2">
                   <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
                   <div className="text-sm font-medium text-[#0B0A0A]">
-                    <span className=" text-sm font-semibold">Returns:</span> Up
-                    to 50% on invested capital
+                    <span className="text-sm font-semibold">Duration:</span>{" "}
+                    {investment?.duration || "12"} months
                   </div>
                 </li>
                 <li className="flex items-start gap-2">
                   <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
                   <div className="text-sm font-medium text-[#0B0A0A]">
-                    <span className="text-sm font-semibold">
-                      Number of Partners:
-                    </span>{" "}
-                    Maximum 5 per project
+                    <span className="text-sm font-semibold">Status:</span>{" "}
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        investment?.status === "PUBLISHED"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {investment?.status || "DRAFT"}
+                    </span>
                   </div>
                 </li>
               </ul>
@@ -99,8 +113,8 @@ function TabTwo() {
                   More benefits include:
                   <span className="text-[#116114] text-sm font-bold">
                     {" "}
-                    Guaranteed Returns, Lower Risk, Shorter Time Frame, Smaller
-                    Investment Size, Diversification Option.
+                    Profit Sharing, Higher Potential Returns, Long-term Growth,
+                    Portfolio Diversification, Real Estate Exposure.
                   </span>
                 </p>
               </div>

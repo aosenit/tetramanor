@@ -2,11 +2,12 @@
 import React from "react";
 import Image from "next/image";
 import { FaCheck, FaCoins } from "react-icons/fa";
-import a from "@/assets/investment/icons/a.webp"
-import b from "@/assets/investment/icons/b.webp"
-import c from "@/assets/investment/icons/c.webp"
-import d from "@/assets/investment/icons/d.webp"
-import two from "@/assets/investment/two.webp"
+import a from "@/assets/investment/icons/a.webp";
+import b from "@/assets/investment/icons/b.webp";
+import c from "@/assets/investment/icons/c.webp";
+import d from "@/assets/investment/icons/d.webp";
+import two from "@/assets/investment/two.webp";
+
 const steps = [
   {
     icon: a,
@@ -31,7 +32,9 @@ const steps = [
   },
 ];
 
-function TabOne() {
+function TabOne({ investments }: { investments: any[] }) {
+  const investment = investments[0];
+
   return (
     <div>
       <div className="space-y-12">
@@ -42,44 +45,55 @@ function TabOne() {
                 <FaCoins className="text-[#116114]" />
               </div>
 
-              <h2 className="text-xl my-3 font-semibold">Fixed ROI Model</h2>
+              <h2 className="text-xl my-3 font-semibold">
+                {investment?.projectName || "Fixed ROI Model"}
+              </h2>
 
               <p className="text-[#0B0A0A] text-sm">
-                This model targets smaller projects that can be completed within
-                18 months, offering predictable and low-risk returns.
+                {investment?.description ||
+                  "This model targets smaller projects that can be completed within 18 months, offering predictable and low-risk returns."}
               </p>
 
               <ul className="space-y-3 mt-10">
                 <li className="flex items-start gap-2">
                   <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
                   <div className="text-sm font-medium text-[#0B0A0A]">
-                    <span className="text-sm font-semibold">Project Size:</span>{" "}
-                    1,000 - 2,000 sqm (5 - 15 homes)
+                    <span className="text-sm font-semibold">
+                      Estimated ROI:
+                    </span>{" "}
+                    {investment?.estimatedROI || "Up to"}% on invested capital
                   </div>
                 </li>
                 <li className="flex items-start gap-2">
                   <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
                   <div className="text-sm font-medium text-[#0B0A0A]">
                     <span className="font-semibold text-sm">
-                      Investment Required:
+                      Minimum Investment:
                     </span>{" "}
-                    Minimum ₦50M per investor
+                    ₦{investment?.minAmount?.toLocaleString() || "50M"}{" "}
+                    {investment?.currency || "NGN"}
                   </div>
                 </li>
                 <li className="flex items-start gap-2">
                   <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
                   <div className="text-sm font-medium text-[#0B0A0A]">
-                    <span className=" text-sm font-semibold">Returns:</span> Up
-                    to 50% on invested capital
+                    <span className="text-sm font-semibold">Duration:</span>{" "}
+                    {investment?.duration || "12"} months
                   </div>
                 </li>
                 <li className="flex items-start gap-2">
                   <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
                   <div className="text-sm font-medium text-[#0B0A0A]">
-                    <span className="text-sm font-semibold">
-                      Number of Partners:
-                    </span>{" "}
-                    Maximum 5 per project
+                    <span className="text-sm font-semibold">Status:</span>{" "}
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        investment?.status === "PUBLISHED"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {investment?.status || "DRAFT"}
+                    </span>
                   </div>
                 </li>
               </ul>
@@ -97,7 +111,7 @@ function TabOne() {
             </div>
 
             <div className="flex items-center justify-center">
-              <div className="bg-amber-100 rounded-xl  w-full">
+              <div className="bg-amber-100 rounded-xl w-full">
                 <Image
                   src={two}
                   alt="Fixed ROI illustration showing houses and guaranteed returns"

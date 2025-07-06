@@ -7,16 +7,14 @@ import InvestmentModels from "./components/InvestmentModel";
 import WhyPartnerWithTetramore from "./components/WhyPartnerWithTetramore";
 import RoiCalculator from "./components/RoiCalculator";
 
-
-
 function Page() {
   return (
     <div className="bg-[#fafafa]">
-          <Hero />
+      <Hero />
       <InvestmentOpportunities />
       <InvestmentModels />
-      <RoiCalculator/>
-      <WhyPartnerWithTetramore/>
+      <RoiCalculator />
+      <WhyPartnerWithTetramore />
       <Footer />
     </div>
   );

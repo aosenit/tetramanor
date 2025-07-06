@@ -1,11 +1,80 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import TabOne from "./TabOne"
-import TabTwo from "./TabTwo"
+import { useState } from "react";
+import TabOne from "./TabOne";
+import TabTwo from "./TabTwo";
+import { useFetchData } from "@/hooks/useApi";
+
+// Skeleton Loading Component
+const InvestmentModelSkeleton = () => (
+  <div className="space-y-12">
+    <div className="bg-[#f9f4f0] rounded-xl p-2 md:p-4">
+      <div className="grid md:grid-cols-2 gap-8">
+        <div className="space-y-4">
+          {/* Icon skeleton */}
+          <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+
+          {/* Title skeleton */}
+          <div className="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
+
+          {/* Description skeleton */}
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+          </div>
+
+          {/* List items skeleton */}
+          <div className="space-y-3 mt-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex items-start gap-2">
+                <div className="w-3 h-3 bg-gray-200 rounded-full mt-1 animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+              </div>
+            ))}
+          </div>
+
+          {/* Benefits skeleton */}
+          <div className="space-y-2 mt-6">
+            <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Image skeleton */}
+        <div className="flex items-center justify-center">
+          <div className="bg-gray-200 rounded-xl w-full h-64 animate-pulse"></div>
+        </div>
+      </div>
+    </div>
+
+    {/* How it works skeleton */}
+    <div className="space-y-6">
+      <div className="h-8 bg-gray-200 rounded w-48 animate-pulse"></div>
+      <div className="grid grid-cols-1 mt-8 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="space-y-4">
+            <div className="w-8 h-8 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-5 bg-gray-200 rounded w-32 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 export default function InvestmentModels() {
-  const [activeTab, setActiveTab] = useState("fixed-roi")
+  const [activeTab, setActiveTab] = useState("fixed-roi");
+  const { data, isLoading, error } = useFetchData("investments");
+
+  // Defensive: data?.data is the array of investments
+  const investments = data?.data || [];
+  const fixedROI = investments.filter(
+    (inv: any) => inv.investmentType === "FIXED_ROI"
+  );
+  const equityShare = investments.filter(
+    (inv: any) => inv.investmentType === "EQUITY_SHARE"
+  );
 
   return (
     <main className="container mx-auto px-4 md:px-8 lg:px-16 py-12">
@@ -43,10 +112,22 @@ export default function InvestmentModels() {
           </div>
         </div>
         <div>
-          {activeTab === "fixed-roi" && <TabOne />}
-          {activeTab === "equity-based" && <TabTwo />}
+          {isLoading && <InvestmentModelSkeleton />}
+          {error && (
+            <div className="py-10 text-center text-red-500">
+              Failed to load investments.
+            </div>
+          )}
+          {!isLoading && !error && (
+            <>
+              {activeTab === "fixed-roi" && <TabOne investments={fixedROI} />}
+              {activeTab === "equity-based" && (
+                <TabTwo investments={equityShare} />
+              )}
+            </>
+          )}
         </div>
       </div>
     </main>
-  )
+  );
 }
