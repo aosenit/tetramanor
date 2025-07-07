@@ -25,8 +25,10 @@ const rentalSchema = z.object({
   rent: z.number().min(0, "Rent must be a positive number"),
   frequency: z.enum(["MONTHLY", "YEARLY", "QUARTERLY"]),
   agencyFee: z.number().min(0, "Agency fee must be a positive number"),
-  countryFee: z.number().min(0, "Country fee must be a positive number"),
+  cautionFee: z.number().min(0, "Caution fee must be a positive number"),
+  unitAmount: z.number().min(1, "Unit amount must be at least 1"),
   status: z.enum(["RENTED", "NOT_RENTED"]),
+  images: z.array(z.string()).optional(),
 });
 
 type RentalFormData = z.infer<typeof rentalSchema>;
@@ -47,9 +49,7 @@ interface UploadedImage {
   id: string;
   imageUrl: string;
   name: string;
-  publicId: string;
-  createdAt: string;
-  isPrimary: boolean;
+  file: File; // Store the actual file
 }
 
 export default function EditRental() {
@@ -65,8 +65,10 @@ export default function EditRental() {
     rent: 0,
     frequency: "MONTHLY",
     agencyFee: 0,
-    countryFee: 0,
+    cautionFee: 0,
+    unitAmount: 1,
     status: "NOT_RENTED",
+    images: [],
   });
   const [errors, setErrors] = useState<Partial<RentalFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,14 +87,10 @@ export default function EditRental() {
 
   // API mutations
   const { mutateAsync: createRental, isPending: isCreating } =
-    usePostData("rentals");
+    useUploadData("rentals");
   const { mutateAsync: updateRental, isPending: isUpdating } = usePutData(
     rentalId ? `rentals/${rentalId}` : null
   );
-
-  // File upload mutation
-  const { mutateAsync: uploadImages, isPending: isUploading } =
-    useUploadData("upload/images");
 
   // Extract properties from response
   const properties: Property[] = propertiesResponse?.data?.items || [];
@@ -108,14 +106,11 @@ export default function EditRental() {
         rent: rentalData?.data?.rent || 0,
         frequency: rentalData?.data?.frequency || "MONTHLY",
         agencyFee: rentalData?.data?.agencyFee || 0,
-        countryFee: rentalData?.data?.countryFee || 0,
+        cautionFee: rentalData?.data?.cautionFee || 0,
+        unitAmount: rentalData?.data?.unitAmount || 1,
         status: rentalData?.data?.status || "NOT_RENTED",
+        images: [],
       });
-
-      // Load existing images if any
-      if (rentalData?.data?.images) {
-        setUploadedImages(rentalData.data.images);
-      }
     }
   }, [rentalData, isEditMode]);
 
@@ -146,27 +141,20 @@ export default function EditRental() {
     }
   };
 
-  // Handle file upload
-  const handleFileUpload = async (files: FileList | null) => {
+  // Handle file upload - store files directly
+  const handleFileUpload = (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
-    const formData = new FormData();
+    // Convert files to UploadedImage format for display
+    const newImages: UploadedImage[] = Array.from(files).map((file, index) => ({
+      id: `temp-${Date.now()}-${index}`,
+      imageUrl: URL.createObjectURL(file),
+      name: file.name,
+      file: file,
+    }));
 
-    Array.from(files).forEach((file) => {
-      formData.append("images", file);
-    });
-
-    try {
-      const response = await uploadImages(formData);
-
-      if (response.success) {
-        setUploadedImages((prev) => [...prev, ...response.data]);
-        toast.success("Images uploaded successfully");
-      }
-    } catch (error: any) {
-      console.error("Upload error:", error);
-      toast.error("Failed to upload images");
-    }
+    setUploadedImages((prev) => [...prev, ...newImages]);
+    toast.success("Images added successfully");
   };
 
   // Validate form data
@@ -214,15 +202,14 @@ export default function EditRental() {
       formDataToSubmit.append("rent", formData.rent.toString());
       formDataToSubmit.append("frequency", formData.frequency);
       formDataToSubmit.append("agencyFee", formData.agencyFee.toString());
-      formDataToSubmit.append("cautionFee", formData.countryFee.toString()); // Map countryFee to cautionFee
+      formDataToSubmit.append("cautionFee", formData.cautionFee.toString());
+      formDataToSubmit.append("unitAmount", formData.unitAmount.toString());
       formDataToSubmit.append("status", formData.status);
 
-      // Add images if any
-      if (uploadedImages.length > 0) {
-        uploadedImages.forEach((image) => {
-          formDataToSubmit.append("images", image.id);
-        });
-      }
+      // Add images as binary files
+      uploadedImages.forEach((image) => {
+        formDataToSubmit.append("images", image.file);
+      });
 
       if (isEditMode) {
         await updateRental(formDataToSubmit);
@@ -330,6 +317,28 @@ export default function EditRental() {
 
         <div>
           <label className="block mb-1 text-sm text-[#323539] font-medium">
+            Unit Amount *
+          </label>
+          <Input
+            type="number"
+            value={formData.unitAmount}
+            onChange={(e) =>
+              handleInputChange("unitAmount", parseInt(e.target.value) || "")
+            }
+            placeholder="Enter unit amount"
+            className={`bg-[#E5E5E7] border ${
+              errors.unitAmount ? "border-red-500" : "border-[#116114]"
+            }`}
+            min="1"
+            required
+          />
+          {errors.unitAmount && (
+            <p className="text-red-500 text-sm mt-1">{errors.unitAmount}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block mb-1 text-sm text-[#323539] font-medium">
             Rental frequency
           </label>
           <Dropdown
@@ -359,9 +368,9 @@ export default function EditRental() {
             type="number"
             value={formData.rent}
             onChange={(e) =>
-              handleInputChange("rent", parseFloat(e.target.value) || 0)
+              handleInputChange("rent", parseFloat(e.target.value) || "")
             }
-            placeholder=""
+            placeholder="Enter rent"
             className={`bg-[#E5E5E7] border ${
               errors.rent ? "border-red-500" : "border-[#116114]"
             }`}
@@ -379,10 +388,10 @@ export default function EditRental() {
             <Input
               type="number"
               value={formData.agencyFee}
+              placeholder="Enter agency fee"
               onChange={(e) =>
-                handleInputChange("agencyFee", parseFloat(e.target.value) || 0)
+                handleInputChange("agencyFee", parseFloat(e.target.value) || "")
               }
-              placeholder=""
               className={`bg-[#E5E5E7] border ${
                 errors.agencyFee ? "border-red-500" : "border-[#116114]"
               }`}
@@ -397,17 +406,20 @@ export default function EditRental() {
             </label>
             <Input
               type="number"
-              value={formData.countryFee}
+              value={formData.cautionFee}
               onChange={(e) =>
-                handleInputChange("countryFee", parseFloat(e.target.value) || 0)
+                handleInputChange(
+                  "cautionFee",
+                  parseFloat(e.target.value) || ""
+                )
               }
-              placeholder=""
+              placeholder="Enter caution fee"
               className={`bg-[#E5E5E7] border ${
-                errors.countryFee ? "border-red-500" : "border-[#116114]"
+                errors.cautionFee ? "border-red-500" : "border-[#116114]"
               }`}
             />
-            {errors.countryFee && (
-              <p className="text-red-500 text-sm mt-1">{errors.countryFee}</p>
+            {errors.cautionFee && (
+              <p className="text-red-500 text-sm mt-1">{errors.cautionFee}</p>
             )}
           </div>
         </div>
@@ -436,7 +448,7 @@ export default function EditRental() {
             }
             className="mt-2 text-sm text-[#116114] hover:underline"
           >
-            {isUploading ? "Uploading..." : "Click here to upload images"}
+            Click here to upload images
           </button>
 
           {/* Display uploaded images */}
@@ -451,11 +463,11 @@ export default function EditRental() {
                   />
                   <button
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
                       setUploadedImages((prev) =>
                         prev.filter((img) => img.id !== image.id)
-                      )
-                    }
+                      );
+                    }}
                     className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     ×
@@ -495,7 +507,7 @@ export default function EditRental() {
         <div className="flex justify-between items-center py-8">
           <button
             type="submit"
-            disabled={isSubmitting || isCreating || isUpdating || isUploading}
+            disabled={isSubmitting || isCreating || isUpdating}
             className="bg-[#116114] hover:bg-[#116114] text-white text-sm px-8 py-2 rounded"
           >
             {isSubmitting || isCreating || isUpdating ? "Saving..." : "Save"}

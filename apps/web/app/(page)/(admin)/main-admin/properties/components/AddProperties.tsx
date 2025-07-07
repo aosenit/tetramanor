@@ -52,6 +52,7 @@ const propertySchema = z.object({
   images: z.array(z.string()),
   documentId: z.string().optional(),
   constructionStatus: z.enum(["ONGOING", "COMPLETED", "PLANNED"]),
+  accountOfficerId: z.string().optional(),
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -78,7 +79,7 @@ const defaultFormData: PropertyFormData = {
   name: "",
   address: "",
   about: "",
-  unitAmount: 0,
+  unitAmount: 1,
   inquiryOptions: ["INQUIRY_FORM"],
   unitTypes: [],
   whyInvest: {
@@ -96,6 +97,7 @@ const defaultFormData: PropertyFormData = {
   images: [],
   documentId: "",
   constructionStatus: "ONGOING",
+  accountOfficerId: "",
 };
 
 const unitTypeOptions = [
@@ -132,6 +134,10 @@ export default function AddProperties() {
     propertyId ? `admin/properties/${propertyId}` : null
   );
 
+  // Fetch account officers
+  const { data: accountOfficersData, isLoading: isLoadingAccountOfficers } =
+    useFetchData("admin/account-officers");
+
   // API mutations
   const { mutateAsync: createProperty, isPending: isCreating } =
     usePostData("admin/properties");
@@ -153,7 +159,7 @@ export default function AddProperties() {
         name: propertyData?.data?.name || "",
         address: propertyData?.data?.address || "",
         about: propertyData?.data?.about || "",
-        unitAmount: propertyData?.data?.unitAmount || 0,
+        unitAmount: propertyData?.data?.unitAmount || 1,
         inquiryOptions: propertyData?.data?.inquiryOptions || ["INQUIRY_FORM"],
         unitTypes: propertyData?.data?.unitTypes || [],
         whyInvest: propertyData?.data?.whyInvest || {
@@ -166,6 +172,7 @@ export default function AddProperties() {
         images: propertyData?.data?.images || [],
         documentId: propertyData?.data?.documentId || "",
         constructionStatus: propertyData?.data?.constructionStatus || "ONGOING",
+        accountOfficerId: propertyData?.data?.accountOfficerId || "",
       });
 
       // Load existing images if any
@@ -484,26 +491,6 @@ export default function AddProperties() {
             <h1 className="font-semibold text-[#116114]">
               {isEditMode ? "Edit Property" : "Add New Property"}
             </h1>
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="w-auto"
-            >
-              <TabsList className="inline-flex w-full bg-[#E5E5E7] rounded-md overflow-hidden p-1">
-                <TabsTrigger
-                  value="company"
-                  className="rounded-sm px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-[#323539]"
-                >
-                  Company
-                </TabsTrigger>
-                <TabsTrigger
-                  value="personal"
-                  className="px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-[#323539]"
-                >
-                  Personal
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
           </div>
         </div>
 
@@ -637,6 +624,48 @@ export default function AddProperties() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="account-officer"
+                  className="text-sm font-medium text-[#323539]"
+                >
+                  Account Officer (Optional)
+                </Label>
+                <Select
+                  value={formData.accountOfficerId || undefined}
+                  onValueChange={(value) =>
+                    handleInputChange(
+                      "accountOfficerId",
+                      value === "none" ? "" : value
+                    )
+                  }
+                >
+                  <SelectTrigger className="w-full bg-[#E5E5E7] border border-[#116114]">
+                    <SelectValue placeholder="Select an account officer" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {isLoadingAccountOfficers ? (
+                      <SelectItem value="loading" disabled>
+                        Loading account officers...
+                      </SelectItem>
+                    ) : accountOfficersData?.data?.length > 0 ? (
+                      <>
+                        <SelectItem value="none">No account officer</SelectItem>
+                        {accountOfficersData.data.map((officer: any) => (
+                          <SelectItem key={officer.id} value={officer.id}>
+                            {officer.name} - {officer.email}
+                          </SelectItem>
+                        ))}
+                      </>
+                    ) : (
+                      <SelectItem value="none">
+                        No account officers available
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
@@ -657,11 +686,9 @@ export default function AddProperties() {
                   id="no-of-units"
                   type="number"
                   value={formData.unitAmount}
+                  placeholder="Enter number of units"
                   onChange={(e) =>
-                    handleInputChange(
-                      "unitAmount",
-                      parseInt(e.target.value) || 0
-                    )
+                    handleInputChange("unitAmount", parseInt(e.target.value))
                   }
                   className={`w-full bg-[#e5e5e7] border ${
                     errors.unitAmount ? "border-red-500" : "border-[#116114]"
@@ -911,18 +938,25 @@ export default function AddProperties() {
               </div>
             </div>
 
-            {/* File Upload Section */}
-            <div className="mt-8 space-y-4">
+            {/* Modern Property Media Section */}
+            <div className="mt-8 space-y-6">
               <h3 className="text-base font-medium text-[#116114]">
                 Property Media
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Property Images Upload */}
                 <div className="space-y-4">
-                  <Label className="text-sm font-medium text-[#323539]">
-                    Property Images
-                  </Label>
-                  <div className="border-2 border-dashed border-[#116114] rounded-lg p-6 text-center">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium text-[#323539]">
+                      Property Images
+                    </Label>
+                    <span className="text-xs text-[#858C95]">
+                      {uploadedImages.length} uploaded
+                    </span>
+                  </div>
+
+                  <div className="relative">
                     <input
                       type="file"
                       multiple
@@ -934,37 +968,59 @@ export default function AddProperties() {
                     />
                     <label
                       htmlFor="image-upload"
-                      className="cursor-pointer flex flex-col items-center gap-2"
+                      className={`block w-full p-8 border-2 border-dashed rounded-xl text-center transition-all duration-200 cursor-pointer ${
+                        isUploadingImages
+                          ? "border-gray-300 bg-gray-50 cursor-not-allowed"
+                          : "border-[#116114] bg-[#F8F9FA] hover:bg-[#E8F5E8] hover:border-[#0A4A0A]"
+                      }`}
                     >
-                      <Upload className="w-8 h-8 text-[#116114]" />
-                      <span className="text-[#116114] font-medium">
-                        {isUploadingImages
-                          ? "Uploading..."
-                          : "Click to upload images"}
-                      </span>
-                      <span className="text-sm text-[#858C95]">
-                        PNG, JPG, WEBP up to 10MB each
-                      </span>
+                      <div className="flex flex-col items-center gap-3">
+                        {isUploadingImages ? (
+                          <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+                        ) : (
+                          <Upload className="w-8 h-8 text-[#116114]" />
+                        )}
+                        <div>
+                          <p className="text-[#116114] font-medium">
+                            {isUploadingImages
+                              ? "Uploading..."
+                              : "Click to upload images"}
+                          </p>
+                          <p className="text-sm text-[#858C95] mt-1">
+                            PNG, JPG, WEBP up to 10MB each
+                          </p>
+                        </div>
+                      </div>
                     </label>
                   </div>
 
-                  {/* Display uploaded images */}
+                  {/* Display uploaded images in a modern grid */}
                   {uploadedImages.length > 0 && (
-                    <div className="grid grid-cols-2 gap-2">
-                      {uploadedImages.map((image) => (
-                        <div key={image.id} className="relative group">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {uploadedImages.map((image, index) => (
+                        <div
+                          key={image.id}
+                          className="relative group aspect-square"
+                        >
                           <img
                             src={image.imageUrl}
                             alt={image.name}
-                            className="w-full h-24 object-cover rounded-lg"
+                            className="w-full h-full object-cover rounded-lg"
                           />
-                          <button
-                            type="button"
-                            onClick={() => removeImage(image.id)}
-                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center">
+                            <button
+                              type="button"
+                              onClick={() => removeImage(image.id)}
+                              className="opacity-0 group-hover:opacity-100 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-all duration-200"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                          {index === 0 && (
+                            <div className="absolute top-2 left-2 bg-[#116114] text-white text-xs px-2 py-1 rounded">
+                              Primary
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -973,10 +1029,16 @@ export default function AddProperties() {
 
                 {/* Property Document Upload */}
                 <div className="space-y-4">
-                  <Label className="text-sm font-medium text-[#323539]">
-                    Property Brochure
-                  </Label>
-                  <div className="border-2 border-dashed border-[#116114] rounded-lg p-6 text-center">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium text-[#323539]">
+                      Property Brochure
+                    </Label>
+                    {uploadedDocument && (
+                      <span className="text-xs text-green-600">✓ Uploaded</span>
+                    )}
+                  </div>
+
+                  <div className="relative">
                     <input
                       type="file"
                       accept=".pdf,.doc,.docx"
@@ -987,30 +1049,68 @@ export default function AddProperties() {
                     />
                     <label
                       htmlFor="document-upload"
-                      className="cursor-pointer flex flex-col items-center gap-2"
+                      className={`block w-full p-8 border-2 border-dashed rounded-xl text-center transition-all duration-200 cursor-pointer ${
+                        isUploadingDocument
+                          ? "border-gray-300 bg-gray-50 cursor-not-allowed"
+                          : uploadedDocument
+                            ? "border-green-500 bg-green-50"
+                            : "border-[#116114] bg-[#F8F9FA] hover:bg-[#E8F5E8] hover:border-[#0A4A0A]"
+                      }`}
                     >
-                      <Upload className="w-8 h-8 text-[#116114]" />
-                      <span className="text-[#116114] font-medium">
-                        {isUploadingDocument
-                          ? "Uploading..."
-                          : "Click to upload document"}
-                      </span>
-                      <span className="text-sm text-[#858C95]">
-                        PDF, DOC, DOCX up to 10MB
-                      </span>
+                      <div className="flex flex-col items-center gap-3">
+                        {isUploadingDocument ? (
+                          <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+                        ) : uploadedDocument ? (
+                          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <svg
+                              className="w-4 h-4 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          </div>
+                        ) : (
+                          <Upload className="w-8 h-8 text-[#116114]" />
+                        )}
+                        <div>
+                          <p
+                            className={`font-medium ${
+                              uploadedDocument
+                                ? "text-green-700"
+                                : "text-[#116114]"
+                            }`}
+                          >
+                            {isUploadingDocument
+                              ? "Uploading..."
+                              : uploadedDocument
+                                ? "Document uploaded successfully"
+                                : "Click to upload document"}
+                          </p>
+                          <p className="text-sm text-[#858C95] mt-1">
+                            PDF, DOC, DOCX up to 10MB
+                          </p>
+                        </div>
+                      </div>
                     </label>
                   </div>
 
                   {/* Display uploaded document */}
                   {uploadedDocument && (
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                       <div className="flex items-center justify-between">
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <a
                             href={uploadedDocument.imageUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-green-700 font-medium hover:text-green-900 underline"
+                            className="text-sm text-green-700 font-medium hover:text-green-900 underline truncate block"
                           >
                             {uploadedDocument.name}
                           </a>
@@ -1021,7 +1121,7 @@ export default function AddProperties() {
                         <button
                           type="button"
                           onClick={removeDocument}
-                          className="text-red-500 hover:text-red-700 ml-2"
+                          className="text-red-500 hover:text-red-700 ml-2 p-1 rounded-full hover:bg-red-50 transition-colors"
                         >
                           <X className="w-4 h-4" />
                         </button>

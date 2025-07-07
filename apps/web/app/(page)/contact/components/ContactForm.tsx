@@ -7,6 +7,7 @@ import { IoMdMail } from "react-icons/io";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -19,7 +20,7 @@ type ContactFormData = z.infer<typeof contactFormSchema>;
 
 function ContactForm() {
   const { mutateAsync: sendMessage, isPending: isSending } =
-    usePostData("contact");
+    usePostData("contact/enquiry");
 
   const {
     register,
@@ -33,6 +34,7 @@ function ContactForm() {
   const onSubmit = async (data: ContactFormData) => {
     try {
       await sendMessage(data);
+      toast.success("Message sent successfully");
       reset();
     } catch (error) {
       console.error("Failed to send message:", error);
