@@ -1,10 +1,8 @@
-import React from 'react'
-import AccountOfficer from '../components/AccountOfficer'
+import React from "react";
+import AccountOfficerInfo from "../components/AccountOfficer";
 
 const Page = () => {
-  return (
-   <AccountOfficer/>
-  )
-}
+  return <AccountOfficerInfo />;
+};
 
-export default Page
+export default Page;

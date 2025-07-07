@@ -58,7 +58,7 @@ interface Property {
   status: "AVAILABLE" | "SOLD_OUT";
   unitAmount: number;
   unitTypes: string[];
-  images: string[];
+  images: Array<{ imageUrl: string }>;
   document: string[];
 }
 

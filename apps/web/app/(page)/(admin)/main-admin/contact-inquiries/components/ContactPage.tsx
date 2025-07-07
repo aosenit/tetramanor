@@ -41,7 +41,7 @@ export default function ContactPage() {
   const router = useRouter();
   const [selected, setSelected] = useState<"embed" | "address">("address");
   const [editMode, setEditMode] = useState(false);
-  const [activeTab, setActiveTab] = useState("account-officers");
+  const [activeTab, setActiveTab] = useState("contact");
 
   const [error, setError] = useState<string | null>(null);
 
@@ -188,7 +188,7 @@ export default function ContactPage() {
             <p
               onClick={() => handleClick("contact")}
               className={`px-6 py-2 rounded text-center text-[#4C5560] cursor-pointer font-medium ${
-                activeTab === "contact" ? "bg-white" : ""
+                activeTab === "contact" ? "bg-white" : "text-primary"
               }`}
             >
               Contact
