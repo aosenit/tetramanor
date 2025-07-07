@@ -33,6 +33,8 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
+const adminEmail = "super_admin@example.com";
+
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { mutateAsync: login, isPending } = usePostData("auth/login");
@@ -54,7 +56,7 @@ export default function LoginPage() {
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
 
-        if (user.email.includes("admin")) {
+        if (user.email.trim() === adminEmail.trim()) {
           router.push("/main-admin");
         } else {
           router.push("/client-admin/dashboard");

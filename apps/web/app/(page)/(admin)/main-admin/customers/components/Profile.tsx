@@ -1,23 +1,161 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@chakra-ui/react";
-import { Plus } from "lucide-react";
+import { Plus, Loader2, AlertCircle, Home } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import four from "@/assets/admin/home/four.webp";
 import { RiEditLine } from "react-icons/ri";
 import { MdArrowBackIosNew } from "react-icons/md";
 import AddUnitModal from "./UnitModal";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useFetchData } from "@/hooks/useApi";
+import placeholder from "@/assets/placeholder.svg";
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  kycStatus: string;
+  createdAt: string;
+}
+
+interface Property {
+  id: string;
+  name: string;
+  totalUnitsPurchased: number;
+  address: string;
+  images: Array<{ imageUrl: string }>;
+}
 
 export default function Profile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const userId = searchParams.get("id");
+
+  // Fetch user profile
+  const {
+    data: userData,
+    isLoading: userLoading,
+    isError: userError,
+  } = useFetchData(userId ? `users/${userId}` : null);
+
+  // Fetch user properties
+  const {
+    data: propertiesData,
+    isLoading: propertiesLoading,
+    isError: propertiesError,
+  } = useFetchData(userId ? `admin/purchases/user/${userId}` : null);
+
+  const user: User | null = userData?.data || null;
+  const properties: Property[] = propertiesData?.data || [];
+
+  // Loading state
+  if (userLoading || propertiesLoading) {
+    return (
+      <div className="min-h-screen space-y-6">
+        <div className="border-b border-[#E5E5E7] pb-4">
+          <div className="flex items-center space-x-1 text-[#858C95]">
+            <span>Home</span>
+            <span className="text-xl text-[#858C95]">/</span>
+            <span className="font-medium text-xl text-[#116114]">
+              Customer management
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <div className="flex flex-col items-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin text-[#116114]" />
+            <p className="text-sm text-gray-600">Loading customer profile...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (userError || propertiesError) {
+    return (
+      <div className="min-h-screen space-y-6">
+        <div className="border-b border-[#E5E5E7] pb-4">
+          <div className="flex items-center space-x-1 text-[#858C95]">
+            <span>Home</span>
+            <span className="text-xl text-[#858C95]">/</span>
+            <span className="font-medium text-xl text-[#116114]">
+              Customer management
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <div className="flex flex-col items-center space-y-4">
+            <AlertCircle className="h-8 w-8 text-red-500" />
+            <p className="text-sm text-gray-600">
+              Failed to load customer profile
+            </p>
+            <Button
+              onClick={() => window.location.reload()}
+              className="bg-[#116114] text-white hover:bg-[#116114]/90"
+            >
+              Try again
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state - no user found
+  if (!user) {
+    return (
+      <div className="min-h-screen space-y-6">
+        <div className="border-b border-[#E5E5E7] pb-4">
+          <div className="flex items-center space-x-1 text-[#858C95]">
+            <span>Home</span>
+            <span className="text-xl text-[#858C95]">/</span>
+            <span className="font-medium text-xl text-[#116114]">
+              Customer management
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <div className="flex flex-col items-center space-y-4">
+            <Home className="h-8 w-8 text-gray-400" />
+            <p className="text-sm text-gray-600">Customer not found</p>
+            <Link href="/main-admin/customers">
+              <Button className="bg-[#116114] text-white hover:bg-[#116114]/90">
+                Back to customers
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Format user initials
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
 
   return (
     <div className="min-h-screen space-y-6">
-      <div className=" border-b border-[#E5E5E7] pb-4 ">
-        <div className="flex items-center space-x-1  text-[#858C95]">
+      <div className="border-b border-[#E5E5E7] pb-4">
+        <div className="flex items-center space-x-1 text-[#858C95]">
           <span>Home</span>
           <span className="text-xl text-[#858C95]">/</span>
           <span className="font-medium text-xl text-[#116114]">
@@ -29,7 +167,7 @@ export default function Profile() {
         <div>
           <h1 className="font-medium text-[#858C95] mt-4">
             View user profile
-            <span className="text-[#116114] font-medium"> - Grace Olabayo</span>
+            <span className="text-[#116114] font-medium"> - {user.name}</span>
           </h1>
         </div>
         <div>
@@ -54,30 +192,34 @@ export default function Profile() {
               <RiEditLine className="text-[#858C95] font-medium text-2xl " />
             </div>
             <div className="bg-white p-4 rounded-full">
-              <p className="text-2xl font-medium text-[#4C5560]">GO</p>
+              <p className="text-2xl font-medium text-[#4C5560]">
+                {getInitials(user.name)}
+              </p>
             </div>
           </div>
 
-          <p className="text-[#4C5560] font-medium">Grace Olabayo</p>
+          <p className="text-[#4C5560] font-medium">{user.name}</p>
         </div>
         <div className="max-w-xl rounded-b-xl space-y-4 p-10 bg-[#F4F4F4]">
           <div className="flex items-center justify-between">
             <p className="text-sm text-[#4C5560]">Email address</p>
-            <p className="font-medium text-[#181818] text-sm">
-              Olabayograce@gmail.com
-            </p>
+            <p className="font-medium text-[#181818] text-sm">{user.email}</p>
           </div>
           <div className="flex items-center justify-between">
             <p className="text-sm text-[#4C5560]">Phone number</p>
-            <p className="font-medium text-[#181818] text-sm">+23467800032</p>
+            <p className="font-medium text-[#181818] text-sm">{user.phone}</p>
           </div>
           <div className="flex items-center justify-between">
             <p className="text-sm text-[#4C5560]">KYC status</p>
-            <p className="font-medium text-[#116114] text-sm">Verified</p>
+            <p className="font-medium text-[#116114] text-sm">
+              {user.kycStatus === "VERIFIED" ? "Verified" : "Pending"}
+            </p>
           </div>
           <div className="flex items-center justify-between">
             <p className="text-sm text-[#4C5560]">Customer since</p>
-            <p className="font-medium text-[#181818] text-sm">Jan 12, 2025</p>
+            <p className="font-medium text-[#181818] text-sm">
+              {formatDate(user.createdAt)}
+            </p>
           </div>
         </div>
         <h3 className="text-[#4C5560] font-medium text-sm">
@@ -86,90 +228,69 @@ export default function Profile() {
         <div>
           <div className="flex items-center font-medium justify-between text-sm">
             <p className="text-[#116114]">Owned properties</p>
-            <Link href="/main-admin/customers/owned-properties?tab=owned">
+            <Link
+              href={`/main-admin/customers/owned-properties?tab=owned&userId=${userId}`}
+            >
               <Button variant="ghost">View all</Button>
             </Link>
           </div>
-          <div className="bg-[#F4F4F4] mt-2 rounded-md p-5 ">
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((_, i) => (
-                <div key={i} className="flex items-stretch gap-4 ">
-                  <div className="h-full flex items-center">
-                    <Image
-                      src={four}
-                      alt="Property"
-                      width={100}
-                      height={100}
-                      className="object-cover rounded-lg h-full"
-                    />
+          <div className="bg-[#F4F4F4] mt-2 rounded-md p-5">
+            {properties.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <Home className="h-8 w-8 text-gray-400 mb-2" />
+                <p className="text-sm text-gray-600">No properties found</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
+                {properties.slice(0, 4).map((property) => (
+                  <div key={property.id} className="flex items-stretch gap-4">
+                    <div className="h-full flex items-center">
+                      <Image
+                        src={property.images[0]?.imageUrl || placeholder}
+                        alt={property.name}
+                        width={100}
+                        height={100}
+                        className="object-cover rounded-lg h-full"
+                      />
+                    </div>
+                    <div className="space-y-3 flex flex-col justify-center">
+                      <p className="text-sm font-medium ml-3">
+                        {property.name}
+                      </p>
+                      <p className="text-sm font-medium ml-3">
+                        {property.totalUnitsPurchased} units
+                      </p>
+                      <Link
+                        href={`/main-admin/customers/property-dashboard?tab=owned&propertyId=${property.id}&userId=${userId}&name=${property.name}`}
+                      >
+                        <Button variant={"ghost"}>View</Button>
+                      </Link>
+                    </div>
                   </div>
-                  <div className="space-y-3 flex flex-col justify-center">
-                    <p className="text-sm font-medium ml-3">
-                      {
-                        [
-                          "Comfy burrows",
-                          "Tm meadows",
-                          "Tm high gardens",
-                          "Kings landing",
-                        ][i]
-                      }
-                    </p>
-                    <p className="text-sm font-medium ml-3">
-                      {[2, 4, 6, 4][i]} units
-                    </p>
-                    <Link href="/main-admin/customers/property-dashboard?tab=owned">
-                      <Button variant={"ghost"}>View</Button>
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <div>
           <div className="flex items-center font-medium justify-between text-sm">
             <p className="text-[#116114]">Rented properties</p>
-            <Link href="/main-admin/customers/owned-properties?tab=rented">
+            <Link
+              href={`/main-admin/customers/owned-properties?tab=rented&userId=${userId}`}
+            >
               <Button variant="ghost">View all</Button>
             </Link>
           </div>
-          <div className="bg-[#F4F4F4] mt-2 rounded-md p-5 ">
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((_, i) => (
-                <div key={i} className="flex items-stretch gap-4 ">
-                  <div className="h-full flex items-center">
-                    <Image
-                      src={four}
-                      alt="Property"
-                      width={100}
-                      height={100}
-                      className="object-cover rounded-lg h-full"
-                    />
-                  </div>
-                  <div className="space-y-3 flex flex-col justify-center">
-                    <p className="text-sm font-medium ml-3">
-                      {
-                        [
-                          "Comfy burrows",
-                          "Tm meadows",
-                          "Tm high gardens",
-                          "Kings landing",
-                        ][i]
-                      }
-                    </p>
-                    <p className="text-sm font-medium ml-3">
-                      {[2, 4, 6, 4][i]} units
-                    </p>
-                    <Link href="/main-admin/customers/property-dashboard?tab=rented">
-                      <Button variant={"ghost"}>View</Button>
-                    </Link>
-                  </div>
-                </div>
-              ))}
+          <div className="bg-[#F4F4F4] mt-2 rounded-md p-5">
+            <div className="flex flex-col items-center justify-center py-8">
+              <Home className="h-8 w-8 text-gray-400 mb-2" />
+              <p className="text-sm text-gray-600">
+                No rented properties found
+              </p>
             </div>
           </div>
         </div>
-        <div className=" py-8">
+        <div className="py-8">
           <Link href="/main-admin/customers">
             <button className="text-[#323539] flex items-center gap-2 hover:text-[#323539] text-sm">
               <MdArrowBackIosNew /> Back to homepage

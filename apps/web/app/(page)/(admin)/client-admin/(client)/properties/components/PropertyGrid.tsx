@@ -133,7 +133,9 @@ export function PropertyGrid() {
                 </div>
               </div>
               <div className="flex justify-end">
-                <Link href={`/client-admin/properties/property-overview?id=${purchase.id}&name=${purchase.name}`}>
+                <Link
+                  href={`/client-admin/properties/property-overview?id=${purchase.id}&name=${purchase.name}`}
+                >
                   <Button variant="outline" size="sm" className="w-full">
                     View Details
                   </Button>
