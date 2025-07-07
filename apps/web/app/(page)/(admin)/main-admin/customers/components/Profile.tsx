@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@chakra-ui/react";
-import { Plus, Loader2, AlertCircle, Home } from "lucide-react";
+import { Plus, Loader2, AlertCircle, Home, Camera } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { RiEditLine } from "react-icons/ri";
@@ -10,6 +10,7 @@ import AddUnitModal from "./UnitModal";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
 import placeholder from "@/assets/placeholder.svg";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface User {
   id: string;
@@ -18,6 +19,7 @@ interface User {
   phone: string;
   kycStatus: string;
   createdAt: string;
+  profileImage?: string;
 }
 
 interface Property {
@@ -30,6 +32,8 @@ interface Property {
 
 export default function Profile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
@@ -50,6 +54,23 @@ export default function Profile() {
 
   const user: User | null = userData?.data || null;
   const properties: Property[] = propertiesData?.data || [];
+
+  // Handle image upload
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProfileImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Handle edit button click
+  const handleEditClick = () => {
+    fileInputRef.current?.click();
+  };
 
   // Loading state
   if (userLoading || propertiesLoading) {
@@ -188,14 +209,31 @@ export default function Profile() {
         </h3>
         <div className="max-w-xl rounded-t-xl space-y-4 p-6 bg-[#F4F4F4] flex flex-col items-center justify-center">
           <div className="relative flex items-center justify-center w-full">
-            <div className="absolute right-0">
-              <RiEditLine className="text-[#858C95] font-medium text-2xl " />
+            <div className="absolute right-0 top-0">
+              <button
+                onClick={handleEditClick}
+                className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow duration-200"
+              >
+                <Camera className="text-[#858C95] h-4 w-4" />
+              </button>
             </div>
-            <div className="bg-white p-4 rounded-full">
-              <p className="text-2xl font-medium text-[#4C5560]">
+            <Avatar className="h-20 w-20 bg-white border-4 border-white shadow-md">
+              <AvatarImage
+                src={profileImage || user.profileImage}
+                alt={user.name}
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-white text-[#4C5560] text-2xl font-medium">
                 {getInitials(user.name)}
-              </p>
-            </div>
+              </AvatarFallback>
+            </Avatar>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
           </div>
 
           <p className="text-[#4C5560] font-medium">{user.name}</p>
@@ -215,12 +253,14 @@ export default function Profile() {
               {user.kycStatus === "VERIFIED" ? "Verified" : "Pending"}
             </p>
           </div>
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-[#4C5560]">Customer since</p>
-            <p className="font-medium text-[#181818] text-sm">
-              {formatDate(user.createdAt)}
-            </p>
-          </div>
+          {user.createdAt && (
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-[#4C5560]">Customer since</p>
+              <p className="font-medium text-[#181818] text-sm">
+                {formatDate(user.createdAt)}
+              </p>
+            </div>
+          )}
         </div>
         <h3 className="text-[#4C5560] font-medium text-sm">
           Property management

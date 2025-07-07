@@ -144,7 +144,7 @@ export default function PropertyDashboard() {
             className="text-gray-500 cursor-pointer"
             onClick={() => router.back()}
           >
-            Admin
+            Properties
           </span>
           <span className="text-gray-400">/</span>
           <span className="font-semibold text-[#116114] text-xl">{name}</span>
@@ -276,9 +276,6 @@ export default function PropertyDashboard() {
                     <div className="flex gap-2 items-center">
                       <div className="font-medium text-sm">
                         ₦{unit.price.toLocaleString()}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        (₦{(unit.price / 1000).toFixed(1)}k)
                       </div>
                     </div>
 
