@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -20,7 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export function ActiveProperties({ data }: { data: any }) {
@@ -31,7 +29,7 @@ export function ActiveProperties({ data }: { data: any }) {
       <div className="flex justify-between items-center px-4 pt-4">
         <h2 className="text-xl font-semibold">Active Properties</h2>
         <Button variant="outline" size="sm" asChild>
-          <Link href="#">View all</Link>
+          <Link href="/client-admin/properties">View all</Link>
         </Button>
       </div>
       <div className=" overflow-hidden">
