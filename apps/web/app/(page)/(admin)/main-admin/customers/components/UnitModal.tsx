@@ -22,7 +22,6 @@ import {
   User,
   Home,
   Loader2,
-  AlertCircle,
   CheckCircle,
   DollarSign,
   Hash,
@@ -115,8 +114,7 @@ export default function AddUnitModal({
     useFetchData("admin/properties");
   const { data: accountOfficersData, isLoading: accountOfficersLoading } =
     useFetchData("account-officers");
-  const { mutateAsync: createPurchase, isPending: isCreating } =
-    usePostData("admin/purchases");
+  const { mutateAsync: createPurchase } = usePostData("admin/purchases");
 
   const properties: Property[] = propertiesData?.data?.items || [];
   const accountOfficers: AccountOfficer[] = accountOfficersData?.data || [];
