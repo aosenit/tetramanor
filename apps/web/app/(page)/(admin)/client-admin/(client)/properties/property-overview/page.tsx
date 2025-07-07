@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronLeft, Filter, MoreHorizontal } from "lucide-react";
 import iconOne from "../../../../../../../assets/customer/propertyOne.png";
 import iconTwo from "../../../../../../../assets/customer/propertyTwo.png";
-import iconThree from "../../../../../../../assets/customer/propertyThree.png";
+// import iconThree from "../../../../../../../assets/customer/PropertyThree.png";
 import iconFour from "../../../../../../../assets/customer/propertyFour.png";
 import Image from "next/image";
 import { useFetchData } from "@/hooks/useApi";
@@ -105,7 +105,7 @@ const PropertyOverview = () => {
     {
       label: "Outstanding Balance",
       value: `₦${outstandingBalance.toLocaleString()}`,
-      icon: iconThree,
+      icon: iconTwo,
     },
     {
       label: "Units Rented",

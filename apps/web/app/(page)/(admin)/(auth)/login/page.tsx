@@ -62,7 +62,6 @@ export default function LoginPage() {
           router.push("/client-admin/dashboard");
         }
       }
-      console.log(response);
     } catch (error) {
       console.log(error);
       toast.error("Invalid email or password");
