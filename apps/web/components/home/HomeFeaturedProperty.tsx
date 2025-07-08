@@ -6,9 +6,11 @@ import Image from "next/image";
 import { useState } from "react";
 import { IoLocationOutline } from "react-icons/io5";
 import reone from "@/assets/home/reone.webp";
+import { useRouter } from "next/navigation";
 
 export default function  HomeFeaturedProperty() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
   return (
     <section className="w-full container mx-auto px-4 lg:px-16 py-12">
       <div className="flex flex-col lg:flex-row gap-12 items-center">
@@ -97,6 +99,7 @@ export default function  HomeFeaturedProperty() {
           <Button
             colorScheme="green"
             className="bg-primary text-white font-semibold rounded px-8 py-3 shadow-none text-base w-fit"
+            onClick={() => router.push("/portfolio")}
           >
             View more
           </Button>

@@ -7,6 +7,7 @@ import b from "@/assets/investment/icons/b.webp";
 import c from "@/assets/investment/icons/c.webp";
 import d from "@/assets/investment/icons/d.webp";
 import two from "@/assets/investment/two.webp";
+import RoiCalculator from "./RoiCalculator";
 
 const steps = [
   {
@@ -81,7 +82,7 @@ function TabOne({ investments }: { investments: any[] }) {
                     {investment?.duration || "12"} months
                   </div>
                 </li>
-                <li className="flex items-start gap-2">
+                {/* <li className="flex items-start gap-2">
                   <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
                   <div className="text-sm font-medium text-[#0B0A0A]">
                     <span className="text-sm font-semibold">Status:</span>{" "}
@@ -95,7 +96,7 @@ function TabOne({ investments }: { investments: any[] }) {
                       {investment?.status || "DRAFT"}
                     </span>
                   </div>
-                </li>
+                </li> */}
               </ul>
 
               <div className="mt-6 flex gap-2">
@@ -145,6 +146,9 @@ function TabOne({ investments }: { investments: any[] }) {
             </div>
           ))}
         </div>
+      </div>
+      <div className="mt-16">
+        <RoiCalculator />
       </div>
     </div>
   );

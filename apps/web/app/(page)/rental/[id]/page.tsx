@@ -9,7 +9,7 @@ function page() {
   return (
     <div className="bg-[#fafafa] pt-10">
       <PropertyDetails />
-      <MapSection />
+      {/* <MapSection /> */}
       <PropertyEnquiryForm />
       <ExploreMore />
       <Footer />

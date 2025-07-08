@@ -1,5 +1,6 @@
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
+import { useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Button } from "@chakra-ui/react";
 import five from "@/assets/home/five.webp";
 import six from "@/assets/home/six.webp";
 import seven from "@/assets/home/seven.webp";
@@ -7,14 +8,22 @@ import eight from "@/assets/home/eight.webp";
 import nine from "@/assets/home/nine.webp";
 
 const campaigns = [
-  { img: five, alt: "Campaign 1" },
-  { img: six, alt: "Campaign 2" },
-  { img: seven, alt: "Campaign 3" },
-  { img: eight, alt: "Campaign 4" },
-  { img: nine, alt: "Campaign 5" },
+  { img: five, alt: "Campaign 1", description: "Description for Campaign 1." },
+  { img: six, alt: "Campaign 2", description: "Description for Campaign 2." },
+  { img: seven, alt: "Campaign 3", description: "Description for Campaign 3." },
+  { img: eight, alt: "Campaign 4", description: "Description for Campaign 4." },
+  { img: nine, alt: "Campaign 5", description: "Description for Campaign 5." },
 ];
 
 export default function OngoingCampaigns() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedCampaign, setSelectedCampaign] = useState<typeof campaigns[0] | null>(null);
+
+  const handleOpen = (campaign: typeof campaigns[0]) => {
+    setSelectedCampaign(campaign);
+    onOpen();
+  };
+
   return (
     <section className="bg-white w-full">
       <div className="container mx-auto px-4 lg:px-16 py-12">
@@ -27,7 +36,12 @@ export default function OngoingCampaigns() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
           {campaigns.map((c, i) => (
-            <div key={i} className="relative w-full aspect-[3/4]">
+            <div
+              key={i}
+              className="relative w-full aspect-[3/4] cursor-pointer"
+              onClick={() => handleOpen(c)}
+              tabIndex={0}
+            >
               <Image
                 src={c.img}
                 alt={c.alt}
@@ -39,6 +53,16 @@ export default function OngoingCampaigns() {
           ))}
         </div>
       </div>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>{selectedCampaign?.alt}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {selectedCampaign?.description}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </section>
   );
 }

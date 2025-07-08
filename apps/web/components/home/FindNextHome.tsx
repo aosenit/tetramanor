@@ -1,8 +1,10 @@
 import { Button } from "@chakra-ui/react";
 import Image from "next/image";
 import tmHighGardens from "@/assets/home/three.webp";
+import { useRouter } from "next/navigation";
 
 export default function FindNextHome() {
+  const router = useRouter();
   return (
     <section className=" w-full container mx-auto px-4 lg:px-16 py-12">
       <div className="flex flex-col gap-8">
@@ -21,6 +23,7 @@ export default function FindNextHome() {
             colorScheme="green"
             rounded="0"
             className="bg-primary text-white font-semibold rounded px-8 py-3 shadow-none text-base  md:w-auto mt-2 md:mt-0"
+            onClick={() => router.push("/rental")}
           >
             View more properties
           </Button>
