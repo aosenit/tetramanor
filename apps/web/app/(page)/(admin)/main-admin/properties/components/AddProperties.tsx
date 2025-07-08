@@ -1,29 +1,24 @@
 "use client";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronRight, Save, Loader2, Upload, X } from "lucide-react";
-import { Textarea } from "@chakra-ui/react";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { toast } from "sonner";
+import { z } from "zod";
 import {
   usePostData,
   usePutData,
   useFetchData,
   useUploadData,
 } from "@/hooks/useApi";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { toast } from "sonner";
-import { z } from "zod";
+import PropertyInfoSection from "./PropertyInfoSection";
+import UnitDescriptionSection from "./UnitDescriptionSection";
+import WhyInvestSection from "./WhyInvestSection";
+import AdvantagesOfInvestmentSection from "./AdvantagesOfInvestmentSection";
+import FeaturesAmenitiesSection from "./FeaturesAmenitiesSection";
+import PropertyMediaSection from "./PropertyMediaSection";
+import Loader from "@/components/Loader";
+import { ChevronRight, Loader2, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Validation schema
 const propertySchema = z.object({
@@ -45,8 +40,16 @@ const propertySchema = z.object({
           description: z.string().min(1, "Advantage description is required"),
         })
       )
-      .min(1, "At least one advantage is required"),
+      .optional(),
   }),
+  investmentAdvantages: z
+    .array(
+      z.object({
+        title: z.string().min(1, "Advantage title is required"),
+        description: z.string().min(1, "Advantage description is required"),
+      })
+    )
+    .optional(),
   features: z.array(z.string()),
   amenities: z.array(z.string()),
   images: z.array(z.string()),
@@ -92,6 +95,7 @@ const defaultFormData: PropertyFormData = {
       },
     ],
   },
+  investmentAdvantages: [],
   features: [],
   amenities: [],
   images: [],
@@ -122,12 +126,31 @@ export default function AddProperties() {
   const isEditMode = !!propertyId;
 
   const [formData, setFormData] = useState<PropertyFormData>(defaultFormData);
-  const [activeTab, setActiveTab] = useState("personal");
   const [errors, setErrors] = useState<Partial<PropertyFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [uploadedDocument, setUploadedDocument] =
     useState<UploadedDocument | null>(null);
+  const [customUnitType, setCustomUnitType] = useState("");
+  const [advantageDialogOpen, setAdvantageDialogOpen] = useState(false);
+  const [editingAdvantageIndex, setEditingAdvantageIndex] = useState<
+    number | null
+  >(null);
+  const [advantageDraft, setAdvantageDraft] = useState({
+    title: "",
+    description: "",
+  });
+  const [advantageInvestmentDialogOpen, setAdvantageInvestmentDialogOpen] =
+    useState(false);
+  const [editingAdvantageInvestmentIndex, setEditingAdvantageInvestmentIndex] =
+    useState<number | null>(null);
+  const [advantageInvestmentDraft, setAdvantageInvestmentDraft] = useState({
+    title: "",
+    description: "",
+  });
+  const [uploadedBanner, setUploadedBanner] = useState<UploadedImage | null>(
+    null
+  );
 
   // Fetch property data if in edit mode
   const { data: propertyData, isLoading: isLoadingProperty } = useFetchData(
@@ -136,7 +159,7 @@ export default function AddProperties() {
 
   // Fetch account officers
   const { data: accountOfficersData, isLoading: isLoadingAccountOfficers } =
-    useFetchData("admin/account-officers");
+    useFetchData("account-officers");
 
   // API mutations
   const { mutateAsync: createProperty, isPending: isCreating } =
@@ -167,6 +190,7 @@ export default function AddProperties() {
           description: "",
           advantages: [{ title: "", description: "" }],
         },
+        investmentAdvantages: propertyData?.data?.investmentAdvantages || [],
         features: propertyData?.data?.features || [],
         amenities: propertyData?.data?.amenities || [],
         images: propertyData?.data?.images || [],
@@ -198,116 +222,12 @@ export default function AddProperties() {
     }
   };
 
-  const handleWhyInvestChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      whyInvest: {
-        ...prev.whyInvest,
-        [field]: value,
-      },
-    }));
-  };
-
-  const handleAdvantageChange = (
-    index: number,
-    field: string,
-    value: string
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      whyInvest: {
-        ...prev.whyInvest,
-        advantages: prev.whyInvest.advantages.map((adv, i) =>
-          i === index ? { ...adv, [field]: value } : adv
-        ),
-      },
-    }));
-  };
-
-  const addAdvantage = () => {
-    setFormData((prev) => ({
-      ...prev,
-      whyInvest: {
-        ...prev.whyInvest,
-        advantages: [
-          ...prev.whyInvest.advantages,
-          { title: "", description: "" },
-        ],
-      },
-    }));
-  };
-
-  const removeAdvantage = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      whyInvest: {
-        ...prev.whyInvest,
-        advantages: prev.whyInvest.advantages.filter((_, i) => i !== index),
-      },
-    }));
-  };
-
   const handleInquiryOptionChange = (option: string, checked: boolean) => {
     setFormData((prev) => ({
       ...prev,
       inquiryOptions: checked
         ? [...prev.inquiryOptions, option]
         : prev.inquiryOptions.filter((opt) => opt !== option),
-    }));
-  };
-
-  const handleUnitTypeChange = (type: string, checked: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      unitTypes: checked
-        ? [...prev.unitTypes, type]
-        : prev.unitTypes.filter((t) => t !== type),
-    }));
-  };
-
-  const addFeature = () => {
-    setFormData((prev) => ({
-      ...prev,
-      features: [...prev.features, ""],
-    }));
-  };
-
-  const removeFeature = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      features: prev.features.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleFeatureChange = (index: number, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      features: prev.features.map((feature, i) =>
-        i === index ? value : feature
-      ),
-    }));
-  };
-
-  const addAmenity = () => {
-    setFormData((prev) => ({
-      ...prev,
-      amenities: [...prev.amenities, ""],
-    }));
-  };
-
-  const removeAmenity = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      amenities: prev.amenities.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleAmenityChange = (index: number, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      amenities: prev.amenities.map((amenity, i) =>
-        i === index ? value : amenity
-      ),
     }));
   };
 
@@ -383,6 +303,24 @@ export default function AddProperties() {
     }));
   };
 
+  // Add handler for banner upload
+  const handleBannerUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const formData = new FormData();
+    formData.append("images", files[0]);
+    try {
+      const response = await uploadImages(formData);
+      if (response.success && response.data.length > 0) {
+        setUploadedBanner(response.data[0]);
+        toast.success("Banner uploaded successfully");
+      }
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload banner");
+    }
+  };
+  const removeBanner = () => setUploadedBanner(null);
+
   // Validate form data
   const validateForm = (): boolean => {
     try {
@@ -418,9 +356,9 @@ export default function AddProperties() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return; // Validation errors are already shown in validateForm
-    }
+    // if (!validateForm()) {
+    //   return; // Validation errors are already shown in validateForm
+    // }
 
     setIsSubmitting(true);
 
@@ -429,20 +367,58 @@ export default function AddProperties() {
       ...formData,
       features: formData.features.filter((f) => f.trim() !== ""),
       amenities: formData.amenities.filter((a) => a.trim() !== ""),
-      whyInvest: {
-        ...formData.whyInvest,
-        advantages: formData.whyInvest.advantages.filter(
-          (adv) => adv.title.trim() !== "" && adv.description.trim() !== ""
-        ),
-      },
+      whyInvest: formData.whyInvest.advantages.filter(
+        (adv) => adv.title.trim() !== "" && adv.description.trim() !== ""
+      ),
+      investmentAdvantages: formData.investmentAdvantages.filter(
+        (adv) => adv.title.trim() !== "" && adv.description.trim() !== ""
+      ),
     };
+
+    // Create payload with only filled fields
+    const payload: any = {};
+
+    // Required fields
+    payload.name = cleanedFormData.name;
+    payload.address = cleanedFormData.address;
+    payload.about = cleanedFormData.about;
+    payload.unitAmount = cleanedFormData.unitAmount;
+    payload.inquiryOptions = cleanedFormData.inquiryOptions;
+    payload.unitTypes = cleanedFormData.unitTypes;
+    payload.whyInvest = cleanedFormData.whyInvest;
+    payload.investmentAdvantages = cleanedFormData.investmentAdvantages;
+    payload.constructionStatus = cleanedFormData.constructionStatus;
+    payload.features = cleanedFormData.features;
+    payload.amenities = cleanedFormData.amenities;
+
+    // Images as array of strings of ids
+    if (uploadedImages.length > 0) {
+      payload.images = uploadedImages.map((image) => image.id);
+    }
+
+    // Banner image as string of id
+    if (uploadedBanner) {
+      payload.banner = uploadedBanner.id;
+    }
+
+    // Document as string of id
+    if (uploadedDocument) {
+      payload.document = uploadedDocument.id;
+    }
+
+    if (
+      cleanedFormData.accountOfficerId &&
+      cleanedFormData.accountOfficerId.trim() !== ""
+    ) {
+      payload.accountOfficerId = cleanedFormData.accountOfficerId;
+    }
 
     try {
       if (isEditMode) {
-        await updateProperty(cleanedFormData);
+        await updateProperty(payload);
         toast.success("Property updated successfully");
       } else {
-        await createProperty(cleanedFormData);
+        await createProperty(payload);
         toast.success("Property created successfully");
       }
 
@@ -460,16 +436,113 @@ export default function AddProperties() {
     }
   };
 
+  // Add handler to add custom unit type
+  const handleAddCustomUnitType = () => {
+    const trimmed = customUnitType.trim();
+    if (trimmed && !formData.unitTypes.includes(trimmed)) {
+      handleInputChange("unitTypes", [...formData.unitTypes, trimmed]);
+      setCustomUnitType("");
+    }
+  };
+
+  const handleRemoveUnitType = (type: string) => {
+    handleInputChange(
+      "unitTypes",
+      formData.unitTypes.filter((t) => t !== type)
+    );
+  };
+
+  // Handlers for dialog
+  const openAddAdvantageDialog = () => {
+    setEditingAdvantageIndex(null);
+    setAdvantageDraft({ title: "", description: "" });
+    setAdvantageDialogOpen(true);
+  };
+  const openEditAdvantageDialog = (index: number) => {
+    setEditingAdvantageIndex(index);
+    setAdvantageDraft({
+      title: formData.whyInvest.advantages[index].title,
+      description: formData.whyInvest.advantages[index].description,
+    });
+    setAdvantageDialogOpen(true);
+  };
+  const handleAdvantageDialogSave = () => {
+    if (!advantageDraft.title.trim() || !advantageDraft.description.trim())
+      return;
+    let newAdvantages = [...formData.whyInvest.advantages];
+    if (editingAdvantageIndex !== null) {
+      newAdvantages[editingAdvantageIndex] = { ...advantageDraft };
+    } else {
+      newAdvantages.push({ ...advantageDraft });
+    }
+    setFormData((prev) => ({
+      ...prev,
+      whyInvest: { ...prev.whyInvest, advantages: newAdvantages },
+    }));
+    setAdvantageDialogOpen(false);
+  };
+  const handleAdvantageDialogCancel = () => {
+    setAdvantageDialogOpen(false);
+  };
+  const handleRemoveAdvantage = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      whyInvest: {
+        ...prev.whyInvest,
+        advantages: prev.whyInvest.advantages.filter((_, i) => i !== index),
+      },
+    }));
+  };
+
+  // Handlers for dialog
+  const openAddAdvantageInvestmentDialog = () => {
+    setEditingAdvantageInvestmentIndex(null);
+    setAdvantageInvestmentDraft({ title: "", description: "" });
+    setAdvantageInvestmentDialogOpen(true);
+  };
+  const openEditAdvantageInvestmentDialog = (index: number) => {
+    setEditingAdvantageInvestmentIndex(index);
+    setAdvantageInvestmentDraft({
+      title: formData.investmentAdvantages[index].title,
+      description: formData.investmentAdvantages[index].description,
+    });
+    setAdvantageInvestmentDialogOpen(true);
+  };
+  const handleAdvantageInvestmentDialogSave = () => {
+    if (
+      !advantageInvestmentDraft.title.trim() ||
+      !advantageInvestmentDraft.description.trim()
+    )
+      return;
+    let newAdvantages = [...formData.investmentAdvantages];
+    if (editingAdvantageInvestmentIndex !== null) {
+      newAdvantages[editingAdvantageInvestmentIndex] = {
+        ...advantageInvestmentDraft,
+      };
+    } else {
+      newAdvantages.push({ ...advantageInvestmentDraft });
+    }
+    setFormData((prev) => ({
+      ...prev,
+      investmentAdvantages: newAdvantages,
+    }));
+    setAdvantageInvestmentDialogOpen(false);
+  };
+  const handleAdvantageInvestmentDialogCancel = () => {
+    setAdvantageInvestmentDialogOpen(false);
+  };
+  const handleRemoveAdvantageInvestment = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      investmentAdvantages: prev.investmentAdvantages.filter(
+        (_, i) => i !== index
+      ),
+    }));
+  };
+
   // Loading state for edit mode
   if (isEditMode && isLoadingProperty) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center gap-2">
-          <Loader2 className="w-6 h-6 animate-spin" />
-          <span>Loading property data...</span>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (
@@ -496,641 +569,96 @@ export default function AddProperties() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="p-6 bg-white">
-            <div className="space-y-6">
-              <h2 className="text-base font-medium text-[#116114]">
-                Property Info
-              </h2>
-              <div className="space-y-2">
-                <Label
-                  htmlFor="property-name"
-                  className="text-sm font-medium text-[#323539]"
-                >
-                  Property Name *
-                </Label>
-                <Input
-                  id="property-name"
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  className={`w-full border bg-[#E5E5E7] py-4 ${
-                    errors.name ? "border-red-500" : "border-[#116114]"
-                  }`}
-                  required
-                />
-                {errors.name && (
-                  <p className="text-red-500 text-sm">{errors.name}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-[#323539]">
-                  Inquiry Options *
-                </Label>
-                <div className="space-y-3">
-                  {inquiryOptions.map((option) => (
-                    <div
-                      key={option.value}
-                      className="flex items-center space-x-2"
-                    >
-                      <Checkbox
-                        id={option.value}
-                        checked={formData.inquiryOptions.includes(option.value)}
-                        onCheckedChange={(checked) =>
-                          handleInquiryOptionChange(
-                            option.value,
-                            checked as boolean
-                          )
-                        }
-                      />
-                      <Label
-                        htmlFor={option.value}
-                        className="text-sm text-[#181818]"
-                      >
-                        {option.label}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-                {errors.inquiryOptions && (
-                  <p className="text-red-500 text-sm">
-                    {errors.inquiryOptions}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="address"
-                  className="text-sm font-medium text-[#323539]"
-                >
-                  Address *
-                </Label>
-                <Input
-                  id="address"
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) => handleInputChange("address", e.target.value)}
-                  className={`w-full border bg-[#E5E5E7] py-4 ${
-                    errors.address ? "border-red-500" : "border-[#116114]"
-                  }`}
-                  required
-                />
-                {errors.address && (
-                  <p className="text-red-500 text-sm">{errors.address}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="about-property"
-                  className="text-sm font-medium text-[#323539]"
-                >
-                  About Property *
-                </Label>
-                <Textarea
-                  id="about-property"
-                  value={formData.about}
-                  onChange={(e) => handleInputChange("about", e.target.value)}
-                  className={`min-h-[80px] bg-[#E5E5E7] border ${
-                    errors.about ? "border-red-500" : "border-[#116114]"
-                  }`}
-                  required
-                />
-                {errors.about && (
-                  <p className="text-red-500 text-sm">{errors.about}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="construction-status"
-                  className="text-sm font-medium text-[#323539]"
-                >
-                  Construction Status
-                </Label>
-                <Select
-                  value={formData.constructionStatus}
-                  onValueChange={(value) =>
-                    handleInputChange("constructionStatus", value)
-                  }
-                >
-                  <SelectTrigger className="w-full bg-[#E5E5E7] border border-[#116114]">
-                    <SelectValue placeholder="Select construction status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ONGOING">Ongoing</SelectItem>
-                    <SelectItem value="COMPLETED">Completed</SelectItem>
-                    <SelectItem value="PLANNED">Planned</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="account-officer"
-                  className="text-sm font-medium text-[#323539]"
-                >
-                  Account Officer (Optional)
-                </Label>
-                <Select
-                  value={formData.accountOfficerId || undefined}
-                  onValueChange={(value) =>
-                    handleInputChange(
-                      "accountOfficerId",
-                      value === "none" ? "" : value
-                    )
-                  }
-                >
-                  <SelectTrigger className="w-full bg-[#E5E5E7] border border-[#116114]">
-                    <SelectValue placeholder="Select an account officer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {isLoadingAccountOfficers ? (
-                      <SelectItem value="loading" disabled>
-                        Loading account officers...
-                      </SelectItem>
-                    ) : accountOfficersData?.data?.length > 0 ? (
-                      <>
-                        <SelectItem value="none">No account officer</SelectItem>
-                        {accountOfficersData.data.map((officer: any) => (
-                          <SelectItem key={officer.id} value={officer.id}>
-                            {officer.name} - {officer.email}
-                          </SelectItem>
-                        ))}
-                      </>
-                    ) : (
-                      <SelectItem value="none">
-                        No account officers available
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+            <PropertyInfoSection
+              formData={formData}
+              errors={errors}
+              accountOfficersData={accountOfficersData}
+              isLoadingAccountOfficers={isLoadingAccountOfficers}
+              handleInputChange={handleInputChange}
+              handleInquiryOptionChange={handleInquiryOptionChange}
+              inquiryOptions={inquiryOptions}
+            />
           </div>
 
           <div className="bg-white mt-4 p-6">
-            <div className="space-y-6">
-              <h2 className="text-base font-medium text-[#116114]">
-                Unit Description
-              </h2>
+            <UnitDescriptionSection
+              formData={formData}
+              errors={errors}
+              customUnitType={customUnitType}
+              setCustomUnitType={setCustomUnitType}
+              handleInputChange={handleInputChange}
+              handleAddCustomUnitType={handleAddCustomUnitType}
+              handleRemoveUnitType={handleRemoveUnitType}
+              unitTypeOptions={unitTypeOptions}
+            />
+          </div>
 
-              <div className="space-y-2">
-                <Label
-                  htmlFor="no-of-units"
-                  className="text-sm font-medium text-[#323539]"
-                >
-                  Number of Units *
-                </Label>
-                <Input
-                  id="no-of-units"
-                  type="number"
-                  value={formData.unitAmount}
-                  placeholder="Enter number of units"
-                  onChange={(e) =>
-                    handleInputChange("unitAmount", parseInt(e.target.value))
-                  }
-                  className={`w-full bg-[#e5e5e7] border ${
-                    errors.unitAmount ? "border-red-500" : "border-[#116114]"
-                  }`}
-                  min="0"
-                  required
-                />
-                {errors.unitAmount && (
-                  <p className="text-red-500 text-sm">{errors.unitAmount}</p>
-                )}
-              </div>
+          <div className="bg-white mt-4 p-6">
+            <WhyInvestSection
+              formData={formData}
+              advantageDialogOpen={advantageDialogOpen}
+              editingAdvantageIndex={editingAdvantageIndex}
+              advantageDraft={advantageDraft}
+              setAdvantageDialogOpen={setAdvantageDialogOpen}
+              setAdvantageDraft={setAdvantageDraft}
+              openAddAdvantageDialog={openAddAdvantageDialog}
+              openEditAdvantageDialog={openEditAdvantageDialog}
+              handleAdvantageDialogSave={handleAdvantageDialogSave}
+              handleAdvantageDialogCancel={handleAdvantageDialogCancel}
+              handleRemoveAdvantage={handleRemoveAdvantage}
+              errors={errors}
+            />
+          </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-[#323539]">
-                  Unit Types *
-                </Label>
-                <div className="grid grid-cols-2 gap-3">
-                  {unitTypeOptions.map((type) => (
-                    <div key={type} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={type}
-                        checked={formData.unitTypes.includes(type)}
-                        onCheckedChange={(checked) =>
-                          handleUnitTypeChange(type, checked as boolean)
-                        }
-                      />
-                      <Label htmlFor={type} className="text-sm text-[#181818]">
-                        {type.replace(/_/g, " ")}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-                {errors.unitTypes && (
-                  <p className="text-red-500 text-sm">{errors.unitTypes}</p>
-                )}
-              </div>
-            </div>
+          <div className="bg-white mt-4 p-6">
+            <AdvantagesOfInvestmentSection
+              formData={formData}
+              advantageInvestmentDialogOpen={advantageInvestmentDialogOpen}
+              editingAdvantageInvestmentIndex={editingAdvantageInvestmentIndex}
+              advantageInvestmentDraft={advantageInvestmentDraft}
+              setAdvantageInvestmentDialogOpen={
+                setAdvantageInvestmentDialogOpen
+              }
+              setAdvantageInvestmentDraft={setAdvantageInvestmentDraft}
+              openAddAdvantageInvestmentDialog={
+                openAddAdvantageInvestmentDialog
+              }
+              openEditAdvantageInvestmentDialog={
+                openEditAdvantageInvestmentDialog
+              }
+              handleAdvantageInvestmentDialogSave={
+                handleAdvantageInvestmentDialogSave
+              }
+              handleAdvantageInvestmentDialogCancel={
+                handleAdvantageInvestmentDialogCancel
+              }
+              handleRemoveAdvantageInvestment={handleRemoveAdvantageInvestment}
+              errors={errors}
+            />
+          </div>
 
-            {/* Why Invest Section */}
-            <div className="mt-8 space-y-6">
-              <h3 className="text-base font-medium text-[#116114]">
-                Why Invest
-              </h3>
+          <div className="bg-white mt-4 p-6">
+            <FeaturesAmenitiesSection
+              formData={formData}
+              handleInputChange={handleInputChange}
+              errors={errors}
+            />
+          </div>
 
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-[#323539]">
-                    Investment Title *
-                  </Label>
-                  <Input
-                    value={formData.whyInvest.title}
-                    onChange={(e) =>
-                      handleWhyInvestChange("title", e.target.value)
-                    }
-                    className={`w-full bg-[#E5E5E7] border py-4 ${
-                      errors.whyInvest?.title
-                        ? "border-red-500"
-                        : "border-[#116114]"
-                    }`}
-                    placeholder="Enter investment title"
-                  />
-                  {errors.whyInvest?.title && (
-                    <p className="text-red-500 text-sm">
-                      {errors.whyInvest.title}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-[#323539]">
-                    Investment Description *
-                  </Label>
-                  <Textarea
-                    value={formData.whyInvest.description}
-                    onChange={(e) =>
-                      handleWhyInvestChange("description", e.target.value)
-                    }
-                    className={`min-h-[80px] bg-[#E5E5E7] border ${
-                      errors.whyInvest?.description
-                        ? "border-red-500"
-                        : "border-[#116114]"
-                    }`}
-                    placeholder="Enter investment description"
-                  />
-                  {errors.whyInvest?.description && (
-                    <p className="text-red-500 text-sm">
-                      {errors.whyInvest.description}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium text-[#323539]">
-                      Investment Advantages *
-                    </Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={addAdvantage}
-                    >
-                      Add Advantage
-                    </Button>
-                  </div>
-
-                  {formData.whyInvest.advantages.map((advantage, index) => (
-                    <div
-                      key={index}
-                      className="p-4 border rounded-lg space-y-3"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-[#323539]">
-                          Advantage {index + 1}
-                        </span>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => removeAdvantage(index)}
-                        >
-                          Remove
-                        </Button>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Input
-                          value={advantage.title}
-                          onChange={(e) =>
-                            handleAdvantageChange(
-                              index,
-                              "title",
-                              e.target.value
-                            )
-                          }
-                          placeholder="Advantage title"
-                          className="bg-[#E5E5E7] border border-[#116114]"
-                        />
-                        <Textarea
-                          value={advantage.description}
-                          onChange={(e) =>
-                            handleAdvantageChange(
-                              index,
-                              "description",
-                              e.target.value
-                            )
-                          }
-                          placeholder="Advantage description"
-                          className="min-h-[60px] bg-[#E5E5E7] border border-[#116114]"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                  {errors.whyInvest?.advantages && (
-                    <p className="text-red-500 text-sm">
-                      Please fill in all advantage fields
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Features and Amenities */}
-            <div className="mt-8 space-y-6">
-              <h3 className="text-base font-medium text-[#116114]">
-                Property Features and Amenities
-              </h3>
-
-              {/* Features */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm font-medium text-[#323539]">
-                    Features
-                  </Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addFeature}
-                  >
-                    Add Feature
-                  </Button>
-                </div>
-
-                <div className="space-y-2">
-                  {formData.features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input
-                        value={feature}
-                        onChange={(e) =>
-                          handleFeatureChange(index, e.target.value)
-                        }
-                        placeholder="Enter feature"
-                        className="flex-1 bg-[#E5E5E7] border border-[#116114]"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeFeature(index)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Amenities */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm font-medium text-[#323539]">
-                    Amenities
-                  </Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addAmenity}
-                  >
-                    Add Amenity
-                  </Button>
-                </div>
-
-                <div className="space-y-2">
-                  {formData.amenities.map((amenity, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input
-                        value={amenity}
-                        onChange={(e) =>
-                          handleAmenityChange(index, e.target.value)
-                        }
-                        placeholder="Enter amenity"
-                        className="flex-1 bg-[#E5E5E7] border border-[#116114]"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeAmenity(index)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Modern Property Media Section */}
-            <div className="mt-8 space-y-6">
-              <h3 className="text-base font-medium text-[#116114]">
-                Property Media
-              </h3>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Property Images Upload */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium text-[#323539]">
-                      Property Images
-                    </Label>
-                    <span className="text-xs text-[#858C95]">
-                      {uploadedImages.length} uploaded
-                    </span>
-                  </div>
-
-                  <div className="relative">
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e.target.files)}
-                      className="hidden"
-                      id="image-upload"
-                      disabled={isUploadingImages}
-                    />
-                    <label
-                      htmlFor="image-upload"
-                      className={`block w-full p-8 border-2 border-dashed rounded-xl text-center transition-all duration-200 cursor-pointer ${
-                        isUploadingImages
-                          ? "border-gray-300 bg-gray-50 cursor-not-allowed"
-                          : "border-[#116114] bg-[#F8F9FA] hover:bg-[#E8F5E8] hover:border-[#0A4A0A]"
-                      }`}
-                    >
-                      <div className="flex flex-col items-center gap-3">
-                        {isUploadingImages ? (
-                          <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
-                        ) : (
-                          <Upload className="w-8 h-8 text-[#116114]" />
-                        )}
-                        <div>
-                          <p className="text-[#116114] font-medium">
-                            {isUploadingImages
-                              ? "Uploading..."
-                              : "Click to upload images"}
-                          </p>
-                          <p className="text-sm text-[#858C95] mt-1">
-                            PNG, JPG, WEBP up to 10MB each
-                          </p>
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-
-                  {/* Display uploaded images in a modern grid */}
-                  {uploadedImages.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {uploadedImages.map((image, index) => (
-                        <div
-                          key={image.id}
-                          className="relative group aspect-square"
-                        >
-                          <img
-                            src={image.imageUrl}
-                            alt={image.name}
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center">
-                            <button
-                              type="button"
-                              onClick={() => removeImage(image.id)}
-                              className="opacity-0 group-hover:opacity-100 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-all duration-200"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                          {index === 0 && (
-                            <div className="absolute top-2 left-2 bg-[#116114] text-white text-xs px-2 py-1 rounded">
-                              Primary
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Property Document Upload */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium text-[#323539]">
-                      Property Brochure
-                    </Label>
-                    {uploadedDocument && (
-                      <span className="text-xs text-green-600">✓ Uploaded</span>
-                    )}
-                  </div>
-
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      onChange={(e) => handleDocumentUpload(e.target.files)}
-                      className="hidden"
-                      id="document-upload"
-                      disabled={isUploadingDocument}
-                    />
-                    <label
-                      htmlFor="document-upload"
-                      className={`block w-full p-8 border-2 border-dashed rounded-xl text-center transition-all duration-200 cursor-pointer ${
-                        isUploadingDocument
-                          ? "border-gray-300 bg-gray-50 cursor-not-allowed"
-                          : uploadedDocument
-                            ? "border-green-500 bg-green-50"
-                            : "border-[#116114] bg-[#F8F9FA] hover:bg-[#E8F5E8] hover:border-[#0A4A0A]"
-                      }`}
-                    >
-                      <div className="flex flex-col items-center gap-3">
-                        {isUploadingDocument ? (
-                          <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
-                        ) : uploadedDocument ? (
-                          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                            <svg
-                              className="w-4 h-4 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                          </div>
-                        ) : (
-                          <Upload className="w-8 h-8 text-[#116114]" />
-                        )}
-                        <div>
-                          <p
-                            className={`font-medium ${
-                              uploadedDocument
-                                ? "text-green-700"
-                                : "text-[#116114]"
-                            }`}
-                          >
-                            {isUploadingDocument
-                              ? "Uploading..."
-                              : uploadedDocument
-                                ? "Document uploaded successfully"
-                                : "Click to upload document"}
-                          </p>
-                          <p className="text-sm text-[#858C95] mt-1">
-                            PDF, DOC, DOCX up to 10MB
-                          </p>
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-
-                  {/* Display uploaded document */}
-                  {uploadedDocument && (
-                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 min-w-0">
-                          <a
-                            href={uploadedDocument.imageUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-green-700 font-medium hover:text-green-900 underline truncate block"
-                          >
-                            {uploadedDocument.name}
-                          </a>
-                          <p className="text-xs text-green-600 mt-1">
-                            {uploadedDocument.docType}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={removeDocument}
-                          className="text-red-500 hover:text-red-700 ml-2 p-1 rounded-full hover:bg-red-50 transition-colors"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+          <div className="bg-white mt-4 p-6">
+            <PropertyMediaSection
+              uploadedImages={uploadedImages}
+              uploadedBanner={uploadedBanner}
+              uploadedDocument={uploadedDocument}
+              isUploadingImages={isUploadingImages}
+              isUploadingDocument={isUploadingDocument}
+              handleImageUpload={handleImageUpload}
+              handleDocumentUpload={handleDocumentUpload}
+              handleBannerUpload={handleBannerUpload}
+              removeImage={removeImage}
+              removeBanner={removeBanner}
+              removeDocument={removeDocument}
+            />
           </div>
 
           {/* Submit Section */}

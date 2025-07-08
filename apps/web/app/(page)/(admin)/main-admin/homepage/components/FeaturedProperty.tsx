@@ -7,7 +7,7 @@ import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import one from "@/assets/admin/home/one.webp";
 import OngoingCampaigns from "./OngoingCampaigns";
 import PropertySelector from "./modals/PropertySelector";
-import { useFetchData, usePatchData, usePutData } from "@/hooks/useApi";
+import { useFetchData, usePostData } from "@/hooks/useApi";
 import { toast } from "sonner";
 import { Loader2, AlertCircle, RefreshCw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -85,11 +85,279 @@ const ConfirmationModal = ({
   );
 };
 
+// Detail Modal Component
+const DetailModal = ({
+  isOpen,
+  onClose,
+  data,
+  type,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  data: any;
+  type: "property" | "rental";
+}) => {
+  if (!isOpen || !data) return null;
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden">
+        {/* Header with Image */}
+        <div className="relative h-48 bg-gradient-to-br from-green-50 to-blue-50">
+          <div className="absolute inset-0 bg-black/30 rounded-t-xl"></div>
+          <Image
+            src={four}
+            alt={type === "property" ? data.name : data.property.name}
+            fill
+            className="object-cover rounded-t-xl"
+          />
+          <div className="absolute top-3 left-3">
+            <span className="bg-white/95 backdrop-blur-sm text-green-700 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">
+              {type === "property" ? "Featured" : "Highlighted"}
+            </span>
+          </div>
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 w-8 h-8 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-all duration-200"
+          >
+            <svg
+              className="w-4 h-4 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-6">
+          {/* Title and Basic Info */}
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-1">
+                {type === "property" ? data.name : data.property.name}
+              </h2>
+              <p className="text-sm text-gray-600">
+                {type === "property"
+                  ? data.description || "Premium property featured on homepage"
+                  : `${data.apartmentType.replace(/_/g, " ")} - ${data.property.location || "Location not specified"}`}
+              </p>
+            </div>
+
+            {/* Key Stats */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-3">
+                <p className="text-xs text-green-600 uppercase tracking-wide font-semibold mb-1">
+                  Type
+                </p>
+                <p className="text-sm font-bold text-green-700">
+                  {type === "property"
+                    ? data.type || "Property"
+                    : data.apartmentType.replace(/_/g, " ")}
+                </p>
+              </div>
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3">
+                <p className="text-xs text-blue-600 uppercase tracking-wide font-semibold mb-1">
+                  Status
+                </p>
+                <p className="text-sm font-bold text-blue-700">
+                  {type === "property" ? "Active" : "Available"}
+                </p>
+              </div>
+              {type === "property" && (
+                <>
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3">
+                    <p className="text-xs text-purple-600 uppercase tracking-wide font-semibold mb-1">
+                      Price
+                    </p>
+                    <p className="text-sm font-bold text-purple-700">
+                      {formatCurrency(data.price || 0)}
+                    </p>
+                  </div>
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-3">
+                    <p className="text-xs text-orange-600 uppercase tracking-wide font-semibold mb-1">
+                      Location
+                    </p>
+                    <p className="text-sm font-bold text-orange-700">
+                      {data.location || "Not specified"}
+                    </p>
+                  </div>
+                </>
+              )}
+              {type === "rental" && (
+                <>
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3">
+                    <p className="text-xs text-purple-600 uppercase tracking-wide font-semibold mb-1">
+                      Rent
+                    </p>
+                    <p className="text-sm font-bold text-purple-700">
+                      {formatCurrency(data.rentAmount || 0)}
+                    </p>
+                  </div>
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-3">
+                    <p className="text-xs text-orange-600 uppercase tracking-wide font-semibold mb-1">
+                      Duration
+                    </p>
+                    <p className="text-sm font-bold text-orange-700">
+                      {data.rentDuration || "Not specified"}
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Detailed Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+              Property Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-600 font-medium">
+                    Created
+                  </span>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {formatDate(data.createdAt || new Date())}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-600 font-medium">
+                    Last Updated
+                  </span>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {formatDate(data.updatedAt || new Date())}
+                  </span>
+                </div>
+                {type === "property" && (
+                  <>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-sm text-gray-600 font-medium">
+                        Bedrooms
+                      </span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {data.bedrooms || "Not specified"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-sm text-gray-600 font-medium">
+                        Bathrooms
+                      </span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {data.bathrooms || "Not specified"}
+                      </span>
+                    </div>
+                  </>
+                )}
+                {type === "rental" && (
+                  <>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-sm text-gray-600 font-medium">
+                        Property Type
+                      </span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {data.property.type || "Not specified"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-sm text-gray-600 font-medium">
+                        Furnished
+                      </span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {data.furnished ? "Yes" : "No"}
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="space-y-3">
+                {type === "property" && (
+                  <>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-sm text-gray-600 font-medium">
+                        Square Feet
+                      </span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {data.squareFeet
+                          ? `${data.squareFeet} sq ft`
+                          : "Not specified"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-sm text-gray-600 font-medium">
+                        Floor
+                      </span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {data.floor || "Not specified"}
+                      </span>
+                    </div>
+                  </>
+                )}
+                {type === "rental" && (
+                  <>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-sm text-gray-600 font-medium">
+                        Available From
+                      </span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {data.availableFrom
+                          ? formatDate(data.availableFrom)
+                          : "Not specified"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-sm text-gray-600 font-medium">
+                        Utilities
+                      </span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {data.utilitiesIncluded ? "Included" : "Not included"}
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function FeaturedProperty() {
   const [showModal, setShowModal] = React.useState(false);
   const [showRentalModal, setShowRentalModal] = React.useState(false);
   const [showFeaturedConfirm, setShowFeaturedConfirm] = React.useState(false);
   const [showRentalConfirm, setShowRentalConfirm] = React.useState(false);
+  const [showFeaturedDetail, setShowFeaturedDetail] = React.useState(false);
+  const [showRentalDetail, setShowRentalDetail] = React.useState(false);
+
+  const router = useRouter();
 
   const {
     data,
@@ -105,9 +373,9 @@ export default function FeaturedProperty() {
   } = useFetchData("rentals?highlighted=true");
 
   const { mutateAsync: removeFeaturedProperty, isPending: isRemovingFeatured } =
-    usePatchData("admin/properties/featured");
+    usePostData("admin/properties/featured");
   const { mutateAsync: removeHighlightedRental, isPending: isRemovingRental } =
-    usePutData("rentals/remove-highlighted");
+    usePostData("rentals/remove-highlighted");
 
   // Extract featured property data
   const featuredProperty = data?.data;
@@ -207,8 +475,6 @@ export default function FeaturedProperty() {
     </div>
   );
 
-  const router = useRouter();
-
   return (
     <>
       <div className="bg-white space-y-10 p-4">
@@ -263,11 +529,7 @@ export default function FeaturedProperty() {
                   />
                   <div className="flex gap-2">
                     <button
-                      onClick={() =>
-                        router.push(
-                          `/main-admin/properties/property-details?id=${featuredProperty.id}`
-                        )
-                      }
+                      onClick={() => setShowFeaturedDetail(true)}
                       className="border bg-white font-medium rounded-md px-3 py-1 text-sm hover:bg-gray-50"
                     >
                       View
@@ -364,11 +626,7 @@ export default function FeaturedProperty() {
                   />
                   <div className="flex gap-2">
                     <button
-                      onClick={() =>
-                        router.push(
-                          `/main-admin/rentals/edit-rentals?id=${highlightedRental.id}`
-                        )
-                      }
+                      onClick={() => setShowRentalDetail(true)}
                       className="border bg-white font-medium rounded-md px-3 py-1 text-sm hover:bg-gray-50"
                     >
                       View
@@ -436,6 +694,22 @@ export default function FeaturedProperty() {
         message={`Are you sure you want to remove "${highlightedRental?.property.name}" as the highlighted rental? This will no longer appear at the top of the homepage.`}
         confirmText="Remove"
         cancelText="Cancel"
+      />
+
+      {/* Featured Property Detail Modal */}
+      <DetailModal
+        isOpen={showFeaturedDetail}
+        onClose={() => setShowFeaturedDetail(false)}
+        data={featuredProperty}
+        type="property"
+      />
+
+      {/* Rental Detail Modal */}
+      <DetailModal
+        isOpen={showRentalDetail}
+        onClose={() => setShowRentalDetail(false)}
+        data={highlightedRental}
+        type="rental"
       />
     </>
   );

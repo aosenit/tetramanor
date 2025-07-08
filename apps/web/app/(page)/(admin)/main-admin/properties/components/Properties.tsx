@@ -297,7 +297,6 @@ export default function PropertyManagement() {
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="AVAILABLE">Available</SelectItem>
                 <SelectItem value="SOLD_OUT">Sold Out</SelectItem>
-                <SelectItem value="RESERVED">Reserved</SelectItem>
               </SelectContent>
             </Select>
             <Select
@@ -350,7 +349,7 @@ export default function PropertyManagement() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {properties.map((property) => (
                 <Card key={property.id} className="overflow-hidden">
                   <div className="relative bg-[#F4F4F4]">

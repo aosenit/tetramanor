@@ -131,7 +131,7 @@ export default function PropertySelector({
 
   const handlePropertySelect = async (property: any) => {
     // Prevent duplicate calls for the same property
-    const propertyId = type === "property" ? property.id : property.propertyId;
+    const propertyId = property?.id;
     if (
       selectedProperty &&
       (type === "property"
@@ -141,21 +141,23 @@ export default function PropertySelector({
       return;
     }
 
-    setSelectedProperty(property);
-    onPropertySelect?.(property);
-
     try {
-      await updateFeaturedProperty(
+      const response = await updateFeaturedProperty(
         type === "property"
           ? {
-              id: property.id,
+              id: propertyId,
               featured: true,
             }
           : {
-              rentalId: property.propertyId,
+              rentalId: propertyId,
             }
       );
-      toast.success("Featured property updated successfully");
+
+      if (response) {
+        toast.success(response.message || "Property updated successfully");
+        setSelectedProperty(property);
+        onPropertySelect?.(property);
+      }
     } catch (error: any) {
       console.log(error);
     }
