@@ -16,10 +16,10 @@ const userSchema = z.object({
   name: z.string().min(1, "Full name is required"),
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .optional(),
+  // password: z
+  //   .string()
+  //   .min(6, "Password must be at least 6 characters")
+  //   .optional(),
 });
 
 type UserFormData = z.infer<typeof userSchema>;
@@ -34,7 +34,7 @@ export default function AddNewCustomers() {
     name: "",
     email: "",
     phone: "",
-    password: "",
+    // password: "",
   });
   const [errors, setErrors] = useState<Partial<UserFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,7 +59,7 @@ export default function AddNewCustomers() {
         name: userData?.data?.name || "",
         email: userData?.data?.email || "",
         phone: userData?.data?.phone || "",
-        password: "",
+        // password: "",
       });
     }
   }, [userData, isEditMode]);
@@ -124,7 +124,7 @@ export default function AddNewCustomers() {
         const createData = {
           name: formData.name,
           email: formData.email,
-          password: formData.password!,
+          phone: formData.phone,
         };
 
         await createUser(createData);
@@ -135,7 +135,7 @@ export default function AddNewCustomers() {
         name: "",
         email: "",
         phone: "",
-        password: "",
+        // password: "",
       });
       router.push("/main-admin/customers");
     } catch (error: any) {
@@ -250,7 +250,7 @@ export default function AddNewCustomers() {
             )}
           </div>
 
-          {!isEditMode && (
+          {/* {!isEditMode && (
             <div className="space-y-2">
               <Label
                 htmlFor="password"
@@ -287,7 +287,7 @@ export default function AddNewCustomers() {
                 <p className="text-red-500 text-sm">{errors.password}</p>
               )}
             </div>
-          )}
+          )} */}
 
           <div className="pt-6 pb-4">
             <p className="text-sm text-[#858C95] mb-4">

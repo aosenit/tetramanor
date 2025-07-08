@@ -270,19 +270,6 @@ function CustomersPageContent() {
             All
           </Button>
 
-          <Select value={currentRole} onValueChange={handleRoleFilter}>
-            <SelectTrigger className="w-[180px] bg-white text-[#858C95]">
-              <SelectValue placeholder="Role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
-              <SelectItem value="ADMIN">Admin</SelectItem>
-              <SelectItem value="INVESTOR">Investor</SelectItem>
-              <SelectItem value="TENANT">Tenant</SelectItem>
-              <SelectItem value="BUYER">Buyer</SelectItem>
-            </SelectContent>
-          </Select>
-
           <Select
             value={currentKycStatus}
             onValueChange={handleKycStatusFilter}

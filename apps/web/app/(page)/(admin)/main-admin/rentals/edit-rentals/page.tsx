@@ -76,6 +76,8 @@ export default function EditRental() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null
   );
+  const [features, setFeatures] = useState<string[]>([]);
+  const [amenities, setAmenities] = useState<string[]>([]);
 
   // Fetch rental data if in edit mode
   const { data: rentalData, isLoading: isLoadingRental } = useFetchData(
@@ -501,8 +503,16 @@ export default function EditRental() {
         <h3 className="text-base py-4 font-medium text-[#116114]">
           Property features and amenities
         </h3>
-        <TagInputGroup label="Features" />
-        <TagInputGroup label="Amenities" />
+        <TagInputGroup
+          label="Features"
+          value={features}
+          onChange={setFeatures}
+        />
+        <TagInputGroup
+          label="Amenities"
+          value={amenities}
+          onChange={setAmenities}
+        />
 
         <div className="flex justify-between items-center py-8">
           <button

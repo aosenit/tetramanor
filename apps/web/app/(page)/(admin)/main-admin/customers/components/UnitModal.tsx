@@ -52,7 +52,7 @@ interface Unit {
   price: number;
   accountOfficerId: string;
   unitType: string;
-  isRented: boolean;
+  currency: "NGN" | "USD";
   floor: number;
 }
 
@@ -103,7 +103,7 @@ export default function AddUnitModal({
       price: 0,
       accountOfficerId: "",
       unitType: "",
-      isRented: false,
+      currency: "NGN",
       floor: 0,
     },
   ]);
@@ -143,7 +143,7 @@ export default function AddUnitModal({
           price: 0,
           accountOfficerId: "",
           unitType: "",
-          isRented: false,
+          currency: "NGN",
           floor: 0,
         },
       ]);
@@ -172,7 +172,7 @@ export default function AddUnitModal({
         price: 0,
         accountOfficerId: selectedAccountOfficer,
         unitType: "",
-        isRented: false,
+        currency: "NGN",
         floor: 0,
       },
     ]);
@@ -481,7 +481,6 @@ export default function AddUnitModal({
                         className="text-sm"
                       />
                     </div>
-
                     {/* Unit Type */}
                     <div className="space-y-2">
                       <Label className="text-sm font-medium">Unit Type</Label>
@@ -503,7 +502,6 @@ export default function AddUnitModal({
                         </SelectContent>
                       </Select>
                     </div>
-
                     {/* Floor */}
                     <div className="space-y-2">
                       <Label className="text-sm font-medium">Floor</Label>
@@ -521,10 +519,11 @@ export default function AddUnitModal({
                         className="text-sm"
                       />
                     </div>
-
                     {/* Price */}
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium">Price (₦)</Label>
+                      <Label className="text-sm font-medium">
+                        Price ({unit.currency})
+                      </Label>
                       <Input
                         type="number"
                         placeholder="0.00"
@@ -539,7 +538,6 @@ export default function AddUnitModal({
                         className="text-sm"
                       />
                     </div>
-
                     {/* Bedroom Count */}
                     <div className="space-y-2">
                       <Label className="text-sm font-medium">Bedrooms</Label>
@@ -555,27 +553,23 @@ export default function AddUnitModal({
                           )
                         }
                         className="text-sm"
-                        disabled
                       />
                     </div>
-
-                    {/* Rental Status */}
+                    {/* Currency */}
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium">
-                        Rental Status
-                      </Label>
+                      <Label className="text-sm font-medium">Currency</Label>
                       <Select
-                        value={unit.isRented ? "true" : "false"}
+                        value={unit.currency}
                         onValueChange={(value) =>
-                          handleUnitChange(index, "isRented", value === "true")
+                          handleUnitChange(index, "currency", value)
                         }
                       >
                         <SelectTrigger className="text-sm">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="false">Available</SelectItem>
-                          <SelectItem value="true">Rented</SelectItem>
+                          <SelectItem value="NGN">NGN</SelectItem>
+                          <SelectItem value="USD">USD</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
