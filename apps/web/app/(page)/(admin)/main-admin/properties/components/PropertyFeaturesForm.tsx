@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import FileUpload from "./UploadFile";
 
 interface TagInputGroupProps {
   label: string;
@@ -38,7 +37,7 @@ export default function TagInputGroup({
     <div className="w-full space-y-2">
       <label className="text-sm font-medium text-gray-700">{label}</label>
       <div className="flex flex-wrap items-center gap-2 px-2 py-2 border-none rounded-md bg-[#e5e5e7] ">
-        {value.map((tag) => (
+        {value?.map((tag) => (
           <span
             key={tag}
             className="flex items-center px-3 py-1 rounded-full border border-gray-300 text-sm bg-white"

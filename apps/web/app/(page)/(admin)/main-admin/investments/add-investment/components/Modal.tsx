@@ -234,24 +234,7 @@ export default function InvestmentModal({
 
             <div className="space-y-3">
               <p className="text-sm text-[#323539] font-medium">Files</p>
-              <FileUpload
-                label={contractName}
-                icon={<FaRegFileLines />}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) setContractName(file.name);
-                }}
-                onDelete={() => setContractName("Contract (PDF)")}
-              />
-              <FileUpload
-                label={brochureName}
-                icon={<FaRegFileLines />}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) setBrochureName(file.name);
-                }}
-                onDelete={() => setBrochureName("Brochure (PDF)")}
-              />
+
               <FileUpload
                 label={imageName}
                 icon={<IoImageOutline />}

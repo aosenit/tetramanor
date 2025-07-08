@@ -10,8 +10,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@chakra-ui/react";
-import { FaRegFileLines } from "react-icons/fa6";
-import { CiFileOn } from "react-icons/ci";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { IoImageOutline } from "react-icons/io5";
 import { MdArrowBackIosNew } from "react-icons/md";
 import { Save, Loader2 } from "lucide-react";
@@ -37,6 +44,14 @@ interface FormData {
   brochurePDF?: File;
   featuredImage?: File;
   offerEndDate: string;
+  whyInvest: {
+    title: string;
+    description: string;
+    advantages: Array<{
+      title: string;
+      description: string;
+    }>;
+  };
 }
 
 const defaultFormData: FormData = {
@@ -49,6 +64,16 @@ const defaultFormData: FormData = {
   currency: "NGN",
   description: "",
   offerEndDate: "",
+  whyInvest: {
+    title: "",
+    description: "",
+    advantages: [
+      {
+        title: "",
+        description: "",
+      },
+    ],
+  },
 };
 
 function AddInvestmentContent() {
@@ -58,9 +83,17 @@ function AddInvestmentContent() {
   const isEditing = !!investmentId;
 
   const [formData, setFormData] = useState<FormData>(defaultFormData);
-  const [contractName, setContractName] = useState("Contract (PDF)");
-  const [brochureName, setBrochureName] = useState("Upload Brochure");
   const [imageName, setImageName] = useState("Featured Image");
+
+  // Why Invest dialog state
+  const [advantageDialogOpen, setAdvantageDialogOpen] = useState(false);
+  const [editingAdvantageIndex, setEditingAdvantageIndex] = useState<
+    number | null
+  >(null);
+  const [advantageDraft, setAdvantageDraft] = useState({
+    title: "",
+    description: "",
+  });
 
   // Fetch investment data for editing
   const {
@@ -99,15 +132,13 @@ function AddInvestmentContent() {
         offerEndDate: investment.offerEndDate
           ? new Date(investment.offerEndDate).toISOString().split("T")[0]
           : "",
+        whyInvest: investment.whyInvest || {
+          title: "",
+          description: "",
+          advantages: [{ title: "", description: "" }],
+        },
       });
 
-      // Set current file names if they exist
-      if (investment.contractPDF) {
-        setContractName("Current Contract (PDF)");
-      }
-      if (investment.brochurePDF) {
-        setBrochureName("Current Brochure (PDF)");
-      }
       if (investment.featuredImage) {
         setImageName("Current Featured Image");
       }
@@ -130,11 +161,65 @@ function AddInvestmentContent() {
     }
   };
 
+  // Why Invest dialog handlers
+  const openAddAdvantageDialog = () => {
+    setEditingAdvantageIndex(null);
+    setAdvantageDraft({ title: "", description: "" });
+    setAdvantageDialogOpen(true);
+  };
+
+  const openEditAdvantageDialog = (index: number) => {
+    setEditingAdvantageIndex(index);
+    setAdvantageDraft({
+      title: formData.whyInvest.advantages[index].title,
+      description: formData.whyInvest.advantages[index].description,
+    });
+    setAdvantageDialogOpen(true);
+  };
+
+  const handleAdvantageDialogSave = () => {
+    if (!advantageDraft.title.trim() || !advantageDraft.description.trim())
+      return;
+    let newAdvantages = [...formData.whyInvest.advantages];
+    if (editingAdvantageIndex !== null) {
+      newAdvantages[editingAdvantageIndex] = { ...advantageDraft };
+    } else {
+      newAdvantages.push({ ...advantageDraft });
+    }
+    setFormData((prev) => ({
+      ...prev,
+      whyInvest: { ...prev.whyInvest, advantages: newAdvantages },
+    }));
+    setAdvantageDialogOpen(false);
+  };
+
+  const handleAdvantageDialogCancel = () => {
+    setAdvantageDialogOpen(false);
+  };
+
+  const handleRemoveAdvantage = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      whyInvest: {
+        ...prev.whyInvest,
+        advantages: prev.whyInvest.advantages.filter((_, i) => i !== index),
+      },
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent, action: "publish" | "draft") => {
     e.preventDefault();
 
-    const submitData = {
+    // Filter out empty advantages
+    const cleanedFormData = {
       ...formData,
+      whyInvest: formData.whyInvest.advantages.filter(
+        (adv) => adv.title.trim() !== "" && adv.description.trim() !== ""
+      ),
+    };
+
+    const submitData = {
+      ...cleanedFormData,
       status: action === "publish" ? "PUBLISHED" : "DRAFT",
     };
 
@@ -146,6 +231,9 @@ function AddInvestmentContent() {
       if (value !== undefined && value !== null && value !== "") {
         if (typeof value === "object" && value instanceof File) {
           formDataToSend.append(key, value);
+        } else if (key === "whyInvest") {
+          // Handle whyInvest as JSON string
+          formDataToSend.append(key, JSON.stringify(value));
         } else {
           formDataToSend.append(key, String(value));
         }
@@ -290,7 +378,7 @@ function AddInvestmentContent() {
               onChange={(e) =>
                 handleInputChange(
                   "estimatedROI",
-                  parseFloat(e.target.value) || 0
+                  parseFloat(e.target.value) || ""
                 )
               }
               required
@@ -306,7 +394,7 @@ function AddInvestmentContent() {
               className="bg-[#E5E5E7] border-none"
               value={formData.minAmount}
               onChange={(e) =>
-                handleInputChange("minAmount", parseFloat(e.target.value) || 0)
+                handleInputChange("minAmount", parseFloat(e.target.value) || "")
               }
               required
             />
@@ -367,34 +455,60 @@ function AddInvestmentContent() {
           />
         </div>
 
+        {/* Why Invest Section */}
+        <div>
+          <h4 className="font-medium text-[#4C5560] mb-4">Why Invest? </h4>
+          <div className="flex flex-col gap-4">
+            {formData.whyInvest.advantages
+              .filter(
+                (advantage) =>
+                  advantage.title.trim() !== "" &&
+                  advantage.description.trim() !== ""
+              )
+              .map((advantage, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-100 p-4 rounded-md flex justify-between items-center"
+                >
+                  <div>
+                    <p className="font-medium text-[#181818]">
+                      {advantage.title}
+                    </p>
+                    <p className="text-[#4C5560] text-sm">
+                      {advantage.description}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEditAdvantageDialog(index)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveAdvantage(index)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={openAddAdvantageDialog}
+              className="text-[#116114] hover:text-[#116114] text-sm"
+            >
+              Add Why Invest Advantage
+            </Button>
+          </div>
+        </div>
+
         {/* Upload Buttons - Show for both new and editing */}
         <div className="flex flex-wrap items-center gap-10">
-          <FileUpload
-            label={contractName}
-            icon={<FaRegFileLines />}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                setContractName(file.name);
-                handleFileChange("contractPDF", file);
-              }
-            }}
-            accept=".pdf"
-          />
-
-          <FileUpload
-            label={brochureName}
-            icon={<CiFileOn />}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                setBrochureName(file.name);
-                handleFileChange("brochurePDF", file);
-              }
-            }}
-            accept=".pdf"
-          />
-
           <FileUpload
             label={imageName}
             icon={<IoImageOutline />}
@@ -489,6 +603,16 @@ function AddInvestmentContent() {
           </Link>
         </div>
       </form>
+
+      {/* Why Invest Dialog */}
+      <AdvantageDialog
+        isOpen={advantageDialogOpen}
+        onClose={handleAdvantageDialogCancel}
+        onSave={handleAdvantageDialogSave}
+        advantageDraft={advantageDraft}
+        setAdvantageDraft={setAdvantageDraft}
+        editingAdvantageIndex={editingAdvantageIndex}
+      />
     </div>
   );
 }
@@ -538,5 +662,79 @@ function FileUpload({
         accept={accept}
       />
     </label>
+  );
+}
+
+function AdvantageDialog({
+  isOpen,
+  onClose,
+  onSave,
+  advantageDraft,
+  setAdvantageDraft,
+  editingAdvantageIndex,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: () => void;
+  advantageDraft: { title: string; description: string };
+  setAdvantageDraft: (draft: { title: string; description: string }) => void;
+  editingAdvantageIndex: number | null;
+}) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            {editingAdvantageIndex !== null
+              ? "Edit Why Invest Advantage"
+              : "Add Why Invest Advantage"}
+          </DialogTitle>
+          <DialogDescription>
+            {editingAdvantageIndex !== null
+              ? "Edit the details of the advantage."
+              : "Add a new advantage to why investors should invest in this offering."}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="title">Title *</Label>
+            <Input
+              id="title"
+              value={advantageDraft.title}
+              onChange={(e) =>
+                setAdvantageDraft({ ...advantageDraft, title: e.target.value })
+              }
+              placeholder="e.g., High Returns"
+              className="col-span-3"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="description">Description *</Label>
+            <Textarea
+              id="description"
+              value={advantageDraft.description}
+              onChange={(e) =>
+                setAdvantageDraft({
+                  ...advantageDraft,
+                  description: e.target.value,
+                })
+              }
+              placeholder="e.g., Our investment offers a guaranteed return of 15% per annum."
+              className="col-span-3"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="button" onClick={onSave}>
+            {editingAdvantageIndex !== null
+              ? "Update Advantage"
+              : "Add Advantage"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
