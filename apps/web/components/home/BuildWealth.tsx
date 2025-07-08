@@ -2,8 +2,10 @@ import { Button } from "@chakra-ui/react";
 import Image from "next/image";
 import { FaCheck } from "react-icons/fa";
 import buildWealth from "@/assets/home/four.webp";
+import { useRouter } from "next/navigation";
 
 export default function BuildWealth() {
+  const router = useRouter();
   return (
     <section className="relative w-full min-h-[340px]">
       <Image
@@ -55,6 +57,7 @@ export default function BuildWealth() {
             <Button
               colorScheme="green"
               className="bg-primary text-white font-semibold  px-6 py-3 text-sm sm:text-base"
+              onClick={() => router.push("/investment")}
             >
               Call for investors
             </Button>
