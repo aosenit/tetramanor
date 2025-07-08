@@ -37,7 +37,7 @@ import {
 
 import iconOne from "../../../../../../../assets/customer/propertyOne.png";
 import iconTwo from "../../../../../../../assets/customer/propertyTwo.png";
-import iconThree from "../../../../../../../assets/customer/propertyThree.png";
+// import iconThree from "../../../../../../../assets/customer/propertyThree.png";
 import iconFour from "../../../../../../../assets/customer/propertyFour.png";
 import Image from "next/image";
 import { useFetchData, usePostData } from "@/hooks/useApi";
@@ -151,7 +151,7 @@ const PropertyOverview = () => {
   const properties = Array.isArray(data?.data) ? data.data : [];
 
   // Calculate stats from data
-  const totalUnitsOwned = properties.filter((p) => p.isRented === false).length;
+  const totalUnitsOwned = properties.length;
   const totalPropertyValue = properties.reduce(
     (sum, p) => sum + (Number(p.price) || 0),
     0
@@ -176,7 +176,7 @@ const PropertyOverview = () => {
     {
       label: "Outstanding Balance",
       value: `₦${outstandingBalance.toLocaleString()}`,
-      icon: iconThree,
+      // icon: iconThree,
     },
     {
       label: "Units Rented",

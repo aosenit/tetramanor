@@ -122,14 +122,7 @@ export default function Dashboard() {
             Dashboard
           </span>
         </div>
-        <div className="bg-white p-1"></div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#858C95] h-4 w-4" />
-          <Input
-            placeholder="Search properties, users and transactions"
-            className="pl-10 max-w-full bg-[#E5E5E7] rounded-lg py-6"
-          />
-        </div>
+
         <div className="flex items-center gap-4 flex-wrap">
           <Button
             variant="outline"
@@ -227,7 +220,7 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <div className="">
+        <div className="pb-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-4 gap-4">
             <div className="flex items-center gap-2">
               <p className=" font-medium text-[#181818]">Properties overview</p>
