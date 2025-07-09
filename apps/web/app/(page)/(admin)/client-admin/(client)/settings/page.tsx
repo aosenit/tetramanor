@@ -679,7 +679,7 @@ export default function AccountSettings() {
 
                         {uploadedFile && (
                           <div className="mt-4 p-2 bg-green-50 rounded border border-green-200">
-                            <p className="text-sm text-green-700 font-medium">
+                            <p className="text-sm text-green-700 font-medium max-w-[200px] truncate">
                               File uploaded: {uploadedFile.name}
                             </p>
                           </div>
