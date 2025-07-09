@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 
-export default function MaintenanceRequestsPage() {
+interface PropertyMaintenanceProps {
+  propertyId?: string;
+}
+
+export default function PropertyMaintenance({
+  propertyId,
+}: PropertyMaintenanceProps) {
   const maintenanceRequests = [
     {
       id: 1,
