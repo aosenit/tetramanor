@@ -372,12 +372,16 @@ export default function PropertyDetails() {
               View property details
             </h2>
             {property?.brochure?.length > 0 && (
-              <div className="flex items-center gap-2">
+              <a
+                className="flex items-center gap-2"
+                download={property?.brochure[0]?.name}
+                href={property?.brochure[0]?.imageUrl}
+              >
                 <Button className="bg-[#116114] text-white">
                   <Download className="w-4 h-4 mr-2" />
                   Download brochure
                 </Button>
-              </div>
+              </a>
             )}
           </div>
 
