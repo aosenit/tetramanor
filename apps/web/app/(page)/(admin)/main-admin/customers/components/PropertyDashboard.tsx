@@ -17,6 +17,7 @@ import {
   Link,
 } from "lucide-react";
 import { Button } from "@chakra-ui/react";
+import Image from "next/image";
 
 interface Unit {
   id: string;
@@ -39,6 +40,9 @@ interface Unit {
       }
     | null;
   paymentStatus: string;
+  images: {
+    imageUrl: string;
+  }[];
 }
 
 export default function PropertyDashboard() {
@@ -219,7 +223,7 @@ export default function PropertyDashboard() {
           </TabsList>
 
           <TabsContent value={tab}>
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer">
               {/* Table Header */}
               <div className="grid grid-cols-8 gap-4 p-4 bg-[#F5F5F5] border-b text-sm font-medium text-gray-600">
                 <div className="flex items-center">
@@ -257,22 +261,25 @@ export default function PropertyDashboard() {
                   <div
                     key={unit?.id}
                     className="grid grid-cols-8 gap-4 p-4 border-b hover:bg-gray-50 items-center transition-colors"
+                    // onClick={() =>
+                    //   router.push(
+                    //     `/main-admin/customers/property-dashboard/detail?unitId=${unit?.id}&userId=${userId}`
+                    //   )
+                    // }
                   >
                     <div className="flex items-center">
                       <Checkbox className="mr-3" />
+                      <Image
+                        src={unit?.images[0]?.imageUrl}
+                        alt={`Unit ${unit.id}`}
+                        width={28}
+                        height={28}
+                        className="rounded-sm object-cover"
+                      />
                     </div>
 
                     <div className="flex items-center gap-3">
-                      {/* <Image
-                        src={four}
-                        alt={`Unit ${unit.id}`}
-                        width={48}
-                        height={48}
-                        className="rounded-lg object-cover"
-                      /> */}
-                      <span className="font-medium text-sm">
-                        Unit {unit?.id}
-                      </span>
+                      <span className="font-medium text-sm">{unit?.id}</span>
                     </div>
 
                     <div className="text-gray-600 text-sm">
