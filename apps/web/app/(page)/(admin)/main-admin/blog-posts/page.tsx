@@ -26,6 +26,13 @@ interface BlogPost {
   galleryImages: string[];
   createdAt: string;
   updatedAt: string;
+  images: {
+    id: string;
+    imageUrl: string;
+    name: string;
+    publicId: string;
+    createdAt: string;
+  }[];
 }
 
 export default function BlogPostsPage() {
@@ -153,7 +160,7 @@ export default function BlogPostsPage() {
               <Card key={post.id} className="overflow-hidden bg-[#F4F4F4]">
                 <div className="relative">
                   <Image
-                    src={post.coverImages?.[0] || four}
+                    src={post.images?.[0]?.imageUrl || four}
                     alt={post.title}
                     width={300}
                     height={200}

@@ -20,14 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
 import Link from "next/link";
 import Image from "next/image";
 import one from "@/assets/admin/customer/one.svg";
@@ -35,7 +28,6 @@ import two from "@/assets/admin/customer/two.svg";
 import three from "@/assets/admin/customer/three.svg";
 import { useState } from "react";
 import { useFetchData } from "@/hooks/useApi";
-import { toast } from "sonner";
 import DeleteRentalModal from "./components/DeleteRentalModal";
 import Loader from "@/components/Loader";
 
@@ -81,9 +73,9 @@ interface Rental {
 }
 
 interface RentalStats {
-  total: number;
-  rented: number;
-  available: number;
+  propertiesForRent: number;
+  rentedProperties: number;
+  propertiesNotForRent: number;
 }
 
 export default function RentalsPage() {
@@ -107,6 +99,8 @@ export default function RentalsPage() {
     isLoading: statsLoading,
     refetch: refetchStats,
   } = useFetchData("rentals/stats");
+
+  console.log(statsResponse?.data);
 
   const rentals: Rental[] = rentalsResponse?.data?.items || [];
   const stats: RentalStats = statsResponse?.data || {
@@ -178,21 +172,21 @@ export default function RentalsPage() {
     {
       id: 0,
       title: "Total properties for rent",
-      count: stats.total,
+      count: stats.propertiesForRent,
       subtitle: "For rent",
       image: one,
     },
     {
       id: 1,
       title: "Rented properties",
-      count: stats.rented,
+      count: stats.rentedProperties,
       subtitle: "properties rented",
       image: three,
     },
     {
       id: 2,
       title: "Not rented properties",
-      count: stats.available,
+      count: stats.propertiesNotForRent,
       subtitle: "Available for rent",
       image: two,
     },

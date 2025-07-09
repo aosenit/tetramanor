@@ -26,7 +26,7 @@ const rentalSchema = z.object({
   frequency: z.enum(["MONTHLY", "YEARLY", "QUARTERLY"]),
   agencyFee: z.number().min(0, "Agency fee must be a positive number"),
   cautionFee: z.number().min(0, "Caution fee must be a positive number"),
-  unitAmount: z.number().min(1, "Unit amount must be at least 1"),
+  // unitAmount: z.number().min(1, "Unit amount must be at least 1"),
   status: z.enum(["RENTED", "NOT_RENTED"]),
   images: z.array(z.string()).optional(),
 });
@@ -66,7 +66,7 @@ export default function EditRental() {
     frequency: "MONTHLY",
     agencyFee: 0,
     cautionFee: 0,
-    unitAmount: 1,
+    // unitAmount: 1,
     status: "NOT_RENTED",
     images: [],
   });
@@ -108,8 +108,8 @@ export default function EditRental() {
         rent: rentalData?.data?.rent || 0,
         frequency: rentalData?.data?.frequency || "MONTHLY",
         agencyFee: rentalData?.data?.agencyFee || 0,
-        cautionFee: rentalData?.data?.cautionFee || 0,
-        unitAmount: rentalData?.data?.unitAmount || 1,
+        cautionFee: rentalData?.data?.cautionFee || "",
+        // unitAmount: rentalData?.data?.unitAmount || 1,
         status: rentalData?.data?.status || "NOT_RENTED",
         images: [],
       });
@@ -205,7 +205,7 @@ export default function EditRental() {
       formDataToSubmit.append("frequency", formData.frequency);
       formDataToSubmit.append("agencyFee", formData.agencyFee.toString());
       formDataToSubmit.append("cautionFee", formData.cautionFee.toString());
-      formDataToSubmit.append("unitAmount", formData.unitAmount.toString());
+      // formDataToSubmit.append("unitAmount", formData.unitAmount.toString());
       formDataToSubmit.append("status", formData.status);
 
       // Add images as binary files
@@ -317,7 +317,7 @@ export default function EditRental() {
           )}
         </div>
 
-        <div>
+        {/* <div>
           <label className="block mb-1 text-sm text-[#323539] font-medium">
             Unit Amount *
           </label>
@@ -337,7 +337,7 @@ export default function EditRental() {
           {errors.unitAmount && (
             <p className="text-red-500 text-sm mt-1">{errors.unitAmount}</p>
           )}
-        </div>
+        </div> */}
 
         <div>
           <label className="block mb-1 text-sm text-[#323539] font-medium">

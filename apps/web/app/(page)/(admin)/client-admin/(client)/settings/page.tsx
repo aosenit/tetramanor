@@ -14,7 +14,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Upload, FileUp, Eye, EyeOff } from "lucide-react";
+import {
+  Upload,
+  FileUp,
+  Eye,
+  EyeOff,
+  CheckCircle,
+  XCircle,
+  Clock,
+} from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -48,6 +56,8 @@ export default function AccountSettings() {
   const [ninNumber, setNinNumber] = useState("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [docType, setDocType] = useState("NIN");
+  const [kycStatus, setKycStatus] = useState<string>("PENDING");
 
   // Password visibility states
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -68,9 +78,11 @@ export default function AccountSettings() {
   // API hooks
   const { data: accountData, isLoading: isLoadingAccount } =
     useFetchData("customer/account/");
+  const { data: kycData, isLoading: isLoadingKyc } = useFetchData("kyc");
   const updateAccountMutation = usePutData("customer/account/update");
   const changePasswordMutation = usePutData("auth/change-password");
   const uploadProfileImageMutation = useUploadData("upload/profile-image");
+  const uploadKycDocumentMutation = useUploadData("kyc/upload");
 
   const [profileData, setProfileData] = useState({
     name: "",
@@ -89,6 +101,38 @@ export default function AccountSettings() {
       });
     }
   }, [accountData]);
+
+  // Update KYC status when API data is loaded
+  useEffect(() => {
+    if (kycData?.data) {
+      setKycStatus(kycData.data.status || "PENDING");
+    }
+  }, [kycData]);
+
+  // Get KYC status display
+  const getKycStatusDisplay = (status: string) => {
+    switch (status?.toUpperCase()) {
+      case "VERIFIED":
+        return {
+          icon: <CheckCircle className="w-4 h-4 text-green-500" />,
+          text: "Verified",
+          color: "text-green-500",
+        };
+      case "REJECTED":
+        return {
+          icon: <XCircle className="w-4 h-4 text-red-500" />,
+          text: "Rejected",
+          color: "text-red-500",
+        };
+      case "PENDING":
+      default:
+        return {
+          icon: <Clock className="w-4 h-4 text-yellow-500" />,
+          text: "Pending",
+          color: "text-yellow-500",
+        };
+    }
+  };
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -285,23 +329,44 @@ export default function AccountSettings() {
     }
   };
 
-  const handleKycVerify = () => {
-    if (!ninNumber || ninNumber.length !== 11) {
-      toast.error("Please enter a valid 11-digit NIN number.");
+  const handleKycVerify = async () => {
+    if (!ninNumber || ninNumber.length === 0) {
+      toast.error("Please enter a valid document ID.");
       return;
     }
     if (!uploadedFile) {
       toast.error("Please upload a document.");
       return;
     }
-    console.log("KYC verification submitted:", {
-      ninNumber,
-      file: uploadedFile.name,
-    });
-    toast.success("KYC verification submitted successfully!");
-    setIsKycModalOpen(false);
-    setNinNumber("");
-    setUploadedFile(null);
+
+    try {
+      // Create FormData for multipart/form-data submission
+      const formData = new FormData();
+      formData.append("document", uploadedFile);
+      formData.append("docId", ninNumber);
+      formData.append("docType", docType);
+
+      // Upload KYC document
+      const response = await uploadKycDocumentMutation.mutateAsync(formData);
+
+      if (response.success) {
+        toast.success("KYC verification submitted successfully!");
+        setIsKycModalOpen(false);
+        setNinNumber("");
+        setUploadedFile(null);
+        setDocType("NIN");
+
+        // Refresh KYC data
+        // You might need to add a refetch function here if available
+      } else {
+        toast.error("Failed to submit KYC verification. Please try again.");
+      }
+    } catch (error: any) {
+      console.error("Error submitting KYC verification:", error);
+      toast.error(
+        error?.message || "Failed to submit KYC verification. Please try again."
+      );
+    }
   };
 
   return (
@@ -504,12 +569,25 @@ export default function AccountSettings() {
                 <p className="text-sm text-gray-500">
                   Verify your identity to unlock full account access.
                 </p>
+                {!isLoadingKyc && (
+                  <div className="flex items-center gap-2 mt-2">
+                    {getKycStatusDisplay(kycStatus).icon}
+                    <span
+                      className={`text-sm font-medium ${getKycStatusDisplay(kycStatus).color}`}
+                    >
+                      {getKycStatusDisplay(kycStatus).text}
+                    </span>
+                  </div>
+                )}
               </div>
               <Dialog open={isKycModalOpen} onOpenChange={setIsKycModalOpen}>
                 <DialogTrigger asChild>
                   <div className="lg:w-[60%] ">
-                    <Button className="bg-[var(--primary-green)] hover:bg-green-700">
-                      Verify Identity
+                    <Button
+                      className="bg-[var(--primary-green)] hover:bg-green-700"
+                      disabled={isLoadingKyc}
+                    >
+                      {isLoadingKyc ? "Loading..." : "Verify Identity"}
                     </Button>
                   </div>
                 </DialogTrigger>
@@ -521,20 +599,47 @@ export default function AccountSettings() {
                   </DialogHeader>
 
                   <div className="space-y-6 py-4">
-                    {/* NIN Number */}
+                    {/* Document Type */}
+                    <div>
+                      <Label
+                        htmlFor="docType"
+                        className="text-sm font-medium text-gray-900 mb-2 block"
+                      >
+                        Document Type
+                      </Label>
+                      <select
+                        id="docType"
+                        value={docType}
+                        onChange={(e) => setDocType(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-md bg-white"
+                      >
+                        <option value="NIN">NIN (National ID)</option>
+                        <option value="DRIVERS_LICENSE">
+                          Driver's License
+                        </option>
+                        <option value="PASSPORT">Passport</option>
+                        <option value="VOTERS_CARD">Voter's Card</option>
+                      </select>
+                    </div>
+
+                    {/* Document ID */}
                     <div>
                       <Label
                         htmlFor="nin"
                         className="text-sm font-medium text-gray-900 mb-2 block"
                       >
-                        NIN number
+                        {docType === "NIN" ? "NIN number" : "Document ID"}
                       </Label>
                       <Input
                         id="nin"
-                        placeholder="Enter your 11-digit identification number"
+                        placeholder={
+                          docType === "NIN"
+                            ? "Enter your 11-digit identification number"
+                            : "Enter your document ID"
+                        }
                         value={ninNumber}
                         onChange={(e) => setNinNumber(e.target.value)}
-                        maxLength={11}
+                        maxLength={docType === "NIN" ? 11 : 20}
                         className="w-full"
                       />
                     </div>

@@ -146,24 +146,24 @@ function PaymentsPageContent() {
     0
   );
 
-const cards = [
-  {
-    id: 0,
-    title: "Total amount paid",
+  const cards = [
+    {
+      id: 0,
+      title: "Total amount paid",
       icon: <PiArrowArcLeftThin />,
       count: totalAmountPaid,
       subtitle: "All time",
-    image: four,
-  },
-  {
-    id: 1,
-    title: "Total amount outstanding",
+      image: four,
+    },
+    {
+      id: 1,
+      title: "Total amount outstanding",
       count: totalOutstanding,
       icon: <HiArrowTurnDownLeft />,
       subtitle: "All time",
-    image: five,
-  },
-];
+      image: five,
+    },
+  ];
 
   // Filter payments based on search
   const filteredPayments = payments.filter(
@@ -226,14 +226,14 @@ const cards = [
               Payment Overview
             </span>
           </div>
-            <Button
-              variant="outline"
-              className="bg-white flex items-center gap-2 text-sm hover:bg-green-800"
+          {/* <Button
+            variant="outline"
+            className="bg-white flex items-center gap-2 text-sm hover:bg-green-800"
             onClick={() => toast.info("Export feature coming soon")}
-            >
-              <Plus className="" />
-              Export CSV
-            </Button>
+          >
+            <Plus className="" />
+            Export CSV
+          </Button> */}
         </div>
       </div>
       <div className="space-y-4">
@@ -249,10 +249,10 @@ const cards = [
 
         {/* Tabs */}
         <Tabs defaultValue="property">
-          <TabsList>
+          {/* <TabsList>
             <TabsTrigger value="property">Property</TabsTrigger>
             <TabsTrigger value="rental">Rental</TabsTrigger>
-          </TabsList>
+          </TabsList> */}
         </Tabs>
 
         {/* Stats Cards */}
@@ -355,46 +355,46 @@ const cards = [
                         {formatCurrency(payment.purchase.price)}
                       </TableCell>
                       <TableCell>{formatDate(payment.paymentDate)}</TableCell>
-                    <TableCell>
-                      <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                          >
-                            <span className="sr-only">Open menu</span>
-                            <Image
-                              src={icon}
-                              alt="Action menu"
-                              width={16}
-                              height={16}
-                              className="object-contain"
-                            />
-                          </Button>
-                        </DropdownMenu.Trigger>
+                      <TableCell>
+                        <DropdownMenu.Root>
+                          <DropdownMenu.Trigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
+                              <span className="sr-only">Open menu</span>
+                              <Image
+                                src={icon}
+                                alt="Action menu"
+                                width={16}
+                                height={16}
+                                className="object-contain"
+                              />
+                            </Button>
+                          </DropdownMenu.Trigger>
 
-                        <DropdownMenu.Content
-                          sideOffset={4}
-                          className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md"
-                        >
-                          <DropdownMenu.Item
-                            className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
+                          <DropdownMenu.Content
+                            sideOffset={4}
+                            className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md"
+                          >
+                            <DropdownMenu.Item
+                              className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
                               onClick={() => handleViewReceipt(payment)}
-                          >
-                            View receipt
-                          </DropdownMenu.Item>
+                            >
+                              View receipt
+                            </DropdownMenu.Item>
 
-                          <DropdownMenu.Item
-                            className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
+                            <DropdownMenu.Item
+                              className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer"
                               onClick={() => handleViewDetails(payment)}
-                          >
-                            Payment details
-                          </DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Root>
-                    </TableCell>
-                  </TableRow>
+                            >
+                              Payment details
+                            </DropdownMenu.Item>
+                          </DropdownMenu.Content>
+                        </DropdownMenu.Root>
+                      </TableCell>
+                    </TableRow>
                   ))
                 )}
               </TableBody>

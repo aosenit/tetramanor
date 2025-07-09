@@ -240,22 +240,9 @@ export default function BlogPostDetails({
             <div className="flex justify-between items-center">
               <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex items-center">
-                  <p className="text-[#979AA0]">Status</p>
-                  <p className="text-[#000000]">;</p>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      post.status === "PUBLISHED"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {post.status || "DRAFT"}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <p className="text-[#979AA0]">Featured</p>
-                  <p className="text-[#000000]">;</p>
-                  <div className="flex items-center gap-1">
+                  {/* <p className="text-[#979AA0]">Featured</p> */}
+                  {/* <p className="text-[#000000]">;</p> */}
+                  {/* <div className="flex items-center gap-1">
                     {post.featured ? (
                       <>
                         <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -264,7 +251,7 @@ export default function BlogPostDetails({
                     ) : (
                       <span className="text-gray-500">No</span>
                     )}
-                  </div>
+                  </div> */}
                 </div>
                 <div className="flex items-center">
                   <p className="text-[#979AA0]">Date posted</p>
@@ -316,15 +303,15 @@ export default function BlogPostDetails({
                 <p>Blog Images</p>
               </div>
               <div className="flex items-center gap-4">
-                <span
+                {/* <span
                   className={`px-2 py-1 rounded-full text-xs font-medium ${
                     post.status === "PUBLISHED"
                       ? "bg-green-100 text-green-800"
                       : "bg-yellow-100 text-yellow-800"
                   }`}
                 >
-                  {post.status || "DRAFT"}
-                </span>
+                  {post.status}
+                </span> */}
                 <Link href={`/main-admin/blog-posts/edit-blog?id=${post.id}`}>
                   <p className="flex items-center gap-1 cursor-pointer">
                     Edit <RiEdit2Line />

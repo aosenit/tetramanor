@@ -1,16 +1,36 @@
 "use client";
 import { useState, useRef } from "react";
 import { Button } from "@chakra-ui/react";
-import { Plus, Loader2, AlertCircle, Home, Camera } from "lucide-react";
+import {
+  Plus,
+  Loader2,
+  AlertCircle,
+  Home,
+  Camera,
+  CheckCircle,
+  XCircle,
+  Clock,
+} from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { RiEditLine } from "react-icons/ri";
 import { MdArrowBackIosNew } from "react-icons/md";
 import AddUnitModal from "./UnitModal";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useFetchData } from "@/hooks/useApi";
+import { useFetchData, usePostData } from "@/hooks/useApi";
 import placeholder from "@/assets/placeholder.svg";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface User {
   id: string;
@@ -30,9 +50,18 @@ interface Property {
   images: Array<{ imageUrl: string }>;
 }
 
+interface KYCData {
+  status: string;
+  remark?: string;
+}
+
 export default function Profile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [kycDialogOpen, setKycDialogOpen] = useState(false);
+  const [kycStatus, setKycStatus] = useState("PENDING");
+  const [kycRemark, setKycRemark] = useState("");
+  const [isUpdatingKyc, setIsUpdatingKyc] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -52,8 +81,20 @@ export default function Profile() {
     isError: propertiesError,
   } = useFetchData(userId ? `admin/purchases/user/${userId}` : null);
 
+  // Fetch KYC data
+  const {
+    data: kycData,
+    isLoading: kycLoading,
+    refetch: refetchKyc,
+  } = useFetchData(userId ? `kyc/user/${userId}` : null);
+
+  // Update KYC status mutation
+  const { mutateAsync: updateKycStatus, isPending: isUpdatingKycStatus } =
+    usePostData(userId ? `kyc/update-status/${userId}` : null);
+
   const user: User | null = userData?.data || null;
   const properties: Property[] = propertiesData?.data || [];
+  const kyc: KYCData | null = kycData?.data || null;
 
   // Handle image upload
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,6 +111,52 @@ export default function Profile() {
   // Handle edit button click
   const handleEditClick = () => {
     fileInputRef.current?.click();
+  };
+
+  // Handle KYC status update
+  const handleKycStatusUpdate = async () => {
+    if (!userId) return;
+
+    setIsUpdatingKyc(true);
+    try {
+      await updateKycStatus({
+        status: kycStatus,
+        remark: kycRemark,
+      });
+
+      toast.success("KYC status updated successfully");
+      setKycDialogOpen(false);
+      refetchKyc();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to update KYC status");
+    } finally {
+      setIsUpdatingKyc(false);
+    }
+  };
+
+  // Get KYC status icon and color
+  const getKycStatusDisplay = (status: string) => {
+    switch (status?.toUpperCase()) {
+      case "VERIFIED":
+        return {
+          icon: <CheckCircle className="w-4 h-4 text-green-500" />,
+          text: "Verified",
+          color: "text-green-500",
+        };
+      case "REJECTED":
+        return {
+          icon: <XCircle className="w-4 h-4 text-red-500" />,
+          text: "Rejected",
+          color: "text-red-500",
+        };
+      case "PENDING":
+      default:
+        return {
+          icon: <Clock className="w-4 h-4 text-yellow-500" />,
+          text: "Pending",
+          color: "text-yellow-500",
+        };
+    }
   };
 
   // Loading state
@@ -249,9 +336,34 @@ export default function Profile() {
           </div>
           <div className="flex items-center justify-between">
             <p className="text-sm text-[#4C5560]">KYC status</p>
-            <p className="font-medium text-[#116114] text-sm">
-              {user.kycStatus === "VERIFIED" ? "Verified" : "Pending"}
-            </p>
+            <div className="flex items-center gap-2">
+              {kycLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  {getKycStatusDisplay(kyc?.status || user.kycStatus).icon}
+                  <span
+                    className={`font-medium text-sm ${getKycStatusDisplay(kyc?.status || user.kycStatus).color}`}
+                  >
+                    {kyc
+                      ? getKycStatusDisplay(kyc?.status || user.kycStatus).text
+                      : "Unverified"}
+                  </span>
+                </>
+              )}
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setKycStatus(kyc?.status || user.kycStatus);
+                  setKycRemark(kyc?.remark || "");
+                  setKycDialogOpen(true);
+                }}
+                className="text-xs"
+              >
+                Edit
+              </Button>
+            </div>
           </div>
           {user.createdAt && (
             <div className="flex items-center justify-between">
@@ -266,14 +378,14 @@ export default function Profile() {
           Property management
         </h3>
         <div>
-          <div className="flex items-center font-medium justify-between text-sm">
+          {/* <div className="flex items-center font-medium justify-between text-sm">
             <p className="text-[#116114]">Owned properties</p>
             <Link
               href={`/main-admin/customers/owned-properties?tab=owned&userId=${userId}`}
             >
               <Button variant="ghost">View all</Button>
             </Link>
-          </div>
+          </div> */}
           <div className="bg-[#F4F4F4] mt-2 rounded-md p-5">
             {properties.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8">
@@ -315,11 +427,11 @@ export default function Profile() {
         <div>
           <div className="flex items-center font-medium justify-between text-sm">
             <p className="text-[#116114]">Rented properties</p>
-            <Link
+            {/* <Link
               href={`/main-admin/customers/owned-properties?tab=rented&userId=${userId}`}
             >
               <Button variant="ghost">View all</Button>
-            </Link>
+            </Link> */}
           </div>
           <div className="bg-[#F4F4F4] mt-2 rounded-md p-5">
             <div className="flex flex-col items-center justify-center py-8">
@@ -339,6 +451,68 @@ export default function Profile() {
         </div>
       </div>
       <AddUnitModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+
+      {/* KYC Status Update Dialog */}
+      <Dialog open={kycDialogOpen} onOpenChange={setKycDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update KYC Status</DialogTitle>
+            <DialogDescription>
+              Update the KYC verification status for {user?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="kyc-status">Status</Label>
+              <select
+                id="kyc-status"
+                value={kycStatus}
+                onChange={(e) => setKycStatus(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md bg-white"
+              >
+                <option value="PENDING">Pending</option>
+                <option value="VERIFIED">Verified</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="kyc-remark">Remark (Optional)</Label>
+              <textarea
+                id="kyc-remark"
+                value={kycRemark}
+                onChange={(e) => setKycRemark(e.target.value)}
+                placeholder="Add a remark about the KYC status..."
+                className="w-full p-2 border border-gray-300 rounded-md bg-white min-h-[80px] resize-none"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setKycDialogOpen(false)}
+              disabled={isUpdatingKyc}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleKycStatusUpdate}
+              disabled={isUpdatingKyc}
+              className="bg-[#116114] hover:bg-[#116114]/90"
+            >
+              {isUpdatingKyc ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                "Update Status"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

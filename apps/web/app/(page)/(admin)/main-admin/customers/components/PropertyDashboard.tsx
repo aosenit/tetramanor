@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+// import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import four from "@/assets/admin/home/four.webp";
-import dp from "@/assets/admin/customer/dp.png";
-import { MdArrowBackIosNew } from "react-icons/md";
+// import dp from "@/assets/admin/customer/dp.png";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
 import {
@@ -17,7 +15,6 @@ import {
   Users,
   CreditCard,
   Link,
-  ArrowLeft,
 } from "lucide-react";
 import { Button } from "@chakra-ui/react";
 
@@ -29,6 +26,9 @@ interface Unit {
   price: number;
   unitCount: number;
   isRented: boolean;
+  unitType: string;
+  accountOfficer: string;
+  paymentStatus: string;
 }
 
 export default function PropertyDashboard() {
@@ -253,19 +253,21 @@ export default function PropertyDashboard() {
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <Image
+                      {/* <Image
                         src={four}
                         alt={`Unit ${unit.id}`}
                         width={48}
                         height={48}
                         className="rounded-lg object-cover"
-                      />
+                      /> */}
                       <span className="font-medium text-sm">
                         Unit {unit.id}
                       </span>
                     </div>
 
-                    <div className="text-gray-600 text-sm">Apartment</div>
+                    <div className="text-gray-600 text-sm">
+                      {unit?.unitType}
+                    </div>
                     <div className="text-gray-600 text-sm">
                       {unit.unitCount}
                     </div>
@@ -280,20 +282,22 @@ export default function PropertyDashboard() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <Image
+                      {/* <Image
                         src={dp}
                         alt="Account Officer"
                         width={28}
                         height={28}
                         className="rounded-full object-cover"
-                      />
+                      /> */}
                       <span className="text-sm text-gray-600">
-                        Account Officer
+                        {unit?.accountOfficer || "N/A"}
                       </span>
                     </div>
 
                     <div>
-                      <p className="text-[#2EBF43] text-sm">Paid</p>
+                      <p className="text-[#2EBF43] text-sm">
+                        {unit?.paymentStatus || "Paid"}
+                      </p>
                     </div>
                   </div>
                 ))
