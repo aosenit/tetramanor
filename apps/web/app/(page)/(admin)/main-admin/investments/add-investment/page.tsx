@@ -524,10 +524,10 @@ function AddInvestmentContent() {
         </div>
 
         <div>
-          <h4 className="font-medium text-[#4C5560] mb-4">
+          {/* <h4 className="font-medium text-[#4C5560] mb-4">
             Visibility and status{" "}
           </h4>
-          {/* Status */}
+         
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <CustomDropdown
               label="Status *"
@@ -539,7 +539,7 @@ function AddInvestmentContent() {
               selected={formData.status}
               onSelect={(value) => handleInputChange("status", value)}
             />
-          </div>
+          </div> */}
         </div>
 
         {/* Buttons */}

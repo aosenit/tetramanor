@@ -23,12 +23,12 @@ import Link from "next/link";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import InvestmentModal from "./add-investment/components/Modal";
 import ConfirmationModal from "./components/ConfirmationModal";
-import { useState, useEffect } from "react";
+
 import { useRouter, useSearchParams } from "next/navigation";
-import { useFetchData, useDeleteData, usePutData } from "@/hooks/useApi";
+import { useFetchData } from "@/hooks/useApi";
 import { toast } from "sonner";
 import { axiosInstance } from "@/services/axiosInstance";
-import React, { Suspense } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import Loader from "@/components/Loader";
 
 interface Investment {
@@ -64,7 +64,7 @@ function InvestmentsPageContent() {
     useState<Investment | null>(null);
   const [confirmationModal, setConfirmationModal] = useState<{
     open: boolean;
-    action: "delete" | "unpublish";
+    action: "delete" | "unpublish" | "publish";
     investment: Investment | null;
   }>({ open: false, action: "delete", investment: null });
   const [isDeleting, setIsDeleting] = useState(false);
@@ -180,7 +180,7 @@ function InvestmentsPageContent() {
       } finally {
         setIsDeleting(false);
       }
-    } else if (action === "unpublish") {
+    } else if (action === "unpublish" || action === "publish") {
       setIsUpdatingStatus(true);
       try {
         const newStatus =
@@ -226,18 +226,19 @@ function InvestmentsPageContent() {
 
   // Get status display name
   const getStatusDisplayName = (status: string) => {
-    switch (status) {
+    switch (status?.toUpperCase()) {
       case "PUBLISHED":
         return "Published";
       case "UNPUBLISHED":
         return "Unpublished";
       default:
-        return status;
+        return "Draft";
     }
   };
 
   // Format currency
   const formatCurrency = (amount: number, currency: string) => {
+    if (!amount) return "N/A";
     return new Intl.NumberFormat("en-NG", {
       style: "currency",
       currency: currency || "NGN",
@@ -515,7 +516,10 @@ function InvestmentsPageContent() {
                                   onSelect={() => {
                                     setConfirmationModal({
                                       open: true,
-                                      action: "unpublish",
+                                      action:
+                                        investment.status === "PUBLISHED"
+                                          ? "unpublish"
+                                          : "publish",
                                       investment: investment,
                                     });
                                   }}

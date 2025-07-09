@@ -1,12 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Trash2, EyeOff } from "lucide-react";
+import { AlertTriangle, Trash2, EyeOff, Eye } from "lucide-react";
 
 interface ConfirmationModalProps {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  action: "delete" | "unpublish";
+  action: "delete" | "unpublish" | "publish";
   investmentName?: string;
   isLoading?: boolean;
 }
@@ -23,7 +23,7 @@ export default function ConfirmationModal({
 
   const isDelete = action === "delete";
   const isUnpublish = action === "unpublish";
-
+  const isPublish = action === "publish";
   const getModalContent = () => {
     if (isDelete) {
       return {
@@ -44,6 +44,18 @@ export default function ConfirmationModal({
         confirmText: "Unpublish Investment",
         confirmVariant: "outline" as const,
         confirmClass: "border-orange-500 text-orange-600 hover:bg-orange-50",
+      };
+    }
+
+    if (isPublish) {
+      return {
+        title: "Publish Investment",
+        description: `Are you sure you want to publish "${investmentName}"? This will make the investment visible to public view.`,
+        icon: <Eye className="w-12 h-12 text-green-500" />,
+        confirmText: "Publish Investment",
+        confirmVariant: "default" as const,
+        confirmClass:
+          "border-green-500  hover:bg-opacity-80 bg-[var(--primary-green)] text-white",
       };
     }
 
