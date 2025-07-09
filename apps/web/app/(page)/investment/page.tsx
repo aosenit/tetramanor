@@ -5,7 +5,6 @@ import InvestmentOpportunities from "./components/InvestmentOpportunities";
 import InvestmentModels from "./components/InvestmentModel";
 // import HowItWorks from "./components/TabOne";
 import WhyPartnerWithTetramore from "./components/WhyPartnerWithTetramore";
-import RoiCalculator from "./components/RoiCalculator";
 
 function Page() {
   return (
@@ -13,7 +12,7 @@ function Page() {
       <Hero />
       <InvestmentOpportunities />
       <InvestmentModels />
-      <RoiCalculator />
+      {/* <RoiCalculator /> */}
       <WhyPartnerWithTetramore />
       <Footer />
     </div>
