@@ -4,7 +4,7 @@ import { ChevronUp, Download, Save, X } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { GrLocation } from "react-icons/gr";
 import { useSearchParams } from "next/navigation";
-import four from "@/assets/admin/home/four.webp";
+import placeholder from "@/assets/placeholder.svg";
 import c from "@/assets/investment/icons/c.webp";
 import h from "@/assets/investment/icons/h.svg";
 import g from "@/assets/investment/icons/g.svg";
@@ -371,12 +371,14 @@ export default function PropertyDetails() {
             <h2 className="text-sm font-medium text-[#116114]">
               View property details
             </h2>
-            <div className="flex items-center gap-2">
-              <Button className="bg-[#116114] text-white">
-                <Download className="w-4 h-4 mr-2" />
-                Download brochure
-              </Button>
-            </div>
+            {property?.brochure?.length > 0 && (
+              <div className="flex items-center gap-2">
+                <Button className="bg-[#116114] text-white">
+                  <Download className="w-4 h-4 mr-2" />
+                  Download brochure
+                </Button>
+              </div>
+            )}
           </div>
 
           {updateError && (
@@ -386,35 +388,41 @@ export default function PropertyDetails() {
           )}
 
           {/* Property Images */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
-            <div className="aspect-[4/3] relative rounded-lg overflow-hidden">
-              <Image
-                src={four}
-                alt="Property exterior view"
-                fill
-                className="object-cover"
-              />
+          {property?.image?.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
+              <div className="aspect-[4/3] relative rounded-lg overflow-hidden">
+                <Image
+                  src={property?.image[0]?.imageUrl || placeholder}
+                  alt="Property exterior view"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="aspect-[4/3] relative rounded-lg overflow-hidden">
+                <Image
+                  src={property?.image[1]?.imageUrl || placeholder}
+                  alt="Property exterior view"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="aspect-[4/3] relative rounded-lg overflow-hidden">
+                <Image
+                  src={property?.image[2]?.imageUrl || placeholder}
+                  alt="Property exterior view"
+                  fill
+                  className="object-cover"
+                />
+              </div>
             </div>
-            <div className="aspect-[4/3] relative rounded-lg overflow-hidden">
-              <Image
-                src={four}
-                alt="Property exterior view"
-                fill
-                className="object-cover"
-              />
+          ) : (
+            <div className="flex justify-start items-start h-full py-10">
+              <p className="text-[#858C95]">No images available</p>
             </div>
-            <div className="aspect-[4/3] relative rounded-lg overflow-hidden">
-              <Image
-                src={four}
-                alt="Property exterior view"
-                fill
-                className="object-cover"
-              />
-            </div>
-          </div>
+          )}
 
           {/* Property Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:flex md:justify-between gap-8">
             <div className="space-y-4">
               <div className="flex items-center gap-12">
                 <label className="text-xs font-medium text-[#181818] block min-w-[100px]">
@@ -506,10 +514,10 @@ export default function PropertyDetails() {
                     </Collapsible>
                   </div>
                 ) : (
-                  <Collapsible className="flex-1 mt-1">
+                  <Collapsible className="flex-1 mt-1 ">
                     <CollapsibleTrigger className="flex items-center gap-2 w-full text-left">
                       <span className="text-[#116114] font-medium text-sm">
-                        {property?.unitAmount} Units
+                        {property?.unitTypes?.length} Units
                       </span>
                       <ChevronUp className="text-[#4C5560]" />
                     </CollapsibleTrigger>
@@ -570,8 +578,32 @@ export default function PropertyDetails() {
         </div>
       </div>
       <div className="bg-white mt-4 p-8">
-        <h2 className="text-sm font-medium text-[#181818] mb-4">
-          Why invest:{" "}
+        <h2 className="text-sm font-medium text-[var(--primary-green)] mb-4">
+          Property description
+        </h2>
+        {isEditing ? (
+          <div className="space-y-4">
+            <Input
+              value={formData.about}
+              onChange={(e) => handleInputChange("about", e.target.value)}
+              placeholder="Property description"
+              className="font-medium text-[#116114]"
+            />
+            <Textarea
+              value={formData.about}
+              onChange={(e) => handleInputChange("about", e.target.value)}
+              placeholder="Property description"
+              className="text-sm leading-relaxed text-[#181818]"
+              rows={4}
+            />
+          </div>
+        ) : (
+          <p className=" text-sm font-medium">{property?.about}</p>
+        )}
+      </div>
+      <div className="bg-white mt-4 p-8">
+        <h2 className="text-sm font-medium text-[var(--primary-green)] mb-4">
+          Why invest
         </h2>
         {isEditing ? (
           <div className="space-y-4">
@@ -594,10 +626,10 @@ export default function PropertyDetails() {
         ) : (
           <>
             <p className="text-[#116114] text-sm font-medium">
-              {property?.whyInvest?.title}
+              {property?.whyInvest[0]?.title || "N/A"}
             </p>
-            <p className="text-sm leading-relaxed text-[#181818] mt-2">
-              {property?.whyInvest?.description}
+            <p className="text-sm font-medium">
+              {property?.whyInvest[0]?.description || "N/A"}
             </p>
           </>
         )}
@@ -662,22 +694,31 @@ export default function PropertyDetails() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {property?.whyInvest?.advantages?.map((adv, idx) => (
-              <div key={idx} className="flex items-center gap-4">
-                <Image
-                  src={
-                    defaultAdvantages[idx % defaultAdvantages.length]?.icon || c
-                  }
-                  alt="Investment advantage icon"
-                  width={40}
-                  height={40}
-                />
-                <div>
-                  <h4 className="text-[#116114] font-semibold">{adv.title}</h4>
-                  <p className="text-sm text-[#202020]">{adv.description}</p>
+            {property?.whyInvest?.advantages?.length > 0 ? (
+              property?.whyInvest?.advantages?.map((adv, idx) => (
+                <div key={idx} className="flex items-center gap-4">
+                  <Image
+                    src={
+                      defaultAdvantages[idx % defaultAdvantages.length]?.icon ||
+                      c
+                    }
+                    alt="Investment advantage icon"
+                    width={40}
+                    height={40}
+                  />
+                  <div>
+                    <h4 className="text-[#116114] font-semibold">
+                      {adv.title || "N/A"}
+                    </h4>
+                    <p className="text-sm text-[#202020]">
+                      {adv.description || "N/A"}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-sm text-[#181818]">No advantages available</p>
+            )}
           </div>
         )}
       </div>
@@ -716,17 +757,21 @@ export default function PropertyDetails() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {property?.features?.map((feature, index) => (
-              <div
-                key={index}
-                className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
-              >
-                <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
-                <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden w-full">
-                  {feature}
-                </span>
-              </div>
-            ))}
+            {property?.features?.length > 0 ? (
+              property?.features?.map((feature, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
+                >
+                  <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
+                  <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden w-full">
+                    {feature || "N/A"}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-[#181818]">No features available</p>
+            )}
           </div>
         )}
 
@@ -764,20 +809,47 @@ export default function PropertyDetails() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {property?.amenities?.map((amenity, index) => (
-              <div
-                key={index}
-                className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
-              >
-                <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
-                <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden w-full">
-                  {amenity}
-                </span>
-              </div>
-            ))}
+            {property?.amenities?.length > 0 ? (
+              property?.amenities?.map((amenity, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
+                >
+                  <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
+                  <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden w-full">
+                    {amenity || "N/A"}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-[#181818]">No amenities available</p>
+            )}
           </div>
         )}
       </div>
+      {/* add and edit contact options */}
+      {!isEditing && (
+        <div className="bg-white mt-4 p-8">
+          <h2 className="text-sm font-medium text-[var(--primary-green)] mb-4">
+            Contact options enabled
+          </h2>
+          {/* add address and also account office */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <h3 className="text-sm font-medium text-[#181818]">Address</h3>
+              <p className="text-sm text-[#181818]">{property?.address}</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-sm font-medium text-[#181818]">
+                Account officer
+              </h3>
+              <p className="text-sm text-[#181818]">
+                {property?.accountOfficer || "N/A"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex justify-between px-3 items-center py-12">
         {!isEditing ? (
           <Button

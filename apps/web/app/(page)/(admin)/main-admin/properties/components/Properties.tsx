@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Search, Plus, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import four from "@/assets/admin/home/four.webp";
 import { CiLocationOn } from "react-icons/ci";
 import { FiEdit3 } from "react-icons/fi";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
+import placeholder from "@/assets/placeholder.svg";
 
 export default function PropertyManagement() {
   const router = useRouter();
@@ -357,7 +357,7 @@ export default function PropertyManagement() {
                       src={
                         property.images && property.images.length > 0
                           ? property.images[0]?.imageUrl
-                          : four
+                          : placeholder
                       }
                       alt={property.name}
                       width={300}
