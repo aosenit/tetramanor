@@ -1,7 +1,47 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
 
-const PropertyPaymentHistory = () => {
+interface Payment {
+  id: string;
+  paymentId: string;
+  purchaseId: string;
+  customerId: string;
+  propertyId: string;
+  paymentType: string;
+  amountPaid: number;
+  balanceRemaining: number;
+  paymentMode: string | null;
+  paymentDate: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface PropertyPaymentHistoryProps {
+  payments?: Payment[];
+}
+
+const PropertyPaymentHistory: React.FC<PropertyPaymentHistoryProps> = ({
+  payments = [],
+}) => {
+  // Helper function to format currency
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  // Helper function to format date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
   return (
     <div className="space-y-4 bg-white rounded-lg border p-4">
       <div className="flex items-center justify-between">
@@ -106,45 +146,53 @@ const PropertyPaymentHistory = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {Array.from({ length: 10 }).map((_, index) => (
-              <tr
-                key={index}
-                className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
-              >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  TTV-123-CMB
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  Jan 15, 2025
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {index === 1 ? "₦5,000,000" : "₦300,000"}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {index % 3 === 1 ? "Credit Card" : "Bank Transfer"}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-green-500 text-sm font-medium">
-                    Completed
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ₦4,700,000
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="text-gray-400 hover:text-gray-500">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                    </svg>
-                  </button>
+            {payments.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
+                  No payment history available
                 </td>
               </tr>
-            ))}
+            ) : (
+              payments.map((payment, index) => (
+                <tr
+                  key={payment.id}
+                  className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {payment.paymentId}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatDate(payment.paymentDate)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatCurrency(payment.amountPaid)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {payment.paymentMode || "Not specified"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="text-green-500 text-sm font-medium">
+                      Completed
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatCurrency(payment.balanceRemaining)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button className="text-gray-400 hover:text-gray-500">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

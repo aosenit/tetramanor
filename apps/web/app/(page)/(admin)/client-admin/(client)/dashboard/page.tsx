@@ -10,11 +10,17 @@ import { useFetchData } from "@/hooks/useApi";
 import Loader from "@/components/Loader";
 import { AlertCircle, RefreshCw, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
   const { data, isLoading, isError, error, refetch } =
     useFetchData("customer/dashboard");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const { data: getKYCStatus, isPending: isKYCStatusPending } =
+    useFetchData("kyc");
+
+  console.log(getKYCStatus?.data?.status);
 
   // Loading state
   if (isLoading) {
@@ -120,7 +126,9 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {!user?.kycStatusVerified && <VerifyBanner />}
+        {isKYCStatusPending && <Skeleton className="w-full h-10" />}
+        {getKYCStatus?.data?.status?.toLowerCase() !== "verified" &&
+          !isKYCStatusPending && <VerifyBanner />}
         <DashboardStats data={data?.data} />
 
         <div className="w-screen lg:w-full overflow-x-hidden h-fit">

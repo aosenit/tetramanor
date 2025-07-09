@@ -1,17 +1,99 @@
 import { Mail, Phone } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { PropertyGallery } from "./PropertyGallery";
 import { PropertyFeatures } from "./PropertyFeature";
 import { PropertyLocation } from "./PropertyLocation";
 import Image from "next/image";
 import placeholder from "@/assets/placeholder.svg";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { usePostData } from "@/hooks/useApi";
+import { toast } from "sonner";
 
 const PropertyDetailOverview = ({ property }: { property: any }) => {
+  const [isRentDialogOpen, setIsRentDialogOpen] = useState(false);
+  const { mutate: addRental, isPending: isAddingRental } = usePostData(
+    "customer/add-rental"
+  );
+
+  const handlePutUpForRent = () => {
+    setIsRentDialogOpen(true);
+  };
+
+  const confirmPutUpForRent = () => {
+    addRental(
+      { purchaseId: property.id },
+      {
+        onSuccess: () => {
+          toast.success("Property put up for rent successfully!");
+          setIsRentDialogOpen(false);
+        },
+        onError: (error) => {
+          toast.error(error?.message || "Failed to put property up for rent");
+        },
+      }
+    );
+  };
+
+  const cancelPutUpForRent = () => {
+    setIsRentDialogOpen(false);
+  };
+
   return (
     <div className="grid grid-cols-1 gap-6">
+      <div className="flex justify-end w-full">
+        <Dialog open={isRentDialogOpen} onOpenChange={setIsRentDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              className="bg-[var(--primary-green)] text-white"
+              onClick={handlePutUpForRent}
+            >
+              Put up for rent
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Put Property Up for Rent</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-sm text-gray-600 mb-4">
+                Are you sure you want to put{" "}
+                <span className="font-semibold">{property.name}</span> up for
+                rent? This action cannot be undone.
+              </p>
+              <div className="flex gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={cancelPutUpForRent}
+                  className="flex-1"
+                  disabled={isAddingRental}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmPutUpForRent}
+                  className="flex-1"
+                  disabled={isAddingRental}
+                >
+                  {isAddingRental ? "Putting Up for Rent..." : "Confirm"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
       <div className="space-y-6">
         <div className="bg-white rounded-lg border p-4 space-y-3">
-          <PropertyGallery />
+          <PropertyGallery
+            gallery={property?.property?.images}
+            coverImage={property?.property?.coverImage}
+          />
 
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">{property.name}</h1>

@@ -5,15 +5,7 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  ChevronLeft,
-  Filter,
-  MoreHorizontal,
-  X,
-  Home,
-  Eye,
-  FileText,
-} from "lucide-react";
+import { ChevronLeft, Filter, MoreHorizontal, Home, Eye } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -142,45 +134,51 @@ const PropertyOverview = () => {
   const name = useSearchParams().get("name");
   const router = useRouter();
 
-  const { data, isLoading, isError, error } = useFetchData(
-    id ? `/customer/properties/${id}` : ""
-  );
+  // Fetch properties using the new endpoint
+  const {
+    data: propertiesData,
+    isLoading: isPropertiesLoading,
+    isError: isPropertiesError,
+    error: propertiesError,
+  } = useFetchData(id ? `/customer/properties/${id}` : "");
+
+  // Fetch stats using the new endpoint
+  const {
+    data: statsData,
+    isLoading: isStatsLoading,
+    isError: isStatsError,
+    error: statsError,
+  } = useFetchData(id ? `/customer/properties/stats/${id}` : "");
+
   const { mutate: addRental, isPending: isAddingRental } = usePostData(
     "customer/add-rental"
   );
-  const properties = Array.isArray(data?.data) ? data.data : [];
 
-  // Calculate stats from data
-  const totalUnitsOwned = properties.length;
-  const totalPropertyValue = properties.reduce(
-    (sum, p) => sum + (Number(p.price) || 0),
-    0
-  );
-  const outstandingBalance = properties.reduce(
-    (sum, p) => sum + (Number(p.outstandingBalance) || 0),
-    0
-  );
-  const unitsRented = properties.filter((p) => p.isRented === true).length;
+  const properties = Array.isArray(propertiesData?.data)
+    ? propertiesData.data
+    : [];
+  const stats = statsData?.data || {};
 
+  // Use stats from API instead of calculating
   const summary = [
     {
       label: "Total Units Owned",
-      value: totalUnitsOwned.toString().padStart(2, "0"),
+      value: (stats.totalUnitsOwned || 0).toString().padStart(2, "0"),
       icon: iconOne,
     },
     {
       label: "Total Property Value",
-      value: `₦${totalPropertyValue.toLocaleString()}`,
+      value: `₦${(stats.totalPropertyValue || 0).toLocaleString()}`,
       icon: iconTwo,
     },
     {
       label: "Outstanding Balance",
-      value: `₦${outstandingBalance.toLocaleString()}`,
+      value: `₦${(stats.outstandingPayment || 0).toLocaleString()}`,
       // icon: iconThree,
     },
     {
       label: "Units Rented",
-      value: unitsRented.toString().padStart(2, "0"),
+      value: (stats.unitsRented || 0).toString().padStart(2, "0"),
       icon: iconFour,
     },
   ];
@@ -272,6 +270,11 @@ const PropertyOverview = () => {
     setSelectedPropertyForRent(null);
   };
 
+  // Check if any data is loading
+  const isLoading = isPropertiesLoading || isStatsLoading;
+  const isError = isPropertiesError || isStatsError;
+  const error = propertiesError || statsError;
+
   return (
     <div className="bg-gray-50 min-h-screen pb-8">
       <div className="px-2 sm:px-4 lg:px-8 py-6 space-y-6 max-w-7xl mx-auto">
@@ -307,8 +310,8 @@ const PropertyOverview = () => {
               </div>
               <div className="flex items-center justify-center h-10 w-10 rounded-full bg-blue-50">
                 <Image
-                  src={item.icon.src}
-                  alt={item.label}
+                  src={item?.icon?.src}
+                  alt={item?.label}
                   className="h-10 w-10 object-contain"
                   height={20}
                   width={20}
@@ -468,7 +471,8 @@ const PropertyOverview = () => {
                 // Filter by search
                 const matchesSearch =
                   p.name?.toLowerCase().includes(search.toLowerCase()) ||
-                  p.unitType?.toLowerCase().includes(search.toLowerCase());
+                  p.unitType?.toLowerCase().includes(search.toLowerCase()) ||
+                  p.propertyName?.toLowerCase().includes(search.toLowerCase());
 
                 if (!matchesSearch) return false;
 
@@ -523,10 +527,22 @@ const PropertyOverview = () => {
                           </td>
                           <td className="px-3 py-2 flex items-center gap-3 min-w-[150px]">
                             <div className="h-10 w-14 bg-gray-200 rounded-md border flex items-center justify-center">
-                              <span className="text-xs text-gray-500">IMG</span>
+                              {property.images && property.images.length > 0 ? (
+                                <Image
+                                  src={property.images[0].imageUrl}
+                                  alt={property.name || property.propertyName}
+                                  width={56}
+                                  height={40}
+                                  className="rounded-md object-cover"
+                                />
+                              ) : (
+                                <span className="text-xs text-gray-500">
+                                  IMG
+                                </span>
+                              )}
                             </div>
                             <span className="font-semibold text-gray-900 truncate">
-                              {property.name}
+                              {property.name || property.propertyName}
                             </span>
                           </td>
                           <td className="px-3 py-2">
@@ -593,13 +609,15 @@ const PropertyOverview = () => {
                                     ? "Already Rented"
                                     : "Put Up for Rent"}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    router.push(
+                                      `/client-admin/properties/${property.id}?id=${id}&name=${name}&type=${activeTab}`
+                                    )
+                                  }
+                                >
                                   <Eye className="mr-2 h-4 w-4" />
                                   View Details
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                  <FileText className="mr-2 h-4 w-4" />
-                                  View Documents
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -624,7 +642,8 @@ const PropertyOverview = () => {
               <p className="text-sm text-gray-600 mb-4">
                 Are you sure you want to put{" "}
                 <span className="font-semibold">
-                  {selectedPropertyForRent?.name}
+                  {selectedPropertyForRent?.name ||
+                    selectedPropertyForRent?.propertyName}
                 </span>{" "}
                 up for rent? This action cannot be undone.
               </p>
