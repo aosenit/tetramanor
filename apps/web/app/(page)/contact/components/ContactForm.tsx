@@ -8,6 +8,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useFetchData } from "@/hooks/useApi";
+import type { ContactResponse, ContactData } from "@/types/contact";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -21,6 +23,15 @@ type ContactFormData = z.infer<typeof contactFormSchema>;
 function ContactForm() {
   const { mutateAsync: sendMessage, isPending: isSending } =
     usePostData("contact/enquiry");
+
+  // Fetch contact info
+  const {
+    data: contactResponse,
+    isLoading: isContactLoading,
+    error: contactError,
+  } = useFetchData("contact");
+
+  const contact: ContactData | undefined = contactResponse?.data;
 
   const {
     register,
@@ -53,32 +64,52 @@ function ContactForm() {
                 </h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 border  gap-6 p-6">
-                {/* make a link to phone number */}
-                <a href="tel:+23481234567" target="_blank">
-                  <p className="flex items-center gap-4">
-                    <FaPhone className="text-green-700" />
-                    +234 916 647 9719
-                  </p>
-                </a>
-                {/* make a link to email */}
-                <a href="mailto:tetramanor@mail.com" target="_blank">
-                  <p className="flex items-center gap-4">
-                    <IoMdMail className="text-green-700" />
-                    tetramanor@mail.com
-                  </p>
-                </a>
-                {/* make a link to location */}
-                <a
-                  href="https://maps.google.com/?q=13+Random+Address+Ikeja+Lagos+State"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <p className="flex items-center gap-4">
-                    <FaLocationDot className="text-green-700" />
-                    13, Random Address, Ikeja, Lagos State.
-                  </p>
-                </a>
+                {isContactLoading ? (
+                  <p>Loading contact info...</p>
+                ) : contactError ? (
+                  <p className="text-red-500">Failed to load contact info</p>
+                ) : contact ? (
+                  <>
+                    {/* Phone */}
+                    <a href={`tel:${contact.phoneNumber}`} target="_blank" rel="noopener noreferrer">
+                      <p className="flex items-center gap-4">
+                        <FaPhone className="text-green-700" />
+                        {contact.phoneNumber}
+                      </p>
+                    </a>
+                    {/* Email */}
+                    <a href={`mailto:${contact.companyEmail}`} target="_blank" rel="noopener noreferrer">
+                      <p className="flex items-center gap-4">
+                        <IoMdMail className="text-green-700" />
+                        {contact.companyEmail}
+                      </p>
+                    </a>
+                    {/* Address */}
+                    <a
+                      href={contact.mapEmbedCode || `https://maps.google.com/?q=${encodeURIComponent(contact.officeAddress)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <p className="flex items-center gap-4">
+                        <FaLocationDot className="text-green-700" />
+                        {contact.officeAddress}
+                      </p>
+                    </a>
+                  </>
+                ) : (
+                  <p>No contact info available.</p>
+                )}
               </div>
+              {/* Optionally render social media links */}
+              {/* {contact?.socialMedia?.length ? (
+                <div className="flex flex-wrap gap-4 p-6 pt-0">
+                  {contact.socialMedia.map((sm) => (
+                    <a key={sm.platform} href={sm.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                      {sm.platform}
+                    </a>
+                  ))}
+                </div>
+              ) : null} */}
             </div>
           </div>
           <div className=" bg-white rounded-lg ">

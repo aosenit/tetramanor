@@ -1,68 +1,66 @@
 "use client";
 import React from "react";
 import PropertyCard from "../components/property-card";
-import five from "@/assets/portfolio/five.webp"
-import six from "@/assets/portfolio/six.webp"
-import seven from "@/assets/portfolio/seven.webp"
-
+import { useFetchData } from "@/hooks/useApi";
+import type { PropertyResponse, PropertyItem } from "@/types/property";
 
 function Completed() {
-  const projects = [
-    {
-      id: 1,
-      title: "Comfy Burrows",
-      description: "A luxury residential development in the heart of Lagos.",
-      image: five,
-    },
-    {
-      id: 2,
-      title: "TM Gardens",
-      description: "An exclusive gated community with modern amenities.",
-      image: six,
-    },
-    {
-      id: 3,
-      title: "TM Meadows",
-      description: "A serene residential estate with beautiful landscapes.",
-      image: seven,
-    },
-  ];
+  // Fetch completed properties (limit 3)
+  const {
+    data: propertyResponse,
+    isLoading,
+    error,
+  } = useFetchData("property", {
+    page: 1,
+    limit: 3,
+    constructionStatus: "COMPLETED",
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
+
+  const properties: PropertyItem[] = propertyResponse?.data?.items || [];
 
   return (
     <section className="py-16 container mx-auto px-4 lg:px-16 bg-white ">
       <h2 className="text-3xl md:text-4xl font-bold mb-10 text-gray-900 ">
         Completed Projects
       </h2>
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="w-full h-full md:col-span-2">
-          <PropertyCard
-            slug="burrows"
-            image={projects[0].image.src}
-            title={projects[0].title}
-            location="Yaba, Lagos, Nigeria."
-            status="Sold Out"
-            className="h-full min-h-[400px]"
-          />
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : error ? (
+        <div className="text-red-500">Failed to load properties</div>
+      ) : (
+        <div className="grid gap-6">
+          {/* Top: First card spans full width */}
+          {properties[0] && (
+            <div className="w-full">
+              <PropertyCard
+                key={properties[0].id}
+                slug={properties[0].id}
+                image={properties[0].images[0]?.imageUrl}
+                title={properties[0].name}
+                location={properties[0].address}
+                status={properties[0].status === "SOLDOUT" ? "Sold Out" : properties[0].status}
+                className="h-full min-h-[400px]"
+              />
+            </div>
+          )}
+          {/* Bottom: Next two cards side by side */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {properties.slice(1, 3).map((property) => (
+              <PropertyCard
+                key={property.id}
+                slug={property.id}
+                image={property.images[0]?.imageUrl}
+                title={property.name}
+                location={property.address}
+                status={property.status === "SOLDOUT" ? "Sold Out" : property.status}
+                className="h-full min-h-[400px]"
+              />
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 col-span-1 md:col-span-2">
-          <PropertyCard
-            slug="TM-Gardens"
-            image={projects[1].image.src}
-            title={projects[1].title}
-            location="Surulere, Lagos, Nigeria."
-            status="Sold Out"
-            className="flex-1 min-h-[400px]"
-          />
-          <PropertyCard
-            slug="TM-Meadows"
-            image={projects[2].image.src}
-            title={projects[2].title}
-            location="Mende, Maryland, Lagos, Nigeria."
-            status="Sold Out"
-            className="flex-1 min-h-[400px]"
-          />
-        </div>
-      </div>
+      )}
     </section>
   );
 }

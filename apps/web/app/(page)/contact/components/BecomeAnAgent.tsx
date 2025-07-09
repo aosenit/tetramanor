@@ -7,6 +7,8 @@ import c from "@/assets/investment/icons/c.webp";
 import d from "@/assets/investment/icons/d.webp";
 import { IoMdMail } from "react-icons/io";
 import { MdCall } from "react-icons/md";
+import { useFetchData } from "@/hooks/useApi";
+
 const steps = [
   {
     icon: a,
@@ -32,6 +34,15 @@ const steps = [
   },
 ];
 function BecomeAnAgent() {
+  // Fetch contact info
+  const {
+    data: contactResponse,
+    isLoading: isContactLoading,
+    error: contactError,
+  } = useFetchData("contact");
+
+  const agent = contactResponse?.data?.agentInquiry;
+
   return (
     <div className="bg-[#f3f7f3] py-12">
       <div className="container mx-auto px-4 lg:px-16 py-12">
@@ -49,13 +60,13 @@ function BecomeAnAgent() {
               <span className="text-green-700">
                 <MdCall />
               </span>
-              +234 812 345 67
+              {isContactLoading ? "Loading..." : agent?.phone || "N/A"}
             </p>
             <p className="flex items-center gap-4">
               <span className="text-green-700">
                 <IoMdMail />
               </span>{" "}
-              tetramanor@mail.com
+              {isContactLoading ? "Loading..." : agent?.email || "N/A"}
             </p>
           </div>
         </div>

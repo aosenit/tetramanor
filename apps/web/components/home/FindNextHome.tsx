@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import Image from "next/image";
-import tmHighGardens from "@/assets/home/three.webp";
+import placeholder from "@/assets/placeholder.jpg";
 import { useRouter } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
 
@@ -112,21 +112,19 @@ export default function FindNextHome() {
         ) : error || !rental || !property ? (
           <div className="text-center py-20 text-lg text-red-500">Failed to load rental.</div>
         ) : (
-        <div className="relative w-full max-w-full h-[500px] lg:h-[600px] rounded-[5px] overflow-hidden">
-          {property.images && property.images[0]?.imageUrl ? (
-            <Image
-              src={property.images[0].imageUrl}
-              alt={property.name}
-              className="object-cover rounded-xl"
-              fill
-              sizes="100vw"
-              priority
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-200 rounded-xl flex items-center justify-center text-gray-500">
-              No image available
-            </div>
-          )}
+          <div className="relative w-full max-w-full h-[500px] lg:h-[600px] rounded-[5px] overflow-hidden">
+          <Image
+            src={
+              property.images && property.images[0]?.imageUrl
+                ? property.images[0].imageUrl
+                : placeholder.src // ✅ fallback to placeholder
+            }
+            alt={property.name}
+            className="object-cover rounded-xl"
+            fill
+            sizes="100vw"
+            priority
+          />
           {/* Badge */}
           <div className="absolute top-6 left-2 lg:left-6 bg-[#8B8B8B] bg-opacity-80 text-white text-sm px-5 py-2 rounded-full">
             {property.name}
