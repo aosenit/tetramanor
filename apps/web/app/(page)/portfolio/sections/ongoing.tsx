@@ -3,8 +3,11 @@ import React from "react";
 import PropertyCard from "../components/property-card";
 import { useFetchData } from "@/hooks/useApi";
 import type { PropertyResponse, PropertyItem } from "@/types/property";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 function Ongoing() {
+  const router = useRouter();
   // Fetch ongoing properties (limit 3)
   const {
     data: propertyResponse,
@@ -30,36 +33,41 @@ function Ongoing() {
       ) : error ? (
         <div className="text-red-500">Failed to load properties</div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Left: First card spans full height */}
-          {properties[0] && (
-            <div className="w-full h-full">
-              <PropertyCard
-                key={properties[0].id}
-                image={properties[0].images[0]?.imageUrl}
-                title={properties[0].name}
-                location={properties[0].address}
-                status={properties[0].constructionStatus === "ONGOING" ? "Ongoing" : properties[0].constructionStatus}
-                className="h-full min-h-[700px]"
-                slug={properties[0].id}
-              />
+        <>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Left: First card spans full height */}
+            {properties[0] && (
+              <div className="w-full h-full">
+                <PropertyCard
+                  key={properties[0].id}
+                  image={properties[0].images[0]?.imageUrl}
+                  title={properties[0].name}
+                  location={properties[0].address}
+                  status={properties[0].constructionStatus === "ONGOING" ? "Ongoing" : properties[0].constructionStatus}
+                  className="h-full min-h-[700px]"
+                  slug={properties[0].id}
+                />
+              </div>
+            )}
+            {/* Right: Stack next two cards */}
+            <div className="flex flex-col gap-6">
+              {properties.slice(1, 3).map((property) => (
+                <PropertyCard
+                  key={property.id}
+                  image={property.images[0]?.imageUrl}
+                  title={property.name}
+                  location={property.address}
+                  status={property.constructionStatus === "ONGOING" ? "Ongoing" : property.constructionStatus}
+                  className="flex-1"
+                  slug={property.id}
+                />
+              ))}
             </div>
-          )}
-          {/* Right: Stack next two cards */}
-          <div className="flex flex-col gap-6">
-            {properties.slice(1, 3).map((property) => (
-              <PropertyCard
-                key={property.id}
-                image={property.images[0]?.imageUrl}
-                title={property.name}
-                location={property.address}
-                status={property.constructionStatus === "ONGOING" ? "Ongoing" : property.constructionStatus}
-                className="flex-1"
-                slug={property.id}
-              />
-            ))}
           </div>
-        </div>
+          <div className="flex justify-center mt-8">
+            <Button size="lg" onClick={() => router.push("/portfolio/view-more?type=ongoing")}>View More</Button>
+          </div>
+        </>
       )}
     </section>
   );

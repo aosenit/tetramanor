@@ -294,31 +294,6 @@ export default function PropertyDetails() {
             <p className="text-[#0C0C0C] leading-relaxed text-sm mb-6">
               {property.about}
             </p>
-
-            {/* Why Invest Section */}
-            {/* {property.whyInvest && (
-              <div className="mb-8">
-                <h2 className="text-xl font-semibold text-[#000000] mb-4">
-                  {property.whyInvest.title}
-                </h2>
-                <p className="text-[#0C0C0C] leading-relaxed text-sm mb-4">
-                  {property.whyInvest.description}
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {property.whyInvest.advantages.map((advantage, index) => (
-                    <div key={index} className="bg-gray-50 p-4 rounded">
-                      <h3 className="font-semibold text-sm mb-2">
-                        {advantage.title}
-                      </h3>
-                      <p className="text-xs text-gray-600">
-                        {advantage.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )} */}
-
             {/* Property Features */}
             <div className="mb-8 mt-10">
               <h2 className="text-xl font-semibold text-[#000000] mb-4">
