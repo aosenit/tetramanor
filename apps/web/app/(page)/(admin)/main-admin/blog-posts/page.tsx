@@ -1,7 +1,6 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import four from "@/assets/admin/home/four.webp";
 import { Input } from "@/components/ui/input";
 import { Search, Plus, ChevronDown } from "lucide-react";
 import {
@@ -17,6 +16,7 @@ import BlogPostDetails from "./components/BlogPostDetails";
 import { useState, useEffect } from "react";
 import { useFetchData } from "@/hooks/useApi";
 import Loader from "@/components/Loader";
+import placeholder from "@/assets/placeholder.svg";
 
 interface BlogPost {
   id: string;
@@ -160,7 +160,7 @@ export default function BlogPostsPage() {
               <Card key={post.id} className="overflow-hidden bg-[#F4F4F4]">
                 <div className="relative">
                   <Image
-                    src={post.images?.[0]?.imageUrl || four}
+                    src={post.images?.[0]?.imageUrl || placeholder}
                     alt={post.title}
                     width={300}
                     height={200}

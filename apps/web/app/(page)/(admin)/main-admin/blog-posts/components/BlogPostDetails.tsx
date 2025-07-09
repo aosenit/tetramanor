@@ -320,30 +320,26 @@ export default function BlogPostDetails({
               </div>
             </div>
             <div className="pb-8 border-b border-gray-300 flex flex-col md:flex-row gap-10">
-              {post?.images?.length > 0
-                ? post?.images
-                    .slice(0, 4)
-                    .map((image, index) => (
-                      <Image
-                        key={index}
-                        src={image?.imageUrl || four}
-                        alt={`Blog image ${index + 1}`}
-                        width={200}
-                        height={150}
-                        className="md:w-[200px] w-full h-[150px] object-cover"
-                      />
-                    ))
-                : // Show placeholder images if no images
-                  Array.from({ length: 4 }).map((_, index) => (
+              {post?.images?.length > 0 ? (
+                post?.images
+                  .slice(0, 4)
+                  .map((image, index) => (
                     <Image
                       key={index}
-                      src={four}
-                      alt="Placeholder image"
+                      src={image?.imageUrl || four}
+                      alt={`Blog image ${index + 1}`}
                       width={200}
                       height={150}
-                      className="md:w-[200px] w-full"
+                      className="md:w-[200px] w-full h-[150px] object-cover"
                     />
-                  ))}
+                  ))
+              ) : (
+                // Show placeholder images if no images
+                //  show empty state
+                <div className="flex justify-center items-center h-full">
+                  <p className="text-[#858C95]">No images available</p>
+                </div>
+              )}
             </div>
           </div>
 
