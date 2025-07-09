@@ -27,7 +27,17 @@ interface Unit {
   unitCount: number;
   isRented: boolean;
   unitType: string;
-  accountOfficer: string;
+  accountOfficer:
+    | string
+    | {
+        id: string;
+        name: string;
+        email: string;
+        phone: string;
+        createdAt: string;
+        updatedAt: string;
+      }
+    | null;
   paymentStatus: string;
 }
 
@@ -235,7 +245,7 @@ export default function PropertyDashboard() {
               </div>
 
               {/* Table Rows */}
-              {currentUnits.length === 0 ? (
+              {currentUnits?.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8">
                   <Home className="h-8 w-8 text-gray-400 mb-2" />
                   <p className="text-sm text-gray-600">
@@ -243,9 +253,9 @@ export default function PropertyDashboard() {
                   </p>
                 </div>
               ) : (
-                currentUnits.map((unit, index) => (
+                currentUnits?.map((unit, index) => (
                   <div
-                    key={unit.id}
+                    key={unit?.id}
                     className="grid grid-cols-8 gap-4 p-4 border-b hover:bg-gray-50 items-center transition-colors"
                   >
                     <div className="flex items-center">
@@ -261,23 +271,23 @@ export default function PropertyDashboard() {
                         className="rounded-lg object-cover"
                       /> */}
                       <span className="font-medium text-sm">
-                        Unit {unit.id}
+                        Unit {unit?.id}
                       </span>
                     </div>
 
                     <div className="text-gray-600 text-sm">
-                      {unit?.unitType}
+                      {unit?.unitType || "N/A"}
                     </div>
                     <div className="text-gray-600 text-sm">
-                      {unit.unitCount}
+                      {unit?.unitCount}
                     </div>
                     <div className="text-gray-600 text-sm">
-                      {unit.isRented ? "Rented" : "Owned"}
+                      {unit?.isRented ? "Rented" : "Owned"}
                     </div>
 
                     <div className="flex gap-2 items-center">
                       <div className="font-medium text-sm">
-                        ₦{unit.price.toLocaleString()}
+                        ₦{unit?.price?.toLocaleString()}
                       </div>
                     </div>
 
@@ -290,13 +300,19 @@ export default function PropertyDashboard() {
                         className="rounded-full object-cover"
                       /> */}
                       <span className="text-sm text-gray-600">
-                        {unit?.accountOfficer || "N/A"}
+                        {unit?.accountOfficer &&
+                        typeof unit.accountOfficer === "object" &&
+                        "name" in unit.accountOfficer
+                          ? unit.accountOfficer.name
+                          : typeof unit?.accountOfficer === "string"
+                            ? unit.accountOfficer
+                            : "N/A"}
                       </span>
                     </div>
 
                     <div>
                       <p className="text-[#2EBF43] text-sm">
-                        {unit?.paymentStatus || "Paid"}
+                        {unit?.paymentStatus || "N/A"}
                       </p>
                     </div>
                   </div>
