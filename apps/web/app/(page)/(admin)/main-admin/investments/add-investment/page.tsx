@@ -84,6 +84,7 @@ function AddInvestmentContent() {
 
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [imageName, setImageName] = useState("Featured Image");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Why Invest dialog state
   const [advantageDialogOpen, setAdvantageDialogOpen] = useState(false);
@@ -139,8 +140,9 @@ function AddInvestmentContent() {
         },
       });
 
-      if (investment.featuredImage) {
+      if (investment?.image[0]) {
         setImageName("Current Featured Image");
+        setImagePreview(investment?.image[0]?.imageUrl);
       }
     }
   }, [investmentResponse, isEditing]);
@@ -158,7 +160,26 @@ function AddInvestmentContent() {
         ...prev,
         [field]: file,
       }));
+
+      // Create preview for image files
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImagePreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+        setImageName(file.name);
+      }
     }
+  };
+
+  const handleRemoveImage = () => {
+    setFormData((prev) => ({
+      ...prev,
+      featuredImage: undefined,
+    }));
+    setImagePreview(null);
+    setImageName("Featured Image");
   };
 
   // Why Invest dialog handlers
@@ -509,18 +530,39 @@ function AddInvestmentContent() {
 
         {/* Upload Buttons - Show for both new and editing */}
         <div className="flex flex-wrap items-center gap-10">
-          <FileUpload
-            label={imageName}
-            icon={<IoImageOutline />}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                setImageName(file.name);
-                handleFileChange("featuredImage", file);
-              }
-            }}
-            accept="image/*"
-          />
+          <div className="space-y-4">
+            <FileUpload
+              label={imageName}
+              icon={<IoImageOutline />}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  handleFileChange("featuredImage", file);
+                }
+              }}
+              accept="image/*"
+            />
+
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="relative inline-block">
+                <img
+                  src={imagePreview}
+                  alt="Featured Image Preview"
+                  className="w-48 h-32 object-cover rounded-md border"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleRemoveImage}
+                  className="absolute -top-2 -right-2 w-6 h-6 p-0 rounded-full"
+                >
+                  ×
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div>
