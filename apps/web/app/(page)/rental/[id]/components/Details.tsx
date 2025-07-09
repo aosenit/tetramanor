@@ -1,33 +1,5 @@
 "use client";
 import Image from "next/image";
-import two from "@/assets/rental/two.webp";
-import three from "@/assets/rental/three.webp";
-import four from "@/assets/rental/four.webp";
-import five from "@/assets/rental/five.webp";
-import six from "@/assets/rental/six.webp";
-import seven from "@/assets/rental/seven.webp";
-import eleven from "@/assets/rental/eleven.jpg";
-import twelve from "@/assets/rental/twelve.jpg";
-import thirteen from "@/assets/rental/thirteen.jpg";
-import fourteen from "@/assets/rental/fourteen.jpg";
-import fifteen from "@/assets/rental/fifteen.jpg";
-import sixteen from "@/assets/rental/sixteen.jpg";
-// import {
-//   FaDog,
-//   FaParking,
-//   FaWindowMaximize,
-//   FaShieldAlt,
-//   FaWater,
-//   FaWind,
-//   FaUtensils,
-//   FaToilet,
-//   FaDoorOpen,
-//   FaLeaf,
-//   FaTrash,
-//   FaHome,
-//   FaSpinner,
-// } from "react-icons/fa";
-import { MdLocationOn } from "react-icons/md";
 import { FiShare2 } from "react-icons/fi";
 import Header from "@/app/(page)/portfolio/components/header";
 import { useParams } from "next/navigation";
@@ -35,15 +7,24 @@ import { useFetchData } from "@/hooks/useApi";
 import { useState } from "react";
 import MapSection from "@/app/(page)/portfolio/view-property/sections/map";
 import { FaHome } from "react-icons/fa";
+import { PiCarBatteryFill, PiCircleFill } from "react-icons/pi";
+import { MdGridOn, MdOutlineSecurity, MdDelete } from "react-icons/md";
+import { TbWindow } from "react-icons/tb";
+import { GiWaterDrop, GiTreehouse } from "react-icons/gi";
+import { FaBath } from "react-icons/fa";
+import { MdBed, MdKitchen, MdOutlineAcUnit, MdOutlineMicrowave, MdMeetingRoom, MdWindow } from "react-icons/md";
+import { PiBedBold } from "react-icons/pi";
+import { IoLocationOutline } from "react-icons/io5";
+import placeholder from "/assets/placeholder.jpg"
 
 // Image mapping based on construction status
 const constructionImages = {
-  ONGOING: [two, three, four],
-  COMPLETED: [eleven, twelve, thirteen],
+  ONGOING: [placeholder],
+  COMPLETED: [placeholder],
 };
 
 // Fallback images for properties without images
-const fallbackImages = [five, six, seven, fourteen, fifteen, sixteen];
+const fallbackImages = [placeholder];
 
 // Loading Skeleton Component
 function PropertyDetailsSkeleton() {
@@ -197,6 +178,31 @@ export default function PropertyDetails() {
         ? getFallbackImages(property.constructionStatus)
         : [getFallbackImage(property.id), ...fallbackImages.slice(1, 3)];
 
+  const featureIcons: Record<string, JSX.Element> = {
+    "POP Ceilings": <PiCircleFill className="text-green-600 mr-2" />,
+    "Vitrified & Granite Tiles": <MdGridOn className="text-green-600 mr-2" />,
+    "Vintage PVC French Windows": <TbWindow className="text-green-600 mr-2" />,
+    "24/7 Security": <MdOutlineSecurity className="text-green-600 mr-2" />,
+    "Backup Power Supply": <PiCarBatteryFill  className="text-green-600 mr-2" />,
+    "Treated Water System": <GiWaterDrop className="text-green-600 mr-2" />,
+    "High-Quality Kitchen Cabinets & Wardrobes": <MdKitchen className="text-green-600 mr-2" />,
+    "Premium Sanitary Fittings": <FaBath className="text-green-600 mr-2" />,
+    "Walk-in Closets": <MdMeetingRoom className="text-green-600 mr-2" />,
+    "Landscaping & Green Spaces": <GiTreehouse className="text-green-600 mr-2" />,
+    "Efficient Waste Disposal & Central Sewage Management": <MdDelete className="text-green-600 mr-2" />,
+  };
+
+  const amenityIcons: Record<string, JSX.Element> = {
+    "Mattress": <PiBedBold className="text-green-600 mr-2" />,
+    "Bed frame": <MdBed className="text-green-600 mr-2" />,
+    "Fridge": <MdKitchen className="text-green-600 mr-2" />,
+    "Air Conditioner": <MdOutlineAcUnit className="text-green-600 mr-2" />,
+    "Water Heater": <MdOutlineMicrowave className="text-green-600 mr-2" />,
+    "Tabletop Cooker": <MdOutlineMicrowave className="text-green-600 mr-2" />,
+    "Wardrobe": <MdMeetingRoom className="text-green-600 mr-2" />,
+    "Window Blinds": <MdWindow className="text-green-600 mr-2" />,
+  };
+
   return (
     <div className="font-sans">
       <Header />
@@ -218,54 +224,70 @@ export default function PropertyDetails() {
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 p-4">
+          {/* Main image on the left */}
           <div className="w-full md:w-2/3 relative">
             <div className="absolute top-4 left-4 bg-gray-700 bg-opacity-70 text-white px-3 py-1 rounded-lg text-xs">
               {property.constructionStatus}
             </div>
             <Image
-              src={displayImages[currentImageIndex] || displayImages[0]}
+              src={
+                displayImages[0] && (typeof displayImages[0] === "string" ? displayImages[0] : (displayImages[0] as any).src)
+                  ? (typeof displayImages[0] === "string" ? displayImages[0] : (displayImages[0] as any).src)
+                  : placeholder
+              }
               alt={`${property.name} main view`}
               className="w-full h-[250px] sm:h-[300px] md:h-[400px] object-cover rounded"
               width={800}
               height={600}
             />
           </div>
+          {/* Side images stacked vertically on the right */}
           <div className="w-full md:w-1/3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-1 gap-4">
-            {displayImages.slice(1, 3).map((image, index) => (
-              <Image
-                key={index}
-                src={image}
-                alt={`${property.name} view ${index + 1}`}
-                className="w-full h-[100px] sm:h-[120px] object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
-                width={400}
-                height={300}
-                onClick={() => setCurrentImageIndex(index + 1)}
-              />
-            ))}
-            {displayImages.length > 3 && (
-              <div className="relative w-full h-[100px] sm:h-[120px]">
+            {Array.from({ length: 3 }).map((_, index) => {
+              const img = displayImages[index + 1];
+              const isLast = index === 2 && displayImages.length > 4;
+              return isLast ? (
+                <div className="relative w-full h-[100px] sm:h-[120px]" key={index}>
+                  <Image
+                    src={
+                      img && (typeof img === "string" ? img : (img as any).src)
+                        ? (typeof img === "string" ? img : (img as any).src)
+                        : placeholder
+                    }
+                    alt={`${property.name} view ${index + 2}`}
+                    className="w-full h-full object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+                    width={400}
+                    height={300}
+                    onClick={() => setCurrentImageIndex(index + 1)}
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded">
+                    <p className="text-white font-semibold text-2xl">5+</p>
+                    <span className="text-white ml-2 text-base">Photos</span>
+                  </div>
+                </div>
+              ) : (
                 <Image
-                  src={displayImages[3]}
-                  alt={`${property.name} view 4`}
-                  className="w-full h-full object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+                  key={index}
+                  src={
+                    img && (typeof img === "string" ? img : (img as any).src)
+                      ? (typeof img === "string" ? img : (img as any).src)
+                      : placeholder
+                  }
+                  alt={`${property.name} view ${index + 2}`}
+                  className="w-full h-[100px] sm:h-[120px] object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
                   width={400}
                   height={300}
-                  onClick={() => setCurrentImageIndex(3)}
+                  onClick={() => setCurrentImageIndex(index + 1)}
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded">
-                  <p className="text-white font-semibold text-sm">
-                    +{displayImages.length - 3} More
-                  </p>
-                </div>
-              </div>
-            )}
+              );
+            })}
           </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8 p-4">
           <div className="w-full lg:w-2/3">
             <div className="flex items-center text-sm font-medium text-[#4D4E53] mb-2">
-              <MdLocationOn className="mr-1" />
+              <IoLocationOutline  className="mr-1" />
               <span>{property.address}</span>
             </div>
             <h1 className="text-2xl font-semibold mb-4">{property.name}</h1>
@@ -274,7 +296,7 @@ export default function PropertyDetails() {
             </p>
 
             {/* Why Invest Section */}
-            {property.whyInvest && (
+            {/* {property.whyInvest && (
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-[#000000] mb-4">
                   {property.whyInvest.title}
@@ -295,7 +317,7 @@ export default function PropertyDetails() {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Property Features */}
             <div className="mb-8 mt-10">
@@ -305,7 +327,7 @@ export default function PropertyDetails() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-medium text-[#0B0A0A]">
                 {property.features.map((feature, index) => (
                   <div className="flex items-center" key={index}>
-                    <span className="text-green-600 mr-2">✓</span>
+                    {featureIcons[feature] || <PiCircleFill className="text-green-600 mr-2" />}
                     <span>{feature}</span>
                   </div>
                 ))}
@@ -313,15 +335,15 @@ export default function PropertyDetails() {
             </div>
 
             {/* Amenities */}
-            {property.amenities.length > 0 && (
-              <div className="mb-8">
+            {property.amenities && property.amenities.length > 0 && (
+              <div className="mb-8 mt-10">
                 <h2 className="text-xl font-semibold text-[#000000] mb-4">
                   Amenities
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-medium text-[#0B0A0A]">
                   {property.amenities.map((amenity, index) => (
                     <div className="flex items-center" key={index}>
-                      <span className="text-green-600 mr-2">✓</span>
+                      {amenityIcons[amenity] || <MdBed className="text-green-600 mr-2" />}
                       <span>{amenity}</span>
                     </div>
                   ))}
