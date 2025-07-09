@@ -44,10 +44,10 @@ const HomeHero = ({ title = "TM HighGardens", location = "Eko Atlantic, Lagos, N
             <p className="text-3xl md:text-4xl lg:text-6xl font-bold">
               {title}
             </p>
-            <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
-              <p className="text-3xl md:text-4xl lg:text-5xl font-semibold">
+            <div className="flex flex-col lg:flex-row lg:justify-end gap-4">
+              {/* <p className="text-3xl md:text-4xl lg:text-5xl font-semibold">
                 The Billionaire's Playground.
-              </p>
+              </p> */}
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="px-4 py-2 bg-[#FFFFFF4D] backdrop-blur-lg text-white w-full lg:w-auto font-medium whitespace-nowrap"
