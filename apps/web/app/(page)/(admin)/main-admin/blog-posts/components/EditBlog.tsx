@@ -74,6 +74,13 @@ export default function EditBlog() {
   const [galleryImages, setGalleryImages] = useState<UploadedImage[]>([]);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+  const [publishLoading, setPublishLoading] = useState(false);
+  const [draftLoading, setDraftLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{
+    title?: string;
+    content?: string;
+    images?: string;
+  }>({});
 
   const { mutateAsync: uploadImages } = useUploadData("upload/images");
   const { mutateAsync: createBlog, isPending: isCreating } =
@@ -87,7 +94,7 @@ export default function EditBlog() {
     blogId ? `blogs/${blogId}` : null
   );
 
-  const isPending = isCreating || isUpdating;
+  const isPending = isCreating || isUpdating || publishLoading || draftLoading;
 
   // Load existing blog post data when editing
   useEffect(() => {
@@ -128,12 +135,22 @@ export default function EditBlog() {
     }
   }, [isEditing, blogPostResponse]);
 
-  const handleSubmit = async () => {
-    if (!title.trim() || !content.trim()) {
-      toast.error("Please fill in all required fields");
-      return;
+  const validateFields = () => {
+    const errors: { title?: string; content?: string; images?: string } = {};
+    if (!isEditing) {
+      if (!title.trim()) errors.title = "Title is required";
+      if (!content.trim()) errors.content = "Content is required";
+      if (coverImages.length === 0 && galleryImages.length === 0)
+        errors.images = "At least one image is required";
     }
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
+  const handleSubmit = async () => {
+    setValidationErrors({});
+    if (!validateFields()) return;
+    setPublishLoading(true);
     try {
       const payload = {
         title: title.trim(),
@@ -143,7 +160,6 @@ export default function EditBlog() {
         coverImage: coverImages.length > 0 ? coverImages[0].id : null,
         images: galleryImages.map((img) => img.id),
       };
-
       if (isEditing) {
         await updateBlog(payload);
         toast.success("Blog post updated successfully");
@@ -151,14 +167,18 @@ export default function EditBlog() {
         await createBlog(payload);
         toast.success("Blog post created successfully");
       }
-
       router.push("/main-admin/blog-posts");
     } catch (error) {
       console.error("Error saving blog post:", error);
+    } finally {
+      setPublishLoading(false);
     }
   };
 
   const handleSaveDraft = async () => {
+    setValidationErrors({});
+    if (!isEditing && !validateFields()) return;
+    setDraftLoading(true);
     try {
       const payload = {
         title: title.trim() || "Untitled Draft",
@@ -168,7 +188,6 @@ export default function EditBlog() {
         coverImage: coverImages.length > 0 ? coverImages[0].id : null,
         images: galleryImages.map((img) => img.id),
       };
-
       if (isEditing) {
         await updateBlog(payload);
         toast.success("Draft updated successfully");
@@ -176,10 +195,11 @@ export default function EditBlog() {
         await createBlog(payload);
         toast.success("Draft saved successfully");
       }
-
       router.push("/main-admin/blog-posts");
     } catch (error) {
       console.error("Error saving draft:", error);
+    } finally {
+      setDraftLoading(false);
     }
   };
 
@@ -283,6 +303,11 @@ export default function EditBlog() {
                 placeholder="Enter a compelling blog title..."
                 disabled={isPending}
               />
+              {validationErrors.title && !isEditing && (
+                <p className="text-xs text-red-500 mt-1">
+                  {validationErrors.title}
+                </p>
+              )}
             </div>
 
             {/* Rich Text Editor */}
@@ -296,6 +321,11 @@ export default function EditBlog() {
                 placeholder="Start writing your blog content..."
                 disabled={isPending}
               />
+              {validationErrors.content && !isEditing && (
+                <p className="text-xs text-red-500 mt-1">
+                  {validationErrors.content}
+                </p>
+              )}
             </div>
           </div>
 
@@ -384,6 +414,11 @@ export default function EditBlog() {
                   ))}
                 </div>
               )}
+              {validationErrors.images && !isEditing && (
+                <p className="text-xs text-red-500 mt-1">
+                  {validationErrors.images}
+                </p>
+              )}
             </div>
 
             {/* Gallery Images */}
@@ -446,6 +481,11 @@ export default function EditBlog() {
                   ))}
                 </div>
               )}
+              {validationErrors.images && !isEditing && (
+                <p className="text-xs text-red-500 mt-1">
+                  {validationErrors.images}
+                </p>
+              )}
             </div>
 
             {/* Publish Button */}
@@ -456,7 +496,7 @@ export default function EditBlog() {
                   disabled={isPending}
                   className="w-full bg-[#116114] hover:bg-[#116114]/90 text-white"
                 >
-                  {isPending ? (
+                  {publishLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       {isEditing ? "Updating..." : "Publishing..."}
@@ -473,7 +513,7 @@ export default function EditBlog() {
                   variant="outline"
                   className="w-full"
                 >
-                  {isPending ? (
+                  {draftLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       Saving...

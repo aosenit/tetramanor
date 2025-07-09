@@ -92,6 +92,20 @@ export default function ContactPage() {
     }
   };
 
+  const handleSocialLinksChange = (
+    socialLinks: Array<{ platform: string; url: string }>
+  ) => {
+    // Only include social links that have non-empty URLs
+    const validSocialLinks = socialLinks.filter(
+      (link) => link.url.trim() !== ""
+    );
+
+    setFormData((prev) => ({
+      ...prev,
+      socialMedia: validSocialLinks,
+    }));
+  };
+
   const handleSave = async () => {
     setError(null);
 
@@ -244,25 +258,64 @@ export default function ContactPage() {
           />
         </div>
 
-        <>
-          <div
-            onClick={() => setSocialOpen(true)}
-            className="flex items-center text-sm text-[#323539] gap-2 text-left font-medium cursor-pointer"
-          >
-            <span>Social media</span>
-            <ChevronDown />
+        {/* Social Media Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm text-[#323539]">Social media</Label>
+            {editMode && (
+              <Button
+                onClick={() => setSocialOpen(true)}
+                variant="outline"
+                size="sm"
+                className="text-[#116114] hover:text-[#116114]"
+              >
+                Edit Social Links
+              </Button>
+            )}
           </div>
+
+          {/* Display social media links when not in edit mode */}
+          {!editMode && formData.socialMedia.length > 0 && (
+            <div className="space-y-2">
+              {formData.socialMedia.map((link, index) => (
+                <div key={index} className="flex items-center gap-2 text-sm">
+                  <span className="font-medium capitalize">
+                    {link.platform}:
+                  </span>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#116114] hover:underline"
+                  >
+                    {link.url}
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Show placeholder when no social links */}
+          {!editMode && formData.socialMedia.length === 0 && (
+            <div className="text-sm text-gray-500">
+              No social media links added
+            </div>
+          )}
 
           {/* Modal */}
           <Dialog open={socialOpen} onOpenChange={setSocialOpen}>
             <DialogPortal>
               <DialogOverlay className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50" />
               <DialogContent className="max-w-md w-full p-0 bg-white rounded-md z-50 shadow-lg border-none">
-                <Socials />
+                <Socials
+                  socialLinks={formData.socialMedia}
+                  onSocialLinksChange={handleSocialLinksChange}
+                  disabled={isUpdating}
+                />
               </DialogContent>
             </DialogPortal>
           </Dialog>
-        </>
+        </div>
 
         {/* Map Location */}
         <div className="space-y-4">
