@@ -2,7 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, ChevronDown } from "lucide-react";
+import { Search, Plus, ChevronDown, Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,6 +17,7 @@ import { useState, useEffect } from "react";
 import { useFetchData } from "@/hooks/useApi";
 import Loader from "@/components/Loader";
 import placeholder from "@/assets/placeholder.svg";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface BlogPost {
   id: string;
@@ -26,6 +27,7 @@ interface BlogPost {
   galleryImages: string[];
   createdAt: string;
   updatedAt: string;
+  status: string;
   images: {
     id: string;
     imageUrl: string;
@@ -36,22 +38,93 @@ interface BlogPost {
 }
 
 export default function BlogPostsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [openModal, setOpenModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [authorFilter, setAuthorFilter] = useState("all");
-  const [dateFilter, setDateFilter] = useState("all");
+
+  // Get current URL parameters
+  const currentSearch = searchParams.get("search") || "";
+  const currentPageParam = parseInt(searchParams.get("page") || "1");
+  const currentLimit = parseInt(searchParams.get("limit") || "10");
+  const currentStatus = searchParams.get("status") || "";
+  const currentAuthor = searchParams.get("author") || "";
+  const currentDateFilter = searchParams.get("dateFilter") || "";
+
+  // Build query string for API
+  const buildQueryString = () => {
+    const params = new URLSearchParams({
+      page: currentPageParam.toString(),
+      limit: currentLimit.toString(),
+    });
+
+    if (currentSearch) params.append("search", currentSearch);
+    if (currentStatus && currentStatus !== "all")
+      params.append("status", currentStatus.toUpperCase());
+    if (currentAuthor && currentAuthor !== "all")
+      params.append("author", currentAuthor);
+    if (currentDateFilter && currentDateFilter !== "all")
+      params.append("dateFilter", currentDateFilter);
+
+    return params.toString();
+  };
 
   // Fetch blog posts data
-  const { data: blogPostsResponse, isLoading, refetch } = useFetchData("blogs");
+  const {
+    data: blogPostsResponse,
+    isLoading,
+    refetch,
+  } = useFetchData(`blogs/all?${buildQueryString()}`);
 
-  const blogPosts: BlogPost[] = blogPostsResponse?.data || [];
+  // New API structure
+  const response = blogPostsResponse?.data || {
+    items: [],
+    page: 1,
+    total: 0,
+    limit: 10,
+  };
 
-  // Filter blog posts based on search
-  const filteredBlogPosts = blogPosts.filter((post) =>
-    post.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const blogPosts: BlogPost[] = response.items || [];
+  const totalItems = response.total || 0;
+  const currentPage = currentPageParam;
+  const totalPages = Math.ceil(totalItems / currentLimit);
+
+  // Update URL parameters
+  const updateURLParams = (params: Record<string, string>) => {
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        newSearchParams.set(key, value);
+      } else {
+        newSearchParams.delete(key);
+      }
+    });
+
+    router.replace(`?${newSearchParams.toString()}`);
+  };
+
+  // Handle search
+  const handleSearch = (value: string) => {
+    updateURLParams({ search: value, page: "1" });
+  };
+
+  // Handle status filter
+  const handleStatusChange = (value: string) => {
+    const filterValue = value === "all" ? "" : value;
+    updateURLParams({ status: filterValue, page: "1" });
+  };
+
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    updateURLParams({ page: page.toString() });
+  };
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    router.replace("/main-admin/blog-posts");
+  };
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -67,10 +140,32 @@ export default function BlogPostsPage() {
     setOpenModal(true);
   };
 
-  // Refetch data when component mounts or when returning from create/edit
+  // Get status display name
+  const getStatusDisplayName = (status: string) => {
+    switch (status?.toUpperCase()) {
+      case "PUBLISHED":
+        return "Published";
+      case "DRAFT":
+        return "Draft";
+      case "UNPUBLISHED":
+        return "Unpublished";
+      default:
+        return "Draft";
+    }
+  };
+
+  // Refetch data when URL parameters change
   useEffect(() => {
     refetch();
-  }, [refetch]);
+  }, [
+    currentPageParam,
+    currentLimit,
+    currentSearch,
+    currentStatus,
+    currentAuthor,
+    currentDateFilter,
+    refetch,
+  ]);
 
   if (isLoading) {
     return <Loader />;
@@ -106,57 +201,70 @@ export default function BlogPostsPage() {
           <Input
             placeholder="Search by blog title"
             className="pl-10 bg-[#E5E5E7] border-0"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={currentSearch}
+            onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
 
         {/* Filters */}
-        <div className="flex py-4 mt-2 gap-4">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <div className="flex flex-wrap py-4 mt-2 gap-4">
+          <Button
+            variant="outline"
+            className="bg-white text-[#858C95]"
+            onClick={clearAllFilters}
+          >
+            All
+          </Button>
+
+          <Select
+            value={currentStatus || "all"}
+            onValueChange={handleStatusChange}
+          >
             <SelectTrigger className="w-32 text-[#858C95] hover:text-[#858C95]">
-              <SelectValue placeholder="All" />
+              <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="published">Published</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="unpublished">Unpublished</SelectItem>
             </SelectContent>
           </Select>
 
-          <Select value={authorFilter} onValueChange={setAuthorFilter}>
-            <SelectTrigger className="w-48 text-[#858C95] hover:text-[#858C95]">
-              <SelectValue placeholder="Filter by Author" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Authors</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
-            </SelectContent>
-          </Select>
+          <Button
+            variant="link"
+            className="text-[#858C95] text-sm p-0"
+            onClick={clearAllFilters}
+          >
+            Clear all
+          </Button>
+        </div>
 
-          <Select value={dateFilter} onValueChange={setDateFilter}>
-            <SelectTrigger className="w-48 text-[#858C95] hover:text-[#858C95]">
-              <SelectValue placeholder="Filter by Date" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Dates</SelectItem>
-              <SelectItem value="newest">Newest first</SelectItem>
-              <SelectItem value="oldest">Oldest first</SelectItem>
-              <SelectItem value="this-week">This week</SelectItem>
-              <SelectItem value="this-month">This month</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Results count */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-[#116114] font-medium">
+            Blog posts ({totalItems})
+          </h2>
+          {isLoading && (
+            <div className="flex items-center gap-2 text-sm text-[#858C95]">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Loading...
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredBlogPosts.length === 0 ? (
+          {blogPosts.length === 0 ? (
             <div className="col-span-full text-center py-12 text-[#858C95]">
-              {searchTerm
-                ? "No blog posts found matching your search"
+              {currentSearch ||
+              currentStatus ||
+              currentAuthor ||
+              currentDateFilter
+                ? "No blog posts found matching your filters"
                 : "No blog posts available"}
             </div>
           ) : (
-            filteredBlogPosts.map((post) => (
+            blogPosts?.map((post) => (
               <Card key={post.id} className="overflow-hidden bg-[#F4F4F4]">
                 <div className="relative">
                   <Image
@@ -178,7 +286,9 @@ export default function BlogPostsPage() {
                     </span>
                   </div>
                   <div className="flex justify-between text-black items-center">
-                    <p className="text-sm">Published</p>
+                    <p className="text-sm">
+                      {getStatusDisplayName(post.status)}
+                    </p>
                     <Button
                       onClick={() => handleViewClick(post)}
                       className="text-[#858C95] hover:text-[#858C95] flex items-center gap-1"
@@ -194,6 +304,56 @@ export default function BlogPostsPage() {
             ))
           )}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center space-x-2 mt-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNum;
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
+
+              return (
+                <Button
+                  key={pageNum}
+                  variant={currentPage === pageNum ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handlePageChange(pageNum)}
+                  className={
+                    currentPage === pageNum ? "bg-[#116114] text-white" : ""
+                  }
+                >
+                  {pageNum}
+                </Button>
+              );
+            })}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        )}
 
         {selectedPost && (
           <BlogPostDetails

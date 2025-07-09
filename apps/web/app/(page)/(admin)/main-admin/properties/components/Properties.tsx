@@ -310,7 +310,6 @@ export default function PropertyManagement() {
                 <SelectItem value="all">All Construction</SelectItem>
                 <SelectItem value="ONGOING">Ongoing</SelectItem>
                 <SelectItem value="COMPLETED">Completed</SelectItem>
-                <SelectItem value="PLANNED">Planned</SelectItem>
               </SelectContent>
             </Select>
           </div>

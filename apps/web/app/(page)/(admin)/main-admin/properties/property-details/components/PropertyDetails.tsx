@@ -848,7 +848,13 @@ export default function PropertyDetails() {
                 Account officer
               </h3>
               <p className="text-sm text-[#181818]">
-                {property?.accountOfficer || "N/A"}
+                {property?.accountOfficer &&
+                typeof property.accountOfficer === "object" &&
+                "name" in property.accountOfficer
+                  ? property.accountOfficer.name
+                  : typeof property?.accountOfficer === "string"
+                    ? property.accountOfficer
+                    : "N/A"}
               </p>
             </div>
           </div>

@@ -79,20 +79,23 @@ const handleError = async (error: any) => {
   const originalRequest = error.config;
 
   // Handle 401 errors with token refresh
-  if (status === 401 && !originalRequest._retry) {
-    originalRequest._retry = true;
-    try {
-      const newToken = await refreshToken();
-      originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
-      return axiosInstance(originalRequest);
-    } catch (refreshError) {
-      if (!originalRequest.url.includes("login")) {
-        // localStorage.clear();
-        // window.location.href = "/login";
-        toast.error("Unauthorized: Please log in again.");
-      }
-      return Promise.reject(refreshError);
-    }
+  if ((status === 401 || status === 502) && !originalRequest._retry) {
+    // originalRequest._retry = true;
+    // try {
+    //   const newToken = await refreshToken();
+    //   originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+    //   return axiosInstance(originalRequest);
+    // } catch (refreshError) {
+    //   if (!originalRequest.url.includes("login")) {
+    //     // localStorage.clear();
+    //     // window.location.href = "/login";
+    //     toast.error("Unauthorized: Please log in again.");
+    //   }
+    //   return Promise.reject(refreshError);
+    // }
+    toast.error("Unauthorized: Please log in again.");
+    localStorage.clear();
+    window.location.href = "/login";
   }
 
   const messages: Record<number, string> = {
