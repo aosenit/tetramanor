@@ -165,7 +165,8 @@ export default function RentalsPage() {
 
   // Format apartment type
   const formatApartmentType = (type: string) => {
-    return type.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+    if (!type) return "";
+    return type?.replace(/_/g, " ")?.replace(/\b\w/g, (l) => l?.toUpperCase());
   };
 
   const cards = [
