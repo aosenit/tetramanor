@@ -2,185 +2,78 @@
 import React from "react";
 import Image from "next/image";
 import {
-  FaCheck,
-  FaWifi,
-  FaShieldAlt,
-  FaTint,
-  FaSquare,
-  FaDesktop,
-  FaWater,
-  FaBuilding,
-  FaGlassMartini,
-  FaUsers,
-  FaBriefcase,
-  FaBolt,
-  FaClock,
-  FaDumbbell,
-  FaEye,
+  FaCheck
 } from "react-icons/fa";
+import { PropertyItem } from "@/types/property";
+import placeholder from "@/assets/placeholder.jpg";
+
 
 interface AboutPropertyProps {
-  title?: string;
-  location?: string;
-  image?: string;
+  property: PropertyItem;
 }
 
-export default function PropertyListing({ 
-  title = "TM HighGardens", 
-  location = "the heart of Eko Atlantic City",
-  image = "/assets/portfolio/two.webp"
-}: AboutPropertyProps) {
+export default function AboutProperty({ property }: AboutPropertyProps) {
   return (
     <div className="container mx-auto px-4 lg:px-16 py-12 bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
         <div>
           <h1 className="text-3xl font-bold mb-4 text-[#0b0a0a]">
-            About {title}
+            About {property.name}
           </h1>
           <p className="text-[#0c0c0c] mb-6">
-            {title} is an ultra-luxurious residential masterpiece
-            designed for the 1% who appreciate the pinnacle of elegance,
-            affluence, and opulence. Nestled in {location},
-            Africa's premier real estate destination, {title} offers an
-            exclusive lifestyle and a prime investment opportunity.
+            {property.about}
           </p>
-
-          <p className="text-[#0c0c0c] mb-4">
-            This architectural marvel boasts an exquisite selection of
-            luxury apartments, including:
-          </p>
-
-          <ul className="space-y-3 mb-6">
-            <li className="flex items-center">
-              <FaCheck className="h-5 w-5 text-[#116114] mr-2 flex-shrink-0" />
-              <span>1-Bedroom Apartments</span>
-            </li>
-            <li className="flex items-center">
-              <FaCheck className="h-5 w-5 text-[#116114] mr-2 flex-shrink-0" />
-              <span>2-Bedroom Apartments</span>
-            </li>
-            <li className="flex items-center">
-              <FaCheck className="h-5 w-5 text-[#116114] mr-2 flex-shrink-0" />
-              <span>3-Bedroom Apartments</span>
-            </li>
-            <li className="flex items-center">
-              <FaCheck className="h-5 w-5 text-[#116114] mr-2 flex-shrink-0" />
-              <span>3-Bedroom Maisonettes</span>
-            </li>
-            <li className="flex items-center">
-              <FaCheck className="h-5 w-5 text-[#116114] mr-2 flex-shrink-0" />
-              <span>4-Bedroom Maisonettes</span>
-            </li>
-            <li className="flex items-center">
-              <FaCheck className="h-5 w-5 text-[#116114] mr-2 flex-shrink-0" />
-              <span>Penthouse</span>
-            </li>
-          </ul>
+          {property.unitTypes?.length > 0 && (
+            <>
+              <p className="text-[#0c0c0c] mb-4">
+                This property offers the following unit types:
+              </p>
+              <ul className="space-y-3 mb-6">
+                {property.unitTypes.map((type, idx) => (
+                  <li className="flex items-center" key={idx}>
+                    <FaCheck className="h-5 w-5 text-[#116114] mr-2 flex-shrink-0" />
+                    <span>{type}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
-
         <div className="relative h-[400px] lg:h-auto rounded-lg overflow-hidden">
           <Image
-            src={image}
-            alt={`${title} luxury residential building`}
+            src={property.images?.find(img => img.isPrimary)?.imageUrl || property.images?.[0]?.imageUrl || placeholder}
+            alt={`${property.name} luxury residential building`}
             fill
             className="object-cover"
           />
         </div>
       </div>
-
       <div className="mb-16">
         <h2 className="text-2xl font-bold mb-4 text-[#0b0a0a]">Key Features</h2>
         <p className="text-[#0c0c0c] mb-6">
-          {title} blends sophisticated aesthetics with superior
-          craftsmanship, featuring:
+          {property.name} blends sophisticated aesthetics with superior craftsmanship, featuring:
         </p>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-start">
-            <FaShieldAlt className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>External Security Door & Smart Door Locks</span>
-          </div>
-          <div className="flex items-start">
-            <FaSquare className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>High-Quality Kitchen Cabinets & Bedroom Wardrobes</span>
-          </div>
-          <div className="flex items-start">
-            <FaTint className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>State-of-the-Art Sanitary Fittings</span>
-          </div>
-          <div className="flex items-start">
-            <FaDesktop className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>Premium Interior Decor</span>
-          </div>
-          <div className="flex items-start">
-            <FaSquare className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>Aluminum EBM Profile Windows</span>
-          </div>
-          <div className="flex items-start">
-            <FaSquare className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>High-Quality Ceramic & Vitrified Tiles</span>
-          </div>
-          <div className="flex items-start">
-            <FaWifi className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>High-Speed Internet & Entertainment Wiring</span>
-          </div>
-          <div className="flex items-start">
-            <FaSquare className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>P.O.P Ceilings & Satin Wall Finishing</span>
-          </div>
+          {property.features?.map((feature, idx) => (
+            <div className="flex items-start" key={idx}>
+              <FaCheck className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
+              <span>{feature}</span>
+            </div>
+          ))}
         </div>
       </div>
-
       <div>
-        <h2 className="text-2xl font-bold mb-4 text-[#0b0a0a]">
-          World-Class Amenities
-        </h2>
+        <h2 className="text-2xl font-bold mb-4 text-[#0b0a0a]">World-Class Amenities</h2>
         <p className="text-[#0c0c0c] mb-6">
-          Residents of {title} enjoy exclusive access to
-          state-of-the-art facilities, including
+          Residents of {property.name} enjoy exclusive access to state-of-the-art facilities, including
         </p>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-start">
-            <FaWater className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>Elevated Pool</span>
-          </div>
-          <div className="flex items-start">
-            <FaGlassMartini className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>Lounge/Bar</span>
-          </div>
-          <div className="flex items-start">
-            <FaBuilding className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>Stunning Sea View</span>
-          </div>
-          <div className="flex items-start">
-            <FaUsers className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>Children's Play Area</span>
-          </div>
-          <div className="flex items-start">
-            <FaEye className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>24/7 Surveillance</span>
-          </div>
-          <div className="flex items-start">
-            <FaBriefcase className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>Office Space</span>
-          </div>
-          <div className="flex items-start">
-            <FaWifi className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>Fiber Optic Connectivity</span>
-          </div>
-          <div className="flex items-start">
-            <FaBolt className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>Uninterrupted Power Supply</span>
-          </div>
-          <div className="flex items-start">
-            <FaDumbbell className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>Fully Equipped Gym</span>
-          </div>
-          <div className="flex items-start">
-            <FaClock className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-            <span>24/7 Concierge Services</span>
-          </div>
+          {property.amenities?.map((amenity, idx) => (
+            <div className="flex items-start" key={idx}>
+              <FaCheck className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
+              <span>{amenity}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -2,64 +2,41 @@
 import React from "react";
 import Image from "next/image";
 import { FaCheck } from "react-icons/fa";
-import { useSearchParams } from "next/navigation";
-import { useFetchData } from "@/hooks/useApi";
-import placeholder from "@/assets/portfolio/nine.webp";
+import type { PropertyItem } from "@/types/property";
+import placeholder from "@/assets/placeholder.jpg";
 
-export default function WhyInvest() {
-  const searchParams = useSearchParams();
-  const title = searchParams.get("title");
+interface WhyInvestProps {
+  property: PropertyItem;
+}
 
-  // Fetch property data by title
-  const {
-    data: propertyResponse,
-    isLoading,
-    error,
-  } = useFetchData("property", {
-    page: 1,
-    limit: 1,
-    search: title,
-  });
-
-  const property = propertyResponse?.data?.items?.[0];
-  const whyInvest = property?.whyInvest;
-
+export default function WhyInvest({ property }: WhyInvestProps) {
+  const whyInvest = property.whyInvest;
   return (
     <div className="bg-[#f3f7f3]">
       <div className="container mx-auto px-4 lg:px-16 py-12 ">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div className="relative h-[400px] lg:h-[500px] rounded-lg overflow-hidden">
             <Image
-              src={property?.images?.[0]?.imageUrl || placeholder}
-              alt={property?.name || "Property image"}
+              src={property.images?.[0]?.imageUrl || placeholder}
+              alt={property.name || "Property image"}
               fill
               className="object-cover"
             />
           </div>
-
           <div>
             <h2 className="text-3xl font-bold mb-8 text-[#0b0a0a]">
-              {whyInvest?.title || `Why Invest${property ? ` in ${property.name}` : ""}?`}
+              {property ? `Why Invest in ${property.name}?` : "Why Invest?"}
             </h2>
-
-            {isLoading ? (
-              <div>Loading...</div>
-            ) : error ? (
-              <div className="text-red-500">Failed to load investment info.</div>
-            ) : whyInvest ? (
+            {whyInvest?.length ? (
               <div className="space-y-8">
-                {whyInvest.advantages?.map((adv, idx) => (
+                {whyInvest?.map((adv, idx) => (
                   <div className="flex items-start" key={idx}>
                     <div className="mt-1 mr-4 flex-shrink-0">
                       <FaCheck className="h-5 w-5 text-[#116114]" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold mb-1">
-                        {adv.title}
-                      </h3>
-                      <p className="text-[#5c5c5c]">
-                        {adv.description}
-                      </p>
+                      <h3 className="text-xl font-semibold mb-1">{adv.title}</h3>
+                      <p className="text-[#5c5c5c]">{adv.description}</p>
                     </div>
                   </div>
                 ))}

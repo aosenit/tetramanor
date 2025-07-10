@@ -64,6 +64,19 @@ function TabTwo({ investments }: { investments: any[] }) {
     }
   };
 
+  // Define InvestmentImage type if not already defined
+  // (If already imported from TabOne, you can remove this)
+  type InvestmentImage = {
+    imageUrl: string;
+    isPrimary?: boolean;
+  };
+
+  const getInvestmentImage = (images: InvestmentImage[] | undefined) => {
+    if (!images || images.length === 0) return four;
+    const primary = images.find((img) => img.isPrimary);
+    return primary?.imageUrl || images[0].imageUrl || four;
+  };
+
   return (
     <div>
       <div className="space-y-12">
@@ -83,9 +96,11 @@ function TabTwo({ investments }: { investments: any[] }) {
                   <div className="flex items-center justify-center">
                     <div className="bg-amber-100 rounded-xl w-full">
                       <Image
-                        src={four}
-                        alt="Equity-Based investment illustration"
+                        src={getInvestmentImage(investment?.image)}
+                        alt={investment?.projectName || ""}
                         className="w-full"
+                        width={1200}
+                        height={800}
                       />
                     </div>
                   </div>

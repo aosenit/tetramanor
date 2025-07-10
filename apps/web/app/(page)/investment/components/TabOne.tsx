@@ -6,7 +6,7 @@ import a from "@/assets/investment/icons/a.webp";
 import b from "@/assets/investment/icons/b.webp";
 import c from "@/assets/investment/icons/c.webp";
 import d from "@/assets/investment/icons/d.webp";
-import two from "@/assets/investment/two.webp";
+import placeholder from "@/assets/placeholder.jpg";
 import RoiCalculator from "./RoiCalculator";
 
 const steps = [
@@ -62,6 +62,18 @@ function TabOne({ investments }: { investments: any[] }) {
         return prev + 1;
       });
     }
+  }
+
+  // Define InvestmentImage type if not already defined
+  type InvestmentImage = {
+    imageUrl: string;
+    isPrimary?: boolean;
+  };
+
+  const getInvestmentImage = (images: InvestmentImage[] | undefined) => {
+    if (!images || images.length === 0) return placeholder;
+    const primary = images.find((img) => img.isPrimary);
+    return primary?.imageUrl || images[0].imageUrl || placeholder;
   };
 
   return (
@@ -138,8 +150,8 @@ function TabOne({ investments }: { investments: any[] }) {
                   <div className="flex items-center justify-center">
                     <div className="bg-amber-100 rounded-xl w-full">
                       <Image
-                        src={two}
-                        alt="Fixed ROI illustration showing houses and guaranteed returns"
+                        src={getInvestmentImage(investment?.image)}
+                        alt={investment?.projectName || ""}
                         className="w-full"
                         width={1200}
                         height={800}

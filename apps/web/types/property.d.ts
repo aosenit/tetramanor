@@ -1,3 +1,5 @@
+import { JSX } from "react";
+
 export interface PropertyImage {
   id: string;
   imageUrl: string;
@@ -36,6 +38,8 @@ export interface WhyInvestAdvantage {
 }
 
 export interface WhyInvest {
+  map(arg0: (adv: any, idx: any) => JSX.Element): import("react").ReactNode;
+  length: any;
   title: string;
   advantages: WhyInvestAdvantage[];
   description: string;
