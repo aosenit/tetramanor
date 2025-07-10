@@ -28,6 +28,7 @@ import {
   useUploadData,
   useFetchData,
   useUploadPatchData,
+  useUploadPutData,
 } from "@/hooks/useApi";
 import { CustomDropdown } from "./components/CustomDropdown";
 
@@ -115,7 +116,7 @@ function AddInvestmentContent() {
     mutate: updateInvestment,
     isPending: isUpdating,
     error: updateError,
-  } = useUploadPatchData(`investments/${investmentId}`);
+  } = useUploadPutData(`investments/${investmentId}`);
 
   // Load investment data into form when editing
   useEffect(() => {

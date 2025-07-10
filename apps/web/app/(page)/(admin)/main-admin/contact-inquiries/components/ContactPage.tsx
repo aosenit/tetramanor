@@ -18,6 +18,9 @@ import { useRouter } from "next/navigation";
 import Socials from "./SocialLinkForm";
 import { useFetchData, usePutData } from "@/hooks/useApi";
 import Loader from "@/components/Loader";
+import { LuInstagram } from "react-icons/lu";
+import { BsTwitterX, BsWhatsapp } from "react-icons/bs";
+import { SlSocialLinkedin } from "react-icons/sl";
 
 interface ContactData {
   id: string;
@@ -276,65 +279,133 @@ export default function ContactPage() {
 
           {/* Display social media links when not in edit mode */}
           {!editMode && formData.socialMedia.length > 0 && (
-            <div className="space-y-2">
-              {formData.socialMedia.map((link, index) => (
-                <div key={index} className="flex items-center gap-2 text-sm">
-                  <span className="font-medium capitalize">
-                    {link.platform}:
-                  </span>
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#116114] hover:underline"
+            <div className="space-y-3">
+              {formData.socialMedia.map((link, index) => {
+                const getIcon = (platform: string) => {
+                  switch (platform.toLowerCase()) {
+                    case "whatsapp":
+                      return <BsWhatsapp className="w-5 h-5 text-green-600" />;
+                    case "linkedin":
+                      return (
+                        <SlSocialLinkedin className="w-5 h-5 text-blue-600" />
+                      );
+                    case "x":
+                      return <BsTwitterX className="w-5 h-5 text-black" />;
+                    case "instagram":
+                      return <LuInstagram className="w-5 h-5 text-pink-600" />;
+                    default:
+                      return (
+                        <div className="w-5 h-5 bg-gray-400 rounded-full" />
+                      );
+                  }
+                };
+
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200"
                   >
-                    {link.url}
-                  </a>
-                </div>
-              ))}
+                    {getIcon(link.platform)}
+                    <div className="flex-1">
+                      <div className="font-medium capitalize text-sm text-[#323539]">
+                        {link.platform}
+                      </div>
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-[#116114] hover:underline break-all"
+                      >
+                        {link.url}
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 
           {/* Show placeholder when no social links */}
           {!editMode && formData.socialMedia.length === 0 && (
-            <div className="text-sm text-gray-500">
-              No social media links added
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="text-sm text-gray-500 text-center">
+                No social media links added
+              </div>
+              <div className="text-xs text-gray-400 text-center mt-1">
+                Click "Edit Social Links" to add your social media profiles
+              </div>
             </div>
           )}
 
           {/* Modal */}
           <Dialog open={socialOpen} onOpenChange={setSocialOpen}>
-            <DialogPortal>
-              <DialogOverlay className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50" />
-              <DialogContent className="max-w-md w-full p-0 bg-white rounded-md z-50 shadow-lg border-none">
-                <Socials
-                  socialLinks={formData.socialMedia}
-                  onSocialLinksChange={handleSocialLinksChange}
+            <DialogContent className="max-w-md w-full p-0 bg-white rounded-md shadow-lg border-none">
+              <div className="p-4 border-b">
+                <h3 className="text-lg font-medium text-[#323539]">
+                  Edit Social Media Links
+                </h3>
+              </div>
+              <Socials
+                socialLinks={formData.socialMedia}
+                onSocialLinksChange={handleSocialLinksChange}
+                disabled={isUpdating}
+              />
+              <div className="p-4 border-t flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setSocialOpen(false)}
                   disabled={isUpdating}
-                />
-              </DialogContent>
-            </DialogPortal>
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => setSocialOpen(false)}
+                  disabled={isUpdating}
+                  className="bg-[#116114] text-white"
+                >
+                  Done
+                </Button>
+              </div>
+            </DialogContent>
           </Dialog>
         </div>
 
         {/* Map Location */}
         <div className="space-y-4">
           <Label>Map location</Label>
-          <div className="flex gap-6">
+          <div className="flex gap-4">
             {["embed", "address"].map((type) => (
               <div className="flex items-center gap-2" key={type}>
-                <div
+                <button
                   onClick={() => setSelected(type as "embed" | "address")}
-                  className={`cursor-pointer py-2 px-2 rounded-full text-sm ${
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     selected === type
-                      ? "bg-gray-300 text-black"
-                      : "bg-gray-100 text-gray-500"
+                      ? "bg-[#116114] text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
-                ></div>
-                <p>Use {type} code</p>
+                >
+                  Use {type} code
+                </button>
               </div>
             ))}
           </div>
+
+          {/* Map Embed Code Input */}
+          {selected === "embed" && editMode && (
+            <div className="space-y-2">
+              <Label htmlFor="map-embed">Map Embed Code</Label>
+              <textarea
+                id="map-embed"
+                value={formData.mapEmbedCode}
+                onChange={(e) =>
+                  handleInputChange("mapEmbedCode", e.target.value)
+                }
+                placeholder="Paste your Google Maps embed code here..."
+                className="w-full p-3 border border-gray-300 rounded-md resize-none h-32 focus:ring-2 focus:ring-[#116114] focus:border-[#116114]"
+                disabled={!editMode}
+              />
+            </div>
+          )}
         </div>
 
         {/* Office Address */}
@@ -346,23 +417,55 @@ export default function ContactPage() {
             onChange={(e) => handleInputChange("officeAddress", e.target.value)}
             disabled={!editMode}
             className={editMode ? "bg-white" : "bg-[#D9D9D9]"}
+            placeholder="Enter your office address"
           />
         </div>
 
         {/* Map Preview */}
-        <div
-          className={`border h-64 rounded-lg flex items-center justify-center ${
-            editMode ? "bg-white" : "bg-[#D9D9D9]"
-          }`}
-        >
-          {selected === "embed" && formData.mapEmbedCode ? (
-            <div
-              className="w-full h-full"
-              dangerouslySetInnerHTML={{ __html: formData.mapEmbedCode }}
-            />
-          ) : (
-            <span className="text-gray-500">Map preview</span>
-          )}
+        <div className="space-y-2">
+          <Label>Map Preview</Label>
+          <div
+            className={`border border-gray-300 rounded-lg overflow-hidden ${
+              editMode ? "bg-white" : "bg-[#D9D9D9]"
+            }`}
+            style={{ height: "300px" }}
+          >
+            {selected === "embed" && formData.mapEmbedCode ? (
+              <div
+                className="w-full h-full"
+                dangerouslySetInnerHTML={{ __html: formData.mapEmbedCode }}
+              />
+            ) : selected === "address" && formData.officeAddress ? (
+              <div className="w-full h-full flex items-center justify-center p-4">
+                <div className="text-center">
+                  <div className="text-lg font-medium text-[#323539] mb-2">
+                    Office Address
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {formData.officeAddress}
+                  </div>
+                  <div className="mt-4 text-xs text-gray-500">
+                    Address will be displayed on the contact page
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-gray-500 mb-2">
+                    {selected === "embed"
+                      ? "No embed code added"
+                      : "No address added"}
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    {selected === "embed"
+                      ? "Add a Google Maps embed code to show the map"
+                      : "Add an office address to display location"}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Agent Inquiry */}

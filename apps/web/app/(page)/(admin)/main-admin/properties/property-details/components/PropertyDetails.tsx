@@ -1,9 +1,9 @@
 "use client";
 import Image from "next/image";
 import { ChevronUp, Download } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { GrLocation } from "react-icons/gr";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import placeholder from "@/assets/placeholder.svg";
 import c from "@/assets/investment/icons/c.webp";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,18 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { useFetchData } from "@/hooks/useApi";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useFetchData, useDeleteData } from "@/hooks/useApi";
 import { MdArrowBackIosNew } from "react-icons/md";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const defaultAdvantages = [
   {
@@ -37,7 +46,9 @@ const defaultAdvantages = [
 
 export default function PropertyDetails() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const propertyId = searchParams.get("id");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Fetch property data
   const {
@@ -46,6 +57,24 @@ export default function PropertyDetails() {
     error,
     refetch,
   } = useFetchData(propertyId ? `admin/properties/${propertyId}` : "");
+
+  // Delete property mutation
+  const { mutateAsync: deleteProperty, isPending: isDeleting } = useDeleteData(
+    propertyId ? `admin/properties/${propertyId}` : null
+  );
+
+  const handleDeleteProperty = async () => {
+    try {
+      await deleteProperty();
+      toast.success("Property deleted successfully");
+      router.push("/main-admin/properties");
+    } catch (error: any) {
+      console.error("Failed to delete property:", error);
+      const errorMessage =
+        error?.response?.data?.message || "Failed to delete property";
+      toast.error(errorMessage);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -316,17 +345,56 @@ export default function PropertyDetails() {
         </div>
       </div>
       <div className="flex justify-between px-3 items-center py-12">
-        <Button className="bg-[#116114] text-white">
-          <Link href={`/main-admin/properties/add-properties?id=${propertyId}`}>
-            Edit
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button className="bg-[#116114] text-white">
+            <Link
+              href={`/main-admin/properties/add-properties?id=${propertyId}`}
+            >
+              Edit
+            </Link>
+          </Button>
+          <Button
+            className="bg-red-500 text-white hover:bg-red-600"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            Delete
+          </Button>
+        </div>
         <Link href="/main-admin/properties">
           <button className="text-[#323539] flex items-center gap-2 hover:text-[#323539] text-sm">
             <MdArrowBackIosNew /> Back
           </button>
         </Link>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Property</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{property?.name}"? This action
+              cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col gap-2 md:flex-row">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-red-500 text-white hover:bg-red-600"
+              onClick={handleDeleteProperty}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete Property"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

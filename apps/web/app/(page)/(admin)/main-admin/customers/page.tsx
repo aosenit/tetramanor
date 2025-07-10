@@ -35,7 +35,7 @@ interface User {
   name: string;
   email: string;
   phone: string;
-  kycStatusVerified: boolean;
+  kycStatus: boolean;
   engagement: string | null;
   createdAt: string;
   updatedAt: string;
@@ -170,10 +170,8 @@ function CustomersPageContent() {
   const totalUsers = data?.data?.total || 0;
 
   // Calculate stats from API data
-  const verifiedUsers = users.filter((user) => user.kycStatusVerified).length;
-  const unverifiedUsers = users.filter(
-    (user) => !user.kycStatusVerified
-  ).length;
+  const verifiedUsers = users.filter((user) => user.kycStatus).length;
+  const unverifiedUsers = users.filter((user) => !user.kycStatus).length;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -278,8 +276,9 @@ function CustomersPageContent() {
               <SelectValue placeholder="KYC Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="true">Verified</SelectItem>
-              <SelectItem value="false">Unverified</SelectItem>
+              <SelectItem value="VERIFIED">Verified</SelectItem>
+              <SelectItem value="PENDING">Pending</SelectItem>
+              <SelectItem value="UNVERIFIED">Unverified</SelectItem>
             </SelectContent>
           </Select>
 
@@ -375,9 +374,15 @@ function CustomersPageContent() {
                         {getRoleDisplayName(user.role)}
                       </TableCell>
                       <TableCell
-                        className={`font-medium ${user.kycStatusVerified ? "text-[#116114]" : "text-orange-600"}`}
+                        className={`font-medium ${
+                          user.kycStatus === "VERIFIED"
+                            ? "text-[#116114]"
+                            : user.kycStatus === "PENDING"
+                              ? "text-yellow-600"
+                              : "text-red-600"
+                        }`}
                       >
-                        {user.kycStatusVerified ? "Verified" : "Unverified"}
+                        {user.kycStatus}
                       </TableCell>
                       <TableCell className="text-[#181818]">
                         {getEngagementDisplay(user.engagement, user.role)}

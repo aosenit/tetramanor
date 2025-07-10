@@ -269,13 +269,15 @@ export default function PropertyDashboard() {
                   >
                     <div className="flex items-center">
                       <Checkbox className="mr-3" />
-                      <Image
-                        src={unit?.images[0]?.imageUrl}
-                        alt={`Unit ${unit.id}`}
-                        width={28}
-                        height={28}
-                        className="rounded-sm object-cover"
-                      />
+                      {unit?.images[0]?.imageUrl && (
+                        <Image
+                          src={unit?.images[0]?.imageUrl}
+                          alt={`Unit ${unit.id}`}
+                          width={28}
+                          height={28}
+                          className="rounded-sm object-cover"
+                        />
+                      )}
                     </div>
 
                     <div className="flex items-center gap-3">
