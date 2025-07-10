@@ -6,7 +6,6 @@ import { Search, X, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import logo from "@/assets/home/logo.webp";
 import PropertyCard from "../cards/Property";
-import four from "@/assets/admin/home/four.webp";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/services/axiosInstance";
 import { usePostData } from "@/hooks/useApi";
@@ -29,9 +28,7 @@ export default function PropertySelector({
     mutateAsync: updateFeaturedProperty,
     isPending: isUpdatingFeaturedProperty,
   } = usePostData(
-    type === "property"
-      ? "admin/properties/featured"
-      : "admin/rentals/highlight"
+    type === "property" ? "admin/properties/featured" : "rentals/highlight"
   );
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -290,7 +287,10 @@ export default function PropertySelector({
                                 : property.property.features.includes(
                                     "FURNISHED"
                                   ),
-                            image: four,
+                            image:
+                              type === "property"
+                                ? property.images[0]?.imageUrl
+                                : property.property.images[0]?.imageUrl,
                           }}
                           isSelected={
                             type === "property"

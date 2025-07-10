@@ -121,7 +121,7 @@ export default function PropertyMediaSection({
             />
           </label>
           {/* Uploaded Document */}
-          {uploadedDocument && (
+          {uploadedDocument?.imageUrl && (
             <div className="flex items-center gap-2 mt-4">
               <a
                 href={uploadedDocument.imageUrl}

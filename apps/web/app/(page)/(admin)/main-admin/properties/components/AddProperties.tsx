@@ -165,7 +165,7 @@ export default function AddProperties() {
   const { mutateAsync: createProperty, isPending: isCreating } =
     usePostData("admin/properties");
   const { mutateAsync: updateProperty, isPending: isUpdating } = usePutData(
-    propertyId ? `admin/properties/${propertyId}` : null
+    propertyId ? `admin/properties/edit/${propertyId}` : null
   );
 
   // File upload mutations
@@ -177,7 +177,6 @@ export default function AddProperties() {
   // Load property data when editing
   useEffect(() => {
     if (propertyData && isEditMode) {
-      console.log("Property data:", propertyData);
       setFormData({
         name: propertyData?.data?.name || "",
         address: propertyData?.data?.address || "",
@@ -365,13 +364,13 @@ export default function AddProperties() {
     // Filter out empty features and amenities
     const cleanedFormData = {
       ...formData,
-      features: formData.features.filter((f) => f.trim() !== ""),
-      amenities: formData.amenities.filter((a) => a.trim() !== ""),
-      whyInvest: formData.whyInvest.advantages.filter(
-        (adv) => adv.title.trim() !== "" && adv.description.trim() !== ""
+      features: formData?.features?.filter((f) => f.trim() !== ""),
+      amenities: formData?.amenities?.filter((a) => a.trim() !== ""),
+      whyInvest: formData?.whyInvest.advantages?.filter(
+        (adv) => adv?.title?.trim() !== "" && adv?.description?.trim() !== ""
       ),
-      investmentAdvantages: formData.investmentAdvantages.filter(
-        (adv) => adv.title.trim() !== "" && adv.description.trim() !== ""
+      investmentAdvantages: formData?.investmentAdvantages?.filter(
+        (adv) => adv?.title?.trim() !== "" && adv?.description?.trim() !== ""
       ),
     };
 
@@ -425,12 +424,6 @@ export default function AddProperties() {
       router.push("/main-admin/properties");
     } catch (error: any) {
       console.error("Error:", error);
-      const errorMessage =
-        error?.response?.data?.message ||
-        (isEditMode
-          ? "Failed to update property"
-          : "Failed to create property");
-      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

@@ -1,6 +1,4 @@
 "use client";
-
-import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import DoughnutChart from "./DoughnutChart";
 
@@ -8,7 +6,6 @@ interface PropertyStatisticsChartProps {
   total: number;
   forSale: number;
   forRent: number;
-  rentedOut: number;
 }
 
 function ChartFallback() {
@@ -23,20 +20,16 @@ export default function PropertyStatisticsChart({
   total,
   forSale,
   forRent,
-  rentedOut,
 }: PropertyStatisticsChartProps) {
-  // Validate that percentages add up to 100
-  const totalPercentage = forSale + forRent + rentedOut;
-
   return (
     <div className="relative">
       <div className="flex flex-col items-center justify-center h-[380px]">
         <div className="relative w-[350px] h-[350px]">
           <Suspense fallback={<ChartFallback />}>
             <DoughnutChart
-              data={[forSale, forRent, rentedOut]}
-              labels={["For sale", "For rent", "Rented out"]}
-              colors={["#1e5631", "#8cd98c", "#e6ffe6"]}
+              data={[forSale, forRent]}
+              labels={["For sale", "For rent"]}
+              colors={["#1e5631", "#8cd98c"]}
               cutout="70%"
             />
           </Suspense>
@@ -62,13 +55,6 @@ export default function PropertyStatisticsChart({
             <span>For rent</span>
           </div>
           <span className="font-medium">{forRent}%</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-[#e6ffe6]"></div>
-            <span>Rented out</span>
-          </div>
-          <span className="font-medium">{rentedOut}%</span>
         </div>
       </div>
     </div>

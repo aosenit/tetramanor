@@ -496,7 +496,8 @@ export default function FeaturedProperty() {
             </div>
             <div>
               <p className="text-xs text-[#4C5560]">
-                Set the property that appears at the top of the homepage
+                Set the featured property that appears at the top of the
+                homepage
               </p>
             </div>
 
@@ -521,11 +522,11 @@ export default function FeaturedProperty() {
 
                 <div className="flex gap-4 items-center">
                   <Image
-                    src={four}
+                    src={featuredProperty.images[0]?.imageUrl}
                     alt="Featured property"
-                    width={120}
+                    width={80}
                     height={80}
-                    className="rounded-lg object-cover"
+                    className="rounded-lg object-cover size-[80px]"
                   />
                   <div className="flex gap-2">
                     <button
@@ -589,7 +590,8 @@ export default function FeaturedProperty() {
             </div>
             <div>
               <p className="text-xs text-[#4C5560]">
-                Set the property that appears at the top of the homepage
+                Set the highlighted rental that appears at the top of the
+                homepage
               </p>
             </div>
 
@@ -618,11 +620,11 @@ export default function FeaturedProperty() {
 
                 <div className="flex gap-4 items-center">
                   <Image
-                    src={four}
+                    src={highlightedRental.property.images[0]?.imageUrl}
                     alt="Featured property"
-                    width={120}
+                    width={80}
                     height={80}
-                    className="rounded-lg object-cover"
+                    className="rounded-lg object-cover size-[80px]"
                   />
                   <div className="flex gap-2">
                     <button

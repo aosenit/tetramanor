@@ -1,6 +1,8 @@
 import Image, { StaticImageData } from "next/image";
 import { Loader2 } from "lucide-react";
 
+import placeholder from "@/assets/placeholder.svg";
+
 type Property = {
   id?: string;
   name: string;
@@ -33,7 +35,7 @@ export default function PropertyCard({
     >
       <div className="flex items-center gap-4">
         <Image
-          src={property.image}
+          src={property.image || placeholder}
           alt={property.name}
           width={100}
           height={100}

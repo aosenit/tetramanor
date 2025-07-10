@@ -14,12 +14,7 @@ import {
 } from "@/components/ui/select";
 import { X, Upload, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  usePostData,
-  usePutData,
-  useFetchData,
-  useUploadData,
-} from "@/hooks/useApi";
+import { usePostData, usePutData, useUploadData } from "@/hooks/useApi";
 import { toast } from "sonner";
 
 interface CampaignFormData {
@@ -27,9 +22,10 @@ interface CampaignFormData {
   type: "INVESTMENT" | "SALE" | "PROMOTION";
   description: string;
   startDate: string;
-  endDate: string;
+  endDate?: string;
   isActive: boolean;
   images: string[];
+  isIndefinite: boolean;
 }
 
 interface UploadedImage {
@@ -64,6 +60,7 @@ export default function CampaignModal({
     endDate: "",
     isActive: true,
     images: [],
+    isIndefinite: false,
   });
 
   const [errors, setErrors] = useState<Partial<CampaignFormData>>({});
@@ -108,6 +105,7 @@ export default function CampaignModal({
         images: Array.isArray(campaignData.images)
           ? campaignData.images.map((img: any) => img.id)
           : [],
+        isIndefinite: campaignData.isIndefinite ?? false,
       });
       // Load existing images if any
       if (Array.isArray(campaignData.images)) {
@@ -127,6 +125,7 @@ export default function CampaignModal({
         endDate: "",
         isActive: true,
         images: [],
+        isIndefinite: false,
       });
       setErrors({});
       setUploadedImages([]);
@@ -205,11 +204,11 @@ export default function CampaignModal({
       newErrors.startDate = "Start date is required";
     }
 
-    if (!formData.endDate) {
+    if (!formData.isIndefinite && !formData.endDate) {
       newErrors.endDate = "End date is required";
     }
 
-    if (formData.startDate && formData.endDate) {
+    if (formData.startDate && formData.endDate && !formData.isIndefinite) {
       const startDate = new Date(formData.startDate);
       const endDate = new Date(formData.endDate);
 
@@ -238,10 +237,16 @@ export default function CampaignModal({
 
     try {
       // Prepare the payload
-      const payload = {
-        ...formData,
+      const { isIndefinite, ...rest } = formData;
+      if (isIndefinite) {
+        delete rest.endDate;
+      } else {
+        rest.endDate = new Date(formData.endDate).toISOString();
+      }
+
+      const payload: Record<string, any> = {
+        ...rest,
         startDate: new Date(formData.startDate).toISOString(),
-        endDate: new Date(formData.endDate).toISOString(),
       };
 
       if (isEditMode) {
@@ -256,12 +261,6 @@ export default function CampaignModal({
       refetch();
     } catch (error: any) {
       console.error("Failed to save campaign:", error);
-      const errorMessage =
-        error?.response?.data?.message ||
-        (isEditMode
-          ? "Failed to update campaign"
-          : "Failed to create campaign");
-      toast.error(errorMessage);
     }
   };
 
@@ -331,6 +330,20 @@ export default function CampaignModal({
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isIndefinite"
+                checked={formData.isIndefinite}
+                onChange={(e) =>
+                  handleInputChange("isIndefinite", e.target.checked)
+                }
+                className="rounded accent-[var(--primary-green)]"
+              />
+              <Label htmlFor="isIndefinite" className="text-[#323539] text-sm">
+                Ongoing Campaign (No end date)
+              </Label>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -349,27 +362,31 @@ export default function CampaignModal({
                   <p className="text-red-500 text-xs">{errors.startDate}</p>
                 )}
               </div>
-              <div className="space-y-2">
-                <Label className="text-[#323539] text-sm font-medium">
-                  End date
-                </Label>
-                <Input
-                  type="date"
-                  value={formData.endDate}
-                  onChange={(e) => handleInputChange("endDate", e.target.value)}
-                  className={`bg-[#E5E5E7] text-xs ${errors.endDate ? "border-red-500" : ""}`}
-                />
-                {errors.endDate && (
-                  <p className="text-red-500 text-xs">{errors.endDate}</p>
-                )}
-              </div>
+              {!formData.isIndefinite && (
+                <div className="space-y-2">
+                  <Label className="text-[#323539] text-sm font-medium">
+                    End date
+                  </Label>
+                  <Input
+                    type="date"
+                    value={formData.endDate}
+                    onChange={(e) =>
+                      handleInputChange("endDate", e.target.value)
+                    }
+                    className={`bg-[#E5E5E7] text-xs ${errors.endDate ? "border-red-500" : ""}`}
+                  />
+                  {errors.endDate && (
+                    <p className="text-red-500 text-xs">{errors.endDate}</p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label className="text-[#323539] text-sm font-medium">
                 Banner Images
               </Label>
-              <div className="border border-gray-300 rounded-lg p-8 text-center bg-white transition-colors cursor-pointer hover:bg-gray-50">
+              <div className="border border-gray-300 rounded-lg p-4 text-center bg-white transition-colors cursor-pointer hover:bg-gray-50">
                 <input
                   type="file"
                   multiple
@@ -386,9 +403,9 @@ export default function CampaignModal({
                       : "Upload banner images"}
                   </p>
                   {isUploadingImages ? (
-                    <Loader2 className="mx-auto h-8 w-8 text-[#798088] mt-2 animate-spin" />
+                    <Loader2 className="mx-auto size-5 text-[#798088] mt-2 animate-spin" />
                   ) : (
-                    <Upload className="mx-auto h-8 w-8 text-[#798088] mt-2" />
+                    <Upload className="mx-auto size-5 text-[#798088] mt-2" />
                   )}
                   {uploadedImages.length > 0 && (
                     <p className="text-xs text-green-600 mt-2">
@@ -447,7 +464,7 @@ export default function CampaignModal({
                 onChange={(e) =>
                   handleInputChange("isActive", e.target.checked)
                 }
-                className="rounded"
+                className="rounded accent-[var(--primary-green)]"
               />
               <Label htmlFor="isActive" className="text-[#323539] text-sm">
                 Active Campaign

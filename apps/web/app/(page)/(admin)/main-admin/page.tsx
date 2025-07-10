@@ -2,8 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import Image from "next/image";
 import three from "@/assets/admin/home/three.webp";
@@ -227,21 +226,18 @@ export default function Dashboard() {
               <Image src={three} alt="property" width={35} height={35} />
             </div>
             <div className="flex border rounded-lg overflow-hidden">
-              <button className="px-4 py-2 text-sm font-semibold bg-white text-[#858C95] border-r">
-                All
-              </button>
-              <button className="px-4 py-2 font-semibold text-sm bg-[#F8F9FB] text-[#323539] border-r">
-                Recent
-              </button>
-              <button className="px-3 py-2 text-sm bg-white text-[#858C95]">
-                <Plus className="h-4 w-4" />
+              <button
+                className="px-4 py-2 text-sm font-semibold bg-white text-[#858C95] border-r hover:opacity-80 transition-opacity duration-300"
+                onClick={() => router.push("/main-admin/properties")}
+              >
+                View All
               </button>
             </div>
           </div>
           <div className="w-full bg-white rounded-lg overflow-hidden">
-            <div className="grid grid-cols-4 gap-4 bg-[#e5e5e7]  p-4 text-sm font-medium text-[#116114]">
+            <div className="grid grid-cols-3 gap-4 bg-[#e5e5e7]  p-4 text-sm font-medium text-[#116114]">
               <p>Property</p>
-              <p>Price</p>
+
               <p>Date Added</p>
               <p>Status</p>
             </div>
@@ -249,12 +245,13 @@ export default function Dashboard() {
               stats.recentProperties.map((property: any, index: number) => (
                 <div
                   key={property.id || index}
-                  className="grid grid-cols-4 text-[#181818] gap-4 p-4 border-t text-xs"
+                  className="grid grid-cols-3 text-[#181818] gap-4 p-4 border-t text-xs"
                 >
                   <p className="font-medium">{property.name}</p>
-                  <p>₦{property.price?.toLocaleString() ?? 0}</p>
                   <p>{new Date(property.createdAt).toLocaleDateString()}</p>
-                  <p className="text-green-600">New</p>
+                  <p className="text-green-600">
+                    {property?.status || "Available"}
+                  </p>
                 </div>
               ))
             ) : (
@@ -274,14 +271,11 @@ export default function Dashboard() {
                 <Image src={one} alt="property" width={35} height={35} />
               </div>
               <div className="flex rounded-lg overflow-hidden">
-                <button className="px-4 py-2 text-sm font-semibold bg-white text-[#858C95] border-r">
-                  All
-                </button>
-                <button className="px-4 py-2 font-semibold text-sm bg-[#F8F9FB] text-[#323539] border-r">
-                  Recent
-                </button>
-                <button className="px-3 py-2 text-sm bg-white text-[#858C95]">
-                  <Plus className="h-4 w-4" />
+                <button
+                  className="px-4 py-2 text-sm font-semibold bg-white text-[#858C95] border-r hover:opacity-80 transition-opacity duration-300"
+                  onClick={() => router.push("/main-admin/investments")}
+                >
+                  View All
                 </button>
               </div>
             </div>
@@ -322,11 +316,11 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="flex rounded-lg overflow-hidden">
-                  <button className="px-4 py-2 text-sm font-semibold bg-white text-[#858C95] border-r">
-                    All
-                  </button>
-                  <button className="px-4 py-2 font-semibold text-sm bg-[#F8F9FB] text-[#323539] border-r">
-                    Recent
+                  <button
+                    className="px-4 py-2 text-sm font-semibold bg-white text-[#858C95] border-r hover:opacity-80 transition-opacity duration-300"
+                    onClick={() => router.push("/main-admin/notifications")}
+                  >
+                    View All
                   </button>
                 </div>
               </div>
@@ -353,7 +347,6 @@ export default function Dashboard() {
                     Math.ceil(stats.inventoryBreakdown?.percentageRentedOut) ??
                     0
                   }
-                  rentedOut={stats.totalRented ?? 0}
                 />
               </CardContent>
             </Card>
