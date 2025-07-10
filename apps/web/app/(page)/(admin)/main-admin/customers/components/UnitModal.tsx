@@ -84,9 +84,11 @@ const bedroomCountMap: Record<string, number> = {
 export default function AddUnitModal({
   open,
   onClose,
+  refetchProperties,
 }: {
   open: boolean;
   onClose: () => void;
+  refetchProperties?: () => void;
 }) {
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
@@ -234,6 +236,7 @@ export default function AddUnitModal({
       await createPurchase(payload);
       toast.success("Purchase created successfully");
       onClose();
+      refetchProperties?.();
     } catch (error) {
       console.error("Error creating purchase:", error);
     } finally {

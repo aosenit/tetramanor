@@ -43,7 +43,7 @@ export function PaymentTableRow({
       <TableCell>
         <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
           <Check className="mr-1 h-3 w-3" />
-          Completed
+          {Number(payment.balanceRemaining) > 0 ? "Pending" : "Completed"}
         </Badge>
       </TableCell>
       <TableCell className="text-gray-600">

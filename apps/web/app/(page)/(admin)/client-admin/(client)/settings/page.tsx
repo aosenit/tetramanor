@@ -583,12 +583,17 @@ export default function AccountSettings() {
               <Dialog open={isKycModalOpen} onOpenChange={setIsKycModalOpen}>
                 <DialogTrigger asChild>
                   <div className="lg:w-[60%] ">
-                    <Button
-                      className="bg-[var(--primary-green)] hover:bg-green-700"
-                      disabled={isLoadingKyc}
-                    >
-                      {isLoadingKyc ? "Loading..." : "Verify Identity"}
-                    </Button>
+                    {kycStatus?.toLowerCase() === "pending" ||
+                    kycStatus?.toLowerCase() === "unverified" ? (
+                      <Button
+                        className="bg-[var(--primary-green)] hover:bg-green-700"
+                        disabled={isLoadingKyc}
+                      >
+                        {isLoadingKyc ? "Loading..." : "Verify Identity"}
+                      </Button>
+                    ) : (
+                      ""
+                    )}
                   </div>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">

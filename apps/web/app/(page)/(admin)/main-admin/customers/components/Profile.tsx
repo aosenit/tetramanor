@@ -1,6 +1,5 @@
 "use client";
 import { useState, useRef } from "react";
-import { Button } from "@chakra-ui/react";
 import {
   Plus,
   Loader2,
@@ -30,6 +29,14 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 interface User {
@@ -79,6 +86,7 @@ export default function Profile() {
     data: propertiesData,
     isLoading: propertiesLoading,
     isError: propertiesError,
+    refetch: refetchProperties,
   } = useFetchData(userId ? `admin/purchases/user/${userId}` : null);
 
   // Fetch KYC data
@@ -89,8 +97,9 @@ export default function Profile() {
   } = useFetchData(userId ? `kyc/user/${userId}` : null);
 
   // Update KYC status mutation
-  const { mutateAsync: updateKycStatus, isPending: isUpdatingKycStatus } =
-    usePostData(userId ? `kyc/update-status/${userId}` : null);
+  const { mutateAsync: updateKycStatus } = usePostData(
+    userId ? `kyc/update-status/${userId}` : null
+  );
 
   const user: User | null = userData?.data || null;
   const properties: Property[] = propertiesData?.data || [];
@@ -128,7 +137,7 @@ export default function Profile() {
       setKycDialogOpen(false);
       refetchKyc();
     } catch (error: any) {
-      toast.error(error?.message || "Failed to update KYC status");
+      console.log(error);
     } finally {
       setIsUpdatingKyc(false);
     }
@@ -283,8 +292,9 @@ export default function Profile() {
             variant={"outline"}
             className="flex items-center text-[#323539] gap-2 text-sm"
             onClick={() => setIsModalOpen(true)}
+            size={"sm"}
           >
-            <Plus className="" />
+            <Plus className="w-4 h-4" />
             Add new property
           </Button>
         </div>
@@ -345,9 +355,7 @@ export default function Profile() {
                   <span
                     className={`font-medium text-sm ${getKycStatusDisplay(kyc?.status || user.kycStatus).color}`}
                   >
-                    {kyc
-                      ? getKycStatusDisplay(kyc?.status || user.kycStatus).text
-                      : "Unverified"}
+                    {kyc?.status || user.kycStatus}
                   </span>
                 </>
               )}
@@ -450,7 +458,11 @@ export default function Profile() {
           </Link>
         </div>
       </div>
-      <AddUnitModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AddUnitModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        refetchProperties={refetchProperties}
+      />
 
       {/* KYC Status Update Dialog */}
       <Dialog open={kycDialogOpen} onOpenChange={setKycDialogOpen}>
@@ -464,16 +476,19 @@ export default function Profile() {
           <div className="space-y-4">
             <div>
               <Label htmlFor="kyc-status">Status</Label>
-              <select
-                id="kyc-status"
+              <Select
+                onValueChange={(value) => setKycStatus(value)}
                 value={kycStatus}
-                onChange={(e) => setKycStatus(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md bg-white"
               >
-                <option value="PENDING">Pending</option>
-                <option value="VERIFIED">Verified</option>
-                <option value="REJECTED">Rejected</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PENDING">Pending</SelectItem>
+                  <SelectItem value="VERIFIED">Verified</SelectItem>
+                  <SelectItem value="REJECTED">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="kyc-remark">Remark (Optional)</Label>

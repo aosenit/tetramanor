@@ -658,7 +658,7 @@ const PropertyOverview = () => {
                 </Button>
                 <Button
                   onClick={confirmPutUpForRent}
-                  className="flex-1"
+                  className="flex-1 bg-[var(--primary-green)] text-white"
                   disabled={isAddingRental}
                 >
                   {isAddingRental ? "Putting Up for Rent..." : "Confirm"}

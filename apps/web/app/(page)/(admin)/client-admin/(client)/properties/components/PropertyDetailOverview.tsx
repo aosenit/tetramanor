@@ -15,9 +15,11 @@ import {
 } from "@/components/ui/dialog";
 import { usePostData } from "@/hooks/useApi";
 import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 
 const PropertyDetailOverview = ({ property }: { property: any }) => {
   const [isRentDialogOpen, setIsRentDialogOpen] = useState(false);
+  const type = useSearchParams().get("type");
   const { mutate: addRental, isPending: isAddingRental } = usePostData(
     "customer/add-rental"
   );
@@ -50,12 +52,14 @@ const PropertyDetailOverview = ({ property }: { property: any }) => {
       <div className="flex justify-end w-full">
         <Dialog open={isRentDialogOpen} onOpenChange={setIsRentDialogOpen}>
           <DialogTrigger asChild>
-            <Button
-              className="bg-[var(--primary-green)] text-white"
-              onClick={handlePutUpForRent}
-            >
-              Put up for rent
-            </Button>
+            {type === "owned" && (
+              <Button
+                className="bg-[var(--primary-green)] text-white"
+                onClick={handlePutUpForRent}
+              >
+                Put up for rent
+              </Button>
+            )}
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -78,7 +82,7 @@ const PropertyDetailOverview = ({ property }: { property: any }) => {
                 </Button>
                 <Button
                   onClick={confirmPutUpForRent}
-                  className="flex-1"
+                  className="flex-1 bg-[var(--primary-green)] text-white"
                   disabled={isAddingRental}
                 >
                   {isAddingRental ? "Putting Up for Rent..." : "Confirm"}

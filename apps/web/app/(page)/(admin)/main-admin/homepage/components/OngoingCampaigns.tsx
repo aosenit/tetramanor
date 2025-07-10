@@ -30,6 +30,8 @@ export default function OngoingCampaigns() {
 
   // Format date range
   const formatDateRange = (startDate: string, endDate: string) => {
+    // id endDate  is null , return "" for endDate
+
     const start = new Date(startDate);
     const end = new Date(endDate);
 
@@ -42,6 +44,10 @@ export default function OngoingCampaigns() {
       day: "numeric",
       year: "numeric",
     });
+
+    if (!endDate) {
+      return `${startFormatted} – `;
+    }
 
     return `${startFormatted} – ${endFormatted}`;
   };

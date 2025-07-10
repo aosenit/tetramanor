@@ -172,7 +172,9 @@ const PropertyPaymentHistory: React.FC<PropertyPaymentHistoryProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="text-green-500 text-sm font-medium">
-                      Completed
+                      {Number(payment?.balanceRemaining) > 0
+                        ? "Pending"
+                        : "Completed"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

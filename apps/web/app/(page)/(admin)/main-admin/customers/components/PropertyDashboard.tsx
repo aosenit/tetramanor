@@ -46,7 +46,7 @@ interface Unit {
 }
 
 export default function PropertyDashboard() {
-  const [tab, setTab] = useState("rented");
+  const [tab, setTab] = useState("owned");
   const router = useRouter();
   const searchParams = useSearchParams();
   const propertyId = searchParams.get("propertyId");
@@ -261,11 +261,11 @@ export default function PropertyDashboard() {
                   <div
                     key={unit?.id}
                     className="grid grid-cols-8 gap-4 p-4 border-b hover:bg-gray-50 items-center transition-colors"
-                    // onClick={() =>
-                    //   router.push(
-                    //     `/main-admin/customers/property-dashboard/detail?unitId=${unit?.id}&userId=${userId}`
-                    //   )
-                    // }
+                    onClick={() =>
+                      router.push(
+                        `/main-admin/customers/properties-details?unitId=${unit?.id}&userId=${userId}`
+                      )
+                    }
                   >
                     <div className="flex items-center">
                       <Checkbox className="mr-3" />
