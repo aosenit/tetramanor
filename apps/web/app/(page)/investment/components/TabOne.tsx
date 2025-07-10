@@ -1,12 +1,12 @@
 "use client";
-import React from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
-import { FaCheck, FaCoins } from "react-icons/fa";
+import { FaCheck, FaCoins, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import a from "@/assets/investment/icons/a.webp";
 import b from "@/assets/investment/icons/b.webp";
 import c from "@/assets/investment/icons/c.webp";
 import d from "@/assets/investment/icons/d.webp";
-import two from "@/assets/investment/two.webp";
+import placeholder from "@/assets/placeholder.jpg";
 import RoiCalculator from "./RoiCalculator";
 
 const steps = [
@@ -34,95 +34,142 @@ const steps = [
 ];
 
 function TabOne({ investments }: { investments: any[] }) {
-  const investment = investments[0];
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [current, setCurrent] = useState(0);
+
+  const scrollToIndex = (idx: number) => {
+    if (scrollRef.current) {
+      const card = scrollRef.current.children[idx] as HTMLElement;
+      if (card) {
+        card.scrollIntoView({ behavior: "smooth", inline: "start" });
+      }
+    }
+  };
+
+  const handlePrev = () => {
+    if (current > 0) {
+      setCurrent((prev) => {
+        scrollToIndex(prev - 1);
+        return prev - 1;
+      });
+    }
+  };
+
+  const handleNext = () => {
+    if (current < investments.length - 1) {
+      setCurrent((prev) => {
+        scrollToIndex(prev + 1);
+        return prev + 1;
+      });
+    }
+  }
+
+  // Define InvestmentImage type if not already defined
+  type InvestmentImage = {
+    imageUrl: string;
+    isPrimary?: boolean;
+  };
+
+  const getInvestmentImage = (images: InvestmentImage[] | undefined) => {
+    if (!images || images.length === 0) return placeholder;
+    const primary = images.find((img) => img.isPrimary);
+    return primary?.imageUrl || images[0].imageUrl || placeholder;
+  };
 
   return (
     <div>
       <div className="space-y-12">
-        <div className="bg-[#f9f4f0] rounded-xl p-2 md:p-4">
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="">
-              <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#11611414]">
-                <FaCoins className="text-[#116114]" />
+        <div className="relative">
+          <button
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
+            onClick={handlePrev}
+            disabled={current === 0}
+            aria-label="Previous"
+          >
+            <FaChevronLeft />
+          </button>
+          <div className="flex overflow-x-auto gap-8 scrollbar-hide pb-2" ref={scrollRef}>
+            {investments.map((investment, idx) => (
+              <div key={idx} className="bg-[#f9f4f0] rounded-xl p-2 md:p-4 min-w-full max-w-full flex-shrink-0">
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div className="">
+                    <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#11611414]">
+                      <FaCoins className="text-[#116114]" />
+                    </div>
+
+                    <h2 className="text-xl my-3 font-semibold">
+                      {investment?.projectName || "Fixed ROI Model"}
+                    </h2>
+
+                    <p className="text-[#0B0A0A] text-sm">
+                      {investment?.description ||
+                        "This model targets smaller projects that can be completed within 18 months, offering predictable and low-risk returns."}
+                    </p>
+
+                    <ul className="space-y-3 mt-10">
+                      <li className="flex items-start gap-2">
+                        <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
+                        <div className="text-sm font-medium text-[#0B0A0A]">
+                          <span className="text-sm font-semibold">
+                            Estimated ROI:
+                          </span>{" "}
+                          {investment?.estimatedROI || "Up to"}% on invested capital
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
+                        <div className="text-sm font-medium text-[#0B0A0A]">
+                          <span className="font-semibold text-sm">
+                            Minimum Investment:
+                          </span>{" "}
+                          ₦{investment?.minAmount?.toLocaleString() || "50M"}{" "}
+                          {investment?.currency || "NGN"}
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
+                        <div className="text-sm font-medium text-[#0B0A0A]">
+                          <span className="text-sm font-semibold">Duration:</span>{" "}
+                          {investment?.duration || "12"} months
+                        </div>
+                      </li>
+                    </ul>
+
+                    <div className="mt-6 flex gap-2">
+                      <p className="font-medium text-sm text-[#0B0A0A]">
+                        More benefits include:
+                        <span className="text-[#116114] text-sm font-bold">
+                          {" "}
+                          Guaranteed Returns, Lower Risk, Shorter Time Frame, Smaller
+                          Investment Size, Diversification Option.
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-center">
+                    <div className="bg-amber-100 rounded-xl w-full">
+                      <Image
+                        src={getInvestmentImage(investment?.image)}
+                        alt={investment?.projectName || ""}
+                        className="w-full"
+                        width={1200}
+                        height={800}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-
-              <h2 className="text-xl my-3 font-semibold">
-                {investment?.projectName || "Fixed ROI Model"}
-              </h2>
-
-              <p className="text-[#0B0A0A] text-sm">
-                {investment?.description ||
-                  "This model targets smaller projects that can be completed within 18 months, offering predictable and low-risk returns."}
-              </p>
-
-              <ul className="space-y-3 mt-10">
-                <li className="flex items-start gap-2">
-                  <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
-                  <div className="text-sm font-medium text-[#0B0A0A]">
-                    <span className="text-sm font-semibold">
-                      Estimated ROI:
-                    </span>{" "}
-                    {investment?.estimatedROI || "Up to"}% on invested capital
-                  </div>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
-                  <div className="text-sm font-medium text-[#0B0A0A]">
-                    <span className="font-semibold text-sm">
-                      Minimum Investment:
-                    </span>{" "}
-                    ₦{investment?.minAmount?.toLocaleString() || "50M"}{" "}
-                    {investment?.currency || "NGN"}
-                  </div>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
-                  <div className="text-sm font-medium text-[#0B0A0A]">
-                    <span className="text-sm font-semibold">Duration:</span>{" "}
-                    {investment?.duration || "12"} months
-                  </div>
-                </li>
-                {/* <li className="flex items-start gap-2">
-                  <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
-                  <div className="text-sm font-medium text-[#0B0A0A]">
-                    <span className="text-sm font-semibold">Status:</span>{" "}
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        investment?.status === "PUBLISHED"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {investment?.status || "DRAFT"}
-                    </span>
-                  </div>
-                </li> */}
-              </ul>
-
-              <div className="mt-6 flex gap-2">
-                <p className="font-medium text-sm text-[#0B0A0A]">
-                  More benefits include:
-                  <span className="text-[#116114] text-sm font-bold">
-                    {" "}
-                    Guaranteed Returns, Lower Risk, Shorter Time Frame, Smaller
-                    Investment Size, Diversification Option.
-                  </span>
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center">
-              <div className="bg-amber-100 rounded-xl w-full">
-                <Image
-                  src={two}
-                  alt="Fixed ROI illustration showing houses and guaranteed returns"
-                  className="w-full"
-                  width={1200}
-                  height={800}
-                />
-              </div>
-            </div>
+            ))}
           </div>
+          <button
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
+            onClick={handleNext}
+            disabled={current === investments.length - 1}
+            aria-label="Next"
+          >
+            <FaChevronRight />
+          </button>
         </div>
       </div>
       <div className="mt-10">

@@ -1,79 +1,31 @@
+"use client";
 import React from "react";
-import Image, { StaticImageData } from "next/image";
-import {
-  FaDoorOpen,
-  FaExpand,
-  FaMapMarkerAlt,
-  FaShieldAlt,
-} from "react-icons/fa";
+import Image from "next/image";
+import { FaDoorOpen, FaExpand, FaMapMarkerAlt, FaShieldAlt } from "react-icons/fa";
 import { MdBed } from "react-icons/md";
 import Link from "next/link";
-import three from "@/assets/rental/three.webp"
-import four from "@/assets/rental/four.webp"
-import five from "@/assets/rental/five.webp"
-const properties = [
-  {
-    id: "1",
-    title: "TM Meadows",
-    location: "Lekki, Lagos, Nigeria",
-    price: "₦3.5m",
-    period: "year",
-    beds: 3,
-    features: ["Balcony", "Walk-In Closets", "CCTV"],
-    imageUrl: three,
-  },
-  {
-    id: "2",
-    title: "TM Meadows",
-    location: "Lekki, Lagos, Nigeria",
-    price: "₦3.5m",
-    period: "year",
-    beds: 3,
-    features: ["Balcony", "Walk-In Closets", "CCTV"],
-    imageUrl: four,
-  },
-  {
-    id: "3",
-    title: "Oceanview Homes",
-    location: "Victoria Island, Lagos",
-    price: "₦5m",
-    period: "year",
-    beds: 4,
-    features: ["Sea View", "Smart Home", "Security"],
-    imageUrl: five,
-  },
-];
-
-interface PropertyCardProps {
-  id: string;
-  title: string;
-  location: string;
-  price: string;
-  period: string;
-  beds: number;
-  features: string[];
-  imageUrl: StaticImageData;
-}
+import { useFetchData } from "@/hooks/useApi";
+import placeholder from "@/assets/placeholder.jpg";
 
 function PropertyCard({
   id,
-  title,
-  location,
-  price,
-  period,
-  beds,
+  name,
+  address,
+  unitAmount,
+  unitTypes,
   features,
-  imageUrl,
-}: PropertyCardProps) {
+  images,
+}: any) {
+  const imageUrl = images?.find((img: any) => img.isPrimary)?.imageUrl || images?.[0]?.imageUrl || placeholder;
   return (
-    <div className="overflow-hidden h-fit rounded-sm border border-gray-200 bg-white">
+    <div className="overflow-hidden h-full rounded-sm border border-gray-200 bg-white min-w-[320px] max-w-sm flex-shrink-0">
       <div className="relative">
         <div className="absolute left-4 top-4 z-10 rounded-lg bg-gray-800/80 px-2 py-1 text-xs font-medium text-white">
           UNFURNISHED
         </div>
         <Image
-          src={imageUrl || "/placeholder.svg"}
-          alt={title}
+          src={imageUrl}
+          alt={name}
           width={600}
           height={400}
           className="h-64 w-full object-cover"
@@ -81,22 +33,21 @@ function PropertyCard({
       </div>
       <div className="p-6 bg-[#f1f4f1]">
         <div className="flex items-center justify-between">
-          <h3 className="xl:text-xl  text-[#1D1D1D] font-semibold">{title}</h3>
-          <div className="flex items-center text-xs font-medium text-[#4D4E53]">
+          <h3 className="xl:text-xl  truncate text-[#1D1D1D] font-semibold">{name}</h3>
+          <div className="flex truncate items-center text-xs font-medium text-[#4D4E53]">
             <FaMapMarkerAlt className="mr-1 h-3 w-3" />
-            {location}
+            {address}
           </div>
         </div>
         <div className="mt-6  flex flex-wrap gap-3">
           <div className="flex border-r-2 font-medium text-xs text-[#4D4E53] border-[#BBBCCD] items-center gap-2  px-3 py-1">
             <MdBed className=" text-[#CD6115] text-lg" />
-            <span>{beds} Beds</span>
+            <span>{unitAmount} Beds</span>
           </div>
-          {features.map((feature, index) => {
+          {features?.slice(0, 2).map((feature: string, index: number) => {
             let Icon = FaShieldAlt;
             if (index === 0) Icon = FaExpand;
             else if (index === 1) Icon = FaDoorOpen;
-
             return (
               <div
                 key={index}
@@ -115,26 +66,32 @@ function PropertyCard({
           >
             View property
           </Link>
-          <div className="text-right">
-            <span className=" text-2xl text-black font-semibold">{price}</span>
-            <span className=" text-[#2B2D2F] font-medium">/{period}</span>
-          </div>
+          {/* Price/period can be added here if available in backend */}
         </div>
       </div>
     </div>
   );
 }
+
 function ExploreMore() {
+  const { data, isLoading, error } = useFetchData("property", { page: 1, limit: 10 });
+  const properties = data?.data?.items || [];
   return (
     <div className="container mx-auto px-4 lg:px-16 py-12 ">
       <h1 className="text-2xl text-black font-semibold text-center">
         Explore More Properties
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 mt-10 xl:grid-cols-3 gap-4">
-        {properties.map((property) => (
-          <PropertyCard key={property.id} {...property} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="text-center py-8">Loading...</div>
+      ) : error ? (
+        <div className="text-center py-8 text-red-500">Failed to load properties.</div>
+      ) : (
+        <div className="flex overflow-x-auto gap-4 mt-10 scrollbar-hide pb-4">
+          {properties.map((property: any) => (
+            <PropertyCard key={property.id} {...property} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,35 +1,19 @@
 "use client";
+import type { PropertyItem } from "@/types/property";
 import Image from "next/image";
 import React from "react";
-import { useSearchParams } from "next/navigation";
-import { useFetchData } from "@/hooks/useApi";
-import placeholder from "@/assets/portfolio/more.webp";
+import placeholder from "@/assets/placeholder.jpg";
 
-function MorePictures() {
-  const searchParams = useSearchParams();
-  const title = searchParams.get("title");
 
-  // Fetch property data by title
-  const {
-    data: propertyResponse,
-    isLoading,
-    error,
-  } = useFetchData("property", {
-    page: 1,
-    limit: 1,
-    search: title,
-  });
+interface MorePicturesProps {
+  property: PropertyItem;
+}
 
-  const property = propertyResponse?.data?.items?.[0];
-  const images = property?.images?.slice(1) || [];
-
+function MorePictures({ property }: MorePicturesProps) {
+  const images = property.images?.filter(img => !img.isPrimary) || [];
   return (
-    <div>
-      {isLoading ? (
-        <div>Loading more pictures...</div>
-      ) : error ? (
-        <div className="text-red-500">Failed to load pictures.</div>
-      ) : images.length > 0 ? (
+    <div className="container mx-auto px-4 lg:px-16 py-12 ">
+      {images.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {images.map((img, idx) => (
             <Image

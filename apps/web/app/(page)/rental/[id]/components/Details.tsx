@@ -16,6 +16,7 @@ import { MdBed, MdKitchen, MdOutlineAcUnit, MdOutlineMicrowave, MdMeetingRoom, M
 import { PiBedBold } from "react-icons/pi";
 import { IoLocationOutline } from "react-icons/io5";
 import placeholder from "/assets/placeholder.jpg"
+import { useToast } from "@chakra-ui/react";
 
 // Image mapping based on construction status
 const constructionImages = {
@@ -125,6 +126,7 @@ export default function PropertyDetails() {
   const params = useParams();
   const propertyId = params.id as string;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const toast = useToast();
 
   const { data, isLoading, error } = useFetchData(
     `property/detail/${propertyId}`
@@ -203,6 +205,19 @@ export default function PropertyDetails() {
     "Window Blinds": <MdWindow className="text-green-600 mr-2" />,
   };
 
+  const handleShare = () => {
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copied!",
+        description: "Page link copied to clipboard.",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  };
+
   return (
     <div className="font-sans">
       <Header />
@@ -217,7 +232,7 @@ export default function PropertyDetails() {
               {property.name}
             </span>
           </div>
-          <button className="flex items-center text-[#151515] font-medium text-sm hover:text-gray-900">
+          <button className="flex items-center text-[#151515] font-medium text-sm hover:text-gray-900" onClick={handleShare}>
             <FiShare2 className="mr-1" />
             <span>Share</span>
           </button>
