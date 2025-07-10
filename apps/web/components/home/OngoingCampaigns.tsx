@@ -64,11 +64,11 @@ export default function OngoingCampaigns() {
           Stay informed with our latest updates, announcements, and
           opportunities.
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="flex overflow-x-auto gap-4 md:gap-6 pb-2 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
           {campaigns.map((c, i) => (
             <div
               key={c.id}
-              className="relative w-full aspect-[3/4] cursor-pointer"
+              className="relative min-w-[220px] sm:min-w-[250px] md:min-w-[260px] lg:min-w-[280px] aspect-[3/4] cursor-pointer"
               onClick={() => handleOpen(c)}
               tabIndex={0}
             >
