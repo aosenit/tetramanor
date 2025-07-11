@@ -8,12 +8,7 @@ import FileUpload from "../../properties/components/UploadFile";
 import TagInputGroup from "../../properties/components/PropertyFeaturesForm";
 import Dropdown from "./components/Dropdown";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  usePostData,
-  usePutData,
-  useFetchData,
-  useUploadData,
-} from "@/hooks/useApi";
+import { useFetchData, useUploadData, useUploadPutData } from "@/hooks/useApi";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -90,7 +85,7 @@ export default function EditRental() {
   // API mutations
   const { mutateAsync: createRental, isPending: isCreating } =
     useUploadData("rentals");
-  const { mutateAsync: updateRental, isPending: isUpdating } = usePutData(
+  const { mutateAsync: updateRental, isPending: isUpdating } = useUploadPutData(
     rentalId ? `rentals/${rentalId}` : null
   );
 
@@ -111,8 +106,12 @@ export default function EditRental() {
         cautionFee: rentalData?.data?.cautionFee || "",
         // unitAmount: rentalData?.data?.unitAmount || 1,
         status: rentalData?.data?.status || "NOT_RENTED",
-        images: [],
+        images: rentalData?.data?.property?.images || [],
       });
+
+      setUploadedImages(rentalData?.data?.property?.images || []);
+      setFeatures(rentalData?.data?.property?.features || []);
+      setAmenities(rentalData?.data?.property?.amenities || []);
     }
   }, [rentalData, isEditMode]);
 
