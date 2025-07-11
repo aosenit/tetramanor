@@ -93,18 +93,18 @@ function TabTwo({ investments }: { investments: any[] }) {
             {investments.map((investment, idx) => (
               <div key={idx} className="bg-[#f9f4f0] rounded-xl p-2 md:p-4 min-w-full max-w-full flex-shrink-0">
                 <div className="grid md:grid-cols-2 gap-8">
-                  <div className="flex items-center justify-center">
-                    <div className="bg-amber-100 rounded-xl w-full">
+                  <div className="flex items-center justify-center h-[350px]">
+                    <div className="bg-amber-100 rounded-xl w-full h-[350px] flex items-center justify-center overflow-hidden">
                       <Image
                         src={getInvestmentImage(investment?.image)}
                         alt={investment?.projectName || ""}
-                        className="w-full"
-                        width={1200}
-                        height={800}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        width={400}
+                        height={300}
                       />
                     </div>
                   </div>
-                  <div className="">
+                  <div className="h-[300px] flex flex-col justify-between">
                     <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#11611414]">
                       <FaMoneyBillTrendUp className="text-[#116114]" />
                     </div>

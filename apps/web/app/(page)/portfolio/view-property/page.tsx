@@ -64,7 +64,7 @@ export default function Page({ searchParams }: PageProps) {
           <WhyInvest property={property} />
           <MorePictures property={property} />
           <MapSection location={property.address} />
-          <EconomicAdvantages location={property.address} />
+          <EconomicAdvantages property={property} />
           <ScheduleInspection propertyTitle={property.name} />
         </>
       ) : (
