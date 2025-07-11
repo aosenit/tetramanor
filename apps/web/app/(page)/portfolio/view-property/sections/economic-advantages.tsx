@@ -6,14 +6,26 @@ import {
   FaPassport,
   FaKey,
 } from "react-icons/fa";
+import { PropertyItem } from "@/types/property";
 
 interface EconomicAdvantagesProps {
-  location?: string;
+  property: PropertyItem;
 }
 
-export default function EconomicAdvantages({ location = "Eko Atlantic, Lagos, Nigeria" }: EconomicAdvantagesProps) {
-  // Extract the main location (e.g., "Eko Atlantic" from "Eko Atlantic, Lagos, Nigeria")
-  const mainLocation = location.split(',')[0];
+const defaultAdvantages = [
+  { icon: FaFileAlt, title: "Tax-Free Living", description: "Enjoy a complete holiday from all federal, state, and local taxes." },
+  { icon: FaShippingFast, title: "Duty-Free Importation", description: "No import duties on capital goods, machinery, raw materials, or consumables." },
+  { icon: FaFileContract, title: "Hassle-Free Approvals", description: "One-stop permits and operating licenses for businesses." },
+  { icon: FaMoneyBillWave, title: "100% Repatriation of Capital & Profits", description: "Withdraw earnings with ease." },
+  { icon: FaPassport, title: "No Expatriate Quota Restrictions", description: "Ideal for international investors and businesses." },
+  { icon: FaKey, title: "100% Foreign Ownership", description: "Your investment is yours, no restrictions." },
+];
+
+export default function EconomicAdvantages({ property }: EconomicAdvantagesProps) {
+  const mainLocation = property.address.split(',')[0];
+  const advantages = property.investmentAdvantages?.length > 0 
+    ? property.investmentAdvantages 
+    : defaultAdvantages;
   
   return (
     <div className="container mx-auto px-4 lg:px-16 py-12 bg-white">
@@ -26,84 +38,25 @@ export default function EconomicAdvantages({ location = "Eko Atlantic, Lagos, Ni
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-16">
-        {/* Tax-Free Living */}
-        <div className="flex flex-col items-center md:items-start">
-          <div className="bg-[#f0f7f0] p-4 rounded-full mb-6">
-            <FaFileAlt className="h-6 w-6 text-[#116114]" />
-          </div>
-          <h3 className="text-xl font-semibold mb-3 text-[#0b0a0a]">
-            Tax-Free Living
-          </h3>
-          <p className="text-[#5c5c5c] text-center md:text-left">
-            Enjoy a complete holiday from all federal, state, and local taxes.
-          </p>
-        </div>
-
-        {/* Duty-Free Importation */}
-        <div className="flex flex-col items-center md:items-start">
-          <div className="bg-[#f0f7f0] p-4 rounded-full mb-6">
-            <FaShippingFast className="h-6 w-6 text-[#116114]" />
-          </div>
-          <h3 className="text-xl font-semibold mb-3 text-[#0b0a0a]">
-            Duty-Free Importation
-          </h3>
-          <p className="text-[#5c5c5c] text-center md:text-left">
-            No import duties on capital goods, machinery, raw materials, or
-            consumables.
-          </p>
-        </div>
-
-        {/* Hassle-Free Approvals */}
-        <div className="flex flex-col items-center md:items-start">
-          <div className="bg-[#f0f7f0] p-4 rounded-full mb-6">
-            <FaFileContract className="h-6 w-6 text-[#116114]" />
-          </div>
-          <h3 className="text-xl font-semibold mb-3 text-[#0b0a0a]">
-            Hassle-Free Approvals
-          </h3>
-          <p className="text-[#5c5c5c] text-center md:text-left">
-            One-stop permits and operating licenses for businesses.
-          </p>
-        </div>
-
-        {/* 100% Repatriation of Capital & Profits */}
-        <div className="flex flex-col items-center md:items-start">
-          <div className="bg-[#f0f7f0] p-4 rounded-full mb-6">
-            <FaMoneyBillWave className="h-6 w-6 text-[#116114]" />
-          </div>
-          <h3 className="text-xl font-semibold mb-3 text-[#0b0a0a]">
-            100% Repatriation of Capital & Profits
-          </h3>
-          <p className="text-[#5c5c5c] text-center md:text-left">
-            Withdraw earnings with ease.
-          </p>
-        </div>
-
-        {/* No Expatriate Quota Restrictions */}
-        <div className="flex flex-col items-center md:items-start">
-          <div className="bg-[#f0f7f0] p-4 rounded-full mb-6">
-            <FaPassport className="h-6 w-6 text-[#116114]" />
-          </div>
-          <h3 className="text-xl font-semibold mb-3 text-[#0b0a0a]">
-            No Expatriate Quota Restrictions
-          </h3>
-          <p className="text-[#5c5c5c] text-center md:text-left">
-            Ideal for international investors and businesses.
-          </p>
-        </div>
-
-        {/* 100% Foreign Ownership */}
-        <div className="flex flex-col items-center md:items-start">
-          <div className="bg-[#f0f7f0] p-4 rounded-full mb-6">
-            <FaKey className="h-6 w-6 text-[#116114]" />
-          </div>
-          <h3 className="text-xl font-semibold mb-3 text-[#0b0a0a]">
-            100% Foreign Ownership
-          </h3>
-          <p className="text-[#5c5c5c] text-center md:text-left">
-            Your investment is yours, no restrictions.
-          </p>
-        </div>
+        {advantages.map((advantage, index) => {
+          const IconComponent = property.investmentAdvantages?.length > 0 
+            ? defaultAdvantages[index % defaultAdvantages.length]?.icon || FaFileAlt
+            : advantage.icon || defaultAdvantages[index % defaultAdvantages.length]?.icon || FaFileAlt;
+          
+          return (
+            <div key={index} className="flex flex-col items-center md:items-start">
+              <div className="bg-[#f0f7f0] p-4 rounded-full mb-6">
+                <IconComponent className="h-6 w-6 text-[#116114]" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-[#0b0a0a]">
+                {advantage.title}
+              </h3>
+              <p className="text-[#5c5c5c] text-center md:text-left">
+                {advantage.description}
+              </p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

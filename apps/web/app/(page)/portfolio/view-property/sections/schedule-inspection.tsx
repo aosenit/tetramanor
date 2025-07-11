@@ -47,7 +47,7 @@ export default function ScheduleInspection({ propertyTitle = "TM HighGardens" }:
           <div>
             <h2 className="text-4xl font-bold mb-6">Schedule an inspection</h2>
             <p className="text-lg text-gray-300">
-              Experience the luxury for yourself. Book a personalized tour of {propertyTitle} 
+              Experience the luxury for yourself. Book a personalized tour of {propertyTitle} {""}
               and explore our model apartments, premium finishes,
               and world-class amenities.
             </p>

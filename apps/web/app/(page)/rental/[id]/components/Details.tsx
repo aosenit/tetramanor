@@ -246,8 +246,10 @@ export default function PropertyDetails() {
             </div>
             <Image
               src={
-                displayImages[0] && (typeof displayImages[0] === "string" ? displayImages[0] : (displayImages[0] as any).src)
-                  ? (typeof displayImages[0] === "string" ? displayImages[0] : (displayImages[0] as any).src)
+                displayImages[0]
+                  ? typeof displayImages[0] === "string"
+                    ? displayImages[0]
+                    : displayImages[0].imageUrl
                   : placeholder
               }
               alt={`${property.name} main view`}
@@ -265,8 +267,10 @@ export default function PropertyDetails() {
                 <div className="relative w-full h-[100px] sm:h-[120px]" key={index}>
                   <Image
                     src={
-                      img && (typeof img === "string" ? img : (img as any).src)
-                        ? (typeof img === "string" ? img : (img as any).src)
+                      img
+                        ? typeof img === "string"
+                          ? img
+                          : img.imageUrl
                         : placeholder
                     }
                     alt={`${property.name} view ${index + 2}`}
@@ -284,8 +288,10 @@ export default function PropertyDetails() {
                 <Image
                   key={index}
                   src={
-                    img && (typeof img === "string" ? img : (img as any).src)
-                      ? (typeof img === "string" ? img : (img as any).src)
+                    img
+                      ? typeof img === "string"
+                        ? img
+                        : img.imageUrl
                       : placeholder
                   }
                   alt={`${property.name} view ${index + 2}`}
@@ -367,18 +373,20 @@ export default function PropertyDetails() {
                   {property.unitTypes.length}
                 </span>
               </div>
-              <div className="flex justify-between text-xs">
+              {/* <div className="flex justify-between text-xs">
                 <span className="text-[#5C5C5C] font-medium">Status</span>
                 <span className="text-[#000000] font-semibold">
                   {property.constructionStatus}
                 </span>
-              </div>
+              </div> */}
             </div>
 
             {/* Account Officer */}
+            <div className="mt-4">
+
             {property.accountOfficer && (
               <>
-                <h2 className="text-lg border-b border-[#ECECEC] text-[#151515] py-4 px-6 font-semibold">
+                <h2 className="text-lg border  border-[#ECECEC] text-[#151515] py-4 px-6 font-semibold">
                   Contact Officer
                 </h2>
                 <div className="space-y-4 p-6">
@@ -403,6 +411,7 @@ export default function PropertyDetails() {
                 </div>
               </>
             )}
+            </div>
           </div>
         </div>
       </div>

@@ -14,7 +14,7 @@ export default function WhyInvest({ property }: WhyInvestProps) {
   return (
     <div className="bg-[#f3f7f3]">
       <div className="container mx-auto px-4 lg:px-16 py-12 ">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           <div className="relative h-[400px] lg:h-[500px] rounded-lg overflow-hidden">
             <Image
               src={property.images?.[0]?.imageUrl || placeholder}

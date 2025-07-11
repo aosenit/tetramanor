@@ -1,7 +1,8 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import { useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Button } from "@chakra-ui/react";
 import { useFetchData } from "@/hooks/useApi";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 type CampaignImage = {
   id: string;
@@ -40,11 +41,25 @@ export default function OngoingCampaigns() {
   const { data, isLoading, error } = useFetchData("/campaigns");
   const campaigns = (data as CampaignsResponse | undefined)?.data || [];
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = React.useState<Campaign | null>(null);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const showArrows = campaigns.length > 3;
 
   const handleOpen = (campaign: Campaign) => {
     setSelectedCampaign(campaign);
     onOpen();
+  };
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const scrollAmount = clientWidth * 0.8;
+      scrollRef.current.scrollTo({
+        left: direction === "left" ? scrollLeft - scrollAmount : scrollLeft + scrollAmount,
+        behavior: "smooth",
+      });
+    }
   };
 
   if (isLoading) {
@@ -64,29 +79,55 @@ export default function OngoingCampaigns() {
           Stay informed with our latest updates, announcements, and
           opportunities.
         </div>
-        <div className="flex overflow-x-auto gap-4 md:gap-6 pb-2 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
-          {campaigns.map((c, i) => (
-            <div
-              key={c.id}
-              className="relative min-w-[220px] sm:min-w-[250px] md:min-w-[260px] lg:min-w-[280px] aspect-[3/4] cursor-pointer"
-              onClick={() => handleOpen(c)}
-              tabIndex={0}
+        <div className="relative">
+          {showArrows && (
+            <button
+              aria-label="Scroll left"
+              onClick={() => scroll("left")}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              {c.images && c.images[0]?.imageUrl ? (
-                <Image
-                  src={c.images[0].imageUrl}
-                  alt={c.title}
-                  className="rounded-lg object-cover"
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
-                  No image
-                </div>
-              )}
-            </div>
-          ))}
+              <FaChevronLeft />
+            </button>
+          )}
+          <div
+            className="flex overflow-x-auto gap-4 md:gap-6 pb-2 scrollbar-hide"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+            ref={scrollRef}
+          >
+            {campaigns.map((c, i) => (
+              <div
+                key={c.id}
+                className="relative min-w-[220px] sm:min-w-[250px] md:min-w-[260px] lg:min-w-[280px] aspect-[3/4] cursor-pointer"
+                onClick={() => handleOpen(c)}
+                tabIndex={0}
+              >
+                {c.images && c.images[0]?.imageUrl ? (
+                  <Image
+                    src={c.images[0].imageUrl}
+                    alt={c.title}
+                    className="rounded-lg object-cover"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+                    No image
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          {showArrows && (
+            <button
+              aria-label="Scroll right"
+              onClick={() => scroll("right")}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <FaChevronRight />
+            </button>
+          )}
         </div>
       </div>
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
