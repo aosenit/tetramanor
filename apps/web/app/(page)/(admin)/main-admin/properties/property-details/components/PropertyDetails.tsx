@@ -245,7 +245,7 @@ export default function PropertyDetails() {
           {property?.whyInvest?.[0]?.description || "N/A"}
         </p>
       </div>
-      <div className="bg-white mt-4 p-8">
+      {/* <div className="bg-white mt-4 p-8">
         <h2 className="text-sm font-medium text-[#181818] mb-4">
           Advantage of investment{" "}
         </h2>
@@ -275,7 +275,7 @@ export default function PropertyDetails() {
             <p className="text-sm text-[#181818]">No advantages available</p>
           )}
         </div>
-      </div>
+      </div> */}
       <div className="bg-white mt-4 p-8 space-y-6">
         <h2 className="text-sm font-medium text-[#181818] mb-6">Features</h2>
 

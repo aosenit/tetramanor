@@ -5,23 +5,10 @@ import Image from "next/image";
 import logo from "@/assets/home/logo.webp";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  ChevronDown,
-  ChevronUp,
-  Plus,
-  Loader2,
-  Trash2,
-  Star,
-  AlertTriangle,
-} from "lucide-react";
+import { Plus, Loader2, Trash2, AlertTriangle } from "lucide-react";
 import { RiEdit2Line } from "react-icons/ri";
 import { toast } from "sonner";
-import {
-  usePutData,
-  useDeleteData,
-  usePostData,
-  useGetData,
-} from "@/hooks/useApi";
+import { usePutData, useDeleteData, useGetData } from "@/hooks/useApi";
 
 interface BlogPost {
   id: string;
