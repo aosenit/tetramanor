@@ -31,6 +31,7 @@ import { useFetchData } from "@/hooks/useApi";
 import DeleteRentalModal from "./components/DeleteRentalModal";
 import Loader from "@/components/Loader";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 interface Rental {
   id: string;
@@ -87,6 +88,7 @@ export default function RentalsPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [rentalToDelete, setRentalToDelete] = useState<Rental | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Fetch rentals data
   const {
@@ -116,6 +118,18 @@ export default function RentalsPage() {
       window.removeEventListener("refetch-rentals-stats", handleRefetchEvent);
     };
   }, [refetchRentals, refetchStats]);
+
+  // Check for refresh parameter and trigger refetch
+  useEffect(() => {
+    const refresh = searchParams.get("refresh");
+    if (refresh === "true") {
+      console.log("Refresh parameter detected, refetching data...");
+      refetchRentals();
+      refetchStats();
+      // Remove the refresh parameter from URL
+      router.replace("/main-admin/rentals");
+    }
+  }, [searchParams, refetchRentals, refetchStats, router]);
 
   const rentals: Rental[] = rentalsResponse?.data?.items || [];
   const stats: RentalStats = statsResponse?.data || {

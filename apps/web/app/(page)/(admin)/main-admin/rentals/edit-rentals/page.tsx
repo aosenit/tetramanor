@@ -4,11 +4,10 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { MdArrowBackIosNew } from "react-icons/md";
 import Link from "next/link";
-import FileUpload from "../../properties/components/UploadFile";
 import TagInputGroup from "../../properties/components/PropertyFeaturesForm";
 import Dropdown from "./components/Dropdown";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useFetchData, useUploadData, useUploadPutData } from "@/hooks/useApi";
+import { useFetchData, useUploadPutData, useUploadData } from "@/hooks/useApi";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -85,6 +84,7 @@ export default function EditRental() {
   // API mutations
   const { mutateAsync: createRental, isPending: isCreating } =
     useUploadData("rentals");
+
   const { mutateAsync: updateRental, isPending: isUpdating } = useUploadPutData(
     rentalId ? `rentals/${rentalId}` : null
   );
@@ -106,14 +106,39 @@ export default function EditRental() {
         cautionFee: rentalData?.data?.cautionFee || "",
         // unitAmount: rentalData?.data?.unitAmount || 1,
         status: rentalData?.data?.status || "NOT_RENTED",
-        images: rentalData?.data?.property?.images || [],
+        images: rentalData?.data?.images || [],
       });
 
-      setUploadedImages(rentalData?.data?.property?.images || []);
+      // Convert API images to UploadedImage format for display
+      if (rentalData?.data?.images && rentalData.data.images.length > 0) {
+        const existingImages: UploadedImage[] = rentalData.data.images.map(
+          (image: any) => ({
+            id: image.id,
+            imageUrl: image.imageUrl,
+            name: image.name,
+            file: null, // We don't have the original file for existing images
+          })
+        );
+        setUploadedImages(existingImages);
+      } else {
+        setUploadedImages([]);
+      }
+
       setFeatures(rentalData?.data?.property?.features || []);
       setAmenities(rentalData?.data?.property?.amenities || []);
     }
   }, [rentalData, isEditMode]);
+
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      uploadedImages.forEach((image) => {
+        if (image.imageUrl.startsWith("blob:")) {
+          URL.revokeObjectURL(image.imageUrl);
+        }
+      });
+    };
+  }, []);
 
   // Handle form input changes
   const handleInputChange = (field: keyof RentalFormData, value: any) => {
@@ -142,20 +167,36 @@ export default function EditRental() {
     }
   };
 
-  // Handle file upload - store files directly
+  // Handle file upload
   const handleFileUpload = (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
+    console.log("Files selected:", files.length);
+
     // Convert files to UploadedImage format for display
-    const newImages: UploadedImage[] = Array.from(files).map((file, index) => ({
-      id: `temp-${Date.now()}-${index}`,
-      imageUrl: URL.createObjectURL(file),
-      name: file.name,
-      file: file,
-    }));
+    const newImages: UploadedImage[] = Array.from(files).map((file, index) => {
+      console.log("Processing file:", file.name, file.size, file.type);
+      return {
+        id: `temp-${Date.now()}-${index}`,
+        imageUrl: URL.createObjectURL(file),
+        name: file.name,
+        file: file,
+      };
+    });
 
     setUploadedImages((prev) => [...prev, ...newImages]);
-    toast.success("Images added successfully");
+    toast.success(`${files.length} image(s) added successfully`);
+  };
+
+  // Remove image
+  const removeImage = (imageId: string) => {
+    setUploadedImages((prev) => {
+      const imageToRemove = prev.find((img) => img.id === imageId);
+      if (imageToRemove) {
+        URL.revokeObjectURL(imageToRemove.imageUrl);
+      }
+      return prev.filter((img) => img.id !== imageId);
+    });
   };
 
   // Validate form data
@@ -185,7 +226,8 @@ export default function EditRental() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    // Only validate form when creating new rental, not when editing
+    if (!isEditMode && !validateForm()) {
       toast.error("Please fix the errors in the form");
       return;
     }
@@ -196,7 +238,7 @@ export default function EditRental() {
       // Create FormData for multipart/form-data submission
       const formDataToSubmit = new FormData();
 
-      // Add all form fields
+      // Add all form fields as strings
       formDataToSubmit.append("propertyId", formData.propertyId);
       formDataToSubmit.append("apartmentType", formData.apartmentType);
       formDataToSubmit.append("location", formData.location);
@@ -204,13 +246,43 @@ export default function EditRental() {
       formDataToSubmit.append("frequency", formData.frequency);
       formDataToSubmit.append("agencyFee", formData.agencyFee.toString());
       formDataToSubmit.append("cautionFee", formData.cautionFee.toString());
-      // formDataToSubmit.append("unitAmount", formData.unitAmount.toString());
       formDataToSubmit.append("status", formData.status);
 
-      // Add images as binary files
-      uploadedImages.forEach((image) => {
-        formDataToSubmit.append("images", image.file);
-      });
+      // Add images as binary files directly to the array
+      console.log("Uploaded images:", uploadedImages);
+
+      // Handle images for edit vs create mode
+      if (isEditMode) {
+        // In edit mode, we need to handle existing images and new images separately
+        uploadedImages.forEach((image) => {
+          if (image.file) {
+            // New image - send as binary file
+            console.log(
+              "Adding new image to FormData:",
+              image.name,
+              image.file
+            );
+            formDataToSubmit.append("images", image.file);
+          } else if (image.id) {
+            // Existing image - send the ID to keep it
+            console.log("Keeping existing image:", image.id);
+            formDataToSubmit.append("existingImageIds", image.id);
+          }
+        });
+      } else {
+        // In create mode, all images are new
+        uploadedImages.forEach((image) => {
+          if (image.file) {
+            console.log("Adding image to FormData:", image.name, image.file);
+            formDataToSubmit.append("images", image.file);
+          }
+        });
+      }
+
+      // Debug: Log FormData contents
+      for (let [key, value] of formDataToSubmit.entries()) {
+        console.log(`${key}:`, value);
+      }
 
       if (isEditMode) {
         await updateRental(formDataToSubmit);
@@ -220,9 +292,14 @@ export default function EditRental() {
         toast.success("Rental created successfully");
       }
 
-      router.push("/main-admin/rentals");
+      // Trigger refetch of rentals and stats
+      window.dispatchEvent(new CustomEvent("refetch-rentals-stats"));
+
+      // Navigate back with refresh parameter
+      router.push("/main-admin/rentals?refresh=true");
     } catch (error: any) {
       console.error("Error:", error);
+      toast.error(error?.response?.data?.message || "Failed to save rental");
     } finally {
       setIsSubmitting(false);
     }
@@ -425,56 +502,71 @@ export default function EditRental() {
           </div>
         </div>
 
-        {/* Description */}
+        {/* Images Upload */}
         <div>
-          <FileUpload
-            label="Upload property images"
-            accept="image/*"
-            multiple={true}
-            id="property-images"
-          />
-          {/* Custom file input for handling uploads */}
+          <label className="block mb-1 text-sm text-[#323539] font-medium">
+            Property Images
+          </label>
           <input
             type="file"
             multiple
             accept="image/*"
             onChange={(e) => handleFileUpload(e.target.files)}
             className="hidden"
-            id="hidden-file-upload"
+            id="file-upload"
           />
           <button
             type="button"
-            onClick={() =>
-              document.getElementById("hidden-file-upload")?.click()
-            }
-            className="mt-2 text-sm text-[#116114] hover:underline"
+            onClick={() => document.getElementById("file-upload")?.click()}
+            className="w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#116114] transition-colors"
           >
-            Click here to upload images
+            <div className="flex flex-col items-center">
+              <svg
+                className="w-8 h-8 text-gray-400 mb-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
+              <span className="text-sm text-gray-600">
+                Click to upload images or drag and drop
+              </span>
+              <span className="text-xs text-gray-400 mt-1">
+                PNG, JPG, JPEG up to 10MB each
+              </span>
+            </div>
           </button>
 
           {/* Display uploaded images */}
           {uploadedImages.length > 0 && (
-            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-              {uploadedImages.map((image) => (
-                <div key={image.id} className="relative group">
-                  <img
-                    src={image.imageUrl}
-                    alt={image.name}
-                    className="w-full h-32 object-cover rounded-lg"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setUploadedImages((prev) =>
-                        prev.filter((img) => img.id !== image.id)
-                      );
-                    }}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
+            <div className="mt-4">
+              <p className="text-sm text-gray-600 mb-2">
+                {uploadedImages.length} image(s) selected
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {uploadedImages.map((image) => (
+                  <div key={image.id} className="relative group">
+                    <img
+                      src={image.imageUrl}
+                      alt={image.name}
+                      className="w-full h-32 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(image.id)}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
