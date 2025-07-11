@@ -16,7 +16,12 @@ import {
 } from "lucide-react";
 import { RiEdit2Line } from "react-icons/ri";
 import { toast } from "sonner";
-import { usePutData, useDeleteData } from "@/hooks/useApi";
+import {
+  usePutData,
+  useDeleteData,
+  usePostData,
+  useGetData,
+} from "@/hooks/useApi";
 
 interface BlogPost {
   id: string;
@@ -122,14 +127,18 @@ export default function BlogPostDetails({
   onClose: () => void;
   onUpdate?: () => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState("Status");
   const [isLoading, setIsLoading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selected, setSelected] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const { mutateAsync: updateBlog } = usePutData(`blogs/${post?.id}`);
-  const { mutateAsync: deleteBlog } = useDeleteData(`blogs/${post?.id}`);
+  const { mutateAsync: deleteBlog, isPending: isDeleting } = useDeleteData(
+    `blogs/${post?.id}`
+  );
+  const { mutateAsync: togglePublish, isPending: isPublishing } = useGetData(
+    `blogs/toggle-visibility/${post?.id}`
+  );
 
   useEffect(() => {
     if (open) {
@@ -174,7 +183,6 @@ export default function BlogPostDetails({
   };
 
   const handleDeleteConfirm = async () => {
-    setIsDeleting(true);
     try {
       await deleteBlog();
       toast.success("Blog post deleted successfully");
@@ -184,7 +192,6 @@ export default function BlogPostDetails({
       console.error("Error deleting blog post:", error);
       toast.error("Failed to delete blog post");
     } finally {
-      setIsDeleting(false);
       setShowDeleteModal(false);
     }
   };
@@ -196,6 +203,20 @@ export default function BlogPostDetails({
   const handleSelect = (value: string) => {
     if (value === "Status") return;
     handleStatusChange(value);
+  };
+
+  const handlePublishClick = async () => {
+    if (!post?.id) return;
+    try {
+      await togglePublish();
+      toast.success(
+        `Blog post ${post.status === "PUBLISHED" ? "unpublished" : "published"} successfully`
+      );
+      onUpdate?.();
+      onClose();
+    } catch (error) {
+      console.error("Error toggling blog post visibility:", error);
+    }
   };
 
   return (
@@ -352,7 +373,18 @@ export default function BlogPostDetails({
             />
           </div>
 
-          <div className="flex justify-center items-center gap-4 p-6 bg-white">
+          <div className="flex justify-between items-center gap-4 p-6 bg-white">
+            <Button
+              onClick={handlePublishClick}
+              disabled={isPublishing}
+              className="bg-[#116114] text-white px-4 py-2 text-sm rounded-md"
+            >
+              {isPublishing
+                ? "Loading..."
+                : post?.status === "PUBLISHED"
+                  ? "Unpublish"
+                  : "Publish"}
+            </Button>
             <button
               onClick={onClose}
               className="text-[#323539] hover:text-[#323539] text-sm"
