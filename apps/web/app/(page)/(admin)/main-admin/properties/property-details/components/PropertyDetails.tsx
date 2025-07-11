@@ -353,12 +353,12 @@ export default function PropertyDetails() {
               Edit
             </Link>
           </Button>
-          <Button
+          {/* <Button
             className="bg-red-500 text-white hover:bg-red-600"
             onClick={() => setShowDeleteDialog(true)}
           >
             Delete
-          </Button>
+          </Button> */}
         </div>
         <Link href="/main-admin/properties">
           <button className="text-[#323539] flex items-center gap-2 hover:text-[#323539] text-sm">
