@@ -53,7 +53,7 @@ const HomeHero = ({ property }: HeroProps) => {
           </motion.h1>
         </div>
       </div>
-      {isModalOpen && <Modal onClose={() => setIsModalOpen(false)} />}
+      {isModalOpen && <Modal brochureId={property?.id}  brochureName={property?.brochure} onClose={() => setIsModalOpen(false)} />}
     </section>
   );
 };

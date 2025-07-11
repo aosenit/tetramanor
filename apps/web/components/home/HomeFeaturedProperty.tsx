@@ -4,8 +4,6 @@ import Modal from "@/app/(page)/portfolio/view-property/sections/modal";
 import { Button } from "@chakra-ui/react";
 import Image from "next/image";
 import { useState } from "react";
-import { IoLocationOutline } from "react-icons/io5";
-import reone from "@/assets/home/reone.webp";
 import { useRouter } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
 
@@ -60,6 +58,7 @@ type FeaturedPropertyResponse = {
 
 export default function  HomeFeaturedProperty() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalProps, setModalProps] = useState<{id: string, name: string} | null>(null);
   const router = useRouter();
 
   const { data, isLoading, error } = useFetchData("/property/featured");
@@ -84,7 +83,7 @@ export default function  HomeFeaturedProperty() {
 
   return (
     <section className="w-full container mx-auto px-4 lg:px-16 py-12">
-      <div className="flex flex-col lg:flex-row gap-12 items-center">
+      <div className="flex flex-col lg:flex-row gap-12 items-start">
         {/* Left: Image with Overlay */}
         <div className="relative w-full lg:w-[55%] h-[400px] sm:h-[500px] lg:h-[610px]">
           {imageUrl ? (
@@ -113,9 +112,10 @@ export default function  HomeFeaturedProperty() {
                 </div>
               </div>
               <Button
-                onClick={() => setIsModalOpen(true)}
+                onClick={featured.brochure ? () => setModalProps({id: featured.brochure, name: `${featured.name}-brochure.pdf`}) : undefined}
                 size="sm"
                 className="bg-white text-[#202020] font-semibold rounded px-6 py-2 shadow-none text-base w-full md:w-auto"
+                disabled={!featured.brochure}
               >
                 Download brochure
               </Button>
@@ -154,7 +154,13 @@ export default function  HomeFeaturedProperty() {
           </Button>
         </div>
       </div>
-      {isModalOpen && <Modal onClose={() => setIsModalOpen(false)} />}
+      {modalProps && (
+        <Modal
+          onClose={() => setModalProps(null)}
+          brochureId={modalProps.id}
+          brochureName={modalProps.name}
+        />
+      )}
     </section>
   );
 }

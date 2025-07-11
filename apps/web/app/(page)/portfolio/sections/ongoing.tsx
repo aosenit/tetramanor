@@ -2,7 +2,7 @@
 import React from "react";
 import PropertyCard from "../components/property-card";
 import { useFetchData } from "@/hooks/useApi";
-import type { PropertyResponse, PropertyItem } from "@/types/property";
+import type {PropertyItem } from "@/types/property";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 

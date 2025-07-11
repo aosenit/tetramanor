@@ -3,14 +3,17 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
 import two from "@/assets/portfolio/two.webp"
+import { usePostExportData } from "@/hooks/useApi";
 
-const Modal = ({ onClose }: { onClose: () => void }) => {
+const Modal = ({ onClose, brochureId, brochureName }: { onClose: () => void; brochureId: string; brochureName: string }) => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
     date: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutate: downloadBrochure, isPending, isError } = usePostExportData(`/upload/download-document/${brochureId}`);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -24,14 +27,37 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    alert(
-      "Thank you! Your inspection has been scheduled. We'll contact you shortly to confirm."
+    setIsSubmitting(true);
+    downloadBrochure(
+      {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+      },
+      {
+        onSuccess: (data: Blob) => {
+          const blob = new Blob([data]);
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = brochureName || "brochure.pdf";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          setFormData({ name: "", phone: "", email: "", date: "" });
+          onClose();
+        },
+        onError: () => {
+          // Optionally show error toast here
+        },
+        onSettled: () => {
+          setIsSubmitting(false);
+        },
+      }
     );
-    setFormData({ name: "", phone: "", email: "", date: "" });
-    onClose();
   };
 
   return (
@@ -117,8 +143,9 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
               <button
                 type="submit"
                 className="w-full bg-[#116114] text-white py-3 rounded-md hover:bg-[#0d4e10] transition duration-300"
+                disabled={isSubmitting || isPending}
               >
-                Submit
+                {isSubmitting || isPending ? "Downloading..." : "Download"}
               </button>
             </form>
           </div>

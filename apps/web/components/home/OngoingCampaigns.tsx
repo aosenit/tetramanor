@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React, { useRef } from "react";
-import { useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Button } from "@chakra-ui/react";
+import { useDisclosure, Modal, ModalOverlay, ModalContent, ModalCloseButton, ModalBody } from "@chakra-ui/react";
 import { useFetchData } from "@/hooks/useApi";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 

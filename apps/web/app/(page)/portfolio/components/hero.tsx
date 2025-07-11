@@ -1,14 +1,9 @@
 "use client";
-import { useState } from "react";
 import Header from "./header";
 import Image from "next/image";
-import { CiLocationOn } from "react-icons/ci";
 import { motion } from "framer-motion";
 import one from "@/assets/portfolio/one.webp"
-import Modal from "../view-property/sections/modal";
-
 const HomeHero = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <section className="relative h-[60vh] overflow-hidden">
@@ -35,9 +30,6 @@ const HomeHero = () => {
         </motion.h1>
       </div>
       </div>
-
-      {/* Modal */}
-      {isModalOpen && <Modal onClose={() => setIsModalOpen(false)} />}
     </section>
   );
 };

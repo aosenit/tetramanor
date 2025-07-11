@@ -24,6 +24,7 @@ import { useFetchData, useDeleteData } from "@/hooks/useApi";
 import { MdArrowBackIosNew } from "react-icons/md";
 import Link from "next/link";
 import { toast } from "sonner";
+import { downloadDocument } from "@/lib/utils";
 
 const defaultAdvantages = [
   {
@@ -133,16 +134,13 @@ export default function PropertyDetails() {
               View property details
             </h2>
             {property?.brochure?.length > 0 && (
-              <a
-                className="flex items-center gap-2"
-                download={property?.brochure[0]?.name}
-                href={property?.brochure[0]?.imageUrl}
+              <Button
+                className="bg-[#116114] text-white"
+                onClick={() => downloadDocument(property.brochure[0].id, property.brochure[0].name || "brochure.pdf")}
               >
-                <Button className="bg-[#116114] text-white">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download brochure
-                </Button>
-              </a>
+                <Download className="w-4 h-4 mr-2" />
+                Download brochure
+              </Button>
             )}
           </div>
 
