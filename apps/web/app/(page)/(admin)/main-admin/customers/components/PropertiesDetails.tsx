@@ -88,7 +88,7 @@ export default function PropertyDetails() {
     error,
   } = useFetchData(
     propertyId && userId
-      ? `admin/purchases/property/${propertyId}/user/${userId}`
+      ? `admin/purchases/property-detail/${propertyId}/user/${userId}`
       : null
   );
 
@@ -129,8 +129,6 @@ export default function PropertyDetails() {
   const property = propertyData.data;
   const unit = property?.[0]; // Get the first unit for display
   const images = unit?.images || [];
-  const propertyFeatures = unit?.property?.features || [];
-  const propertyAmenities = unit?.property?.amenities || [];
 
   return (
     <div className="p-6 space-y-8">
@@ -146,14 +144,14 @@ export default function PropertyDetails() {
       <div className="flex justify-between items-start flex-wrap gap-4">
         <div>
           <h2 className="text-sm font-semibold text-[#252525]">
-            {unit?.property?.name || propertyName}
+            {propertyData?.data?.property?.name || propertyName}
           </h2>
           <div className="flex items-center gap-2 font-medium text-[#737687] text-xs mt-1">
             <MapPin className="w-4 h-4" />
-            {unit?.property?.address || "Address not available"}
+            {propertyData?.data?.property?.address || "Address not available"}
           </div>
         </div>
-        <div className="flex gap-6 text-sm font-medium text-gray-600">
+        {/* <div className="flex gap-6 text-sm font-medium text-gray-600">
           <Link
             href={{
               pathname: "/main-admin/customers/gallery",
@@ -210,34 +208,41 @@ export default function PropertyDetails() {
               View payment history
             </Button>
           </Link>
-        </div>
+        </div> */}
       </div>
       <div className="lg:flex gap-6">
-        <div className="relative w-full lg:w-3/5 h-[400px]">
-          <Image
-            src={images?.[0]?.imageUrl || nine}
-            alt="Main property"
-            fill
-            className="object-cover rounded-lg"
-          />
+        <div className="relative w-full lg:w-3/5 h-[400px] ">
+          {propertyData?.data?.property?.images?.map((image: any) => (
+            <Image
+              src={image.imageUrl || nine}
+              alt="Main property"
+              fill
+              key={image.id}
+              className="object-cover rounded-lg "
+            />
+          ))}
           <div className="absolute top-4 left-4 bg-white text-xs font-semibold rounded-2xl px-3 py-1 shadow">
-            {unit?.name || "Unit"}
+            {propertyData?.data?.property?.name || "Unit"}
           </div>
           <div className="absolute bottom-4 left-4 text-sm space-y-1 text-white backdrop-blur-sm p-2 bg-black/30 rounded-lg max-w-[90%]">
             <p>
               Unit type{" "}
               <span className="text-white font-medium">
-                {unit?.unitType?.replace(/_/g, " ") || "N/A"}
+                {propertyData?.data?.property?.unitTypes?.map(
+                  (unit: any, index) => <li key={index}>{unit} </li>
+                ) || "N/A"}
               </span>
             </p>
             <p>
               Amount paid{" "}
               <span className="text-white font-medium">
-                ₦{unit?.price?.toLocaleString() || "N/A"}
+                ₦{propertyData?.data?.price?.toLocaleString() || "N/A"}
               </span>{" "}
               <span className="text-xs text-gray-200">
-                {unit?.createdAt
-                  ? new Date(unit.createdAt).toLocaleDateString()
+                {propertyData?.data?.property?.createdAt
+                  ? new Date(
+                      propertyData?.data?.property?.createdAt
+                    ).toLocaleDateString()
                   : "N/A"}
               </span>
             </p>
@@ -246,16 +251,18 @@ export default function PropertyDetails() {
 
         {/* Thumbnails */}
         <div className="hidden lg:flex flex-col gap-4 w-2/5 h-[400px]">
-          {images.slice(1, 3).map((image: any, index: number) => (
-            <div key={index} className="flex-1 relative">
-              <Image
-                src={image.imageUrl || nine}
-                alt={`Thumbnail ${index + 1}`}
-                fill
-                className="rounded-md object-cover"
-              />
-            </div>
-          ))}
+          {propertyData?.data?.property?.images
+            ?.slice(1, 3)
+            .map((image: any, index: number) => (
+              <div key={index} className="flex-1 relative">
+                <Image
+                  src={image.imageUrl || nine}
+                  alt={`Thumbnail ${index + 1}`}
+                  fill
+                  className="rounded-md object-cover"
+                />
+              </div>
+            ))}
           {images.length < 3 && (
             <div className="flex-1 relative bg-gray-100 rounded-md flex items-center justify-center">
               <span className="text-gray-400 text-sm">No more images</span>
@@ -271,8 +278,9 @@ export default function PropertyDetails() {
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm text-gray-700">
           {/* Show property features from API */}
-          {propertyFeatures.length > 0
-            ? propertyFeatures.map((feature: string, index: number) => (
+          {propertyData?.data?.property?.features?.length > 0 &&
+            propertyData?.data?.property?.features?.map(
+              (feature: string, index: number) => (
                 <div
                   key={index}
                   className="flex items-center text-xs text-[#6B6B6B] gap-2"
@@ -280,35 +288,41 @@ export default function PropertyDetails() {
                   <div className="w-4 h-4 bg-[#116114] rounded-full"></div>
                   {feature}
                 </div>
-              ))
-            : propertyAmenities.length > 0
-              ? propertyAmenities.map((amenity: string, index: number) => (
-                  <div
-                    key={index}
-                    className="flex items-center text-xs text-[#6B6B6B] gap-2"
-                  >
-                    <div className="w-4 h-4 bg-[#116114] rounded-full"></div>
-                    {amenity}
-                  </div>
-                ))
-              : // Fallback to default features if no API data
-                features.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center text-xs text-[#6B6B6B] gap-2"
-                  >
-                    <Image src={item.icon} alt="icon" />
-                    {item.name}
-                  </div>
-                ))}
+              )
+            )}
+        </div>
+      </div>
+
+      <div className="border rounded-xl p-6 bg-white">
+        <h3 className="text-[#116114] text-sm font-medium mb-4">
+          Unit amenities
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm text-gray-700">
+          {/* Show property features from API */}
+          {propertyData?.data?.property?.amenities?.length > 0 &&
+            propertyData?.data?.property?.amenities?.map(
+              (amenity: string, index: number) => (
+                <div
+                  key={index}
+                  className="flex items-center text-xs text-[#6B6B6B] gap-2"
+                >
+                  <div className="w-4 h-4 bg-[#116114] rounded-full"></div>
+                  {amenity}
+                </div>
+              )
+            )}
         </div>
       </div>
 
       {/* Back Button */}
       <div className="pt-20 flex justify-end  pb-4">
-        <Button onClick={() => router.back()}>
-          <MdArrowBackIosNew />
-          Back
+        <Button
+          onClick={() => router.back()}
+          size={"sm"}
+          className="text-sm !text-white !bg-[#115314] hover:bg-[#116114]/80"
+        >
+          <MdArrowBackIosNew className="w-4 h-4" />
+          Go back
         </Button>
       </div>
     </div>
