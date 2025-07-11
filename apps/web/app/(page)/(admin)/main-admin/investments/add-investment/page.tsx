@@ -523,9 +523,7 @@ function AddInvestmentContent() {
               variant="outline"
               onClick={openAddAdvantageDialog}
               className="text-[#116114] hover:text-[#116114] text-sm"
-            >
-              Add Why Invest Advantage
-            </Button>
+            ></Button>
           </div>
         </div>
 

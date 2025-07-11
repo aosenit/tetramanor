@@ -453,16 +453,17 @@ export default function AddProperties() {
   };
   const openEditAdvantageDialog = (index: number) => {
     setEditingAdvantageIndex(index);
+    const advantages = formData.whyInvest.advantages || [];
     setAdvantageDraft({
-      title: formData.whyInvest.advantages[index].title,
-      description: formData.whyInvest.advantages[index].description,
+      title: advantages[index]?.title || "",
+      description: advantages[index]?.description || "",
     });
     setAdvantageDialogOpen(true);
   };
   const handleAdvantageDialogSave = () => {
     if (!advantageDraft.title.trim() || !advantageDraft.description.trim())
       return;
-    let newAdvantages = [...formData.whyInvest.advantages];
+    let newAdvantages = [...(formData.whyInvest.advantages || [])];
     if (editingAdvantageIndex !== null) {
       newAdvantages[editingAdvantageIndex] = { ...advantageDraft };
     } else {
@@ -482,7 +483,9 @@ export default function AddProperties() {
       ...prev,
       whyInvest: {
         ...prev.whyInvest,
-        advantages: prev.whyInvest.advantages.filter((_, i) => i !== index),
+        advantages: (prev.whyInvest.advantages || []).filter(
+          (_, i) => i !== index
+        ),
       },
     }));
   };
@@ -495,9 +498,10 @@ export default function AddProperties() {
   };
   const openEditAdvantageInvestmentDialog = (index: number) => {
     setEditingAdvantageInvestmentIndex(index);
+    const advantages = formData.investmentAdvantages || [];
     setAdvantageInvestmentDraft({
-      title: formData.investmentAdvantages[index].title,
-      description: formData.investmentAdvantages[index].description,
+      title: advantages[index]?.title || "",
+      description: advantages[index]?.description || "",
     });
     setAdvantageInvestmentDialogOpen(true);
   };
@@ -507,7 +511,7 @@ export default function AddProperties() {
       !advantageInvestmentDraft.description.trim()
     )
       return;
-    let newAdvantages = [...formData.investmentAdvantages];
+    let newAdvantages = [...(formData.investmentAdvantages || [])];
     if (editingAdvantageInvestmentIndex !== null) {
       newAdvantages[editingAdvantageInvestmentIndex] = {
         ...advantageInvestmentDraft,
@@ -527,7 +531,7 @@ export default function AddProperties() {
   const handleRemoveAdvantageInvestment = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      investmentAdvantages: prev.investmentAdvantages.filter(
+      investmentAdvantages: (prev.investmentAdvantages || []).filter(
         (_, i) => i !== index
       ),
     }));

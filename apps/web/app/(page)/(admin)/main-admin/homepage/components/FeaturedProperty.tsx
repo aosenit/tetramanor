@@ -1,8 +1,6 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import three from "@/assets/admin/home/three.webp";
-import four from "@/assets/admin/home/four.webp";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import one from "@/assets/admin/home/one.webp";
 import OngoingCampaigns from "./OngoingCampaigns";
@@ -12,6 +10,7 @@ import { toast } from "sonner";
 import { Loader2, AlertCircle, RefreshCw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import placeholder from "@/assets/placeholder.svg";
 
 // Confirmation Modal Component
 const ConfirmationModal = ({
@@ -116,6 +115,8 @@ const DetailModal = ({
     });
   };
 
+  console.log(data);
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden">
@@ -123,14 +124,18 @@ const DetailModal = ({
         <div className="relative h-48 bg-gradient-to-br from-green-50 to-blue-50">
           <div className="absolute inset-0 bg-black/30 rounded-t-xl"></div>
           <Image
-            src={four}
+            src={
+              type === "property"
+                ? data.images[0]?.imageUrl || placeholder
+                : data.property.images[0]?.imageUrl || placeholder
+            }
             alt={type === "property" ? data.name : data.property.name}
             fill
             className="object-cover rounded-t-xl"
           />
           <div className="absolute top-3 left-3">
             <span className="bg-white/95 backdrop-blur-sm text-green-700 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">
-              {type === "property" ? "Featured" : "Highlighted"}
+              {data?.status && type === "property" ? "Featured" : "Highlighted"}
             </span>
           </div>
           <button
@@ -157,15 +162,42 @@ const DetailModal = ({
         <div className="p-6 space-y-6">
           {/* Title and Basic Info */}
           <div className="space-y-4">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-1">
-                {type === "property" ? data.name : data.property.name}
-              </h2>
-              <p className="text-sm text-gray-600">
-                {type === "property"
-                  ? data.description || "Premium property featured on homepage"
-                  : `${data.apartmentType.replace(/_/g, " ")} - ${data.property.location || "Location not specified"}`}
-              </p>
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-gray-600 uppercase tracking-wide font-semibold ">
+                  Name:
+                </p>
+                <p className="text-sm font-bold text-gray-700">
+                  {type === "property" ? data.name : data.property.name}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-gray-600 uppercase tracking-wide font-semibold ">
+                  Location:
+                </p>
+                <p className="text-sm font-bold text-gray-700">
+                  {type === "property" ? data.address : data.property.address}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-gray-600 uppercase tracking-wide font-semibold ">
+                  About:
+                </p>
+                <p className="text-sm font-bold text-gray-700">
+                  {type === "property" ? data.about : data.property.about}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-gray-600 uppercase tracking-wide font-semibold ">
+                  Unit Amount:
+                </p>
+                <p className="text-sm font-bold text-gray-700">
+                  {type === "property"
+                    ? data.unitAmount
+                    : data.property.unitAmount}
+                </p>
+              </div>
             </div>
 
             {/* Key Stats */}
@@ -176,8 +208,12 @@ const DetailModal = ({
                 </p>
                 <p className="text-sm font-bold text-green-700">
                   {type === "property"
-                    ? data.type || "Property"
-                    : data.apartmentType.replace(/_/g, " ")}
+                    ? data?.unitTypes?.map((apartment: any) => (
+                        <li key={apartment}>{apartment.replace(/_/g, " ")}</li>
+                      ))
+                    : data?.property?.unitTypes?.map((apartment: any) => (
+                        <li key={apartment}>{apartment.replace(/_/g, " ")}</li>
+                      ))}
                 </p>
               </div>
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3">
@@ -185,161 +221,94 @@ const DetailModal = ({
                   Status
                 </p>
                 <p className="text-sm font-bold text-blue-700">
-                  {type === "property" ? "Active" : "Available"}
+                  {type === "property" ? data?.status : data?.property?.status}
                 </p>
               </div>
-              {type === "property" && (
-                <>
-                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3">
-                    <p className="text-xs text-purple-600 uppercase tracking-wide font-semibold mb-1">
-                      Price
-                    </p>
-                    <p className="text-sm font-bold text-purple-700">
-                      {formatCurrency(data.price || 0)}
-                    </p>
-                  </div>
-                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-3">
-                    <p className="text-xs text-orange-600 uppercase tracking-wide font-semibold mb-1">
-                      Location
-                    </p>
-                    <p className="text-sm font-bold text-orange-700">
-                      {data.location || "Not specified"}
-                    </p>
-                  </div>
-                </>
-              )}
-              {type === "rental" && (
-                <>
-                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3">
-                    <p className="text-xs text-purple-600 uppercase tracking-wide font-semibold mb-1">
-                      Rent
-                    </p>
-                    <p className="text-sm font-bold text-purple-700">
-                      {formatCurrency(data.rentAmount || 0)}
-                    </p>
-                  </div>
-                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-3">
-                    <p className="text-xs text-orange-600 uppercase tracking-wide font-semibold mb-1">
-                      Duration
-                    </p>
-                    <p className="text-sm font-bold text-orange-700">
-                      {data.rentDuration || "Not specified"}
-                    </p>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
 
-          {/* Detailed Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
-              Property Details
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-600 font-medium">
-                    Created
-                  </span>
-                  <span className="text-sm font-semibold text-gray-900">
-                    {formatDate(data.createdAt || new Date())}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-600 font-medium">
-                    Last Updated
-                  </span>
-                  <span className="text-sm font-semibold text-gray-900">
-                    {formatDate(data.updatedAt || new Date())}
-                  </span>
-                </div>
-                {type === "property" && (
-                  <>
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-sm text-gray-600 font-medium">
-                        Bedrooms
-                      </span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {data.bedrooms || "Not specified"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-sm text-gray-600 font-medium">
-                        Bathrooms
-                      </span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {data.bathrooms || "Not specified"}
-                      </span>
-                    </div>
-                  </>
-                )}
-                {type === "rental" && (
-                  <>
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-sm text-gray-600 font-medium">
-                        Property Type
-                      </span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {data.property.type || "Not specified"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-sm text-gray-600 font-medium">
-                        Furnished
-                      </span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {data.furnished ? "Yes" : "No"}
-                      </span>
-                    </div>
-                  </>
-                )}
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3">
+                <p className="text-xs text-purple-600 uppercase tracking-wide font-semibold mb-1">
+                  Features
+                </p>
+                <p className="text-sm font-bold text-purple-700">
+                  {type !== "property"
+                    ? data?.property?.features?.map((feature: any) => (
+                        <li key={feature}>{feature}</li>
+                      ))
+                    : data?.features?.map((feature: any) => (
+                        <li key={feature}>{feature}</li>
+                      ))}
+                </p>
               </div>
-              <div className="space-y-3">
-                {type === "property" && (
-                  <>
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-sm text-gray-600 font-medium">
-                        Square Feet
-                      </span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {data.squareFeet
-                          ? `${data.squareFeet} sq ft`
-                          : "Not specified"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-sm text-gray-600 font-medium">
-                        Floor
-                      </span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {data.floor || "Not specified"}
-                      </span>
-                    </div>
-                  </>
-                )}
-                {type === "rental" && (
-                  <>
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-sm text-gray-600 font-medium">
-                        Available From
-                      </span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {data.availableFrom
-                          ? formatDate(data.availableFrom)
-                          : "Not specified"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-sm text-gray-600 font-medium">
-                        Utilities
-                      </span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {data.utilitiesIncluded ? "Included" : "Not included"}
-                      </span>
-                    </div>
-                  </>
-                )}
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-3">
+                <p className="text-xs text-orange-600 uppercase tracking-wide font-semibold mb-1">
+                  Amenities
+                </p>
+                <p className="text-sm font-bold text-orange-700">
+                  {type !== "property"
+                    ? data?.property?.amenities?.map((amenity: any) => (
+                        <li key={amenity}>{amenity}</li>
+                      ))
+                    : data?.amenities?.map((amenity: any) => (
+                        <li key={amenity}>{amenity}</li>
+                      ))}
+                </p>
+              </div>
+              <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-3">
+                <p className="text-xs text-pink-600 uppercase tracking-wide font-semibold mb-1">
+                  Why Invest
+                </p>
+                <p className="text-sm font-bold text-pink-700">
+                  {type !== "property"
+                    ? data?.property?.whyInvest?.map((val: any) => (
+                        <li key={val} className="flex flex-col list-decimal">
+                          <span className="text-xs text-pink--600 uppercase tracking-wide font-semibold mb-1">
+                            title: {val.title}
+                          </span>
+                          <span className="text-xs text-pink--600 uppercase tracking-wide font-semibold mb-1">
+                            description: {val.description}
+                          </span>
+                        </li>
+                      ))
+                    : data?.whyInvest?.map((val: any) => (
+                        <li key={val} className="flex flex-col list-decimal">
+                          <span className="text-xs text-gray-600 uppercase tracking-wide font-semibold mb-1">
+                            title: {val.title}
+                          </span>
+                          <span className="text-xs text-gray-600 uppercase tracking-wide font-semibold mb-1">
+                            description: {val.description}
+                          </span>
+                        </li>
+                      ))}
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-3">
+                <p className="text-xs text-slate-600 uppercase tracking-wide font-semibold mb-1">
+                  Investment Advantages
+                </p>
+                <p className="text-sm font-bold text-slate-700">
+                  {type !== "property"
+                    ? data?.property?.investmentAdvantages?.map((val: any) => (
+                        <li key={val} className="flex flex-col list-decimal">
+                          <span className="text-xs text-gray-600 uppercase tracking-wide font-semibold mb-1">
+                            title: {val.title}
+                          </span>
+                          <span className="text-xs text-gray-600 uppercase tracking-wide font-semibold mb-1">
+                            description: {val.description}
+                          </span>
+                        </li>
+                      ))
+                    : data?.investmentAdvantages?.map((val: any) => (
+                        <li key={val} className="flex flex-col list-decimal">
+                          <span className="text-xs text-gray-600 uppercase tracking-wide font-semibold mb-1">
+                            title: {val.title}
+                          </span>
+                          <span className="text-xs text-gray-600 uppercase tracking-wide font-semibold mb-1">
+                            description: {val.description}
+                          </span>
+                        </li>
+                      ))}
+                </p>
               </div>
             </div>
           </div>
@@ -460,7 +429,7 @@ export default function FeaturedProperty() {
       <div className="flex flex-col items-center gap-2">
         <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
           <Image
-            src={four}
+            src={placeholder}
             alt="Empty"
             width={24}
             height={24}
@@ -487,7 +456,7 @@ export default function FeaturedProperty() {
                   Featured property
                 </p>
                 <Image
-                  src={three}
+                  src={placeholder}
                   alt="Featured property"
                   width={35}
                   height={35}
