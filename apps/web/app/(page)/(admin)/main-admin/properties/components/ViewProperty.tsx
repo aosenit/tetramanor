@@ -1,8 +1,13 @@
 import Image from "next/image";
 import { ChevronDown, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { downloadDocument } from "@/lib/utils";
 
 export default function Component() {
+  // TODO: Replace with actual property data from props or fetch
+  const property = {
+    brochure: [{ id: "brochure-id", name: "brochure.pdf" }],
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Navigation */}
@@ -29,10 +34,15 @@ export default function Component() {
               <h3 className="text-lg font-medium text-gray-800">
                 View property details
               </h3>
-              <Button className="bg-green-600 hover:bg-green-700 text-white">
-                <Download className="w-4 h-4 mr-2" />
-                Download brochure
-              </Button>
+              {property?.brochure?.length > 0 && (
+                <Button
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => downloadDocument(property.brochure[0].id, property.brochure[0].name || "brochure.pdf")}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download brochure
+                </Button>
+              )}
             </div>
 
             {/* Property Images */}
