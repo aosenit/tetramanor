@@ -300,10 +300,10 @@ function PaymentsPageContent() {
         <div>
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-lg font-medium">Payments breakdown</h2>
-            <div className="flex items-center gap-2 rounded-full border border-gray-300 p-2 w-fit">
+            {/* <div className="flex items-center gap-2 rounded-full border border-gray-300 p-2 w-fit">
               <TbCurrencyNaira className="w-5 h-5 text-[#116114]" />
               <DollarSign className="w-5 h-5 text-[#116114]" />
-            </div>
+            </div> */}
           </div>
 
           <div className="bg-white rounded-md shadow overflow-hidden">
