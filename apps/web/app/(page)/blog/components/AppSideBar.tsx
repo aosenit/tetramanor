@@ -40,7 +40,10 @@ const AppSideBar: React.FC<Props> = ({ children }) => {
               </div>
               <div className="flex flex-col gap-2 line-clamp-3">
                 <p className="text-sm truncate text-gray-600 ">{item.title}</p>
-                <p className="text-sm truncate text-gray-600">{item.content}</p>
+                <p
+                  className="text-sm truncate text-gray-600"
+                  dangerouslySetInnerHTML={{ __html: item.content }}
+                />
               </div>
             </a>
           ))
