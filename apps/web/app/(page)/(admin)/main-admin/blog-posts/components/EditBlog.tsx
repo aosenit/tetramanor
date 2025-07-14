@@ -60,13 +60,11 @@ export default function EditBlog() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [featured, setFeatured] = useState(false);
-  const [status, setStatus] = useState("DRAFT");
   const [coverImages, setCoverImages] = useState<UploadedImage[]>([]);
   const [galleryImages, setGalleryImages] = useState<UploadedImage[]>([]);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
-  const [publishLoading, setPublishLoading] = useState(false);
-  const [draftLoading, setDraftLoading] = useState(false);
+  const [status, setStatus] = useState("DRAFT");
   const [validationErrors, setValidationErrors] = useState<{
     title?: string;
     content?: string;
@@ -85,7 +83,7 @@ export default function EditBlog() {
     blogId ? `blogs/${blogId}` : null
   );
 
-  const isPending = isCreating || isUpdating || publishLoading || draftLoading;
+  const isPending = isCreating || isUpdating;
 
   // Load existing blog post data when editing
   useEffect(() => {
@@ -95,7 +93,6 @@ export default function EditBlog() {
       setContent(blogPost.content || "");
       setFeatured(blogPost.featured || false);
       setStatus(blogPost.status || "DRAFT");
-
       // Handle coverImage (single object)
       const coverImagesData = blogPost.coverImage
         ? [
@@ -138,16 +135,17 @@ export default function EditBlog() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (status: string) => {
     setValidationErrors({});
+    setStatus(status);
     if (!validateFields()) return;
-    setPublishLoading(true);
+
     try {
       const payload = {
         title: title.trim(),
         content: content.trim(),
         featured: featured,
-        status: status,
+        status: status || "DRAFT",
         coverImage: coverImages.length > 0 ? coverImages[0].id : null,
         images: galleryImages.map((img) => img.id),
       };
@@ -162,35 +160,7 @@ export default function EditBlog() {
     } catch (error) {
       console.error("Error saving blog post:", error);
     } finally {
-      setPublishLoading(false);
-    }
-  };
-
-  const handleSaveDraft = async () => {
-    setValidationErrors({});
-    if (!isEditing && !validateFields()) return;
-    setDraftLoading(true);
-    try {
-      const payload = {
-        title: title.trim() || "Untitled Draft",
-        content: content.trim() || "",
-        featured: featured,
-        status: "DRAFT",
-        coverImage: coverImages.length > 0 ? coverImages[0].id : null,
-        images: galleryImages.map((img) => img.id),
-      };
-      if (isEditing) {
-        await updateBlog(payload);
-        toast.success("Draft updated successfully");
-      } else {
-        await createBlog(payload);
-        toast.success("Draft saved successfully");
-      }
-      router.push("/main-admin/blog-posts");
-    } catch (error) {
-      console.error("Error saving draft:", error);
-    } finally {
-      setDraftLoading(false);
+      setStatus("DRAFT");
     }
   };
 
@@ -483,38 +453,28 @@ export default function EditBlog() {
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <div className="space-y-3">
                 <Button
-                  onClick={handleSubmit}
+                  onClick={() => handleSubmit("PUBLISHED")}
                   disabled={isPending}
                   className="w-full bg-[#116114] hover:bg-[#116114]/90 text-white"
                 >
-                  {publishLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {isEditing ? "Updating..." : "Publishing..."}
-                    </>
-                  ) : isEditing ? (
-                    "Update Blog Post"
-                  ) : (
-                    "Publish Blog Post"
-                  )}
+                  {(isCreating && status === "PUBLISHED") ||
+                  (isUpdating && status === "PUBLISHED")
+                    ? "Loading..."
+                    : "Publish Blog Post"}
                 </Button>
                 <Button
-                  onClick={handleSaveDraft}
+                  onClick={() => handleSubmit("DRAFT")}
                   disabled={isPending}
                   variant="outline"
                   className="w-full"
                 >
-                  {draftLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 mr-2" />
-                      Save as Draft
-                    </>
-                  )}
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    {(isCreating && status === "DRAFT") ||
+                    (isUpdating && status === "DRAFT")
+                      ? " Loading..."
+                      : "Save as Draft"}
+                  </>
                 </Button>
                 <p className="text-xs text-gray-500 text-center">
                   {isEditing
