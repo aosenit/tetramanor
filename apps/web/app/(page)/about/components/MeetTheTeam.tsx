@@ -1,12 +1,17 @@
 "use client";
 import Image from "next/image";
-import ceo from "@/assets/ceo.jpg";
-import finance from "@/assets/finance.jpg";
-import director from "@/assets/director.jpg";
+import ceo from "@/assets/ceo.webp";
+import finance from "@/assets/finance.webp";
+import director from "@/assets/director.webp";
 
 export default function MeetTheTeam() {
   const teams = [
-    { id: 1, image: ceo, name: "John O. Beecroft", position: "Managing Director/CEO" },
+    {
+      id: 1,
+      image: ceo,
+      name: "John O. Beecroft",
+      position: "Managing Director/CEO",
+    },
     {
       id: 2,
       image: finance,
@@ -38,7 +43,7 @@ export default function MeetTheTeam() {
                 alt={team.name}
                 width={500}
                 height={500}
-                className="object-cover w-full h-auto rounded-lg"
+                className="object-cover w-full h-auto lg:h-[500px] rounded-lg"
               />
             </div>
             <h3 className="text-lg font-semibold text-black mt-4">
