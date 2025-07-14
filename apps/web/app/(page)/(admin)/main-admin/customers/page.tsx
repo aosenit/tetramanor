@@ -8,7 +8,7 @@ import Image from "next/image";
 import two from "@/assets/admin/two.svg";
 import one from "@/assets/admin/one.svg";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -93,28 +93,30 @@ function StatsSkeleton() {
   );
 }
 
-const stats = [
-  {
-    title: "Total Customers",
-    value: 0,
-    icon: one,
-  },
-  {
-    title: "Verified Customers",
-    value: 0,
-    icon: two,
-  },
-  {
-    title: "Unverified customers",
-    value: 0,
-    icon: three,
-  },
-];
-
 function CustomersPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { data: statsData, isLoading: statsLoading } =
+    useFetchData("admin/users/stats");
+
+  const stats = [
+    {
+      title: "Total Customers",
+      value: statsData?.data?.total || 0,
+      icon: one,
+    },
+    {
+      title: "Verified Customers",
+      value: statsData?.data?.verified || 0,
+      icon: two,
+    },
+    {
+      title: "Unverified customers",
+      value: statsData?.data?.unverified || 0,
+      icon: three,
+    },
+  ];
 
   // Get current values from URL params
   const currentSearch = searchParams.get("search") || "";
@@ -292,14 +294,14 @@ function CustomersPageContent() {
         </div>
 
         {/* Stats Cards */}
-        {isLoading ? (
+        {isLoading || statsLoading ? (
           <StatsSkeleton />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { ...stats[0], value: totalUsers },
-              { ...stats[1], value: verifiedUsers },
-              { ...stats[2], value: unverifiedUsers },
+              { ...stats[0], value: statsData?.data?.total || 0 },
+              { ...stats[1], value: statsData?.data?.verified || 0 },
+              { ...stats[2], value: statsData?.data?.unverified || 0 },
             ].map((stat, index) => (
               <Card
                 key={index}
