@@ -58,6 +58,7 @@ export default function AccountOfficerInfo() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [officerToDelete, setOfficerToDelete] = useState<Officer | null>(null);
   const [officers, setOfficers] = useState<Officer[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [formData, setFormData] = useState<Partial<Officer>>({
     name: "",
     email: "",
@@ -70,8 +71,8 @@ export default function AccountOfficerInfo() {
     usePostData("account-officers");
   const { mutateAsync: updateOfficer, isPending: isUpdating } =
     usePutData("account-officers");
-  const { mutateAsync: deleteOfficer, isPending: isDeleting } =
-    useDeleteData("account-officers");
+  // const { mutateAsync: deleteOfficer, isPending: isDeleting } =
+  //   useDeleteData("account-officers");
 
   useEffect(() => {
     if (data) {
@@ -130,6 +131,7 @@ export default function AccountOfficerInfo() {
 
   const handleDelete = async (id: string) => {
     if (!id) return;
+    setIsDeleting(true);
     try {
       await axiosInstance.delete(`account-officers/${id}`);
       setShowDeleteModal(false);
@@ -137,6 +139,8 @@ export default function AccountOfficerInfo() {
       refetch();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsDeleting(false);
     }
   };
 

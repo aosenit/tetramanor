@@ -1,6 +1,5 @@
 "use client";
 
-import { ReactNode } from "react";
 import { Suspense } from "react";
 
 import { useState } from "react";
@@ -11,9 +10,9 @@ import { Label } from "@/components/ui/label";
 import { useRouter, useSearchParams } from "next/navigation";
 import icon from "@/assets/createnewpassword.png";
 import Image from "next/image";
-import { axiosInstance } from "@/services/axiosInstance";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { usePostData } from "@/hooks/useApi";
 
 function NewPasswordPageContent() {
   const router = useRouter();
@@ -24,12 +23,14 @@ function NewPasswordPageContent() {
     confirmPassword: "",
   });
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
   const [errors, setErrors] = useState({
     password: "",
     confirmPassword: "",
   });
-
+  const { mutateAsync: postData, isPending: isLoading } = usePostData(
+    "auth/reset-password"
+  );
   const urlCode = searchParams.get("code");
 
   const validatePassword = (password: string) => {
@@ -95,26 +96,22 @@ function NewPasswordPageContent() {
       return;
     }
 
-    setIsLoading(true);
     try {
-      const response = await axiosInstance.post("auth/reset-password", {
+      const response = await postData({
         password: formData.password,
         confirmPassword: formData.confirmPassword,
         code: urlCode,
       });
 
-      if (response.data.success) {
-        toast.success("Password reset successfully");
+      if (response) {
+        toast.success(response?.data?.message || "Password reset successfully");
         router.push("/login");
       }
     } catch (error: any) {
-      console.error("Reset password error:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Failed to reset password. Please try again.";
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
+      console.log(
+        error?.response?.data?.message ||
+          "Failed to reset password. Please try again."
+      );
     }
   };
 
@@ -197,7 +194,7 @@ function NewPasswordPageContent() {
             <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
           )}
         </div>
-
+        <div className="py-1"></div>
         <Button
           type="submit"
           disabled={isLoading}

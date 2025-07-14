@@ -235,7 +235,7 @@ export default function InvestmentModal({
             <div className="space-y-3">
               <p className="text-sm text-[#323539] font-medium">Files</p>
 
-              <FileUpload
+              {/* <FileUpload
                 label={imageName}
                 icon={<IoImageOutline />}
                 onChange={(e) => {
@@ -243,6 +243,12 @@ export default function InvestmentModal({
                   if (file) setImageName(file.name);
                 }}
                 onDelete={() => setImageName("Featured Image")}
+              /> */}
+              <Image
+                src={post?.image?.[0].imageUrl}
+                alt="Featured Image"
+                width={100}
+                height={100}
               />
             </div>
 
@@ -254,13 +260,13 @@ export default function InvestmentModal({
               >
                 Edit
               </Button>
-              <Button
+              {/* <Button
                 variant="outline"
                 onClick={handleUnpublish}
                 disabled={isDeleting || isUnpublishing}
               >
                 Unpublish
-              </Button>
+              </Button> */}
               <Button
                 variant="outline"
                 className="text-red-600 hover:text-red-700 hover:bg-red-50"

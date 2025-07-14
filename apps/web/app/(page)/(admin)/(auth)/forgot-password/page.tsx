@@ -1,65 +1,50 @@
 "use client";
 
-import { ReactNode } from "react";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import Image from "next/image";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+
 import icon from "@/assets/passwordreset.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Image from "next/image";
-import { axiosInstance } from "@/services/axiosInstance";
-import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { usePostData } from "@/hooks/useApi";
+
+// ✅ Zod schema
+const schema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+});
+
+type FormData = z.infer<typeof schema>;
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [emailError, setEmailError] = useState("");
   const router = useRouter();
+  const { mutateAsync: postData, isPending: isLoading } = usePostData(
+    "auth/forgot-password"
+  );
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      setEmailError("Email is required");
-      return false;
-    }
-    if (!emailRegex.test(email)) {
-      setEmailError("Please enter a valid email address");
-      return false;
-    }
-    setEmailError("");
-    return true;
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateEmail(email)) {
-      return;
-    }
-
-    setIsLoading(true);
+  const onSubmit = async (data: FormData) => {
     try {
-      const response = await axiosInstance.post("auth/forgot-password", {
-        email: email,
-      });
+      const response = await postData({ email: data.email });
 
-      if (response.data.success) {
-        const { otp } = response.data.data;
-        toast.success("Reset code sent to your email");
-        router.push(
-          `/reset-password?code=${otp}&email=${encodeURIComponent(email)}`
-        );
-      }
+      toast.success(response?.data?.message || "Reset code sent to your email");
+      router.push(`/reset-password?email=${encodeURIComponent(data.email)}`);
     } catch (error: any) {
-      console.error("Forgot password error:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Failed to send reset code. Please try again.";
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
+      toast.error(
+        error?.response?.data?.message || "Something went wrong. Try again."
+      );
     }
   };
 
@@ -82,22 +67,19 @@ export default function ForgotPasswordPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">Email address</Label>
           <Input
             id="email"
             type="email"
             placeholder="Enter your email address"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (emailError) validateEmail(e.target.value);
-            }}
-            className={emailError ? "border-red-500" : ""}
-            required
+            {...register("email")}
+            className={errors.email ? "border-red-500" : ""}
           />
-          {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
+          {errors.email && (
+            <p className="text-red-500 text-sm">{errors.email.message}</p>
+          )}
         </div>
 
         <Button

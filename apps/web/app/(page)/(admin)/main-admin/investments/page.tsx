@@ -354,7 +354,7 @@ function InvestmentsPageContent() {
             </SelectContent>
           </Select>
 
-          <Select
+          {/* <Select
             value={currentRoiRange || "all"}
             onValueChange={handleRoiRangeChange}
           >
@@ -368,7 +368,7 @@ function InvestmentsPageContent() {
               <SelectItem value="41-60">41-60%</SelectItem>
               <SelectItem value="61-100">61-100%</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
 
           <Button
             variant="link"
@@ -511,7 +511,7 @@ function InvestmentsPageContent() {
                                 >
                                   View
                                 </DropdownMenu.Item>
-                                <DropdownMenu.Item
+                                {/* <DropdownMenu.Item
                                   className="px-3 py-2 hover:bg-gray-100 text-sm text-[#292D32] cursor-pointer"
                                   onSelect={() => {
                                     setConfirmationModal({
@@ -527,7 +527,7 @@ function InvestmentsPageContent() {
                                   {investment.status === "PUBLISHED"
                                     ? "Unpublish"
                                     : "Publish"}
-                                </DropdownMenu.Item>
+                                </DropdownMenu.Item> */}
                                 <DropdownMenu.Item
                                   className="px-3 py-2 hover:bg-gray-100 text-sm text-red-600 cursor-pointer"
                                   onSelect={() => {

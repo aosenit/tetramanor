@@ -26,10 +26,12 @@ import Image from "next/image";
 import one from "@/assets/admin/customer/one.svg";
 import two from "@/assets/admin/customer/two.svg";
 import three from "@/assets/admin/customer/three.svg";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFetchData } from "@/hooks/useApi";
 import DeleteRentalModal from "./components/DeleteRentalModal";
 import Loader from "@/components/Loader";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 interface Rental {
   id: string;
@@ -85,6 +87,8 @@ export default function RentalsPage() {
   const [propertyFilter, setPropertyFilter] = useState("all");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [rentalToDelete, setRentalToDelete] = useState<Rental | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Fetch rentals data
   const {
@@ -100,7 +104,32 @@ export default function RentalsPage() {
     refetch: refetchStats,
   } = useFetchData("rentals/stats");
 
-  console.log(statsResponse?.data);
+  // Listen for refetch events from other components
+  useEffect(() => {
+    const handleRefetchEvent = () => {
+      console.log("Refetching rentals and stats from event...");
+      refetchRentals();
+      refetchStats();
+    };
+
+    window.addEventListener("refetch-rentals-stats", handleRefetchEvent);
+
+    return () => {
+      window.removeEventListener("refetch-rentals-stats", handleRefetchEvent);
+    };
+  }, [refetchRentals, refetchStats]);
+
+  // Check for refresh parameter and trigger refetch
+  useEffect(() => {
+    const refresh = searchParams.get("refresh");
+    if (refresh === "true") {
+      console.log("Refresh parameter detected, refetching data...");
+      refetchRentals();
+      refetchStats();
+      // Remove the refresh parameter from URL
+      router.replace("/main-admin/rentals");
+    }
+  }, [searchParams, refetchRentals, refetchStats, router]);
 
   const rentals: Rental[] = rentalsResponse?.data?.items || [];
   const stats: RentalStats = statsResponse?.data || {
@@ -187,7 +216,7 @@ export default function RentalsPage() {
     {
       id: 2,
       title: "Not rented properties",
-      count: stats.propertiesNotForRent,
+      count: stats?.propertiesNotForRent,
       subtitle: "Available for rent",
       image: two,
     },
@@ -385,12 +414,16 @@ export default function RentalsPage() {
                             className="z-50 min-w-[120px] rounded-md border bg-white p-1 shadow-md"
                           >
                             <DropdownMenu.Item className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer">
-                              <Link
-                                href={`/main-admin/rentals/edit-rentals?id=${rental.id}`}
-                                className="w-full"
+                              <button
+                                className="w-full m-0 p-0 text-left"
+                                onClick={() => {
+                                  router.push(
+                                    `/main-admin/rentals/edit-rentals?id=${rental.id}`
+                                  );
+                                }}
                               >
                                 Edit
-                              </Link>
+                              </button>
                             </DropdownMenu.Item>
                             <DropdownMenu.Item
                               className="px-2 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded cursor-pointer"
@@ -399,12 +432,16 @@ export default function RentalsPage() {
                               Delete
                             </DropdownMenu.Item>
                             <DropdownMenu.Item className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded cursor-pointer">
-                              <Link
-                                href={`/main-admin/rentals/rental-details?id=${rental.id}`}
-                                className="w-full"
+                              <button
+                                className="w-full m-0 p-0 text-left"
+                                onClick={() => {
+                                  router.push(
+                                    `/main-admin/rentals/rental-details?id=${rental.id}`
+                                  );
+                                }}
                               >
                                 View details
-                              </Link>
+                              </button>
                             </DropdownMenu.Item>
                           </DropdownMenu.Content>
                         </DropdownMenu.Root>
