@@ -5,7 +5,15 @@ import { IoClose } from "react-icons/io5";
 import two from "@/assets/portfolio/two.webp"
 import { usePostExportData } from "@/hooks/useApi";
 
-const Modal = ({ onClose, brochureId, brochureName }: { onClose: () => void; brochureId: string; brochureName: string }) => {
+const Modal = ({
+  onClose,
+  brochureId,
+  brochureName,
+}: {
+  onClose: () => void;
+  brochureId: string | null;
+  brochureName: string;
+}) => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -13,7 +21,13 @@ const Modal = ({ onClose, brochureId, brochureName }: { onClose: () => void; bro
     date: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { mutate: downloadBrochure, isPending, isError } = usePostExportData(`/upload/download-document/${brochureId}`);
+  const {
+    mutate: downloadBrochure,
+    isPending,
+    isError,
+  } = usePostExportData(
+    brochureId ? `/upload/download-document/${brochureId}` : ""
+  );
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -30,6 +44,10 @@ const Modal = ({ onClose, brochureId, brochureName }: { onClose: () => void; bro
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    if (!brochureId) {
+      setIsSubmitting(false);
+      return;
+    }
     downloadBrochure(
       {
         name: formData.name,
@@ -85,7 +103,10 @@ const Modal = ({ onClose, brochureId, brochureName }: { onClose: () => void; bro
 
           {/* Right: Form */}
           <div className="p-6 lg:p-8 flex flex-col justify-center">
-            <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto w-full">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-6 max-w-md mx-auto w-full"
+            >
               <div>
                 <h2 className="text-2xl font-semibold">Download Brochure</h2>
                 <p className="text-sm text-[#737687] mt-2">
@@ -95,7 +116,10 @@ const Modal = ({ onClose, brochureId, brochureName }: { onClose: () => void; bro
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="name" className="block text-gray-700 mb-2 text-sm">
+                  <label
+                    htmlFor="name"
+                    className="block text-gray-700 mb-2 text-sm"
+                  >
                     First name
                   </label>
                   <input
@@ -110,7 +134,10 @@ const Modal = ({ onClose, brochureId, brochureName }: { onClose: () => void; bro
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-gray-700 mb-2 text-sm">
+                  <label
+                    htmlFor="phone"
+                    className="block text-gray-700 mb-2 text-sm"
+                  >
                     Phone number
                   </label>
                   <input
@@ -126,7 +153,10 @@ const Modal = ({ onClose, brochureId, brochureName }: { onClose: () => void; bro
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-gray-700 mb-2 text-sm">
+                <label
+                  htmlFor="email"
+                  className="block text-gray-700 mb-2 text-sm"
+                >
                   Email address
                 </label>
                 <input
@@ -143,7 +173,7 @@ const Modal = ({ onClose, brochureId, brochureName }: { onClose: () => void; bro
               <button
                 type="submit"
                 className="w-full bg-[#116114] text-white py-3 rounded-md hover:bg-[#0d4e10] transition duration-300"
-                disabled={isSubmitting || isPending}
+                disabled={isSubmitting || isPending || !brochureId}
               >
                 {isSubmitting || isPending ? "Downloading..." : "Download"}
               </button>
