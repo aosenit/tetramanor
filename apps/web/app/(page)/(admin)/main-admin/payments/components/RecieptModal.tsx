@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import logo from "@/assets/home/logo.webp";
+import tmlogo from "@/assets/tmlogo.png";
 import { useEffect, useState } from "react";
 import { Button } from "@chakra-ui/react";
 import { FaRegFileLines } from "react-icons/fa6";
@@ -213,7 +213,7 @@ Tetramanor - Building Tomorrow's Homes Today
       <div className="w-full max-w-3xl overflow-hidden bg-white">
         <header className="bg-[#323539] text-white px-6 py-4">
           <div className="flex justify-center items-center gap-4">
-            <Image src={logo} alt="Logo" width={40} height={40} />
+            <Image src={tmlogo} alt="Logo" width={40} height={40} />
           </div>
         </header>
 

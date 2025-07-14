@@ -10,7 +10,7 @@ interface Props {
 
 const AppSideBar: React.FC<Props> = ({ children }) => {
   // Fetch featured blogs
-  const { data, isLoading, error } = useFetchData("blog", { featured: true });
+  const { data, isLoading, error } = useFetchData("blogs", { featured: true });
   const blogs = data?.data || [];
 
   return (
@@ -38,7 +38,10 @@ const AppSideBar: React.FC<Props> = ({ children }) => {
                   sizes="80px"
                 />
               </div>
-              <p className="text-sm text-gray-600 flex-1 line-clamp-3">{item.title}</p>
+              <div className="flex flex-col gap-2 line-clamp-3">
+                <p className="text-sm truncate text-gray-600 ">{item.title}</p>
+                <p className="text-sm truncate text-gray-600">{item.content}</p>
+              </div>
             </a>
           ))
         ) : (

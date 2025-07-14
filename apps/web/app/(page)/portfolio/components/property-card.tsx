@@ -50,14 +50,14 @@ export default function PropertyCard({
       </div>
       <Link
         href={{
-          pathname: "/portfolio/view-property",
-          query: {
-            title,
-            location,
-            status,
-            image: displayImage,
-            slug,
-          },
+          pathname: `/portfolio/view-property/${slug}`,
+          // query: {
+          //   title,
+          //   location,
+          //   status,
+          //   image: displayImage,
+          //   slug,
+          // },
         }}
         className="absolute bottom-4 right-4"
       >

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { IoIosArrowDown } from "react-icons/io";
-import logo from "@/assets/home/logo.webp";
+import tmlogo from "@/assets/tmlogo.png";
 import { X } from "lucide-react";
 import { Menu } from "lucide-react";
 
@@ -52,7 +52,7 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <Image src={logo} alt="Tetramanor Logo" width={80} height={20} />
+            <Image src={tmlogo} alt="Tetramanor Logo" width={80} height={20} />
           </Link>
 
           {/* Desktop Nav */}

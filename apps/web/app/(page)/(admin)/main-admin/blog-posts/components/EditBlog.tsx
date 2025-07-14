@@ -1,18 +1,9 @@
 "use client";
-
-import { ReactNode } from "react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2, Upload, X, Save } from "lucide-react";
 import { MdArrowBackIosNew } from "react-icons/md";
 import { useRouter, useSearchParams } from "next/navigation";

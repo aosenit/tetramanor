@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Search, X, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import logo from "@/assets/home/logo.webp";
+import tmlogo from "@/assets/tmlogo.png";
 import PropertyCard from "../cards/Property";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/services/axiosInstance";
@@ -174,7 +174,7 @@ export default function PropertySelector({
       >
         <header className="bg-[#323539] rounded-b-md text-white px-6 py-4 flex justify-between items-center">
           <div className="flex justify-center items-center gap-3">
-            <Image src={logo} alt="Logo" width={40} height={40} />
+            <Image src={tmlogo} alt="Logo" width={40} height={40} />
           </div>
           <button onClick={onClose}>
             <X className="w-6 h-6 text-white hover:text-red-300" />

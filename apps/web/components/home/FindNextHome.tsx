@@ -110,67 +110,80 @@ export default function FindNextHome() {
         {isLoading ? (
           <div className="text-center py-20 text-lg">Loading rental...</div>
         ) : error || !rental || !property ? (
-          <div className="text-center py-20 text-lg text-red-500">Failed to load rental.</div>
+          <div className="text-center py-20 text-lg text-red-500">
+            Failed to load rental.
+          </div>
         ) : (
           <div className="relative w-full max-w-full h-[500px] lg:h-[600px] rounded-[5px] overflow-hidden">
-          <Image
-            src={
-              property.images && property.images[0]?.imageUrl
-                ? property.images[0].imageUrl
-                : placeholder.src // ✅ fallback to placeholder
-            }
-            alt={property.name}
-            className="object-cover rounded-xl"
-            fill
-            sizes="100vw"
-            priority
-          />
-          {/* Badge */}
-          <div className="absolute top-6 left-2 lg:left-6 bg-[#8B8B8B] bg-opacity-80 text-white text-sm px-5 py-2 rounded-full">
-            {property.name}
-          </div>
-          {/* Overlay Card */}
-          <div className="absolute left-1/2 -translate-x-1/2 lg:left-6  lg:-translate-x-0  bottom-6 w-[95%]  bg-white p-4  lg:p-8 flex flex-col gap-4 shadow-lg">
-            <div className="text-2xl md:text-3xl font-bold text-black mb-2">
-              {property.name}, {property.address}
+            <Image
+              src={
+                property.images && property.images[0]?.imageUrl
+                  ? property.images[0].imageUrl
+                  : placeholder.src // ✅ fallback to placeholder
+              }
+              alt={property.name}
+              className="object-cover rounded-xl"
+              fill
+              sizes="100vw"
+              priority
+            />
+            {/* Badge */}
+            <div className="absolute top-6 left-2 lg:left-6 bg-[#8B8B8B] bg-opacity-80 text-white text-sm px-5 py-2 rounded-full">
+              {property.name}
             </div>
-            <div className="text-gray-700 text-base mb-4">
-              {property.about}
-            </div>
-            <div className="flex flex-col  md:flex-row md:items-center md:justify-between gap-4">
-              <div className="grid grid-cols-2 lg:flex lg:flex-wrap gap-8 text-black text-base font-medium w-full justify-between">
-                <div>
-                  <div className="font-bold">Rental Price</div>
-                  <div className="text-lg font-extrabold">{rental.price ? `${rental.price.toLocaleString()}` : "N/A"}</div>
+            {/* Overlay Card */}
+            <div className="absolute left-1/2 -translate-x-1/2 lg:left-6  lg:-translate-x-0  bottom-6 w-[95%]  bg-white p-4  lg:p-8 flex flex-col gap-4 shadow-lg">
+              <div className="text-2xl md:text-3xl font-bold text-black mb-2">
+                {property.name}, {property.address}
+              </div>
+              <div className="text-gray-700 text-base mb-4">
+                {property.about}
+              </div>
+              <div className="flex flex-col  md:flex-row md:items-center md:justify-between gap-4">
+                <div className="grid grid-cols-2 lg:flex lg:flex-wrap gap-8 text-black text-base font-medium w-full justify-between">
+                  <div>
+                    <div className="font-bold">Rental Price</div>
+                    <div className="text-lg font-extrabold">
+                      {rental.rent ? `${rental.rent.toLocaleString()}` : "N/A"}{" "}
+                      ({rental.frequency})
+                    </div>
+                  </div>
+                  {rental.agencyFee !== undefined && (
+                    <div>
+                      <div className="font-bold">Agency Fee</div>
+                      <div className="text-lg font-extrabold">
+                        {rental.agencyFee.toLocaleString()}
+                      </div>
+                    </div>
+                  )}
+                  {rental.cautionFee !== undefined && (
+                    <div>
+                      <div className="font-bold">Caution Fee</div>
+                      <div className="text-lg font-extrabold">
+                        {rental.cautionFee.toLocaleString()}
+                      </div>
+                    </div>
+                  )}
+                  {rental.serviceCharge !== undefined && (
+                    <div>
+                      <div className="font-bold">Service Charge</div>
+                      <div className="text-lg font-extrabold">
+                        {rental.serviceCharge.toLocaleString()}
+                      </div>
+                    </div>
+                  )}
+                  {rental.totalPackage !== undefined && (
+                    <div>
+                      <div className="font-bold">Total Package</div>
+                      <div className="text-lg font-extrabold">
+                        {rental.totalPackage.toLocaleString()}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                {rental.agencyFee !== undefined && (
-                  <div>
-                    <div className="font-bold">Agency Fee</div>
-                    <div className="text-lg font-extrabold">{rental.agencyFee.toLocaleString()}</div>
-                  </div>
-                )}
-                {rental.cautionFee !== undefined && (
-                  <div>
-                    <div className="font-bold">Caution Fee</div>
-                    <div className="text-lg font-extrabold">{rental.cautionFee.toLocaleString()}</div>
-                  </div>
-                )}
-                {rental.serviceCharge !== undefined && (
-                  <div>
-                    <div className="font-bold">Service Charge</div>
-                    <div className="text-lg font-extrabold">{rental.serviceCharge.toLocaleString()}</div>
-                  </div>
-                )}
-                {rental.totalPackage !== undefined && (
-                  <div>
-                    <div className="font-bold">Total Package</div>
-                    <div className="text-lg font-extrabold">{rental.totalPackage.toLocaleString()}</div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
-        </div>
         )}
       </div>
     </section>

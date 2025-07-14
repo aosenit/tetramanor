@@ -5,12 +5,12 @@ import { CiLocationOn } from "react-icons/ci";
 import { motion } from "framer-motion";
 import Header from "../../components/header";
 import Modal from "./modal";
-import type { PropertyItem } from "@/types/property";
 import placeholder from "@/assets/placeholder.jpg";
+import { Property } from "../../types";
 
 
 interface HeroProps {
-  property: PropertyItem;
+  property: Property;
 }
 
 const HomeHero = ({ property }: HeroProps) => {

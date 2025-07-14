@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
-import logo from "@/assets/home/logo.webp";
+import tmlogo from "@/assets/tmlogo.png";
 import {
   Select,
   SelectContent,
@@ -56,7 +56,7 @@ export default function AddUnitModal({
       <div className="w-full bg-white max-w-3xl overflow-hidden">
         <header className="bg-[#323539] rounded-b-md text-white px-6 py-4">
           <div className="flex justify-center items-center gap-4">
-            <Image src={logo} alt="Logo" width={40} height={40} />
+            <Image src={tmlogo} alt="Logo" width={40} height={40} />
           </div>
         </header>
 

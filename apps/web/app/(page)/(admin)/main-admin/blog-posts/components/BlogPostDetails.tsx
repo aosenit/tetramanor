@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import four from "@/assets/admin/home/four.webp";
 import Image from "next/image";
-import logo from "@/assets/home/logo.webp";
+import tmlogo from "@/assets/tmlogo.png";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -204,7 +204,7 @@ export default function BlogPostDetails({
         <div className="w-full max-w-5xl overflow-hidden bg-white">
           <header className="bg-[#323539] text-white px-6 py-4">
             <div className="flex justify-center items-center gap-4">
-              <Image src={logo} alt="Logo" width={40} height={40} />
+              <Image src={tmlogo} alt="Logo" width={40} height={40} />
             </div>
           </header>
 
