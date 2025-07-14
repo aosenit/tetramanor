@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import React from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 type PropertyInfoSectionProps = {
   formData: any;
@@ -103,7 +104,7 @@ export default function PropertyInfoSection({
           >
             About Property *
           </Label>
-          <textarea
+          <Textarea
             id="about-property"
             value={formData.about}
             onChange={(e) => handleInputChange("about", e.target.value)}

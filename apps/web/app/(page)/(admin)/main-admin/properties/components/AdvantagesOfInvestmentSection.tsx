@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import React from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 type AdvantagesOfInvestmentSectionProps = {
   formData: any;
@@ -109,7 +110,7 @@ export default function AdvantagesOfInvestmentSection({
                 })
               }
             />
-            <textarea
+            <Textarea
               placeholder="Description"
               value={advantageInvestmentDraft.description}
               onChange={(e) =>

@@ -40,6 +40,7 @@ export default function WhyInvestSection({
   handleRemoveAdvantage,
   errors,
 }: WhyInvestSectionProps) {
+  console.log(formData);
   return (
     <div className="mt-8 space-y-6">
       <h3 className="text-base font-medium text-[#116114]">Why Invest</h3>
@@ -55,7 +56,7 @@ export default function WhyInvestSection({
         </div>
         {/* List of advantages as cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {formData?.whyInvest?.advantages?.map((adv: any, idx: number) => (
+          {formData?.whyInvest?.map((adv: any, idx: number) => (
             <div
               key={idx}
               className="p-4 rounded-lg border bg-[#F8F9FA] cursor-pointer hover:shadow-md transition"

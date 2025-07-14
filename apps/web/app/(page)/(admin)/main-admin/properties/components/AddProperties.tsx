@@ -30,18 +30,14 @@ const propertySchema = z.object({
     .array(z.string())
     .min(1, "At least one inquiry option is required"),
   unitTypes: z.array(z.string()).min(1, "At least one unit type is required"),
-  whyInvest: z.object({
-    title: z.string().min(1, "Investment title is required"),
-    description: z.string().min(1, "Investment description is required"),
-    advantages: z
-      .array(
-        z.object({
-          title: z.string().min(1, "Advantage title is required"),
-          description: z.string().min(1, "Advantage description is required"),
-        })
-      )
-      .optional(),
-  }),
+  whyInvest: z
+    .array(
+      z.object({
+        title: z.string().min(1, "Investment title is required"),
+        description: z.string().min(1, "Investment description is required"),
+      })
+    )
+    .optional(),
   investmentAdvantages: z
     .array(
       z.object({
@@ -85,16 +81,7 @@ const defaultFormData: PropertyFormData = {
   unitAmount: 1,
   inquiryOptions: ["INQUIRY_FORM"],
   unitTypes: [],
-  whyInvest: {
-    title: "",
-    description: "",
-    advantages: [
-      {
-        title: "",
-        description: "",
-      },
-    ],
-  },
+  whyInvest: [],
   investmentAdvantages: [],
   features: [],
   amenities: [],
@@ -184,16 +171,12 @@ export default function AddProperties() {
         unitAmount: propertyData?.data?.unitAmount || 1,
         inquiryOptions: propertyData?.data?.inquiryOptions || ["INQUIRY_FORM"],
         unitTypes: propertyData?.data?.unitTypes || [],
-        whyInvest: propertyData?.data?.whyInvest || {
-          title: "",
-          description: "",
-          advantages: [{ title: "", description: "" }],
-        },
+        whyInvest: propertyData?.data?.whyInvest || [],
         investmentAdvantages: propertyData?.data?.investmentAdvantages || [],
         features: propertyData?.data?.features || [],
         amenities: propertyData?.data?.amenities || [],
         images: propertyData?.data?.images || [],
-        documentId: propertyData?.data?.documentId || "",
+        documentId: propertyData?.data?.document[0]?.id || "",
         constructionStatus: propertyData?.data?.constructionStatus || "ONGOING",
         accountOfficerId: propertyData?.data?.accountOfficerId || "",
       });
@@ -205,7 +188,7 @@ export default function AddProperties() {
 
       // Load existing document if any
       if (propertyData?.data?.document) {
-        setUploadedDocument(propertyData.data.document);
+        setUploadedDocument(propertyData.data.document[0]);
       }
     }
   }, [propertyData, isEditMode]);
@@ -366,7 +349,7 @@ export default function AddProperties() {
       ...formData,
       features: formData?.features?.filter((f) => f.trim() !== ""),
       amenities: formData?.amenities?.filter((a) => a.trim() !== ""),
-      whyInvest: formData?.whyInvest.advantages?.filter(
+      whyInvest: formData?.whyInvest?.filter(
         (adv) => adv?.title?.trim() !== "" && adv?.description?.trim() !== ""
       ),
       investmentAdvantages: formData?.investmentAdvantages?.filter(
@@ -402,7 +385,7 @@ export default function AddProperties() {
 
     // Document as string of id
     if (uploadedDocument) {
-      payload.document = uploadedDocument.id;
+      payload.documentId = uploadedDocument.id;
     }
 
     if (
