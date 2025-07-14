@@ -43,28 +43,23 @@ const HomeHero = ({ property }: HeroProps) => {
               {property.name}
             </p>
             <div className="flex flex-col lg:flex-row lg:justify-end gap-4">
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="px-4 py-2 bg-[#FFFFFF4D] backdrop-blur-lg text-white w-full lg:w-auto font-medium whitespace-nowrap"
-              >
-                Download Brochure
-              </button>
+              {property.document && property.document.length > 0 && (
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="px-4 py-2 bg-[#FFFFFF4D] backdrop-blur-lg text-white w-full lg:w-auto font-medium whitespace-nowrap"
+                >
+                  Download Brochure
+                </button>
+              )}
             </div>
           </motion.h1>
         </div>
       </div>
-      {isModalOpen && (
+      {isModalOpen && property.document && property.document.length > 0 && (
         <Modal
-          brochureId={
-            property.document && property.document.length > 0
-              ? property.document[0].id
-              : null
-          }
-          brochureName={
-            property.document && property.document.length > 0
-              ? property.document[0].name
-              : "brochure.pdf"
-          }
+          brochureId={property.document[0].id}
+          brochureName={property.document[0].name}
+          imageUrl={property.images?.find(img => img.isPrimary)?.imageUrl || property.images?.[0]?.imageUrl || null}
           onClose={() => setIsModalOpen(false)}
         />
       )}
