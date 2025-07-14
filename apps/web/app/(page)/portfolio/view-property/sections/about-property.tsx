@@ -4,12 +4,12 @@ import Image from "next/image";
 import {
   FaCheck
 } from "react-icons/fa";
-import { PropertyItem } from "@/types/property";
+import { Property } from "../../types";
 import placeholder from "@/assets/placeholder.jpg";
 
 
 interface AboutPropertyProps {
-  property: PropertyItem;
+  property: Property;
 }
 
 export default function AboutProperty({ property }: AboutPropertyProps) {

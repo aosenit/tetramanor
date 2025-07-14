@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import logo from "@/assets/home/logo.webp";
+import tmlogo from "@/assets/tmlogo.png";
 import Image from "next/image";
 
 export default function AuthHeader({
@@ -34,7 +34,7 @@ export default function AuthHeader({
         {/* Logo/Brand Section */}
         <Link href="/" className="flex items-center space-x-2">
           <Image
-            src={logo}
+            src={tmlogo}
             alt="Tetramanor Logo"
             width={100}
             height={100}

@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import logo from "@/assets/home/logo.webp";
+import tmlogo from "@/assets/tmlogo.png";
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 
@@ -91,7 +91,7 @@ export default function CampaignPreview({
         <header className="bg-[#323539] rounded-t-md text-white px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
-              <Image src={logo} alt="Logo" width={40} height={40} />
+              <Image src={tmlogo} alt="Logo" width={40} height={40} />
               <span className="text-lg font-medium">Campaign Preview</span>
             </div>
             <button

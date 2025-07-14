@@ -23,70 +23,15 @@ import {
   MessageSquare,
   Bell,
   LogOut,
-  ChevronUp,
-  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import LogoutModal from "@/components/LogoutModal";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export const route = "/main-admin";
 
-const menuItems = [
-  {
-    title: "Dashboard",
-    url: route,
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Homepage",
-    url: `${route}/homepage`,
-    icon: Home,
-  },
-  {
-    title: "Properties",
-    url: `${route}/properties`,
-    icon: Building2,
-  },
-  {
-    title: "Investments",
-    url: `${route}/investments`,
-    icon: TrendingUp,
-  },
-  {
-    title: "Customer",
-    url: `${route}/customers`,
-    icon: Users,
-  },
-  {
-    title: "Rentals",
-    url: `${route}/rentals`,
-    icon: Car,
-  },
-  {
-    title: "Blog posts",
-    url: `${route}/blog-posts`,
-    icon: FileText,
-  },
-  {
-    title: "Payments",
-    url: `${route}/payments`,
-    icon: CreditCard,
-  },
-  {
-    title: "Contact inquiries",
-    url: `${route}/contact-inquiries`,
-    icon: MessageSquare,
-  },
-  {
-    title: "Notifications",
-    url: `${route}/notifications`,
-    icon: Bell,
-  },
-];
 
 export function AppSidebar() {
   const pathname = usePathname();

@@ -1,27 +1,23 @@
 "use client";
 import React from "react";
-import Hero from "../view-property/sections/hero";
-import AboutProperty from "./sections/about-property";
-import WhyInvest from "./sections/why-invest";
-import MorePictures from "./sections/more-pictures";
-import EconomicAdvantages from "./sections/economic-advantages";
-import ScheduleInspection from "./sections/schedule-inspection";
+import Hero from "../sections/hero";
+import AboutProperty from "../sections/about-property";
+import WhyInvest from "../sections/why-invest";
+import MorePictures from "../sections/more-pictures";
+import EconomicAdvantages from "../sections/economic-advantages";
+import ScheduleInspection from "../sections/schedule-inspection";
 import Footer from "@/components/home/Footer";
-import MapSection from "./sections/map";
+import MapSection from "../sections/map";
 import { FiShare2 } from "react-icons/fi";
 import { useToast } from "@chakra-ui/react";
 import { useFetchData } from "@/hooks/useApi";
+import { Property } from "../../types";
 
 interface PageProps {
-  searchParams: {
-    title?: string;
-    location?: string;
-    status?: string;
-    image?: string;
-  }
+  params:{id:string}
 }
 
-export default function Page({ searchParams }: PageProps) {
+export default function Page({ params }: PageProps) {
   const toast = useToast();
   const handleShare = () => {
     if (typeof window !== "undefined") {
@@ -36,15 +32,11 @@ export default function Page({ searchParams }: PageProps) {
     }
   };
 
-  // Fetch property data by title
-  const { data: propertyResponse, isLoading, error } = useFetchData("property", {
-    page: 1,
-    limit: 1,
-    search: searchParams.title,
-  });
-  const property = propertyResponse?.data?.items?.[0];
+  const { data, isLoading, error } = useFetchData(
+    `property/detail/${params.id}`
+  );
+  const property:Property = data?.data
 
-  // Pass the dynamic data to the components that need it
   return (
     <div>
       <div className="flex justify-end p-4">

@@ -33,7 +33,7 @@ export default function Component() {
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-medium text-gray-800">
                 View property details
-              </h3>
+              </h3>,
               {property?.brochure?.length > 0 && (
                 <Button
                   className="bg-green-600 hover:bg-green-700 text-white"

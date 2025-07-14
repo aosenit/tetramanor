@@ -1,8 +1,35 @@
 import Header from "@/app/(page)/portfolio/components/header";
-import React from "react";
+import React, { useState } from "react";
 import home from "@/assets/home/home.mp4";
+import { useFetchData } from "@/hooks/useApi";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { Property } from "@/app/(page)/portfolio/types";
 
 const HomeHero = () => {
+  const [propertyType, setPropertyType] = useState("");
+  const [location, setLocation] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [searchParams, setSearchParams] = useState<{
+    propertyType: string;
+    location: string;
+  }>({ propertyType: "", location: "" });
+  const router = useRouter();
+
+  const { data, isLoading, error } = useFetchData(
+    searchParams.propertyType || searchParams.location
+      ? `property?${searchParams.propertyType ? `propertyType=${encodeURIComponent(searchParams.propertyType)}` : ""}${searchParams.propertyType && searchParams.location ? "&" : ""}${searchParams.location ? `location=${encodeURIComponent(searchParams.location)}` : ""}`
+      : ""
+  );
+  const properties: Property[] = data?.data?.items || [];
+
   return (
     <section className="relative h-[80vh] ">
       <Header />
@@ -25,30 +52,122 @@ const HomeHero = () => {
             Modern, sustainable homes designed for better living and stronger
             communities.
           </p>
-          <form className="flex flex-col md:flex-row items-stretch w-full max-w-3xl bg-black/70 overflow-hidden border border-white/10">
-            <div className="flex items-center px-4 md:px-6 py-3 md:py-4 border-b md:border-b-0 md:border-r border-white/30">
-              <span className="text-white text-sm md:text-base mr-2">
+          <form
+            className="flex flex-row items-stretch w-full max-w-3xl bg-black/70 overflow-hidden border border-white/10"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setSearchParams({ propertyType, location });
+              setModalOpen(true);
+            }}
+          >
+            <div className="flex items-center py-3 px-4 md:px-6 border-r border-white/30">
+              <label className="text-white text-sm md:text-base mr-2 whitespace-nowrap">
                 Property type
-              </span>
-            </div>
-            <div className="flex items-center px-4 md:px-6 py-3 md:py-4 border-b md:border-b-0 md:border-r border-white/10 flex-1">
+              </label>
               <input
                 type="text"
-                placeholder="Enter location"
-                className="bg-transparent outline-none text-white placeholder-white w-full text-sm md:text-base"
+                value={propertyType}
+                onChange={(e) => setPropertyType(e.target.value)}
+                className="bg-transparent outline-none text-white placeholder-white text-sm md:text-base w-32"
               />
             </div>
-            <div className="flex items-center px-4 md:px-6 py-3 md:py-4 border-b md:border-b-0 md:border-r border-white/30">
-              <span className="text-white text-sm md:text-base">
-                Price range
-              </span>
+            <div className="flex items-center py-3 px-4 md:px-6 border-r border-white/10 flex-1">
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="bg-transparent outline-none text-white placeholder-white w-full text-sm md:text-base"
+                placeholder="Enter location"
+              />
             </div>
-            <div className="bg-white text-black font-semibold rounded-none px-6 md:px-8 py-3 md:py-4 text-sm md:text-base h-auto min-w-[120px] hover:bg-gray-200">
+            <button
+              type="submit"
+              className="bg-white py-3 text-black font-semibold rounded-none px-6 md:px-8 text-sm md:text-base min-w-[120px] hover:bg-gray-200"
+            >
               Browse
-            </div>
+            </button>
           </form>
         </div>
       </div>
+      {/* Modal for property results */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Available Properties</DialogTitle>
+          </DialogHeader>
+          <DialogClose asChild>
+            <button className="absolute top-4 right-4 text-gray-500 hover:text-black">
+              &times;
+            </button>
+          </DialogClose>
+          {isLoading ? (
+            <div className="py-8 text-center">Loading...</div>
+          ) : error ? (
+            <div className="py-8 text-center text-red-500">
+              Failed to load properties.
+            </div>
+          ) : properties.length === 0 ? (
+            <div className="py-8 text-center">No properties found.</div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {properties.slice(0, 2).map((property) => (
+                  <div
+                    key={property.id}
+                    className="bg-gray-100 rounded-lg overflow-hidden shadow flex flex-col"
+                  >
+                    <div className="relative w-full h-40">
+                      <Image
+                        src={
+                          property.images?.find((img) => img.isPrimary)
+                            ?.imageUrl ||
+                          property.images?.[0]?.imageUrl ||
+                          "/placeholder.png"
+                        }
+                        alt={property.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        priority={false}
+                      />
+                    </div>
+                    <div className="p-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="font-semibold text-lg mb-1">
+                          {property.name}
+                        </div>
+                        <div className="text-sm text-gray-600 mb-2">
+                          {property.address}
+                        </div>
+                      </div>
+                      <button
+                        className="mt-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+                        onClick={() => {
+                          setModalOpen(false);
+                          router.push(
+                            `/portfolio/view-property/${property.id}`
+                          );
+                        }}
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button
+                className="mt-6 w-full bg-primary text-white font-semibold py-3 rounded hover:bg-primary/90 transition"
+                onClick={() => {
+                  setModalOpen(false);
+                  router.push("/portfolio");
+                }}
+              >
+                View More Properties
+              </button>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };

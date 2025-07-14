@@ -2,11 +2,11 @@
 import React from "react";
 import Image from "next/image";
 import { FaCheck } from "react-icons/fa";
-import type { PropertyItem } from "@/types/property";
+import { Property } from "../../types";
 import placeholder from "@/assets/placeholder.jpg";
 
 interface WhyInvestProps {
-  property: PropertyItem;
+  property: Property;
 }
 
 export default function WhyInvest({ property }: WhyInvestProps) {

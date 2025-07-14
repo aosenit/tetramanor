@@ -1,19 +1,19 @@
 "use client";
 import Image from "next/image";
-import a from "@/assets/about/a.webp";
-import b from "@/assets/about/b.webp";
-import f from "@/assets/about/f.webp";
+import ceo from "@/assets/ceo.jpg";
+import finance from "@/assets/finance.jpg";
+import director from "@/assets/director.jpg";
 
 export default function MeetTheTeam() {
   const teams = [
-    { id: 1, image: a, name: "John Beecroft", position: "MD" },
+    { id: 1, image: ceo, name: "John O. Beecroft", position: "Managing Director/CEO" },
     {
       id: 2,
-      image: b,
+      image: finance,
       name: "Chuka Atuchukwu",
-      position: "Director/Accountant",
+      position: "Finance and Accounts Manager",
     },
-    { id: 3, image: f, name: "Olumide Obasemo", position: "Project Manager" },
+    { id: 3, image: director, name: "Nnamdi Onwurah", position: "Director" },
   ];
 
   return (

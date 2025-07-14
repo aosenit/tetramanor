@@ -6,10 +6,10 @@ import {
   FaPassport,
   FaKey,
 } from "react-icons/fa";
-import { PropertyItem } from "@/types/property";
+import { Property } from "../../types";
 
 interface EconomicAdvantagesProps {
-  property: PropertyItem;
+  property: Property;
 }
 
 const defaultAdvantages = [

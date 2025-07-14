@@ -1,5 +1,5 @@
 "use client";
-import type { PropertyItem } from "@/types/property";
+import { Property } from "../../types";
 import Image from "next/image";
 import React, { useRef } from "react";
 import placeholder from "@/assets/placeholder.jpg";
@@ -7,7 +7,7 @@ import { IconButton, Box, Flex } from "@chakra-ui/react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 interface MorePicturesProps {
-  property: PropertyItem;
+  property: Property;
 }
 
 function MorePictures({ property }: MorePicturesProps) {
