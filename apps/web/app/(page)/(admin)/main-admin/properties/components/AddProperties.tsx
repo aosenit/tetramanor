@@ -436,17 +436,16 @@ export default function AddProperties() {
   };
   const openEditAdvantageDialog = (index: number) => {
     setEditingAdvantageIndex(index);
-    const advantages = formData.whyInvest.advantages || [];
     setAdvantageDraft({
-      title: advantages[index]?.title || "",
-      description: advantages[index]?.description || "",
+      title: formData.whyInvest[index]?.title || "",
+      description: formData.whyInvest[index]?.description || "",
     });
     setAdvantageDialogOpen(true);
   };
   const handleAdvantageDialogSave = () => {
     if (!advantageDraft.title.trim() || !advantageDraft.description.trim())
       return;
-    let newAdvantages = [...(formData.whyInvest.advantages || [])];
+    let newAdvantages = [...(formData.whyInvest || [])];
     if (editingAdvantageIndex !== null) {
       newAdvantages[editingAdvantageIndex] = { ...advantageDraft };
     } else {
@@ -454,7 +453,7 @@ export default function AddProperties() {
     }
     setFormData((prev) => ({
       ...prev,
-      whyInvest: { ...prev.whyInvest, advantages: newAdvantages },
+      whyInvest: newAdvantages,
     }));
     setAdvantageDialogOpen(false);
   };
@@ -464,12 +463,7 @@ export default function AddProperties() {
   const handleRemoveAdvantage = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      whyInvest: {
-        ...prev.whyInvest,
-        advantages: (prev.whyInvest.advantages || []).filter(
-          (_, i) => i !== index
-        ),
-      },
+      whyInvest: (prev.whyInvest || []).filter((_, i) => i !== index),
     }));
   };
 
