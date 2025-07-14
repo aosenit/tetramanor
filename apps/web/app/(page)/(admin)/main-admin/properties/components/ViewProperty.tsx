@@ -33,11 +33,22 @@ export default function Component() {
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-medium text-gray-800">
                 View property details
-              </h3>,
+              </h3>
+              ,
               {property?.brochure?.length > 0 && (
                 <Button
                   className="bg-green-600 hover:bg-green-700 text-white"
-                  onClick={() => downloadDocument(property.brochure[0].id, property.brochure[0].name || "brochure.pdf")}
+                  onClick={() =>
+                    downloadDocument(
+                      property.brochure[0].id,
+                      property.brochure[0].name || "brochure.pdf",
+                      {
+                        name: "John Doe",
+                        email: "john.doe@example.com",
+                        phone: "1234567890",
+                      }
+                    )
+                  }
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Download brochure
