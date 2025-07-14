@@ -1,9 +1,7 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
-import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import icon from "@/assets/createnewpassword.png";
 import Image from "next/image";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { usePostData } from "@/hooks/useApi";
 
 function NewPasswordPageContent() {

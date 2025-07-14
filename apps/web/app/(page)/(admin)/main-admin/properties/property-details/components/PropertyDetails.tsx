@@ -136,7 +136,13 @@ export default function PropertyDetails() {
             {property?.brochure?.length > 0 && (
               <Button
                 className="bg-[#116114] text-white"
-                onClick={() => downloadDocument(property.brochure[0].id, property.brochure[0].name || "brochure.pdf")}
+                onClick={() =>
+                  downloadDocument(
+                    property.brochure[0].id,
+                    property.brochure[0].name || "brochure.pdf",
+                    property.brochure[0].imageUrl || ""
+                  )
+                }
               >
                 <Download className="w-4 h-4 mr-2" />
                 Download brochure
@@ -236,44 +242,44 @@ export default function PropertyDetails() {
         <h2 className="text-sm font-medium text-[var(--primary-green)] mb-4">
           Why invest
         </h2>
-        <p className="text-[#116114] text-sm font-medium">
+        <p className=" text-sm font-medium">
           {property?.whyInvest?.[0]?.title || "N/A"}
         </p>
-        <p className="text-sm font-medium">
+        <p className="text-sm font-medium text-[#4C5560]">
           {property?.whyInvest?.[0]?.description || "N/A"}
         </p>
       </div>
-      {/* <div className="bg-white mt-4 p-8">
-        <h2 className="text-sm font-medium text-[#181818] mb-4">
+      <div className="bg-white mt-4 p-8">
+        <h2 className="text-sm font-medium text-[#116114] mb-4">
           Advantage of investment{" "}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {property?.whyInvest?.advantages?.length > 0 ? (
-            property?.whyInvest?.advantages?.map((adv, idx) => (
+          {property?.investmentAdvantages?.length > 0 ? (
+            property?.investmentAdvantages?.map((adv, idx) => (
               <div key={idx} className="flex items-center gap-4">
-                <Image
+                {/* <Image
                   src={
                     defaultAdvantages[idx % defaultAdvantages.length]?.icon || c
                   }
                   alt="Investment advantage icon"
                   width={40}
                   height={40}
-                />
+                /> */}
                 <div>
-                  <h4 className="text-[#116114] font-semibold">
+                  <h4 className=" font-semibold text-sm">
                     {adv.title || "N/A"}
                   </h4>
-                  <p className="text-sm text-[#202020]">
+                  <p className="text-sm font-medium text-[#4C5560]">
                     {adv.description || "N/A"}
                   </p>
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-sm text-[#181818]">No advantages available</p>
+            <p className="text-sm text-[#181818]">N/A</p>
           )}
         </div>
-      </div> */}
+      </div>
       <div className="bg-white mt-4 p-8 space-y-6">
         <h2 className="text-sm font-medium text-[#181818] mb-6">Features</h2>
 
