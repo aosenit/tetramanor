@@ -2,17 +2,19 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
-import two from "@/assets/portfolio/two.webp"
+import placeholder from "@/assets/placeholder.jpg";
 import { usePostExportData } from "@/hooks/useApi";
 
 const Modal = ({
   onClose,
   brochureId,
   brochureName,
+  imageUrl,
 }: {
   onClose: () => void;
   brochureId: string | null;
   brochureName: string;
+  imageUrl?: string | null;
 }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -92,8 +94,8 @@ const Modal = ({
           {/* Left: Image */}
           <div className="relative h-[300px] lg:h-[600px]">
             <Image
-              src={two}
-              alt="Hill View"
+              src={imageUrl || placeholder}
+              alt="Property Image"
               className="object-cover"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"

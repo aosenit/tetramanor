@@ -59,7 +59,11 @@ type FeaturedPropertyResponse = {
 
 export default function  HomeFeaturedProperty() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalProps, setModalProps] = useState<{id: string, name: string} | null>(null);
+  const [modalProps, setModalProps] = useState<{
+    id: string;
+    name: string;
+    imageUrl: string | null;
+  } | null>(null);
   const router = useRouter();
 
   const { data, isLoading, error } = useFetchData("/property/featured");
@@ -69,7 +73,9 @@ export default function  HomeFeaturedProperty() {
   if (isLoading) {
     return (
       <section className="w-full container mx-auto px-4 lg:px-16 py-12">
-        <div className="text-center py-20 text-lg">Loading featured property...</div>
+        <div className="text-center py-20 text-lg">
+          Loading featured property...
+        </div>
       </section>
     );
   }
@@ -77,7 +83,9 @@ export default function  HomeFeaturedProperty() {
   if (error || !featured) {
     return (
       <section className="w-full container mx-auto px-4 lg:px-16 py-12">
-        <div className="text-center py-20 text-lg text-red-500">Failed to load featured property.</div>
+        <div className="text-center py-20 text-lg text-red-500">
+          Failed to load featured property.
+        </div>
       </section>
     );
   }
@@ -112,22 +120,23 @@ export default function  HomeFeaturedProperty() {
                   {featured.name}
                 </div>
               </div>
-              <Button
-                onClick={() => {
-                  const doc = featured.document && featured.document.length > 0 ? featured.document[0] : null;
-                  if (doc) {
+              {/* Only show Download Brochure button if document exists */}
+              {featured.document && featured.document.length > 0 && (
+                <Button
+                  onClick={() => {
+                    const doc = featured.document[0];
                     setModalProps({
                       id: doc.id,
                       name: doc.name || `${featured.name}-brochure.pdf`,
+                      imageUrl: featured.images?.[0]?.imageUrl || null,
                     });
-                  }
-                }}
-                size="sm"
-                className="bg-white text-[#202020] font-semibold rounded px-6 py-2 shadow-none text-base w-full md:w-auto"
-                disabled={!(featured.document && featured.document.length > 0)}
-              >
-                Download brochure
-              </Button>
+                  }}
+                  size="sm"
+                  className="bg-white text-[#202020] font-semibold rounded px-6 py-2 shadow-none text-base w-full md:w-auto"
+                >
+                  Download brochure
+                </Button>
+              )}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-white text-center">
               {[
@@ -168,6 +177,7 @@ export default function  HomeFeaturedProperty() {
           onClose={() => setModalProps(null)}
           brochureId={modalProps.id}
           brochureName={modalProps.name}
+          imageUrl={modalProps.imageUrl}
         />
       )}
     </section>
