@@ -710,7 +710,9 @@ export default function AccountSettings() {
                       onClick={handleKycVerify}
                       className="flex-1 bg-[var(--primary-green)] hover:bg-green-700"
                     >
-                      Verify
+                      {uploadKycDocumentMutation.isPending
+                        ? "Verifying..."
+                        : "Verify"}
                     </Button>
                   </div>
                 </DialogContent>
