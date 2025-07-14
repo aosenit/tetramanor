@@ -47,6 +47,7 @@ type FeaturedProperty = {
   unitTypes: string[];
   accountOfficerId: string | null;
   images: FeaturedPropertyImage[];
+  document: { id: string; name: string }[];
 };
 
 type FeaturedPropertyResponse = {
@@ -112,10 +113,18 @@ export default function  HomeFeaturedProperty() {
                 </div>
               </div>
               <Button
-                onClick={featured.brochure ? () => setModalProps({id: featured.brochure, name: `${featured.name}-brochure.pdf`}) : undefined}
+                onClick={() => {
+                  const doc = featured.document && featured.document.length > 0 ? featured.document[0] : null;
+                  if (doc) {
+                    setModalProps({
+                      id: doc.id,
+                      name: doc.name || `${featured.name}-brochure.pdf`,
+                    });
+                  }
+                }}
                 size="sm"
                 className="bg-white text-[#202020] font-semibold rounded px-6 py-2 shadow-none text-base w-full md:w-auto"
-                disabled={!featured.brochure}
+                disabled={!(featured.document && featured.document.length > 0)}
               >
                 Download brochure
               </Button>
@@ -148,7 +157,7 @@ export default function  HomeFeaturedProperty() {
           <Button
             colorScheme="green"
             className="bg-primary text-white font-semibold rounded px-8 py-3 shadow-none text-base w-fit"
-            onClick={() => router.push("/portfolio/view-property?location=" + encodeURIComponent(featured.address))}
+            onClick={() => router.push("/portfolio")}
           >
             View more
           </Button>
