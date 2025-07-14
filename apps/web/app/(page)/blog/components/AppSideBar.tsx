@@ -3,6 +3,7 @@ import React, { ReactNode } from "react";
 import Image from "next/image";
 import { useFetchData } from "@/hooks/useApi";
 import placeholder from "@/assets/placeholder.jpg";
+import Link from "next/link";
 
 interface Props {
   children?: ReactNode;
@@ -24,9 +25,9 @@ const AppSideBar: React.FC<Props> = ({ children }) => {
           <div className="text-red-500">Failed to load featured posts.</div>
         ) : blogs.length > 0 ? (
           blogs.map((item: any) => (
-            <a
+            <Link
               key={item.id}
-              href={`/blog/${item.id}`}
+              href={{ pathname: "/blog/blog-id", query: { slug: item.id } }}
               className="flex gap-4 max-w-md items-start p-3 bg-[#f3f5f3] rounded-md shadow-sm hover:bg-gray-200 transition"
             >
               <div className="relative w-[100px] h-[60px] flex-shrink-0">
@@ -45,7 +46,7 @@ const AppSideBar: React.FC<Props> = ({ children }) => {
                   dangerouslySetInnerHTML={{ __html: item.content }}
                 />
               </div>
-            </a>
+            </Link>
           ))
         ) : (
           <div className="text-gray-500">No featured posts found.</div>
