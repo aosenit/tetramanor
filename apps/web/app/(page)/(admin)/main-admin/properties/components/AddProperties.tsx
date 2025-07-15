@@ -83,8 +83,14 @@ const defaultFormData: PropertyFormData = {
   unitTypes: [],
   whyInvest: [],
   investmentAdvantages: [],
-  features: [],
-  amenities: [],
+  features: [
+    "24/7 Security",
+    "Parking Space",
+    "Power Backup",
+    "Water Supply",
+    "Internet Connectivity",
+  ],
+  amenities: ["Swimming Pool", "Gym", "Garden", "Playground", "Security Guard"],
   images: [],
   documentId: "",
   constructionStatus: "ONGOING",
@@ -173,8 +179,8 @@ export default function AddProperties() {
         unitTypes: propertyData?.data?.unitTypes || [],
         whyInvest: propertyData?.data?.whyInvest || [],
         investmentAdvantages: propertyData?.data?.investmentAdvantages || [],
-        features: propertyData?.data?.features || [],
-        amenities: propertyData?.data?.amenities || [],
+        features: propertyData?.data?.features || [], // No default features when editing
+        amenities: propertyData?.data?.amenities || [], // No default amenities when editing
         images: propertyData?.data?.images || [],
         documentId: propertyData?.data?.document[0]?.id || "",
         constructionStatus: propertyData?.data?.constructionStatus || "ONGOING",

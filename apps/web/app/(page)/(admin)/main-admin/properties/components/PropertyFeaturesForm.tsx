@@ -1,4 +1,5 @@
 "use client";
+import { Textarea } from "@/components/ui/textarea";
 import React, { useState } from "react";
 
 interface TagInputGroupProps {
@@ -57,13 +58,13 @@ export default function TagInputGroup({
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={2}
-          placeholder={placeholder}
+          placeholder={""}
           className="flex-1 resize-none bg-[#e5e5e7] py-2 border-none  outline-none text-sm min-w-[100px]"
         />
       </div>
 
       {/* Hint */}
-      <p className="text-xs text-gray-500">Separate tags with commas</p>
+      <p className="text-xs text-gray-500">{placeholder}</p>
     </div>
   );
 }
