@@ -1,11 +1,10 @@
 "use client";
 import Image from "next/image";
-import { ChevronUp, Download } from "lucide-react";
+import { ChevronUp, Download, Pencil } from "lucide-react";
 import React, { useState } from "react";
 import { GrLocation } from "react-icons/gr";
 import { useSearchParams, useRouter } from "next/navigation";
 import placeholder from "@/assets/placeholder.svg";
-import c from "@/assets/investment/icons/c.webp";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -24,26 +23,7 @@ import { useFetchData, useDeleteData } from "@/hooks/useApi";
 import { MdArrowBackIosNew } from "react-icons/md";
 import Link from "next/link";
 import { toast } from "sonner";
-import { downloadDocument } from "@/lib/utils";
-
-const defaultAdvantages = [
-  {
-    icon: c,
-    title: "High Returns",
-    description: "Earn up to 50% ROI over a short duration (~18 months)",
-  },
-  {
-    icon: c,
-    title: "Minimal Risk",
-    description:
-      "Tetramanor handles the entire process, from land acquisition to sales",
-  },
-  {
-    icon: c,
-    title: "Flexible Investment Options",
-    description: "Choose between Fixed ROI or Equity-Based Profit Sharing",
-  },
-];
+import Loader from "@/components/Loader";
 
 export default function PropertyDetails() {
   const searchParams = useSearchParams();
@@ -78,15 +58,7 @@ export default function PropertyDetails() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen px-4">
-        <div className="flex items-center justify-center py-20">
-          <div className="text-center">
-            <p className="text-gray-600 mb-4">Loading property details...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error) {
@@ -108,75 +80,80 @@ export default function PropertyDetails() {
 
   return (
     <div className="min-h-screen px-4">
-      <div className="border-b">
+      <div className="border-b flex justify-between items-center flex-wrap py-4 gap-2">
         <div className="py-2">
           <nav className="">
             <Link href="/main-admin/properties">
               <span className="text-[#858C95]">Home</span>
             </Link>
-            <span className="mx-2 text-xl text-[#116114]">/</span>
-            <span className="font-medium text-xl text-[#116114]">
+            <span className="mx-2 text-lg text-[#116114]">/</span>
+            <span className="font-medium  text-[#116114]">
               property overview
             </span>
           </nav>
+        </div>
+        <div className="flex gap-2">
+          {/* <Button
+            className="bg-red-600 text-white hover:bg-red-700"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <Trash className="w-4 h-4" />
+            Delete Property
+          </Button> */}
+          <Button className="bg-[#116114] text-white">
+            <Link
+              href={`/main-admin/properties/add-properties?id=${propertyId}`}
+              className="flex items-center gap-2"
+            >
+              <Pencil className="w-4 h-4 " />
+              Edit Property
+            </Link>
+          </Button>
         </div>
       </div>
 
       <div className="mt-2">
         <div className="">
-          <h2 className="text-sm font-medium text-[#323539] mb-4">
+          <h2 className="text-sm font-medium text-[#323539] my-4">
             View property listing
           </h2>
         </div>
         <div className="bg-white p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-sm font-medium text-[#116114]">
-              View property details
-            </h2>
-            {property?.brochure?.length > 0 && (
-              <Button
-                className="bg-[#116114] text-white"
-                onClick={() =>
-                  downloadDocument(
-                    property.brochure[0].id,
-                    property.brochure[0].name || "brochure.pdf",
-                    property.brochure[0].imageUrl || ""
-                  )
-                }
+          <div className="flex justify-start lg:justify-end items-center mb-4">
+            {property?.document?.length > 0 && (
+              <a
+                href={property?.document[0].imageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <Download className="w-4 h-4 mr-2" />
-                Download brochure
-              </Button>
+                <Button
+                  className="border-[#116114] text-[#116114] hover:opacity-80"
+                  variant="outline"
+                >
+                  <Download className="w-4 h-4 " />
+                  Download brochure
+                </Button>
+              </a>
             )}
           </div>
 
           {/* Property Images */}
           {property?.images?.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
-              <div className="aspect-[4/3] relative rounded-lg overflow-hidden">
-                <Image
-                  src={property?.images[0]?.imageUrl || placeholder}
-                  alt="Property exterior view"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="aspect-[4/3] relative rounded-lg overflow-hidden">
-                <Image
-                  src={property?.images[1]?.imageUrl || placeholder}
-                  alt="Property exterior view"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="aspect-[4/3] relative rounded-lg overflow-hidden">
-                <Image
-                  src={property?.images[2]?.imageUrl || placeholder}
-                  alt="Property exterior view"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+            <div className="flex flex-wrap gap-10 mb-8">
+              {property?.images?.map((image, index) => (
+                <div
+                  key={index}
+                  className="aspect-[4/3] relative rounded-lg overflow-hidden border border-gray-200 p-2"
+                >
+                  <Image
+                    src={image?.imageUrl || placeholder}
+                    alt="Property exterior view"
+                    height={200}
+                    width={300}
+                    className="object-contain h-[200px] w-[300px] object-center"
+                  />
+                </div>
+              ))}
             </div>
           ) : (
             <div className="flex justify-start items-start h-full py-10">
@@ -188,7 +165,10 @@ export default function PropertyDetails() {
           <div className="grid grid-cols-1 md:flex md:justify-between gap-8">
             <div className="space-y-4">
               <div className="flex items-center gap-12">
-                <label className="text-xs font-medium text-[#181818] block min-w-[100px]">
+                <label
+                  htmlFor="property-name"
+                  className="text-xs font-medium text-[#181818] block min-w-[100px]"
+                >
                   Property name
                 </label>
                 <p className="text-[#116114] font-medium text-sm">
@@ -197,7 +177,10 @@ export default function PropertyDetails() {
               </div>
 
               <div className="flex gap-4 items-start">
-                <label className="text-xs font-medium text-[#181818] min-w-[100px] pt-2">
+                <label
+                  htmlFor="property-units"
+                  className="text-xs font-medium text-[#181818] min-w-[100px] pt-2"
+                >
                   Property units
                 </label>
                 <Collapsible className="flex-1 mt-1 ">
@@ -283,12 +266,12 @@ export default function PropertyDetails() {
       <div className="bg-white mt-4 p-8 space-y-6">
         <h2 className="text-sm font-medium text-[#181818] mb-6">Features</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="flex flex-wrap gap-4">
           {property?.features?.length > 0 ? (
             property?.features?.map((feature, index) => (
               <div
                 key={index}
-                className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
+                className="border border-gray-200 rounded-lg px-2 py-2 w-fit flex items-center h-auto"
               >
                 <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
                 <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden w-full">
@@ -303,12 +286,12 @@ export default function PropertyDetails() {
 
         <h2 className="text-sm font-medium text-[#181818] mb-6">Amenities </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="flex flex-wrap gap-4">
           {property?.amenities?.length > 0 ? (
             property?.amenities?.map((amenity, index) => (
               <div
                 key={index}
-                className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
+                className="border border-gray-200 rounded-lg px-2 py-2 w-fit flex items-center h-auto"
               >
                 <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
                 <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden w-full">
@@ -348,22 +331,7 @@ export default function PropertyDetails() {
           </div>
         </div>
       </div>
-      <div className="flex justify-between px-3 items-center py-12">
-        <div className="flex gap-2">
-          <Button className="bg-[#116114] text-white">
-            <Link
-              href={`/main-admin/properties/add-properties?id=${propertyId}`}
-            >
-              Edit
-            </Link>
-          </Button>
-          {/* <Button
-            className="bg-red-500 text-white hover:bg-red-600"
-            onClick={() => setShowDeleteDialog(true)}
-          >
-            Delete
-          </Button> */}
-        </div>
+      <div className="flex justify-end px-3 items-center py-12">
         <Link href="/main-admin/properties">
           <button className="text-[#323539] flex items-center gap-2 hover:text-[#323539] text-sm">
             <MdArrowBackIosNew /> Back

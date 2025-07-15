@@ -251,7 +251,9 @@ export default function PropertyManagement() {
       <div className="">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1  text-[#858C95]">
-            <span>Admin</span>
+            <Link href="/main-admin" className="cursor-pointer">
+              Admin
+            </Link>
             <span className="text-xl text-[#858C95]">/</span>
             <span className="font-medium text-xl text-[#116114]">
               Property management
