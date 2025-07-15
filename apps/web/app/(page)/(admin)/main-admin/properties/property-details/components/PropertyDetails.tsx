@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { ChevronUp, Download, Pencil } from "lucide-react";
+import { ChevronUp, Download, Pencil, ToggleLeft } from "lucide-react";
 import React, { useState } from "react";
 import { GrLocation } from "react-icons/gr";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -19,11 +19,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useFetchData, useDeleteData } from "@/hooks/useApi";
+import { useFetchData, useDeleteData, usePutData } from "@/hooks/useApi";
 import { MdArrowBackIosNew } from "react-icons/md";
 import Link from "next/link";
 import { toast } from "sonner";
 import Loader from "@/components/Loader";
+
+type AvailabilityStatus = "AVAILABLE" | "SOLD_OUT";
 
 export default function PropertyDetails() {
   const searchParams = useSearchParams();
@@ -38,6 +40,10 @@ export default function PropertyDetails() {
     error,
     refetch,
   } = useFetchData(propertyId ? `admin/properties/${propertyId}` : "");
+
+  const { mutate: updateProperty, isPending: isUpdating } = usePutData(
+    propertyId ? `admin/properties/${propertyId}/avaliability` : null
+  );
 
   // Delete property mutation
   const { mutateAsync: deleteProperty, isPending: isDeleting } = useDeleteData(
@@ -55,6 +61,24 @@ export default function PropertyDetails() {
         error?.response?.data?.message || "Failed to delete property";
       toast.error(errorMessage);
     }
+  };
+
+  const handleToggleAvailability = (status: AvailabilityStatus) => {
+    updateProperty(
+      { status },
+      {
+        onSuccess: () => {
+          toast.success("Property availability updated successfully");
+          refetch();
+        },
+        onError: (error: any) => {
+          console.log(
+            error?.response?.data?.message ||
+              "Failed to update property availability"
+          );
+        },
+      }
+    );
   };
 
   if (isLoading) {
@@ -119,17 +143,33 @@ export default function PropertyDetails() {
           </h2>
         </div>
         <div className="bg-white p-8">
-          <div className="flex justify-start lg:justify-end items-center mb-4">
+          <div className="flex justify-start lg:justify-end items-center mb-4 gap-4 flex-wrap">
+            <Button
+              disabled={isUpdating}
+              className={`border-[#116114] text-[#116114] hover:opacity-80 ${
+                isUpdating ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              variant="outline"
+              onClick={() =>
+                handleToggleAvailability(
+                  property?.status === "AVAILABLE" ? "SOLD_OUT" : "AVAILABLE"
+                )
+              }
+            >
+              <ToggleLeft />
+              {isUpdating
+                ? "Updating..."
+                : property?.status === "AVAILABLE"
+                  ? "Available"
+                  : "Sold Out"}
+            </Button>
             {property?.document?.length > 0 && (
               <a
                 href={property?.document[0].imageUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button
-                  className="border-[#116114] text-[#116114] hover:opacity-80"
-                  variant="outline"
-                >
+                <Button className=" bg-[#116114] text-white hover:opacity-80">
                   <Download className="w-4 h-4 " />
                   Download brochure
                 </Button>
@@ -139,18 +179,18 @@ export default function PropertyDetails() {
 
           {/* Property Images */}
           {property?.images?.length > 0 ? (
-            <div className="flex flex-wrap gap-10 mb-8">
+            <div className="flex flex-wrap gap-5 mb-8 pt-4">
               {property?.images?.map((image, index) => (
                 <div
                   key={index}
-                  className="aspect-[4/3] relative rounded-lg overflow-hidden border border-gray-200 p-2"
+                  className=" relative rounded-lg overflow-hidden border border-gray-200 p-2"
                 >
                   <Image
                     src={image?.imageUrl || placeholder}
                     alt="Property exterior view"
-                    height={200}
-                    width={300}
-                    className="object-contain h-[200px] w-[300px] object-center"
+                    height={180}
+                    width={220}
+                    className="object-contain h-[180px] w-[220px] object-center"
                   />
                 </div>
               ))}
