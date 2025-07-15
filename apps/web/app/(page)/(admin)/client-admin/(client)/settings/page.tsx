@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useFetchData, usePutData, useUploadData } from "@/hooks/useApi";
+import {
+  useFetchData,
+  usePostData,
+  usePutData,
+  useUploadData,
+} from "@/hooks/useApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,7 +85,7 @@ export default function AccountSettings() {
     useFetchData("customer/account/");
   const { data: kycData, isLoading: isLoadingKyc } = useFetchData("kyc");
   const updateAccountMutation = usePutData("customer/account/update");
-  const changePasswordMutation = usePutData("auth/change-password");
+  const changePasswordMutation = usePostData("auth/change-password");
   const uploadProfileImageMutation = useUploadData("upload/profile-image");
   const uploadKycDocumentMutation = useUploadData("kyc/upload");
 
