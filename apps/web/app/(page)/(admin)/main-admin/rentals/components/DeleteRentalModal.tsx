@@ -99,6 +99,7 @@ export default function DeleteRentalModal({
 
   // Format apartment type
   const formatApartmentType = (type: string) => {
+    if (!type) return "";
     return type.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   };
 

@@ -9,6 +9,7 @@ import { Plus, Loader2, Trash2, AlertTriangle } from "lucide-react";
 import { RiEdit2Line } from "react-icons/ri";
 import { toast } from "sonner";
 import { usePutData, useDeleteData, useGetData } from "@/hooks/useApi";
+import { useRouter } from "next/navigation";
 
 interface BlogPost {
   id: string;
@@ -114,12 +115,10 @@ export default function BlogPostDetails({
   onClose: () => void;
   onUpdate?: () => void;
 }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState("");
+  const router = useRouter();
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const { mutateAsync: updateBlog } = usePutData(`blogs/${post?.id}`);
   const { mutateAsync: deleteBlog, isPending: isDeleting } = useDeleteData(
     `blogs/${post?.id}`
   );
@@ -149,22 +148,6 @@ export default function BlogPostDetails({
     });
   };
 
-  const handleStatusChange = async (newStatus: string) => {
-    setIsLoading(true);
-    try {
-      await updateBlog({ status: newStatus.toUpperCase() });
-      toast.success(`Blog post ${newStatus.toLowerCase()} successfully`);
-      setSelected(newStatus);
-      onUpdate?.();
-    } catch (error) {
-      console.error("Error updating blog post:", error);
-      toast.error("Failed to update blog post");
-    } finally {
-      setIsLoading(false);
-      setIsOpen(false);
-    }
-  };
-
   const handleDeleteClick = () => {
     setShowDeleteModal(true);
   };
@@ -185,11 +168,6 @@ export default function BlogPostDetails({
 
   const handleDeleteCancel = () => {
     setShowDeleteModal(false);
-  };
-
-  const handleSelect = (value: string) => {
-    if (value === "Status") return;
-    handleStatusChange(value);
   };
 
   const handlePublishClick = async () => {
@@ -218,19 +196,13 @@ export default function BlogPostDetails({
 
           <div className="flex items-center border-b border-gray-300 p-6 justify-between">
             <div className="flex items-center space-x-1 text-[#858C95]">
-              <span>Admin</span>
+              <button onClick={() => router.back()}>Admin</button>
               <span className="text-xl text-[#858C95]">/</span>
               <span className="font-medium text-xl text-[#116114]">
                 View blog post detail
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <Link href="/main-admin/blog-posts/edit-blog">
-                <Button className="bg-white border border-[#E5E5E7] text-[#323539] flex items-center gap-2 text-sm hover:bg-white">
-                  <Plus className="" />
-                  Add New post
-                </Button>
-              </Link>
               <Button
                 onClick={handleDeleteClick}
                 disabled={isDeleting}
@@ -241,32 +213,29 @@ export default function BlogPostDetails({
                 <Trash2 className="w-4 h-4" />
                 Delete
               </Button>
+              <Link href="/main-admin/blog-posts/edit-blog">
+                <Button className="bg-white border border-[#E5E5E7] text-[#323539] flex items-center gap-2 text-sm hover:bg-white">
+                  <Plus className="" />
+                  Add New post
+                </Button>
+              </Link>
             </div>
           </div>
 
           <div className="p-6 space-y-6">
             <div className="flex justify-between items-center">
               <div className="flex flex-col lg:flex-row gap-4">
-                <div className="flex items-center">
-                  {/* <p className="text-[#979AA0]">Featured</p> */}
-                  {/* <p className="text-[#000000]">;</p> */}
-                  {/* <div className="flex items-center gap-1">
-                    {post.featured ? (
-                      <>
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-[#116114]">Yes</span>
-                      </>
-                    ) : (
-                      <span className="text-gray-500">No</span>
-                    )}
-                  </div> */}
+                <div className="flex items-center gap-1">
+                  <p className="text-[#979AA0]">Status</p>
+                  <p className="text-[#000000]">;</p>
+                  <p className="text-[#116114]">{post.status}</p>
                 </div>
-                <div className="flex items-center">
+                <div className="flex items-center gap-1">
                   <p className="text-[#979AA0]">Date posted</p>
                   <p className="text-[#000000]">;</p>
                   <p className="text-[#116114]">{formatDate(post.createdAt)}</p>
                 </div>
-                <div className="flex items-center">
+                <div className="flex items-center gap-1">
                   <p className="text-[#979AA0]">Author</p>
                   <p className="text-[#000000]">;</p>
                   <p className="text-[#116114]">{post.author || "Admin"}</p>
@@ -311,15 +280,18 @@ export default function BlogPostDetails({
                 <p>Blog Images</p>
               </div>
               <div className="flex items-center gap-4">
-                {/* <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    post.status === "PUBLISHED"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
+                <Button
+                  onClick={handlePublishClick}
+                  disabled={isPublishing}
+                  size="sm"
+                  className="bg-[#116114] text-white px-4 py-2 text-sm rounded-md"
                 >
-                  {post.status}
-                </span> */}
+                  {isPublishing
+                    ? "Loading..."
+                    : post?.status === "PUBLISHED"
+                      ? "Unpublish"
+                      : "Publish"}
+                </Button>
                 <Link href={`/main-admin/blog-posts/edit-blog?id=${post.id}`}>
                   <p className="flex items-center gap-1 cursor-pointer">
                     Edit <RiEdit2Line />
@@ -327,7 +299,7 @@ export default function BlogPostDetails({
                 </Link>
               </div>
             </div>
-            <div className="pb-8 border-b border-gray-300 flex flex-col md:flex-row gap-10">
+            <div className="pb-6 flex flex-col md:flex-row gap-10">
               {post?.images?.length > 0 ? (
                 post?.images
                   .slice(0, 4)
@@ -351,7 +323,7 @@ export default function BlogPostDetails({
             </div>
           </div>
 
-          <div className="text-[#323539] leading-relaxed p-6">
+          <div className="text-[#323539] leading-relaxed  py-10 border-y border-gray-300 px-6">
             <h3 className="text-[#858C95] text-sm font-medium">Blog title</h3>
             <p className="py-2 text-[#116114]">{post.title}</p>
             <div
@@ -360,18 +332,7 @@ export default function BlogPostDetails({
             />
           </div>
 
-          <div className="flex justify-between items-center gap-4 p-6 bg-white">
-            <Button
-              onClick={handlePublishClick}
-              disabled={isPublishing}
-              className="bg-[#116114] text-white px-4 py-2 text-sm rounded-md"
-            >
-              {isPublishing
-                ? "Loading..."
-                : post?.status === "PUBLISHED"
-                  ? "Unpublish"
-                  : "Publish"}
-            </Button>
+          <div className="flex justify-end items-center gap-4 p-6 bg-white">
             <button
               onClick={onClose}
               className="text-[#323539] hover:text-[#323539] text-sm"

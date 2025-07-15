@@ -1,13 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Plus, RefreshCw } from "lucide-react";
+import { Pencil, Plus, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import placeholder from "@/assets/placeholder.svg";
 import React, { useState, useEffect } from "react";
 import { MdArrowBackIosNew } from "react-icons/md";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
 import Loader from "@/components/Loader";
 
@@ -44,7 +44,7 @@ interface DetailsProps {
 function Details({ refetch }: DetailsProps) {
   const searchParams = useSearchParams();
   const rentalId = searchParams.get("id");
-
+  const router = useRouter();
   // Fetch rental data
   const {
     data: rentalData,
@@ -136,22 +136,19 @@ function Details({ refetch }: DetailsProps) {
       <div className="">
         <div className="flex border-b border-[#E5E5E7] pb-4 items-center justify-between">
           <div className="flex items-center space-x-1  text-[#858C95]">
-            <span>Home</span>
+            <button onClick={() => router.back()}>Home</button>
             <span className="text-xl text-[#858C95]">/</span>
             <span className="font-medium text-xl text-[#116114]">
               Rental Overview
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              onClick={handleRefetch}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Refresh
-            </Button>
+            <Link href={`/main-admin/rentals/edit-rentals?id=${rentalId}`}>
+              <Button className="" variant="outline">
+                <Pencil className="" />
+                Edit rental
+              </Button>
+            </Link>
             <Link href="/main-admin/rentals/edit-rentals">
               <Button className="bg-[#116114] flex items-center gap-2 text-sm hover:bg-green-800">
                 <Plus className="" />
@@ -172,8 +169,8 @@ function Details({ refetch }: DetailsProps) {
                   key={image.id}
                   src={image.imageUrl || placeholder}
                   alt="property"
-                  className="w-[350px]"
-                  width={250}
+                  className=" h-[200px] object-cover rounded-lg "
+                  width={300}
                   height={250}
                 />
               ))
@@ -185,7 +182,7 @@ function Details({ refetch }: DetailsProps) {
               />
             )}
           </div>
-          <div className=" space-y-4 max-w-6xl">
+          <div className=" space-y-4 max-w-6xl pt-4">
             <div className="flex items-center justify-between">
               <p className="text-[#181818]">Apartment type </p>
               <p className="text-[#181818]">{rental.apartmentType || "N/A"}</p>
@@ -268,14 +265,14 @@ function Details({ refetch }: DetailsProps) {
         <div className="bg-white mt-4 p-8 space-y-6">
           <h2 className="text-sm font-medium text-[#181818]  mb-6">Features</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="flex flex-wrap gap-4">
             {(property?.features || defaultFeatures).map(
               (feature: string, index: number) => (
                 <div
                   key={index}
-                  className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
+                  className="border border-gray-200 rounded-lg px-4 py-2 w-fit  flex items-center h-auto"
                 >
-                  <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-[#323539] rounded-full mr-2 flex-shrink-0"></div>
                   <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden  w-full">
                     {feature}
                   </span>
@@ -287,14 +284,14 @@ function Details({ refetch }: DetailsProps) {
             Amenities{" "}
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="flex  gap-4">
             {(property?.amenities || defaultAmenities).map(
               (amenity: string, index: number) => (
                 <div
                   key={index}
-                  className="border border-gray-200 rounded-lg px-2 py-2 w-full flex items-center h-auto"
+                  className="border border-gray-200 rounded-lg px-4 py-2 w-fit flex items-center h-auto"
                 >
-                  <div className="w-2 h-2 bg-[#323539] rounded-full mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-[#323539] rounded-full mr-2 flex-shrink-0"></div>
                   <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden  w-full">
                     {amenity}
                   </span>

@@ -155,7 +155,7 @@ export default function RentalsPage() {
     const matchesSearch =
       rental.property.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       rental.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rental.apartmentType.toLowerCase().includes(searchTerm.toLowerCase());
+      rental?.apartmentType?.toLowerCase()?.includes(searchTerm?.toLowerCase());
 
     const matchesStatus =
       statusFilter === "all" ||

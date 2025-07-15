@@ -26,6 +26,7 @@ import {
   UserPlus,
   ArrowLeft,
   Ellipsis,
+  Plus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -38,6 +39,7 @@ import { axiosInstance } from "@/services/axiosInstance";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import Image from "next/image";
 import five from "@/assets/admin/customer/five.svg";
+import Link from "next/link";
 
 // Officer type
 interface Officer {
@@ -149,11 +151,11 @@ export default function AccountOfficerInfo() {
       <div className="min-h-screen p-6">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center space-x-1 text-[#858C95]">
-            <span>Admin</span>
+            <Link href="/main-admin/" className="cursor-pointer">
+              Admin
+            </Link>
             <span className="text-xl text-[#858C95]">/</span>
-            <span className="font-medium text-xl text-[#116114]">
-              Contact Page
-            </span>
+            <span className="font-medium  text-[#116114]">Contact Page</span>
           </div>
         </div>
         <div className="p-6 bg-white space-y-8">
@@ -161,7 +163,6 @@ export default function AccountOfficerInfo() {
             <div className="flex items-center space-x-3 mb-6">
               {isEditing && (
                 <div className="flex items-center space-x-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                  <span>✏️</span>
                   <span>Editing Mode</span>
                 </div>
               )}
@@ -243,13 +244,12 @@ export default function AccountOfficerInfo() {
                 </>
               ) : isEditing ? (
                 <>
-                  <span>💾</span>
-                  <span>Update Officer</span>
+                  <span className="text-sm">Update Officer</span>
                 </>
               ) : (
                 <>
-                  <span>➕</span>
-                  <span>Create Officer</span>
+                  <Plus className="w-4 h-4" />
+                  <span className="text-sm">Create Officer</span>
                 </>
               )}
             </button>
@@ -267,8 +267,8 @@ export default function AccountOfficerInfo() {
               }}
               className="px-4 py-3 text-gray-600 hover:text-gray-800 flex items-center gap-2 transition-colors"
             >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Back to page</span>
+              <ChevronLeft className="size-5" />
+              <span className="text-sm">Back to page</span>
             </button>
           </div>
         </div>
@@ -281,7 +281,9 @@ export default function AccountOfficerInfo() {
       <div className="">
         <div className="flex border-b border-[#E5E5E7] pb-4 items-center justify-between">
           <div className="flex items-center space-x-1 text-[#858C95]">
-            <span>Home</span>
+            <Link href="/main-admin/" className="cursor-pointer">
+              Admin
+            </Link>
             <span className="text-xl text-[#858C95]">/</span>
             <span className="font-medium text-xl text-[#116114]">
               Contact Inquiries
@@ -317,22 +319,22 @@ export default function AccountOfficerInfo() {
       {/* Tabs */}
       <div className="w-full">
         <div className="grid w-fit text-sm grid-cols-2 gap-2">
-          <p
+          <button
             onClick={() => handleClick("contact")}
             className={`px-6 py-2 rounded text-center text-[#4C5560] cursor-pointer font-medium ${
               activeTab === "contact" ? "bg-white" : ""
             }`}
           >
             Contact
-          </p>
-          <p
+          </button>
+          <button
             onClick={() => handleClick("account-officers")}
             className={`px-6 py-2 rounded text-center text-[#4C5560] cursor-pointer font-medium ${
               activeTab === "account-officers" ? "bg-white" : ""
             }`}
           >
             Account officers
-          </p>
+          </button>
         </div>
       </div>
 
@@ -341,7 +343,7 @@ export default function AccountOfficerInfo() {
         <h2 className="text-[#116114] font-medium mb-4">Account Officers</h2>
         <div className="bg-white rounded-md shadow overflow-hidden">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center py-12 h-[60vh]">
               <div className="flex flex-col items-center space-y-4">
                 <Loader2 className="h-8 w-8 animate-spin text-[#116114]" />
                 <p className="text-sm text-gray-600">
@@ -600,11 +602,11 @@ function AddAgent({ onBack }: { onBack: () => void }) {
     <div className="min-h-screen p-6">
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center space-x-1 text-[#858C95]">
-          <span>Admin</span>
+          <Link href="/main-admin/" className="cursor-pointer">
+            Admin
+          </Link>
           <span className="text-xl text-[#858C95]">/</span>
-          <span className="font-medium text-xl text-[#116114]">
-            Contact Page
-          </span>
+          <span className="font-medium  text-[#116114]">Contact Page</span>
         </div>
       </div>
       <div className="p-6 bg-white space-y-8">
@@ -656,7 +658,7 @@ function AddAgent({ onBack }: { onBack: () => void }) {
             onClick={onBack}
             className="text-[#323539] flex items-center gap-2 hover:text-[#323539] text-sm"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" />
             Back to page
           </button>
         </div>
