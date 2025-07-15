@@ -60,13 +60,21 @@ function BecomeAnAgent() {
               <span className="text-green-700">
                 <MdCall />
               </span>
-              {isContactLoading ? "Loading..." : agent?.phone || "N/A"}
+              {isContactLoading ? (
+                <span className="inline-block w-24 h-4 bg-gray-200 rounded animate-pulse" />
+              ) : (
+                agent?.phone || null
+              )}
             </p>
             <p className="flex items-center gap-4">
               <span className="text-green-700">
                 <IoMdMail />
               </span>{" "}
-              {isContactLoading ? "Loading..." : agent?.email || "N/A"}
+              {isContactLoading ? (
+                <span className="inline-block w-32 h-4 bg-gray-200 rounded animate-pulse" />
+              ) : (
+                agent?.email || null
+              )}
             </p>
           </div>
         </div>

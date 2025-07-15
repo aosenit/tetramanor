@@ -7,6 +7,7 @@ import Pagination from "./Pagination";
 import Link from "next/link";
 import placeholder from "@/assets/placeholder.svg";
 import { useFetchData } from "@/hooks/useApi";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const BlogSkeleton = () => (
   <div className="space-y-10">
@@ -51,52 +52,65 @@ const Blogs: React.FC = () => {
     }));
   }
 
+  if (isLoading) {
+    return (
+      <div className="space-y-10">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="h-full overflow-y-auto rounded-md">
+            <Skeleton className="w-full h-60 mb-4 rounded" />
+            <div className="space-y-4 p-4 bg-[#f1f4f1]">
+              <Skeleton className="h-6 w-1/2 mb-2" />
+              <Skeleton className="h-4 w-2/3 mb-2" />
+              <Skeleton className="h-8 w-32" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (!blogPosts || blogPosts.length === 0) return null;
   return (
     <div>
-      {isLoading ? (
-        <BlogSkeleton />
-      ) : (
-        <div className="space-y-10">
-          {blogPosts.map((post) => (
-            <div key={post.id} className="h-full overflow-y-auto  rounded-md">
-              <Image
-                src={post.image}
-                alt={post.title}
-                className="w-full object-cover"
-                width={1000}
-                height={1000}
-              />
-              <div className="space-y-4 p-4 bg-[#f1f4f1]">
-                <h5 className="text-xl font-semibold">{post.title}</h5>
-                <p className="text-black text-justify leading-relaxed">
-                  {post.description}
-                </p>
-                <div className="flex justify-between items-center">
-                  <Link
-                    href={{
-                      pathname: `/blog/blog-id`,
-                      query: { slug: post.slug },
-                    }}
-                    className="px-6 py-2 bg-[#116114] text-sm text-white"
-                  >
-                    Continue Reading
-                  </Link>
-                  <div className="flex gap-6">
-                    <p className="text-sm text-black flex items-center gap-2">
-                      <IoIosBriefcase className="text-[#eb8a43]" />
-                      {post.date}
-                    </p>
-                    <p className="text-sm text-black flex items-center gap-2">
-                      <FaTag className="text-[#eb8a43]" />
-                      {post.tag}
-                    </p>
-                  </div>
+      <div className="space-y-10">
+        {blogPosts.map((post: any) => (
+          <div key={post.id} className="h-full overflow-y-auto  rounded-md">
+            <Image
+              src={post.image}
+              alt={post.title}
+              className="w-full object-cover"
+              width={1000}
+              height={1000}
+            />
+            <div className="space-y-4 p-4 bg-[#f1f4f1]">
+              <h5 className="text-xl font-semibold">{post.title}</h5>
+              <p className="text-black text-justify leading-relaxed">
+                {post.description}
+              </p>
+              <div className="flex justify-between items-center">
+                <Link
+                  href={{
+                    pathname: `/blog/blog-id`,
+                    query: { slug: post.slug },
+                  }}
+                  className="px-6 py-2 bg-[#116114] text-sm text-white"
+                >
+                  Continue Reading
+                </Link>
+                <div className="flex gap-6">
+                  <p className="text-sm text-black flex items-center gap-2">
+                    <IoIosBriefcase className="text-[#eb8a43]" />
+                    {post.date}
+                  </p>
+                  <p className="text-sm text-black flex items-center gap-2">
+                    <FaTag className="text-[#eb8a43]" />
+                    {post.tag}
+                  </p>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
+      </div>
       <div className="flex justify-between items-center mt-10 max-w-md mx-auto">
         <Pagination />
       </div>

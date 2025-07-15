@@ -17,7 +17,7 @@ const MapSection = () => {
       <h2 className="text-2xl font-bold mb-4">Location of Our Offices</h2>
       <div className="relative w-full h-96 rounded-lg overflow-hidden">
         {isContactLoading ? (
-          <div className="flex items-center justify-center w-full h-full">Loading map...</div>
+          <div className="w-full h-full bg-gray-200 animate-pulse rounded-lg" />
         ) : officeAddress ? (
           <>
             <iframe
@@ -41,14 +41,14 @@ const MapSection = () => {
               </div>
             </div>
           </>
-        ) : (
-          <div className="flex items-center justify-center w-full h-full text-red-500">Office address not available</div>
-        )}
+        ) : null}
       </div>
       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
         <h3 className="font-semibold text-gray-800 mb-2">Office Address</h3>
         <p className="text-gray-600 text-sm">
-          {isContactLoading ? "Loading..." : officeAddress || "Not available"}
+          {isContactLoading ? (
+            <span className="inline-block w-32 h-4 bg-gray-200 rounded animate-pulse" />
+          ) : officeAddress ? officeAddress : null}
         </p>
       </div>
     </section>

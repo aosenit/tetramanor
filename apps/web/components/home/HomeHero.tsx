@@ -101,12 +101,15 @@ const HomeHero = () => {
             </button>
           </DialogClose>
           {isLoading ? (
-            <div className="py-8 text-center">Loading...</div>
-          ) : error ? (
-            <div className="py-8 text-center text-red-500">
-              Failed to load properties.
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-8">
+              {[...Array(2)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-gray-200 rounded-lg h-40 animate-pulse"
+                />
+              ))}
             </div>
-          ) : properties.length === 0 ? (
+          ) : error ? null : properties.length === 0 ? (
             <div className="py-8 text-center">No properties found.</div>
           ) : (
             <>

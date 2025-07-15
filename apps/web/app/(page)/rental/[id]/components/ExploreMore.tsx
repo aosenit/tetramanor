@@ -82,10 +82,12 @@ function ExploreMore() {
         Explore More Properties
       </h1>
       {isLoading ? (
-        <div className="text-center py-8">Loading...</div>
-      ) : error ? (
-        <div className="text-center py-8 text-red-500">Failed to load properties.</div>
-      ) : (
+        <div className="flex overflow-x-auto gap-4 mt-10 pb-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="min-w-[320px] max-w-sm h-[400px] bg-gray-200 rounded animate-pulse" />
+          ))}
+        </div>
+      ) : error ? null : (
         <div className="flex overflow-x-auto gap-4 mt-10 scrollbar-hide pb-4">
           {properties.map((property: any) => (
             <PropertyCard key={property.id} {...property} />

@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type FeaturedPropertyImage = {
   id: string;
@@ -57,7 +58,7 @@ type FeaturedPropertyResponse = {
   statusCode: number;
 };
 
-export default function  HomeFeaturedProperty() {
+export default function HomeFeaturedProperty() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalProps, setModalProps] = useState<{
     id: string;
@@ -73,21 +74,23 @@ export default function  HomeFeaturedProperty() {
   if (isLoading) {
     return (
       <section className="w-full container mx-auto px-4 lg:px-16 py-12">
-        <div className="text-center py-20 text-lg">
-          Loading featured property...
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          <div className="relative w-full lg:w-[55%] h-[400px] sm:h-[500px] lg:h-[610px]">
+            <Skeleton className="w-full h-full rounded-xl" />
+          </div>
+          <div className="w-full lg:w-[45%] flex flex-col gap-6">
+            <Skeleton className="h-12 w-2/3 mb-4" />
+            <Skeleton className="h-6 w-1/2 mb-2" />
+            <Skeleton className="h-6 w-1/3 mb-2" />
+            <Skeleton className="h-10 w-32" />
+          </div>
         </div>
       </section>
     );
   }
 
   if (error || !featured) {
-    return (
-      <section className="w-full container mx-auto px-4 lg:px-16 py-12">
-        <div className="text-center py-20 text-lg text-red-500">
-          Failed to load featured property.
-        </div>
-      </section>
-    );
+    return null;
   }
 
   return (
@@ -116,7 +119,7 @@ export default function  HomeFeaturedProperty() {
                 <div className="text-white text-sm flex items-center gap-2">
                   {featured.address}
                 </div>
-                <div className="text-white text-2xl font-bold">
+                <div className="text-white text-xl max-w-xs font-bold">
                   {featured.name}
                 </div>
               </div>
@@ -132,7 +135,7 @@ export default function  HomeFeaturedProperty() {
                     });
                   }}
                   size="sm"
-                  className="bg-white text-[#202020] font-semibold rounded px-6 py-2 shadow-none text-base w-full md:w-auto"
+                  className="bg-white text-[#202020] font-semibold rounded px-6 py-2 shadow-none text-base w-full md:w-fit"
                 >
                   Download brochure
                 </Button>

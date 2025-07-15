@@ -246,6 +246,19 @@ export default function PropertyListing() {
     });
   };
 
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-8">
+        {[...Array(3)].map((_, i) => (
+          <PropertyCardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+  if (error) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 lg:px-16 py-12">
@@ -317,19 +330,7 @@ export default function PropertyListing() {
         </div>
 
         {/* Properties Grid */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <PropertyCardSkeleton key={index} />
-            ))}
-          </div>
-        ) : error ? (
-          <div className="text-center py-16">
-            <p className="text-red-600">
-              Error loading properties. Please try again.
-            </p>
-          </div>
-        ) : properties.length === 0 ? (
+        {properties.length === 0 ? (
           <EmptyState />
         ) : (
           <>

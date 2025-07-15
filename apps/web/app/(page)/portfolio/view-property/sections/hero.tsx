@@ -7,6 +7,7 @@ import Header from "../../components/header";
 import Modal from "./modal";
 import placeholder from "@/assets/placeholder.jpg";
 import { Property } from "../../types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 interface HeroProps {
@@ -16,6 +17,7 @@ interface HeroProps {
 const HomeHero = ({ property }: HeroProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const image = property.images?.find(img => img.isPrimary)?.imageUrl || property.images?.[0]?.imageUrl || placeholder;
+  if (!property) return null;
   return (
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
