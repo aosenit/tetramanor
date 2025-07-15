@@ -1,3 +1,5 @@
+// DEPRECATED: Do not use in user-facing (non-admin) pages. Use skeleton loaders instead for all loading states.
+// This Loader is retained for admin or fallback contexts only.
 "use client";
 
 import Image from "next/image";

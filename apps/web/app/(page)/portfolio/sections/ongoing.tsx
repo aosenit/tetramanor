@@ -29,10 +29,12 @@ function Ongoing() {
         Ongoing Projects
       </h2>
       {isLoading ? (
-        <div>Loading...</div>
-      ) : error ? (
-        <div className="text-red-500">Failed to load properties</div>
-      ) : (
+        <div className="grid md:grid-cols-2 gap-6">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-full min-h-[400px] bg-gray-200 rounded animate-pulse" />
+          ))}
+        </div>
+      ) : error ? null : (
         <>
           <div className="grid md:grid-cols-2 gap-6">
             {/* Left: First card spans full height */}

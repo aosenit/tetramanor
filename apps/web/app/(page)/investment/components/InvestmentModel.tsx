@@ -70,10 +70,10 @@ export default function InvestmentModels() {
   // Defensive: data?.data is the array of investments
   const investments = data?.data || [];
   const fixedROI = investments.filter(
-    (inv: any) => inv.type === "FIXED_ROI"
+    (inv: any) => inv.investmentType === "FIXED_ROI"
   );
   const equityShare = investments.filter(
-    (inv: any) => inv.type === "EQUITY_SHARE"
+    (inv: any) => inv.investmentType === "EQUITY_SHARE"
   );
 
   return (
@@ -113,11 +113,7 @@ export default function InvestmentModels() {
         </div>
         <div>
           {isLoading && <InvestmentModelSkeleton />}
-          {error && (
-            <div className="py-10 text-center text-red-500">
-              Failed to load investments.
-            </div>
-          )}
+          {error && null}
           {!isLoading && !error && (
             <>
               {activeTab === "fixed-roi" && <TabOne investments={fixedROI} />}

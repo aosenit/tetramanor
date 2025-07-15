@@ -5,6 +5,7 @@ import React, { useRef } from "react";
 import placeholder from "@/assets/placeholder.jpg";
 import { IconButton, Box, Flex } from "@chakra-ui/react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface MorePicturesProps {
   property: Property;

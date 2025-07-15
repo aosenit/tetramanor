@@ -3,7 +3,7 @@ import Image from "next/image";
 import placeholder from "@/assets/placeholder.jpg";
 import { useRouter } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
-
+import { Skeleton } from "@/components/ui/skeleton";
 
 type PropertyImage = {
   id: string;
@@ -108,12 +108,18 @@ export default function FindNextHome() {
         </div>
         {/* Image with Overlay Card */}
         {isLoading ? (
-          <div className="text-center py-20 text-lg">Loading rental...</div>
-        ) : error || !rental || !property ? (
-          <div className="text-center py-20 text-lg text-red-500">
-            Failed to load rental.
+          <div className="relative w-full max-w-full h-[500px] lg:h-[600px] rounded-[5px] overflow-hidden">
+            <Skeleton className="w-full h-full rounded-xl" />
+            <div className="absolute top-6 left-2 lg:left-6">
+              <Skeleton className="h-8 w-32 rounded-full" />
+            </div>
+            <div className="absolute left-1/2 -translate-x-1/2 lg:left-6  lg:-translate-x-0  bottom-6 w-[95%]  bg-white p-4  lg:p-8 flex flex-col gap-4 shadow-lg">
+              <Skeleton className="h-8 w-1/2 mb-2" />
+              <Skeleton className="h-6 w-2/3 mb-2" />
+              <Skeleton className="h-10 w-32" />
+            </div>
           </div>
-        ) : (
+        ) : error || !rental || !property ? null : (
           <div className="relative w-full max-w-full h-[500px] lg:h-[600px] rounded-[5px] overflow-hidden">
             <Image
               src={

@@ -31,10 +31,15 @@ export default function ViewMorePortfolio() {
         {isOngoing ? "All Ongoing Projects" : "All Completed Projects"}
       </h2>
       {isLoading ? (
-        <div className="text-center">Loading...</div>
-      ) : error ? (
-        <div className="text-center text-red-500">Failed to load properties</div>
-      ) : properties.length === 0 ? (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="h-full min-h-[400px] bg-gray-200 rounded animate-pulse"
+            />
+          ))}
+        </div>
+      ) : error ? null : properties.length === 0 ? (
         <div className="text-center">No properties found.</div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -44,7 +49,11 @@ export default function ViewMorePortfolio() {
               image={property.images[0]?.imageUrl}
               title={property.name}
               location={property.address}
-              status={property.constructionStatus === "ONGOING" ? "Ongoing" : property.status}
+              status={
+                property.constructionStatus === "ONGOING"
+                  ? "Ongoing"
+                  : property.status
+              }
               className="h-full min-h-[400px]"
               slug={property.id}
             />
@@ -52,7 +61,11 @@ export default function ViewMorePortfolio() {
         </div>
       )}
       <div className="flex justify-center mt-12">
-        <Button variant="outline" size="lg" onClick={() => window.history.back()}>
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={() => window.history.back()}
+        >
           Back
         </Button>
       </div>

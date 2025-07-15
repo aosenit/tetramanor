@@ -4,8 +4,11 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import Header from "../../portfolio/components/header";
 import one from "@/assets/rental/one.webp"
+import { Skeleton } from "@/components/ui/skeleton";
 
 const HomeHero = () => {
+  // If you want to add loading/error logic, you can pass a prop or use context. For now, just add a skeleton fallback example:
+  // Example: if (isLoading) return <Skeleton className="h-[60vh] w-full" />;
   return (
     <section className="relative h-[60vh] overflow-hidden">
       <Header />

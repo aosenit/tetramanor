@@ -29,10 +29,15 @@ function Completed() {
         Completed Projects
       </h2>
       {isLoading ? (
-        <div>Loading...</div>
-      ) : error ? (
-        <div className="text-red-500">Failed to load properties</div>
-      ) : (
+        <div className="grid gap-6">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="h-full min-h-[400px] bg-gray-200 rounded animate-pulse"
+            />
+          ))}
+        </div>
+      ) : error ? null : (
         <>
           <div className="grid gap-6">
             {/* Top: First card spans full width */}
@@ -44,7 +49,11 @@ function Completed() {
                   image={properties[0].images[0]?.imageUrl}
                   title={properties[0].name}
                   location={properties[0].address}
-                  status={properties[0].status === "SOLDOUT" ? "Sold Out" : properties[0].status}
+                  status={
+                    properties[0].status === "SOLDOUT"
+                      ? "Sold Out"
+                      : properties[0].status
+                  }
                   className="h-full min-h-[400px]"
                 />
               </div>
@@ -58,14 +67,21 @@ function Completed() {
                   image={property.images[0]?.imageUrl}
                   title={property.name}
                   location={property.address}
-                  status={property.status === "SOLDOUT" ? "Sold Out" : property.status}
+                  status={
+                    property.status === "SOLDOUT" ? "Sold Out" : property.status
+                  }
                   className="h-full min-h-[400px]"
                 />
               ))}
             </div>
           </div>
           <div className="flex justify-center mt-8">
-            <Button size="lg" onClick={() => router.push("/portfolio/view-more?type=completed")}>View More</Button>
+            <Button
+              size="lg"
+              onClick={() => router.push("/portfolio/view-more?type=completed")}
+            >
+              View More
+            </Button>
           </div>
         </>
       )}

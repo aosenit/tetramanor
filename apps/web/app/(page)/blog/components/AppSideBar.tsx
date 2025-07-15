@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useFetchData } from "@/hooks/useApi";
 import placeholder from "@/assets/placeholder.jpg";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Props {
   children?: ReactNode;
@@ -20,9 +21,20 @@ const AppSideBar: React.FC<Props> = ({ children }) => {
       <aside className="lg:w-1/3 space-y-4">
         <h1 className="text-xl font-semibold mb-4">Featured Post</h1>
         {isLoading ? (
-          <div className="text-gray-500">Loading...</div>
-        ) : error ? (
-          <div className="text-red-500">Failed to load featured posts.</div>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="flex gap-4 max-w-md items-start p-3 bg-[#f3f5f3] rounded-md shadow-sm"
+              >
+                <Skeleton className="w-[100px] h-[60px] rounded-md flex-shrink-0" />
+                <div className="flex flex-col gap-2 line-clamp-3 w-full">
+                  <Skeleton className="h-4 w-1/2 mb-2" />
+                  <Skeleton className="h-3 w-2/3" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : blogs.length > 0 ? (
           blogs.map((item: any) => (
             <Link
@@ -48,9 +60,7 @@ const AppSideBar: React.FC<Props> = ({ children }) => {
               </div>
             </Link>
           ))
-        ) : (
-          <div className="text-gray-500">No featured posts found.</div>
-        )}
+        ) : null}
       </aside>
     </div>
   );

@@ -65,20 +65,33 @@ function ContactForm() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 border  gap-6 p-6">
                 {isContactLoading ? (
-                  <p>Loading contact info...</p>
-                ) : contactError ? (
-                  <p className="text-red-500">Failed to load contact info</p>
-                ) : contact ? (
+                  <div className="flex gap-4">
+                    {[...Array(3)].map((_, i) => (
+                      <span
+                        key={i}
+                        className="inline-block w-32 h-6 bg-gray-200 rounded animate-pulse"
+                      />
+                    ))}
+                  </div>
+                ) : contactError ? null : contact ? (
                   <>
                     {/* Phone */}
-                    <a href={`tel:${contact.phoneNumber}`} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={`tel:${contact.phoneNumber}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <p className="flex items-center gap-4">
                         <FaPhone className="text-green-700" />
                         {contact.phoneNumber}
                       </p>
                     </a>
                     {/* Email */}
-                    <a href={`mailto:${contact.companyEmail}`} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={`mailto:${contact.companyEmail}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <p className="flex items-center gap-4">
                         <IoMdMail className="text-green-700" />
                         {contact.companyEmail}
@@ -86,7 +99,10 @@ function ContactForm() {
                     </a>
                     {/* Address */}
                     <a
-                      href={contact.mapEmbedCode || `https://maps.google.com/?q=${encodeURIComponent(contact.officeAddress)}`}
+                      href={
+                        contact.mapEmbedCode ||
+                        `https://maps.google.com/?q=${encodeURIComponent(contact.officeAddress)}`
+                      }
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -206,7 +222,32 @@ function ContactForm() {
                 disabled={isSending}
                 className="bg-green-700 text-white font-semibold py-3 rounded mt-10 w-full md:col-span-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSending ? "Sending..." : "Send message"}
+                {isSending ? (
+                  <span className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin h-5 w-5 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      ></path>
+                    </svg>
+                  </span>
+                ) : (
+                  "Send message"
+                )}
               </button>
             </form>
           </div>

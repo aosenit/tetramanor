@@ -63,10 +63,30 @@ export default function OngoingCampaigns() {
   };
 
   if (isLoading) {
-    return <div className="text-center py-20 text-lg">Loading campaigns...</div>;
+    return (
+      <section className="bg-white w-full">
+        <div className="container mx-auto px-4 lg:px-16 py-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-black mb-2 text-center">
+            Ongoing Campaigns
+          </h2>
+          <div className="text-gray-700 text-base mb-10 text-center">
+            Stay informed with our latest updates, announcements, and
+            opportunities.
+          </div>
+          <div className="flex gap-4">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="min-w-[220px] sm:min-w-[250px] md:min-w-[260px] lg:min-w-[280px] aspect-[3/4] bg-gray-200 rounded-lg animate-pulse"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
   }
   if (error) {
-    return <div className="text-center py-20 text-lg text-red-500">Failed to load campaigns.</div>;
+    return null;
   }
 
   return (
@@ -85,14 +105,18 @@ export default function OngoingCampaigns() {
               aria-label="Scroll left"
               onClick={() => scroll("left")}
               className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
               <FaChevronLeft />
             </button>
           )}
           <div
             className="flex overflow-x-auto gap-4 md:gap-6 pb-2 scrollbar-hide"
-            style={{ WebkitOverflowScrolling: 'touch' }}
+            style={{ WebkitOverflowScrolling: "touch" }}
             ref={scrollRef}
           >
             {campaigns.map((c, i) => (
@@ -123,7 +147,11 @@ export default function OngoingCampaigns() {
               aria-label="Scroll right"
               onClick={() => scroll("right")}
               className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
               <FaChevronRight />
             </button>
@@ -135,8 +163,9 @@ export default function OngoingCampaigns() {
         <ModalContent>
           <ModalCloseButton />
           <ModalBody>
-            <div className="text-gray-700 text-base">
-              {selectedCampaign?.description}
+            <div className="text-gray-700 space-y-4 text-base">
+              <p>{selectedCampaign?.title}</p>
+              <p>{selectedCampaign?.description}</p>
             </div>
           </ModalBody>
         </ModalContent>
