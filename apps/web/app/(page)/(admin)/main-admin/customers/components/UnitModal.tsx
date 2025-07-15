@@ -92,6 +92,7 @@ export default function AddUnitModal({
 }) {
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
+  const [unitTypes, setUnitTypes] = useState<string[]>([]);
 
   // State management
   const [selectedProperty, setSelectedProperty] = useState<string>("");
@@ -295,7 +296,12 @@ export default function AddUnitModal({
                   <Label className="text-sm font-medium">Property</Label>
                   <Select
                     value={selectedProperty}
-                    onValueChange={setSelectedProperty}
+                    onValueChange={(value) => {
+                      setSelectedProperty(value);
+                      setUnitTypes(
+                        properties.find((p) => p.id === value)?.unitTypes || []
+                      );
+                    }}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Choose a property" />
@@ -497,9 +503,9 @@ export default function AddUnitModal({
                           <SelectValue placeholder="Select unit type" />
                         </SelectTrigger>
                         <SelectContent>
-                          {unitTypeOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
+                          {unitTypes?.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -611,7 +617,7 @@ export default function AddUnitModal({
                         </div>
                         {unit.price > 0 && (
                           <div className="flex items-center gap-1 text-green-600 font-medium">
-                            <DollarSign className="h-3 w-3" />₦
+                            {unit.currency === "NGN" ? "₦ " : "$ "}
                             {unit.price.toLocaleString()}
                           </div>
                         )}

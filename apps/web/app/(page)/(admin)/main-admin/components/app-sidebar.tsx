@@ -10,7 +10,8 @@ import {
   SidebarMenuItem,
 } from "./sidebar";
 import Image from "next/image";
-import logo from "@/assets/full-logo.png";
+import logo from "@/assets/tmlogo.png";
+
 import {
   LayoutDashboard,
   Home,
@@ -32,7 +33,6 @@ import { toast } from "sonner";
 
 export const route = "/main-admin";
 
-
 export function AppSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -45,9 +45,9 @@ export function AppSidebar() {
           <Image
             src={logo}
             alt="logo"
-            width={100}
-            height={100}
-            className="w-40 object-contain"
+            width={30}
+            height={30}
+            className="w-16 object-contain"
           />
         </div>
       </SidebarHeader>

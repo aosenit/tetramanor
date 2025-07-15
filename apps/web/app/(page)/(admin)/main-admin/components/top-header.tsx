@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Bell, Menu } from "lucide-react";
+import { Search, Bell, Menu, AlignJustify } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,6 @@ export function TopHeader() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const { data: notifications } = useFetchData("notifications");
-  console.log(notifications);
 
   return (
     <header className="bg-[#323539] border-b border-gray-700 px-6 py-4">
@@ -24,13 +23,13 @@ export function TopHeader() {
             className="md:hidden text-white hover:bg-gray-700"
             onClick={() => setOpenMobile(true)}
           >
-            <Menu className="h-5 w-5" />
+            <AlignJustify size={32} />
           </Button>
           <div>
-            <h1 className="text-2xl font-semibold text-white">
+            <h1 className="text-sm md:text-2xl font-semibold text-white">
               Hello {user?.name},
             </h1>
-            <p className="text-gray-300">Welcome back</p>
+            <p className="text-xs md:text-base text-gray-300">Welcome back</p>
           </div>
         </div>
 
@@ -46,9 +45,9 @@ export function TopHeader() {
           <Button
             variant="ghost"
             size="icon"
-            className="relative text-white hover:bg-gray-700"
+            className="block relative text-white hover:bg-gray-700"
           >
-            <Bell className="h-5 w-5" />
+            <Bell className="" />
             {notifications?.length > 0 && (
               <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
                 {notifications?.length}

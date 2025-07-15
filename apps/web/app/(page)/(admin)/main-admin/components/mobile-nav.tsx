@@ -24,7 +24,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { route } from "./app-sidebar";
 import Image from "next/image";
-import logo from "@/assets/full-logo.png";
+import logo from "@/assets/tmlogo.png";
 
 const menuItems = [
   {
@@ -94,9 +94,9 @@ export function MobileNav() {
             <Image
               src={logo}
               alt="logo"
-              width={100}
-              height={100}
-              className="w-40 object-contain"
+              width={30}
+              height={30}
+              className="w-16 object-contain"
             />
           </SheetTitle>
         </SheetHeader>

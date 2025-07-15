@@ -169,11 +169,6 @@ function CustomersPageContent() {
 
   const users = data?.data?.items || [];
   const totalPages = data?.data?.total ? Math.ceil(data.data.total / limit) : 0;
-  const totalUsers = data?.data?.total || 0;
-
-  // Calculate stats from API data
-  const verifiedUsers = users.filter((user) => user.kycStatus).length;
-  const unverifiedUsers = users.filter((user) => !user.kycStatus).length;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -233,7 +228,9 @@ function CustomersPageContent() {
       <div className="">
         <div className="flex border-b border-[#E5E5E7] pb-4 items-center justify-between">
           <div className="flex items-center space-x-1  text-[#858C95]">
-            <span>Home</span>
+            <Link href="/main-admin/homepage/">
+              <span>Home</span>{" "}
+            </Link>
             <span className="text-xl text-[#858C95]">/</span>
             <span className="font-medium text-xl text-[#116114]">
               Customer management

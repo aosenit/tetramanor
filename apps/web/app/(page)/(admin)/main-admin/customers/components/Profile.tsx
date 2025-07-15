@@ -273,7 +273,9 @@ export default function Profile() {
     <div className="min-h-screen space-y-6">
       <div className="border-b border-[#E5E5E7] pb-4">
         <div className="flex items-center space-x-1 text-[#858C95]">
-          <span>Home</span>
+          <Link href="/main-admin/homepage/">
+            <span>Home</span>{" "}
+          </Link>
           <span className="text-xl text-[#858C95]">/</span>
           <span className="font-medium text-xl text-[#116114]">
             Customer management

@@ -134,7 +134,10 @@ export default function PropertyDetails() {
     <div className="p-6 space-y-8">
       {/* Breadcrumb */}
       <div className="text-xs text-[#4C5560] font-medium">
-        Customer's properties /{" "}
+        <button onClick={() => router.back()} className="text-sm">
+          Customer's properties
+        </button>{" "}
+        <span className="text-xl text-[#858C95]">/ </span>
         <span className="text-[#116114] text-sm font-medium">
           {propertyLabel}
         </span>
