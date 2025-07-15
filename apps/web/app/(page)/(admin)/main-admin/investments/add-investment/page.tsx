@@ -10,27 +10,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@chakra-ui/react";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
 import { IoImageOutline } from "react-icons/io5";
 import { MdArrowBackIosNew } from "react-icons/md";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, X, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  useUploadData,
-  useFetchData,
-  useUploadPatchData,
-  useUploadPutData,
-} from "@/hooks/useApi";
+import { useUploadData, useFetchData, useUploadPutData } from "@/hooks/useApi";
 import { CustomDropdown } from "./components/CustomDropdown";
+import Image from "next/image";
+import Loader from "@/components/Loader";
 
 interface FormData {
   projectName: string;
@@ -45,14 +34,9 @@ interface FormData {
   brochurePDF?: File;
   featuredImage?: File;
   offerEndDate: string;
-  whyInvest: {
-    title: string;
-    description: string;
-    advantages: Array<{
-      title: string;
-      description: string;
-    }>;
-  };
+  projectSize?: string;
+  numberOfPartners?: string;
+  benefits: string[];
 }
 
 const defaultFormData: FormData = {
@@ -65,16 +49,9 @@ const defaultFormData: FormData = {
   currency: "NGN",
   description: "",
   offerEndDate: "",
-  whyInvest: {
-    title: "",
-    description: "",
-    advantages: [
-      {
-        title: "",
-        description: "",
-      },
-    ],
-  },
+  projectSize: "",
+  numberOfPartners: "",
+  benefits: [],
 };
 
 function AddInvestmentContent() {
@@ -87,15 +64,8 @@ function AddInvestmentContent() {
   const [imageName, setImageName] = useState("Featured Image");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  // Why Invest dialog state
-  const [advantageDialogOpen, setAdvantageDialogOpen] = useState(false);
-  const [editingAdvantageIndex, setEditingAdvantageIndex] = useState<
-    number | null
-  >(null);
-  const [advantageDraft, setAdvantageDraft] = useState({
-    title: "",
-    description: "",
-  });
+  // Benefits state
+  const [newBenefit, setNewBenefit] = useState("");
 
   // Fetch investment data for editing
   const {
@@ -134,11 +104,9 @@ function AddInvestmentContent() {
         offerEndDate: investment.offerEndDate
           ? new Date(investment.offerEndDate).toISOString().split("T")[0]
           : "",
-        whyInvest: investment.whyInvest || {
-          title: "",
-          description: "",
-          advantages: [{ title: "", description: "" }],
-        },
+        projectSize: investment.projectSize || 0,
+        numberOfPartners: investment.numberOfPartners || 0,
+        benefits: investment.benefits || [],
       });
 
       if (investment?.image[0]) {
@@ -183,65 +151,29 @@ function AddInvestmentContent() {
     setImageName("Featured Image");
   };
 
-  // Why Invest dialog handlers
-  const openAddAdvantageDialog = () => {
-    setEditingAdvantageIndex(null);
-    setAdvantageDraft({ title: "", description: "" });
-    setAdvantageDialogOpen(true);
-  };
-
-  const openEditAdvantageDialog = (index: number) => {
-    setEditingAdvantageIndex(index);
-    setAdvantageDraft({
-      title: formData.whyInvest.advantages[index].title,
-      description: formData.whyInvest.advantages[index].description,
-    });
-    setAdvantageDialogOpen(true);
-  };
-
-  const handleAdvantageDialogSave = () => {
-    if (!advantageDraft.title.trim() || !advantageDraft.description.trim())
-      return;
-    let newAdvantages = [...formData.whyInvest.advantages];
-    if (editingAdvantageIndex !== null) {
-      newAdvantages[editingAdvantageIndex] = { ...advantageDraft };
-    } else {
-      newAdvantages.push({ ...advantageDraft });
+  // Benefits handlers
+  const addBenefit = () => {
+    if (newBenefit.trim()) {
+      setFormData((prev) => ({
+        ...prev,
+        benefits: [...prev.benefits, newBenefit.trim()],
+      }));
+      setNewBenefit("");
     }
-    setFormData((prev) => ({
-      ...prev,
-      whyInvest: { ...prev.whyInvest, advantages: newAdvantages },
-    }));
-    setAdvantageDialogOpen(false);
   };
 
-  const handleAdvantageDialogCancel = () => {
-    setAdvantageDialogOpen(false);
-  };
-
-  const handleRemoveAdvantage = (index: number) => {
+  const removeBenefit = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      whyInvest: {
-        ...prev.whyInvest,
-        advantages: prev.whyInvest.advantages.filter((_, i) => i !== index),
-      },
+      benefits: prev.benefits.filter((_, i) => i !== index),
     }));
   };
 
   const handleSubmit = (e: React.FormEvent, action: "publish" | "draft") => {
     e.preventDefault();
 
-    // Filter out empty advantages
-    const cleanedFormData = {
-      ...formData,
-      whyInvest: formData.whyInvest.advantages.filter(
-        (adv) => adv.title.trim() !== "" && adv.description.trim() !== ""
-      ),
-    };
-
     const submitData = {
-      ...cleanedFormData,
+      ...formData,
       status: action === "publish" ? "PUBLISHED" : "DRAFT",
     };
 
@@ -253,8 +185,8 @@ function AddInvestmentContent() {
       if (value !== undefined && value !== null && value !== "") {
         if (typeof value === "object" && value instanceof File) {
           formDataToSend.append(key, value);
-        } else if (key === "whyInvest") {
-          // Handle whyInvest as JSON string
+        } else if (key === "benefits") {
+          // Handle benefits as JSON string
           formDataToSend.append(key, JSON.stringify(value));
         } else {
           formDataToSend.append(key, String(value));
@@ -277,10 +209,6 @@ function AddInvestmentContent() {
         },
       });
     }
-  };
-
-  const handleCancel = () => {
-    router.push("/main-admin/investments");
   };
 
   if (isLoadingInvestment) {
@@ -463,6 +391,44 @@ function AddInvestmentContent() {
           />
         </div>
 
+        {/* Project Size & Number of Partners */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <label className="block mb-1 text-sm text-[#323539] font-medium">
+              Project Size
+            </label>
+            <Input
+              type="number"
+              placeholder="Enter project size"
+              className="bg-[#E5E5E7] border-none"
+              value={formData.projectSize}
+              onChange={(e) =>
+                handleInputChange(
+                  "projectSize",
+                  parseFloat(e.target.value) || 0
+                )
+              }
+            />
+          </div>
+          <div>
+            <label className="block mb-1 text-sm text-[#323539] font-medium">
+              Number of Partners
+            </label>
+            <Input
+              type="number"
+              placeholder="Enter number of partners"
+              className="bg-[#E5E5E7] border-none"
+              value={formData.numberOfPartners}
+              onChange={(e) =>
+                handleInputChange(
+                  "numberOfPartners",
+                  parseFloat(e.target.value) || 0
+                )
+              }
+            />
+          </div>
+        </div>
+
         {/* Description */}
         <div>
           <label className="block mb-1 text-sm text-[#181818] font-medium">
@@ -477,126 +443,100 @@ function AddInvestmentContent() {
           />
         </div>
 
-        {/* Why Invest Section */}
+        {/* Benefits Section */}
         <div>
-          <h4 className="font-medium text-[#4C5560] mb-4">Why Invest? </h4>
+          <h4 className="font-medium text-[#4C5560] mb-4">Benefits</h4>
           <div className="flex flex-col gap-4">
-            {formData.whyInvest.advantages
-              .filter(
-                (advantage) =>
-                  advantage.title.trim() !== "" &&
-                  advantage.description.trim() !== ""
-              )
-              .map((advantage, index) => (
+            <div className="flex gap-2 flex-wrap">
+              {formData.benefits.map((benefit, index) => (
                 <div
                   key={index}
-                  className="bg-gray-100 p-4 rounded-md flex justify-between items-center"
+                  className="bg-gray-100 p-4 rounded-md flex justify-between items-center w-fit"
                 >
-                  <div>
-                    <p className="font-medium text-[#181818]">
-                      {advantage.title}
-                    </p>
-                    <p className="text-[#4C5560] text-sm">
-                      {advantage.description}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openEditAdvantageDialog(index)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemoveAdvantage(index)}
-                    >
-                      Remove
-                    </Button>
-                  </div>
+                  <p className="font-medium text-[#181818]">{benefit}</p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeBenefit(index)}
+                  >
+                    <Trash className="w-4 h-4" />
+                  </Button>
                 </div>
               ))}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={openAddAdvantageDialog}
-              className="text-[#116114] hover:text-[#116114] text-sm"
-            ></Button>
+            </div>
+
+            <div className="flex gap-2">
+              <Input
+                placeholder="Enter a benefit"
+                value={newBenefit}
+                onChange={(e) => setNewBenefit(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addBenefit();
+                  }
+                }}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addBenefit}
+                className="text-[#116114] hover:text-[#116114] text-sm"
+              >
+                Add
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Upload Buttons - Show for both new and editing */}
-        <div className="flex flex-wrap items-center gap-10">
-          <div className="space-y-4">
-            <FileUpload
-              label={imageName}
-              icon={<IoImageOutline />}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  handleFileChange("featuredImage", file);
-                }
-              }}
-              accept="image/*"
-            />
+        <div className="">
+          <h4 className="font-medium text-[#4C5560] mb-4">Featured Image</h4>
+          <div className="flex flex-wrap items-center gap-10">
+            <div className="space-y-4">
+              <FileUpload
+                label={imageName}
+                icon={<IoImageOutline />}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleFileChange("featuredImage", file);
+                  }
+                }}
+                accept="image/*"
+              />
 
-            {/* Image Preview */}
-            {imagePreview && (
-              <div className="relative inline-block">
-                <img
-                  src={imagePreview}
-                  alt="Featured Image Preview"
-                  className="w-48 h-32 object-cover rounded-md border"
-                />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleRemoveImage}
-                  className="absolute -top-2 -right-2 w-6 h-6 p-0 rounded-full"
-                >
-                  ×
-                </Button>
-              </div>
-            )}
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="relative inline-block">
+                  <Image
+                    src={imagePreview}
+                    width={192}
+                    height={128}
+                    alt="Featured Image Preview"
+                    className="w-48 h-32 object-cover rounded-md border"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleRemoveImage}
+                    className="absolute -top-2 -right-2 w-6 h-6 p-0 rounded-full"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        <div>
-          {/* <h4 className="font-medium text-[#4C5560] mb-4">
-            Visibility and status{" "}
-          </h4>
-         
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <CustomDropdown
-              label="Status *"
-              options={[
-                { label: "DRAFT" },
-                { label: "PUBLISHED" },
-                { label: "UNPUBLISHED" },
-              ]}
-              selected={formData.status}
-              onSelect={(value) => handleInputChange("status", value)}
-            />
-          </div> */}
-        </div>
-
-        {/* Buttons */}
-        <div className="pt-6">
-          <div className="flex justify-center gap-6 items-center">
+        <div className="flex justify-between items-center py-8">
+          <div className="flex gap-4">
             <Button
               type="button"
-              variant="ghost"
-              onClick={handleCancel}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
+              variant="outline"
               onClick={(e) => handleSubmit(e, "draft")}
               disabled={isSubmitting}
             >
@@ -612,27 +552,24 @@ function AddInvestmentContent() {
                 </>
               )}
             </Button>
+            <Button
+              type="submit"
+              className="bg-[#116114] hover:bg-[#116114] text-white text-sm px-8 py-2 rounded"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {isEditing ? "Updating..." : "Creating..."}
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  {isEditing ? "Update Investment" : "Publish Investment"}
+                </>
+              )}
+            </Button>
           </div>
-        </div>
-
-        <div className="flex justify-between items-center py-8">
-          <Button
-            type="submit"
-            className="bg-[#116114] hover:bg-[#116114] text-white text-sm px-8 py-2 rounded"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {isEditing ? "Updating..." : "Creating..."}
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                {isEditing ? "Update Investment" : "Publish Investment"}
-              </>
-            )}
-          </Button>
           <Link href="/main-admin/investments">
             <Button
               variant="ghost"
@@ -644,32 +581,13 @@ function AddInvestmentContent() {
           </Link>
         </div>
       </form>
-
-      {/* Why Invest Dialog */}
-      <AdvantageDialog
-        isOpen={advantageDialogOpen}
-        onClose={handleAdvantageDialogCancel}
-        onSave={handleAdvantageDialogSave}
-        advantageDraft={advantageDraft}
-        setAdvantageDraft={setAdvantageDraft}
-        editingAdvantageIndex={editingAdvantageIndex}
-      />
     </div>
   );
 }
 
 export default function AddInvestment() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="flex items-center space-x-2">
-            <Loader2 className="w-6 h-6 animate-spin" />
-            <span>Loading...</span>
-          </div>
-        </div>
-      }
-    >
+    <Suspense fallback={<Loader />}>
       <AddInvestmentContent />
     </Suspense>
   );
@@ -703,79 +621,5 @@ function FileUpload({
         accept={accept}
       />
     </label>
-  );
-}
-
-function AdvantageDialog({
-  isOpen,
-  onClose,
-  onSave,
-  advantageDraft,
-  setAdvantageDraft,
-  editingAdvantageIndex,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: () => void;
-  advantageDraft: { title: string; description: string };
-  setAdvantageDraft: (draft: { title: string; description: string }) => void;
-  editingAdvantageIndex: number | null;
-}) {
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {editingAdvantageIndex !== null
-              ? "Edit Why Invest Advantage"
-              : "Add Why Invest Advantage"}
-          </DialogTitle>
-          <DialogDescription>
-            {editingAdvantageIndex !== null
-              ? "Edit the details of the advantage."
-              : "Add a new advantage to why investors should invest in this offering."}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="title">Title *</Label>
-            <Input
-              id="title"
-              value={advantageDraft.title}
-              onChange={(e) =>
-                setAdvantageDraft({ ...advantageDraft, title: e.target.value })
-              }
-              placeholder="e.g., High Returns"
-              className="col-span-3"
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="description">Description *</Label>
-            <Textarea
-              id="description"
-              value={advantageDraft.description}
-              onChange={(e) =>
-                setAdvantageDraft({
-                  ...advantageDraft,
-                  description: e.target.value,
-                })
-              }
-              placeholder="e.g., Our investment offers a guaranteed return of 15% per annum."
-              className="col-span-3"
-            />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="button" onClick={onSave}>
-            {editingAdvantageIndex !== null
-              ? "Update Advantage"
-              : "Add Advantage"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }

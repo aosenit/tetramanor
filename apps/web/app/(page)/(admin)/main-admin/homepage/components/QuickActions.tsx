@@ -16,6 +16,7 @@ export default function QuickActions() {
       <Button
         variant="outline"
         className="h-12 text-sm text-[#858C95] rounded-lg w-fit justify-start"
+        onClick={() => router.push("/main-admin/properties/add-properties/")}
       >
         Add new property
         <IoMdArrowRoundForward className="h-4 w-4  mr-2" />
@@ -34,15 +35,6 @@ export default function QuickActions() {
         onClick={() => router.push("/main-admin/rentals")}
       >
         Add new rental
-        <IoMdArrowRoundForward className="h-4 w-4 mr-2" />
-      </Button>
-
-      <Button
-        onClick={() => router.push("/main-admin/campaigns")}
-        variant="outline"
-        className="h-12 text-sm w-fit text-[#858C95] rounded-lg justify-start"
-      >
-        Add new Campaign
         <IoMdArrowRoundForward className="h-4 w-4 mr-2" />
       </Button>
 

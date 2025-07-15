@@ -369,14 +369,6 @@ function InvestmentsPageContent() {
               <SelectItem value="61-100">61-100%</SelectItem>
             </SelectContent>
           </Select> */}
-
-          <Button
-            variant="link"
-            className="text-[#858C95] text-sm p-0"
-            onClick={clearAllFilters}
-          >
-            Clear all
-          </Button>
         </div>
 
         {/* Investments Table */}
