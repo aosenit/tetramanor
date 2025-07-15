@@ -70,10 +70,10 @@ export default function InvestmentModels() {
   // Defensive: data?.data is the array of investments
   const investments = data?.data || [];
   const fixedROI = investments.filter(
-    (inv: any) => inv.investmentType === "FIXED_ROI"
+    (inv: any) => inv.type === "FIXED_ROI"
   );
   const equityShare = investments.filter(
-    (inv: any) => inv.investmentType === "EQUITY_SHARE"
+    (inv: any) => inv.type === "EQUITY_SHARE"
   );
 
   return (
