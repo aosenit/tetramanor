@@ -89,7 +89,7 @@ function InvestmentsPageContent() {
 
     if (currentSearch) params.append("search", currentSearch);
     if (currentInvestmentType)
-      params.append("investmentType", currentInvestmentType.toUpperCase());
+      params.append("type", currentInvestmentType.toUpperCase());
     if (currentStatus) params.append("status", currentStatus.toUpperCase());
     if (currentRoiRange) params.append("roiRange", currentRoiRange);
 

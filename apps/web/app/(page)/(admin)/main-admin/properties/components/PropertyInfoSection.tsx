@@ -134,7 +134,7 @@ export default function PropertyInfoSection({
             <SelectContent>
               <SelectItem value="ONGOING">Ongoing</SelectItem>
               <SelectItem value="COMPLETED">Completed</SelectItem>
-              <SelectItem value="PLANNED">Planned</SelectItem>
+              {/* <SelectItem value="PLANNED">Planned</SelectItem> */}
             </SelectContent>
           </Select>
         </div>
