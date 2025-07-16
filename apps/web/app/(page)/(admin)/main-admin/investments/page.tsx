@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { axiosInstance } from "@/services/axiosInstance";
 import React, { Suspense, useState, useEffect } from "react";
 import Loader from "@/components/Loader";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 interface Investment {
   id: string;
@@ -285,13 +286,16 @@ function InvestmentsPageContent() {
       <div className="">
         <div className="flex items-center justify-between">
           <div>
-            <div className="flex items-center space-x-1 text-[#858C95]">
-              <span>Admin</span>
-              <span className="text-xl text-[#858C95]">/</span>
-              <span className="font-medium text-xl text-[#116114]">
-                Investment
-              </span>
-            </div>
+            <Breadcrumb
+              items={[
+                { label: "Admin", href: "/main-admin" },
+                {
+                  label: "Investment",
+                  href: "#",
+                  isActive: true,
+                },
+              ]}
+            />
             <p className="text-[#454D56] text-sm mt-1">
               Manage all investment opportunities{" "}
             </p>

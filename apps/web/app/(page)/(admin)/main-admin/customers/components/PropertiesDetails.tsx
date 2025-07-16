@@ -2,83 +2,53 @@
 
 import Image from "next/image";
 import nine from "@/assets/admin/nine.png";
-import a from "@/assets/admin/a.svg";
-import b from "@/assets/admin/b.svg";
-import c from "@/assets/admin/c.svg";
-import d from "@/assets/admin/d.svg";
-import e from "@/assets/admin/e.svg";
-import f from "@/assets/admin/f.svg";
-import g from "@/assets/admin/g.svg";
-import h from "@/assets/admin/h.svg";
-import i from "@/assets/admin/i.svg";
-import j from "@/assets/admin/j.svg";
-import k from "@/assets/admin/k.svg";
-import { MapPin, Loader2, AlertCircle } from "lucide-react";
+
+import { MapPin } from "lucide-react";
 import { MdArrowBackIosNew } from "react-icons/md";
 import { Button } from "@chakra-ui/react";
 import { CiImageOn } from "react-icons/ci";
 import { IoDocumentsOutline } from "react-icons/io5";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
-import { useFetchData } from "@/hooks/useApi";
-import placeholder from "@/assets/placeholder.svg";
 
-const features = [
-  {
-    name: "Swimming Pool",
-    icon: a,
-  },
-  {
-    name: "Garden",
-    icon: b,
-  },
-  {
-    name: "Parking",
-    icon: c,
-  },
-  {
-    name: "Fireplace",
-    icon: d,
-  },
-  {
-    name: "Study/Office",
-    icon: e,
-  },
-  {
-    name: "Security System",
-    icon: f,
-  },
-  {
-    name: "Wheelchair Access",
-    icon: g,
-  },
-  {
-    name: "Balcony",
-    icon: h,
-  },
-  {
-    name: "Air Conditioning",
-    icon: i,
-  },
-  {
-    name: "Elevator",
-    icon: j,
-  },
-  {
-    name: "Pets Allowed",
-    icon: k,
-  },
-];
+import { useFetchData } from "@/hooks/useApi";
+import { atom, useSetAtom } from "jotai";
+import { useEffect } from "react";
+import { ErrorState, LoadingState } from "./NoDataStates";
+
+// Simple localStorage persistence
+const getStoredPropertyData = () => {
+  if (typeof window !== "undefined") {
+    try {
+      const stored = localStorage.getItem("purchasePropertyData");
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      console.warn("Failed to get property data from localStorage:", error);
+      return {};
+    }
+  }
+  return {};
+};
+
+export const purchasePropertyData = atom(getStoredPropertyData());
+
+// Utility function to clear stored property data
+export const clearStoredPropertyData = () => {
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.removeItem("purchasePropertyData");
+    } catch (error) {
+      console.warn("Failed to clear property data from localStorage:", error);
+    }
+  }
+};
 
 export default function PropertyDetails() {
   const searchParams = useSearchParams();
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const openPaymentModal = () => setIsPaymentModalOpen(true);
-  const closePaymentModal = () => setIsPaymentModalOpen(false);
+  const setPurchasePropertyData = useSetAtom(purchasePropertyData);
   const tab = searchParams.get("tab") || "owned";
   const propertyName = searchParams.get("property") || "Unnamed property";
-  const propertyId = searchParams.get("unitId");
+  const unitId = searchParams.get("unitId");
   const userId = searchParams.get("userId");
   const router = useRouter();
   // Fetch property details
@@ -87,42 +57,39 @@ export default function PropertyDetails() {
     isLoading,
     error,
   } = useFetchData(
-    propertyId && userId
-      ? `admin/purchases/property-detail/${propertyId}/user/${userId}`
+    unitId && userId
+      ? `admin/purchases/property-detail/${unitId}/user/${userId}`
       : null
   );
+
+  useEffect(() => {
+    if (propertyData) {
+      setPurchasePropertyData(propertyData.data);
+
+      // Save to localStorage
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem(
+            "purchasePropertyData",
+            JSON.stringify(propertyData.data)
+          );
+        } catch (error) {
+          console.log("Failed to save property data to localStorage:", error);
+        }
+      }
+    }
+  }, [propertyData, setPurchasePropertyData]);
 
   const propertyLabel = tab === "rented" ? "Rented property" : "Owned property";
 
   // Loading state
   if (isLoading) {
-    return (
-      <div className="p-6 space-y-8">
-        <div className="flex items-center justify-center py-20">
-          <div className="flex flex-col items-center space-y-4">
-            <Loader2 className="h-8 w-8 animate-spin text-[#116114]" />
-            <p className="text-sm text-gray-600">Loading property details...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   // Error state
   if (error || !propertyData?.data) {
-    return (
-      <div className="p-6 space-y-8 h-[80vh] flex items-center justify-center">
-        <div className="flex items-center justify-center py-20">
-          <div className="flex flex-col items-center space-y-4">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <p className="text-sm text-red-600">
-              Error loading property details
-            </p>
-            <Button onClick={() => router.back()}>Go back</Button>
-          </div>
-        </div>
-      </div>
-    );
+    return <ErrorState />;
   }
 
   // Extract property data
@@ -134,7 +101,14 @@ export default function PropertyDetails() {
     <div className="p-6 space-y-8">
       {/* Breadcrumb */}
       <div className="text-xs text-[#4C5560] font-medium">
-        <button onClick={() => router.back()} className="text-sm">
+        <button
+          onClick={() =>
+            router.push(
+              `/main-admin/customers/property-dashboard/?tab=owned&propertyId=${propertyData?.data?.property?.id}&userId=${userId}&name=${propertyData?.data?.property?.name}`
+            )
+          }
+          className="text-sm"
+        >
           Customer's properties
         </button>{" "}
         <span className="text-xl text-[#858C95]">/ </span>
@@ -154,21 +128,22 @@ export default function PropertyDetails() {
             {propertyData?.data?.property?.address || "Address not available"}
           </div>
         </div>
-        {/* <div className="flex gap-6 text-sm font-medium text-gray-600">
+        <div className="flex gap-6 text-sm font-medium text-gray-600">
           <Link
             href={{
               pathname: "/main-admin/customers/gallery",
               query: {
                 tab,
-                property: unit?.property?.name || propertyName,
-                propertyId,
+                propertyId: propertyData?.data?.property?.id,
+                unitId,
                 userId,
               },
             }}
           >
             <Button
               variant="outline"
-              className="flex items-center text-[#323539] gap-3 hover:text-[#323539]"
+              className="flex items-center text-[#323539] gap-3 hover:text-[#323539] text-xs"
+              size={"sm"}
             >
               Gallery
               <CiImageOn />
@@ -179,15 +154,16 @@ export default function PropertyDetails() {
               pathname: "/main-admin/customers/documents",
               query: {
                 tab,
-                property: unit?.property?.name || propertyName,
-                propertyId,
+                propertyId: propertyData?.data?.property?.id,
+                unitId,
                 userId,
               },
             }}
           >
             <Button
               variant={"outline"}
-              className="flex items-center text-[#323539] gap-3 hover:text-[#323539]"
+              className="flex items-center text-[#323539] gap-3 hover:text-[#323539] text-xs"
+              size={"sm"}
             >
               Documents
               <IoDocumentsOutline />
@@ -198,20 +174,21 @@ export default function PropertyDetails() {
               pathname: "/main-admin/customers/payment-history",
               query: {
                 tab,
-                property: unit?.property?.name || propertyName,
-                propertyId,
+                propertyId: propertyData?.data?.property?.id,
+                unitId,
                 userId,
               },
             }}
           >
             <Button
               variant={"outline"}
-              className="flex items-center text-[#323539] gap-1 hover:text-[#323539]"
+              className="flex items-center text-[#323539] gap-1 hover:text-[#323539] text-xs"
+              size={"sm"}
             >
               View payment history
             </Button>
           </Link>
-        </div> */}
+        </div>
       </div>
       <div className="lg:flex gap-6">
         <div className="relative w-full lg:w-3/5 h-[400px] ">

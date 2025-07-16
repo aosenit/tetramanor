@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, Upload, X, Save } from "lucide-react";
+import { Loader2, Upload, X, Save, Loader } from "lucide-react";
 import { MdArrowBackIosNew } from "react-icons/md";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -72,7 +72,8 @@ export default function EditBlog() {
     images?: string;
   }>({});
 
-  const { mutateAsync: uploadImages } = useUploadData("upload/images");
+  const { mutateAsync: uploadImages, isPending: isUploadingImages } =
+    useUploadData("upload/images");
   const { mutateAsync: createBlog, isPending: isCreating } =
     usePostData("blogs");
   const { mutateAsync: updateBlog, isPending: isUpdating } = usePutData(
@@ -214,6 +215,15 @@ export default function EditBlog() {
           <Loader2 className="w-6 h-6 animate-spin" />
           <span>Loading blog post...</span>
         </div>
+      </div>
+    );
+  }
+
+  if (isUploadingImages || isUploadingGallery || isUploadingCover) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="w-6 h-6 animate-spin" />
+        <span>Uploading images...</span>
       </div>
     );
   }

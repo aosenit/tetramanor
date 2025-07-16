@@ -1,77 +1,124 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Link, Upload } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { FaCloudUploadAlt } from "react-icons/fa";
-import { RiDeleteBinLine } from "react-icons/ri";
 import { BsCloudArrowUp } from "react-icons/bs";
 import { MdArrowBackIosNew } from "react-icons/md";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { useFetchData, useUploadData } from "@/hooks/useApi";
+import { axiosInstance } from "@/services/axiosInstance";
+import { ErrorState, LoadingState } from "./NoDataStates";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 interface GalleryImage {
   id: string;
-  src: string; // Now string instead of StaticImageData to support uploaded images
+  imageUrl: string;
   alt: string;
 }
 
 export default function Gallery() {
+  const navigate = useRouter();
   const searchParams = useSearchParams();
-  const propertyName = searchParams.get("property");
+  const unitId = searchParams.get("unitId");
+  const userId = searchParams.get("userId");
   const [images, setImages] = useState<GalleryImage[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const { data, isLoading, error, refetch } = useFetchData(
+    unitId && userId
+      ? `admin/purchases/property-detail/${unitId}/user/${userId}`
+      : null
+  );
+
+  const propertyData = data?.data;
+
+  const { mutateAsync: uploadImages, isPending } =
+    useUploadData("upload/images");
+
+  const handleImageUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const formData = new FormData();
+    Array.from(files).forEach((file) => {
+      formData.append("images", file);
+    });
+    formData.append("productId", unitId || "");
+    formData.append("productType", "UNIT");
+
+    try {
+      await uploadImages(formData);
+      refetch();
+      toast.success("Images uploaded successfully");
+    } catch (error) {
+      console.log(error, "gallery upload error");
+    }
+  };
+
+  const handleDeleteImage = async (id: string) => {
+    setIsDeleting(true);
+    try {
+      await axiosInstance.delete(`upload/images/${id}`);
+      refetch();
+      toast.success("Image deleted successfully");
+    } catch (error) {
+      console.log(error, "gallery delete error");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  useEffect(() => {
+    setImages(propertyData?.gallery || []);
+  }, [propertyData]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleRemove = (id: string) => {
-    setImages(images.filter((img) => img.id !== id));
-  };
-
-  const handleReplace = (id: string) => {
-    if (fileInputRef.current) {
-      fileInputRef.current.dataset.replaceId = id;
-      fileInputRef.current.click();
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const newImageUrl = URL.createObjectURL(file);
-    const replaceId = e.target.dataset.replaceId;
-
-    if (replaceId) {
-      setImages((prev) =>
-        prev.map((img) =>
-          img.id === replaceId ? { ...img, src: newImageUrl } : img
-        )
-      );
-      delete e.target.dataset.replaceId;
-    } else {
-      setImages((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          src: newImageUrl,
-          alt: file.name,
-        },
-      ]);
-    }
-    e.target.value = "";
-  };
+  // const handleReplace = (id: string) => {
+  //   if (fileInputRef.current) {
+  //     fileInputRef.current.dataset.replaceId = id;
+  //     fileInputRef.current.click();
+  //   }
+  // };
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
 
+  if (isLoading || isPending || isDeleting) {
+    return <LoadingState />;
+  }
+
+  if (error) {
+    return <ErrorState />;
+  }
+
   return (
     <div className="min-h-screen space-y-8 p-6">
-      <p className="text-xs text-[#4C5560] font-medium">
-        Admin /{" "}
-        <span className="text-[#116114] text-sm font-medium">
-          User / view profile / view property / view {propertyName} gallery
-        </span>
-      </p>
+      <div className="border-b flex justify-between items-center flex-wrap py-4 gap-2">
+        <div className="py-2">
+          <Breadcrumb
+            items={[
+              { label: "User", href: "/main-admin/customers" },
+              {
+                label: "View Profile",
+                href: `/main-admin/customers/view-profile?id=${userId}`,
+              },
+              {
+                label: "View Property",
+                href: `/main-admin/customers/properties-details/?unitId=${unitId}&userId=${userId}`,
+              },
+              {
+                label: `${propertyData?.name || "Property"} Gallery`,
+                href: "#",
+                isActive: true,
+              },
+            ]}
+          />
+        </div>
+      </div>
 
       {/* Hidden File Input */}
       <input
@@ -79,35 +126,37 @@ export default function Gallery() {
         accept="image/*"
         className="hidden"
         ref={fileInputRef}
-        onChange={handleFileChange}
+        onChange={(e) => handleImageUpload(e.target.files)}
       />
 
-      <div className="grid grid-cols-1 bg-white p-6 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {images.map((image) => (
+      <div className="grid grid-cols-1 bg-white p-6 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {images?.map((image) => (
           <div key={image.id}>
             <div className="flex justify-between p-2">
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleReplace(image.id)}
                 className="text-[#323539]"
               >
                 Replace <FaCloudUploadAlt className="ml-1" />
-              </Button>
+              </Button> */}
 
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleRemove(image.id)}
-                className="text-[#E33B32"
+                onClick={() => handleDeleteImage(image.id)}
+                className="text-[#E33B32]"
+                disabled={isDeleting}
               >
-                Remove <RiDeleteBinLine className="ml-1" />
+                Remove
+                <RiDeleteBinLine className="" />
               </Button>
             </div>
 
             <div className="aspect-[4/3] relative">
               <Image
-                src={image.src}
+                src={image.imageUrl}
                 alt={image.alt}
                 fill
                 className="object-cover rounded-lg"
@@ -118,26 +167,28 @@ export default function Gallery() {
         ))}
 
         {/* Upload Box Centered if < 6 images */}
-        {images.length < 6 && (
-          <div className="w-full col-span-full flex justify-center">
-            <div
+        {images?.length < 6 && (
+          <div className="w-full col-span-full flex ">
+            <button
               onClick={handleUploadClick}
-              className="aspect-[4/3] w-full max-w-sm bg-[#E8E7E7] hover:bg-[#E8E7E7] transition-colors cursor-pointer rounded-lg flex items-center justify-center"
+              className="w-[200px] h-[100px] max-w-sm bg-[#E8E7E7] hover:bg-[#E8E7E7] transition-colors cursor-pointer rounded-lg flex items-center justify-center"
             >
-              <div className="flex gap-4 items-center justify-center text-[#323539]">
+              <div className="flex gap-4 items-center justify-center text-[#323539] ">
                 <p className="text-sm  font-medium">Upload</p>
-                <BsCloudArrowUp className="  text-[#323539]" />
+                <BsCloudArrowUp className="  text-[#323539]" size={20} />
               </div>
-            </div>
+            </button>
           </div>
         )}
       </div>
-      <Link href="/main-admin/customers/properties-details">
-                <button className="text-[#323539] flex items-center gap-2 hover:text-black text-sm mt-6">
-                  <MdArrowBackIosNew />
-                  Back
-        </button>
-      </Link>
+
+      <button
+        className="text-[#323539] flex items-center gap-2 hover:text-black text-sm mt-6"
+        onClick={() => navigate.back()}
+      >
+        <MdArrowBackIosNew />
+        Back
+      </button>
     </div>
   );
 }

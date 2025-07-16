@@ -7,76 +7,144 @@ import six from "@/assets/admin/six.svg";
 import { Input } from "@/components/ui/input";
 import seven from "@/assets/admin/seven.svg";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TbCurrencyNaira } from "react-icons/tb";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { PiFunnel } from "react-icons/pi";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAtomValue } from "jotai";
+import { purchasePropertyData } from "./PropertiesDetails";
+import { LoadingState, ErrorState, EmptyState } from "./NoDataStates";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import AddPaymentModal from "./AddPaymentModal";
-import Link from "next/link";
+import { useFetchData } from "@/hooks/useApi";
 
-const payments = [
-  {
-    id: "PAY-01823",
-    date: "Feb 20, 2025",
-    amount: "₦600,000",
-    status: "Completed",
-    balance: "8,000,000",
-  },
-  {
-    id: "PAY-01823",
-    date: "Feb 20, 2025",
-    amount: "₦600,000",
-    status: "Completed",
-    balance: "8,000,000",
-  },
-  {
-    id: "PAY-01823",
-    date: "Feb 20, 2025",
-    amount: "₦600,000",
-    status: "Completed",
-    balance: "8,000,000",
-  },
-  {
-    id: "PAY-01823",
-    date: "Feb 20, 2025",
-    amount: "₦600,000",
-    status: "Completed",
-    balance: "8,000,000",
-  },
-];
+interface Payment {
+  id: string;
+  paymentId: string;
+  paymentDate: string;
+  amountPaid: number;
+  balanceRemaining: number;
+  paymentMode: string;
+  paymentType: string;
+  customerId: string;
+  propertyId: string;
+  purchaseId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface PaymentHistoryData {
+  remainingAmount: number;
+  amountPaid: number;
+  payments: Payment[];
+}
 
 export default function PaymentHistory() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const unitId = searchParams.get("unitId");
+  const userId = searchParams.get("userId");
+  const propertyData = useAtomValue(purchasePropertyData);
+
   const [search, setSearch] = useState("");
-   const searchParams = useSearchParams();
-  const propertyName = searchParams.get("property");
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+
+  // fetch paymentHistory with search
+  const {
+    data: paymentHistory,
+    isPending: isPaymentHistoryPending,
+    refetch,
+  } = useFetchData(
+    unitId
+      ? `admin/purchases/${unitId}/payments${search ? `?search=${search}` : ""}`
+      : null
+  );
 
   const openPaymentModal = () => setIsPaymentModalOpen(true);
   const closePaymentModal = () => setIsPaymentModalOpen(false);
 
+  // Handle search with debounce
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (unitId) {
+        refetch();
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [search, unitId, refetch]);
+
+  // Extract data from API response
+  const paymentHistoryData: PaymentHistoryData = paymentHistory?.data || {
+    remainingAmount: 0,
+    amountPaid: 0,
+    payments: [],
+  };
+
+  const { payments, amountPaid, remainingAmount } = paymentHistoryData;
+
+  // Filter payments based on search (client-side filtering as backup)
+  const filteredPayments =
+    payments?.filter(
+      (payment) =>
+        payment.paymentId.toLowerCase().includes(search.toLowerCase()) ||
+        payment.paymentMode?.toLowerCase().includes(search.toLowerCase()) ||
+        payment.paymentType.toLowerCase().includes(search.toLowerCase())
+    ) || [];
+
+  // Loading state
+  if (isPaymentHistoryPending) {
+    return <LoadingState message="Loading payment history..." />;
+  }
+
+  // Error state
+  if (!paymentHistory?.data && !isPaymentHistoryPending) {
+    return (
+      <ErrorState
+        message="Failed to load payment history"
+        description="Unable to fetch payment data. Please try again."
+        onAction={() => refetch()}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen space-y-8 p-6">
-      {/* Breadcrumb */}
-      <div className="text-xs text-[#4C5560] font-medium">
-        Admin /{" "}
-        <span className="text-[#116114] text-sm font-medium">
-          {propertyName}
-        </span>
+      <div className="border-b flex justify-between items-center flex-wrap py-4 gap-2">
+        <div className="py-2">
+          <Breadcrumb
+            items={[
+              { label: "User", href: "/main-admin/customers" },
+              {
+                label: "View Profile",
+                href: `/main-admin/customers/view-profile?id=${userId}`,
+              },
+              {
+                label: "View Property",
+                href: `/main-admin/customers/properties-details/?unitId=${unitId}&userId=${userId}`,
+              },
+              {
+                label: `${propertyData?.name || "Property"} Payment History`,
+                href: "#",
+                isActive: true,
+              },
+            ]}
+          />
+        </div>
       </div>
 
       {/* Header */}
       <div className="flex justify-between items-start flex-wrap">
         <h2 className="text-lg font-medium text-gray-800">
-          Payments history of unit 3a
+          Payments history of {propertyData?.name || "unit"}
         </h2>
         <Button
           onClick={openPaymentModal}
           leftIcon={<FiPlus />}
           variant={"outline"}
           size="sm"
-          className=" text-white text-sm"
+          className="text-white text-sm"
         >
           Add payments
         </Button>
@@ -92,7 +160,9 @@ export default function PaymentHistory() {
           <div className="flex text-[#B3B3B3] items-center gap-1">
             <IoMdArrowDropdown />
             <TbCurrencyNaira className="text-2xl mt-1" />
-            <p className="text-[#116114] font-semibold text-2xl">20,000,000</p>
+            <p className="text-[#116114] font-semibold text-2xl">
+              {amountPaid.toLocaleString()}
+            </p>
           </div>
         </div>
 
@@ -104,7 +174,9 @@ export default function PaymentHistory() {
           <div className="flex text-[#B3B3B3] items-center gap-1">
             <IoMdArrowDropdown />
             <TbCurrencyNaira className="text-2xl mt-1" />
-            <p className="text-[#116114] font-semibold text-2xl">10,000,000</p>
+            <p className="text-[#116114] font-semibold text-2xl">
+              {remainingAmount.toLocaleString()}
+            </p>
           </div>
         </div>
       </div>
@@ -112,23 +184,23 @@ export default function PaymentHistory() {
       {/* Payment Table */}
       <div className="bg-white space-y-4 p-6 overflow-hidden">
         {/* Table Header */}
-        <div className="flex justify-between items-center ">
+        <div className="flex justify-between items-center">
           <div className="space-y-2">
             <div className="text-sm font-medium text-gray-800">
               View payment history
             </div>
             <p className="text-[#4D4E53] text-xs">
-              Payment history of customer's properties .
+              Payment history of customer&apos;s properties.
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm flex items-center gap-1 text-[#252525]">
+            {/* <span className="text-sm flex items-center gap-1 text-[#252525]">
               <PiFunnel />
               Filter
-            </span>
+            </span> */}
             <Input
-              type="text"
-              placeholder="Search..."
+              type="search"
+              placeholder="Search payments..."
               className="w-48 h-9 rounded-md text-sm"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -136,42 +208,68 @@ export default function PaymentHistory() {
           </div>
         </div>
 
-        {/* Table Body */}
-        <div className="grid grid-cols-5 px-4 py-4 font-medium  mt-6 text-xs text-[#847A8D] border rounded-md bg-[#F5F5F5]">
-          <div>Payment ID</div>
-          <div>Payment Date</div>
-          <div>Amount Paid</div>
-          <div>Status</div>
-          <div>Remaining balance</div>
-        </div>
+        {/* Empty state */}
+        {filteredPayments.length === 0 && !isPaymentHistoryPending && (
+          <EmptyState
+            message="No payment history found"
+            description={
+              search
+                ? "No payments match your search criteria."
+                : "No payment history has been recorded yet."
+            }
+            actionText="Add Payment"
+            onAction={openPaymentModal}
+            variant="card"
+          />
+        )}
 
-        {payments.map((p, index) => (
-          <div
-            key={index}
-            className={`grid grid-cols-5 px-4 py-4 text-xs text-[#2E2E2E] border-b ${
-              index % 2 === 1 ? "bg-[#FAFAFA]" : ""
-            }`}
-          >
-            <div>{p.id}</div>
-            <div>{p.date}</div>
-            <div>{p.amount}</div>
-            <div className="text-[#116114]">{p.status}</div>
-            <div>{p.balance}</div>
-          </div>
-        ))}
+        {/* Table Body */}
+        {filteredPayments.length > 0 && (
+          <>
+            <div className="grid grid-cols-5 px-4 py-4 font-medium mt-6 text-xs text-[#847A8D] border rounded-md bg-[#F5F5F5]">
+              <div>Payment ID</div>
+              <div>Payment Date</div>
+              <div>Amount Paid</div>
+              <div>Payment Mode</div>
+              <div>Remaining balance</div>
+            </div>
+
+            {filteredPayments.map((payment, index) => (
+              <div
+                key={payment.id}
+                className={`grid grid-cols-5 px-4 py-4 text-xs text-[#2E2E2E] border-b ${
+                  index % 2 === 1 ? "bg-[#FAFAFA]" : ""
+                }`}
+              >
+                <div>{payment.paymentId}</div>
+                <div>{new Date(payment.paymentDate).toLocaleDateString()}</div>
+                <div>₦{payment.amountPaid.toLocaleString()}</div>
+                <div className="text-[#116114]">
+                  {payment.paymentMode || "N/A"}
+                </div>
+                <div>₦{payment.balanceRemaining.toLocaleString()}</div>
+              </div>
+            ))}
+          </>
+        )}
       </div>
 
       {/* Back Button */}
-      <Link href="/main-admin/customers/properties-details">
-      <button className="text-[#323539] flex items-center gap-2 hover:text-black text-sm mt-6">
+      <button
+        className="text-[#323539] flex items-center gap-2 hover:text-black text-sm mt-6"
+        onClick={() => router.back()}
+      >
         <MdArrowBackIosNew />
         Back
-        </button>
-      </Link>
+      </button>
+
       {isPaymentModalOpen && (
         <AddPaymentModal
           open={isPaymentModalOpen}
           onClose={closePaymentModal}
+          property={propertyData}
+          paymentRemaining={remainingAmount}
+          onSuccess={() => refetch()}
         />
       )}
     </div>

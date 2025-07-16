@@ -525,6 +525,10 @@ export default function AddProperties() {
     return <Loader />;
   }
 
+  if (isUploadingImages || isUploadingDocument) {
+    return <Loader />;
+  }
+
   return (
     <div className="min-h-screen">
       <div className="">

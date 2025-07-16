@@ -1,12 +1,8 @@
-import React from 'react'
-import Gallery from '../components/Gallery'
+import React from "react";
+import Gallery from "../components/Gallery";
 
 function page() {
-  return (
-      <div>
-          <Gallery />
-    </div>
-  )
+  return <Gallery />;
 }
 
-export default page
+export default page;

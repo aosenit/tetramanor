@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@chakra-ui/react";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 import { IoImageOutline } from "react-icons/io5";
 import { MdArrowBackIosNew } from "react-icons/md";
@@ -245,10 +246,16 @@ function AddInvestmentContent() {
     <div className="">
       {/* Breadcrumb */}
       <div className="border-b border-[#E5E5E7] pb-4">
-        <span className="text-[#323539] font-medium">Investments &gt; </span>
-        <span className="text-[#858C95] font-medium">
-          {isEditing ? "Edit investment" : "Add new investments"}
-        </span>
+        <Breadcrumb
+          items={[
+            { label: "Investments", href: "/main-admin/investments" },
+            {
+              label: isEditing ? "Edit investment" : "Add new investments",
+              href: "#",
+              isActive: true,
+            },
+          ]}
+        />
       </div>
 
       {/* Error Display */}

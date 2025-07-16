@@ -13,18 +13,60 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Plus } from "lucide-react";
+import { useFetchData, usePostData } from "@/hooks/useApi";
+import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 
-export default function AddUnitModal({
+type paymentType = "OWNERSHIPT" | "RENT" | "INSTALLMENT";
+
+type paymentMode = "BANK_TRANSFER" | "CASH" | "POS";
+
+interface PaymentFormData {
+  purchaseId: string;
+  customerId: string;
+  propertyId: string;
+  paymentType: paymentType;
+  amountPaid: string | number;
+  balanceRemaining: string | number;
+  paymentMode: paymentMode;
+  paymentDate: string;
+}
+
+export default function AddPaymentModal({
   open,
   onClose,
+  property,
+  onSuccess,
+  paymentRemaining,
 }: {
   open: boolean;
   onClose: () => void;
+  property?: any;
+  onSuccess?: () => void;
+  paymentRemaining?: number;
 }) {
-  const [selectedUnit, setSelectedUnit] = useState("");
-  const [selectedQuantity, setSelectedQuantity] = useState("");
+  const searchParams = useSearchParams();
+  const unitId = searchParams.get("unitId");
+  const userId = searchParams.get("userId");
+
+  const { mutateAsync: submitPayment, isPending } = usePostData(
+    "admin/purchases/payments"
+  );
+
+  const { data: userData, isPending: userDataPending } = useFetchData(
+    userId ? `users/${userId}` : ""
+  );
+
+  const [formData, setFormData] = useState<PaymentFormData>({
+    purchaseId: unitId || "",
+    customerId: userId || "",
+    propertyId: property?.property?.id || "",
+    paymentType: "OWNERSHIPT",
+    amountPaid: "",
+    balanceRemaining: "",
+    paymentMode: "POS",
+    paymentDate: new Date().toISOString(),
+  });
 
   useEffect(() => {
     if (open) {
@@ -37,20 +79,48 @@ export default function AddUnitModal({
     };
   }, [open]);
 
-  if (!open) return null; // ✅ safe now
-
-  const apartmentTypes = [
-    { id: "studio", label: "Studio apartment", defaultQuantity: "2" },
-    { id: "4bedroom", label: "4 bedroom duplex", defaultQuantity: "" },
-    { id: "3br", label: "3BR apartment", defaultQuantity: "" },
-    { id: "3br-bq", label: "3BR +BQ", defaultQuantity: "" },
-    { id: "2br", label: "2BR apartment", defaultQuantity: "" },
-  ];
-
-  const handleSelect = (label: string) => {
-    setSelectedUnit(label);
-    setSelectedQuantity("");
+  const handleInputChange = (
+    field: keyof PaymentFormData,
+    value: string | number
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    formData.balanceRemaining = Number(formData.balanceRemaining);
+
+    try {
+      await submitPayment(formData);
+      toast.success("Payment added successfully");
+      onClose();
+
+      // Call onSuccess callback to refresh payment history
+      onSuccess?.();
+
+      // Reset form
+      setFormData({
+        purchaseId: unitId || "",
+        customerId: userId || "",
+        propertyId: property?.property?.id || "",
+        paymentType: "OWNERSHIPT",
+        amountPaid: "",
+        balanceRemaining: "",
+        paymentMode: "BANK_TRANSFER",
+        paymentDate: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Payment submission error:", error);
+      toast.error("Failed to add payment");
+    }
+  };
+
+  if (!open) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 overflow-y-auto p-4">
       <div className="w-full bg-white max-w-3xl overflow-hidden">
@@ -60,155 +130,164 @@ export default function AddUnitModal({
           </div>
         </header>
 
-        <div className="px-6 space-y-4 py-4 ">
-               <div className="">
-                 <p className="text-[#116114]   font-medium">
-                   Add payment
-                 </p>
-                  </div>
-                  <p className="text-[#323539] text-xs ">Customer <span className="font-medium ml-3 text-sm text-black">Grace Olabayo</span></p>
-             </div>
+        <div className="px-6 space-y-4 py-4">
+          <div className="">
+            <p className="text-[#116114] font-medium">Add payment</p>
+          </div>
+          <p className="text-[#323539] text-xs">
+            Customer{" "}
+            <span className="font-medium ml-3 text-sm text-black">
+              {userDataPending ? "Loading..." : userData?.data?.name}
+            </span>
+          </p>
+        </div>
 
-        <div className="px-6 pb-6 pt-2 space-y-6">
-          <form className="space-y-6">
+        <form onSubmit={handleSubmit} className="px-6 pb-6 pt-2 space-y-6">
+          <div className="space-y-6">
             <div className="space-y-2">
               <Label className="text-[#323539] text-sm font-medium">
                 Property name
               </Label>
-              <Select defaultValue="tm-meadows">
+              <Select
+                value={formData.propertyId}
+                disabled
+                onValueChange={(value) =>
+                  handleInputChange("propertyId", value)
+                }
+              >
                 <SelectTrigger className="bg-[#E5E5E7] text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="tm-meadows">TM meadows</SelectItem>
-                  <SelectItem value="queen-mary">Queen mary</SelectItem>
-                  <SelectItem value="queen-mary">TM highgardens</SelectItem>
-                  <SelectItem value="queen-mary">Kings landing</SelectItem>
+                  <SelectItem value={property?.property?.id || ""}>
+                    {property?.property?.name || "Select property"}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-2">
               <Label className="text-[#323539] text-sm font-medium">
                 Payment type
               </Label>
-              <Select defaultValue="cash">
+              <Select
+                value={formData.paymentType}
+                onValueChange={(value) =>
+                  handleInputChange("paymentType", value)
+                }
+              >
                 <SelectTrigger className="bg-[#E5E5E7] text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="banktransfer">Bank transfer</SelectItem>
+                  <SelectItem value="OWNERSHIPT">Ownership</SelectItem>
+                  <SelectItem value="RENT">Rental</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-           <div>
-                       <Label className="text-[#323539] text-sm font-medium">
-                         Unit type
-                       </Label>
-         
-                       <Select>
-                         <SelectTrigger className="bg-[#E5E5E7] text-xs">
-                           <SelectValue>
-                             {selectedUnit && selectedQuantity
-                               ? `${selectedUnit} — ${selectedQuantity} unit${selectedQuantity !== "1" ? "s" : ""}`
-                               : "Select unit type"}
-                           </SelectValue>
-                         </SelectTrigger>
-         
-                         <SelectContent className="w-full max-w-2xl p-4 space-y-4 bg-white shadow-lg rounded-md">
-                           <p className="text-sm py-2 text-gray-600">
-                             Check the type and enter number of units acquired
-                           </p>
-         
-                           {apartmentTypes.map((apartment) => (
-                             <div
-                               key={apartment.id}
-                               className="flex items-center py-3 space-y-4 justify-between cursor-pointer"
-                               onClick={() => handleSelect(apartment.label)}
-                             >
-                               <div className="flex items-center space-x-3">
-                                 <Checkbox
-                                   id={apartment.id}
-                                   checked={selectedUnit === apartment.label}
-                                   onCheckedChange={() => handleSelect(apartment.label)}
-                                   className="h-5 w-5 border-2 border-gray-300"
-                                 />
-                                 <Label
-                                   htmlFor={apartment.id}
-                                   className="text-gray-700 font-medium cursor-pointer"
-                                 >
-                                   {apartment.label}
-                                 </Label>
-                               </div>
-                             </div>
-                           ))}
-         
-                           {selectedUnit && (
-                             <div className="pt-2">
-                               <Label className="text-sm text-gray-700">
-                                 Enter quantity for {selectedUnit}
-                               </Label>
-                               <Input
-                                 type="number"
-                                 value={selectedQuantity}
-                                 onChange={(e) => setSelectedQuantity(e.target.value)}
-                                 placeholder="e.g. 3"
-                                 min="1"
-                                 className="mt-1 w-20 h-8 text-center text-sm border border-gray-300"
-                               />
-                             </div>
-                           )}
-                         </SelectContent>
-                       </Select>
-                     </div>
+
+            <div className="space-y-2">
+              <Label className="text-[#323539] text-sm font-medium">
+                Payment mode
+              </Label>
+              <Select
+                value={formData.paymentMode}
+                onValueChange={(value) =>
+                  handleInputChange("paymentMode", value)
+                }
+              >
+                <SelectTrigger className="bg-[#E5E5E7] text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="BANK_TRANSFER">Bank Transfer</SelectItem>
+                  <SelectItem value="CASH">Cash</SelectItem>
+                  <SelectItem value="POS">POS</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             <div className="space-y-2">
               <Label className="text-[#323539] text-sm font-medium">
                 Amount paid
               </Label>
               <Input
-                type="text"
-                placeholder="₦"
+                type="number"
+                placeholder="0"
                 className="bg-[#E5E5E7] text-xs"
+                value={formData.amountPaid}
+                onChange={(e) =>
+                  handleInputChange(
+                    "amountPaid",
+                    parseFloat(e.target.value) || ""
+                  )
+                }
+                required
               />
             </div>
+
             <div className="space-y-2">
               <Label className="text-[#323539] text-sm font-medium">
                 Balance remaining
               </Label>
               <Input
-                type="text"
-                placeholder="₦"
+                type="number"
+                placeholder="0"
                 className="bg-[#E5E5E7] text-xs"
+                disabled
+                // property?.price - formData.amountPaid
+                value={
+                  paymentRemaining && formData.amountPaid
+                    ? (
+                        Number(paymentRemaining) - Number(formData.amountPaid)
+                      ).toString()
+                    : ""
+                }
+                onChange={(e) =>
+                  handleInputChange(
+                    "balanceRemaining",
+                    parseFloat(e.target.value) || ""
+                  )
+                }
+                required
               />
             </div>
-              <div className="space-y-2">
-                <Label className="text-[#323539] text-sm font-medium">
-                  Payment date
-                </Label>
-                <Input
-                  type="text"
-                  className="bg-[#E5E5E7] text-xs"
-                />
-              </div>
+
+            <div className="space-y-2">
+              <Label className="text-[#323539] text-sm font-medium">
+                Payment date
+              </Label>
+              <Input
+                type="datetime-local"
+                className="bg-[#E5E5E7] text-xs"
+                value={formData.paymentDate.slice(0, 16)}
+                onChange={(e) => {
+                  const date = new Date(e.target.value);
+                  handleInputChange("paymentDate", date.toISOString());
+                }}
+                required
+              />
+            </div>
+
             <div className="flex flex-col sm:flex-row justify-between pt-4">
               <Button
                 type="submit"
+                disabled={isPending}
                 className="bg-[#116114] font-medium text-sm hover:bg-[#116114] text-white"
               >
-                Save payment
+                {isPending ? "Saving..." : "Save payment"}
               </Button>
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 onClick={onClose}
-                className="text-[#323539]"
+                className="border-gray-300 hover:bg-gray-50"
               >
                 Cancel
               </Button>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   );
