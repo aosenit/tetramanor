@@ -21,6 +21,7 @@ const HomeHero = () => {
     propertyType: string;
     location: string;
   }>({ propertyType: "", location: "" });
+  const [visibleCount, setVisibleCount] = useState(2);
   const router = useRouter();
 
   const { data, isLoading, error } = useFetchData(
@@ -29,6 +30,12 @@ const HomeHero = () => {
       : ""
   );
   const properties: Property[] = data?.data?.items || [];
+
+  const filteredProperties = location
+    ? properties.filter((property) =>
+        property.address?.toLowerCase().includes(location.toLowerCase())
+      )
+    : properties;
 
   return (
     <section className="relative h-[80vh] ">
@@ -109,12 +116,12 @@ const HomeHero = () => {
                 />
               ))}
             </div>
-          ) : error ? null : properties.length === 0 ? (
+          ) : error ? null : filteredProperties.length === 0 ? (
             <div className="py-8 text-center">No properties found.</div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {properties.slice(0, 2).map((property) => (
+                {filteredProperties.slice(0, visibleCount).map((property) => (
                   <div
                     key={property.id}
                     className="bg-gray-100 rounded-lg overflow-hidden shadow flex flex-col"
@@ -158,6 +165,14 @@ const HomeHero = () => {
                   </div>
                 ))}
               </div>
+              {visibleCount < filteredProperties.length && (
+                <button
+                  className="mt-6 w-full bg-primary text-white font-semibold py-3 rounded hover:bg-primary/90 transition"
+                  onClick={() => setVisibleCount((prev) => prev + 2)}
+                >
+                  Show More
+                </button>
+              )}
               <button
                 className="mt-6 w-full bg-primary text-white font-semibold py-3 rounded hover:bg-primary/90 transition"
                 onClick={() => {
