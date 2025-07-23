@@ -10,6 +10,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchData, useUploadPutData, useUploadData } from "@/hooks/useApi";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Breadcrumb } from "../../customers/components/Breadcrumb";
 
 // Validation schema
 const rentalSchema = z.object({
@@ -79,7 +80,9 @@ export default function EditRental() {
   );
 
   // Fetch properties for dropdown
-  const { data: propertiesResponse } = useFetchData("admin/properties");
+  const { data: propertiesResponse } = useFetchData(
+    "admin/properties?limit=100"
+  );
 
   // API mutations
   const { mutateAsync: createRental, isPending: isCreating } =
@@ -328,12 +331,12 @@ export default function EditRental() {
     <div className="">
       {/* Breadcrumb */}
       <div className="border-b border-[#E5E5E7] pb-4">
-        <span className="text-[#323539] font-medium">
-          Rental Management &gt;&gt;&gt;{" "}
-        </span>
-        <span className="text-[#858C95] font-medium">
-          {isEditMode ? "Edit" : "Add"}
-        </span>
+        <Breadcrumb
+          items={[
+            { label: "Rental Management", href: "/main-admin/rentals" },
+            { label: isEditMode ? "Edit" : "Add", href: "#" },
+          ]}
+        />
       </div>
 
       {/* Basic Info */}
