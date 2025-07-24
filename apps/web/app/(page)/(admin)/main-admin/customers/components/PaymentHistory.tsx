@@ -10,7 +10,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { TbCurrencyDollar, TbCurrencyNaira } from "react-icons/tb";
 import { IoMdArrowDropdown } from "react-icons/io";
-import { PiFunnel } from "react-icons/pi";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAtomValue } from "jotai";
 import { purchasePropertyData } from "./PropertiesDetails";
@@ -32,6 +32,7 @@ interface Payment {
   purchaseId: string;
   createdAt: string;
   updatedAt: string;
+  currency: string;
 }
 
 interface PaymentHistoryData {
@@ -81,11 +82,11 @@ export default function PaymentHistory() {
     remainingAmount: 0,
     amountPaid: 0,
     payments: [],
-    currency: "",
   };
 
-  const { payments, amountPaid, remainingAmount, currency } =
-    paymentHistoryData;
+  const { payments, amountPaid, remainingAmount } = paymentHistoryData;
+
+  const currency = payments[0]?.currency;
 
   // Filter payments based on search (client-side filtering as backup)
   const filteredPayments =

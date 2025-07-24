@@ -24,22 +24,16 @@ import {
   Edit,
   Trash2,
   UserPlus,
-  ArrowLeft,
   Ellipsis,
   Plus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  useDeleteData,
-  useFetchData,
-  usePostData,
-  usePutData,
-} from "@/hooks/useApi";
+import { useFetchData, usePostData, usePutData } from "@/hooks/useApi";
 import { axiosInstance } from "@/services/axiosInstance";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import Image from "next/image";
-import five from "@/assets/admin/customer/five.svg";
+
 import Link from "next/link";
+import { Breadcrumb } from "../../customers/components/Breadcrumb";
 
 // Officer type
 interface Officer {
@@ -281,13 +275,12 @@ export default function AccountOfficerInfo() {
       <div className="">
         <div className="flex border-b border-[#E5E5E7] pb-4 items-center justify-between">
           <div className="flex items-center space-x-1 text-[#858C95]">
-            <Link href="/main-admin/" className="cursor-pointer">
-              Admin
-            </Link>
-            <span className="text-xl text-[#858C95]">/</span>
-            <span className="font-medium text-xl text-[#116114]">
-              Contact Inquiries
-            </span>
+            <Breadcrumb
+              items={[
+                { label: "Home", href: "/main-admin" },
+                { label: "Contact Inquiries", href: "#" },
+              ]}
+            />
           </div>
           <Button
             onClick={() => setShowAddAgent(true)}

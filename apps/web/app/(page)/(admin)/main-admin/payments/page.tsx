@@ -127,7 +127,7 @@ function PaymentsPageContent() {
   const [showSummary, setShowSummary] = useState(false);
   const [activeCard, setActiveCard] = useState<number | null>(0);
   const [search, setSearch] = useState("");
-  const [selectedCurrency, setSelectedCurrency] = useState<string>("");
+  const [selectedCurrency, setSelectedCurrency] = useState<boolean>(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -135,7 +135,7 @@ function PaymentsPageContent() {
   const buildApiUrl = () => {
     const params = new URLSearchParams();
     if (debouncedSearch) params.append("search", debouncedSearch);
-    if (selectedCurrency) params.append("currency", selectedCurrency);
+    if (selectedCurrency) params.append("currency", "USD");
     return `admin/payments${params.toString() ? `?${params.toString()}` : ""}`;
   };
 
@@ -147,7 +147,7 @@ function PaymentsPageContent() {
     refetch,
   } = useFetchData(buildApiUrl());
 
-  const payments: Payment[] = paymentsResponse?.data || [];
+  const payments: Payment[] = paymentsResponse?.data?.payment || [];
 
   // Debounce search input
   useEffect(() => {
@@ -164,14 +164,8 @@ function PaymentsPageContent() {
   }, [debouncedSearch, selectedCurrency, refetch]);
 
   // Calculate totals
-  const totalAmountPaid = payments.reduce(
-    (sum, payment) => sum + payment.amountPaid,
-    0
-  );
-  const totalOutstanding = payments.reduce(
-    (sum, payment) => sum + (payment.purchase.price - payment.amountPaid),
-    0
-  );
+  const totalAmountPaid = paymentsResponse?.data?.amountPaid;
+  const totalOutstanding = paymentsResponse?.data?.remainingAmount;
 
   const cards = [
     {
@@ -194,15 +188,6 @@ function PaymentsPageContent() {
 
   // Use payments directly since filtering is now done on the server
   const filteredPayments = payments;
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -260,7 +245,7 @@ function PaymentsPageContent() {
         </div>
       </div>
       <div className="space-y-4">
-        <div className="flex gap-2">
+        <div className="grid grid-cols-1 md:flex gap-2 items-center">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#858C95] w-4 h-4" />
             <Input
@@ -271,17 +256,19 @@ function PaymentsPageContent() {
             />
           </div>
           {(search || selectedCurrency) && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setSearch("");
-                setSelectedCurrency("");
-              }}
-              className="text-xs hover:bg-gray-100"
-            >
-              Clear filters
-            </Button>
+            <div className="">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSearch("");
+                  setSelectedCurrency(false);
+                }}
+                className="text-xs hover:bg-gray-100"
+              >
+                Clear filters
+              </Button>
+            </div>
           )}
         </div>
 
@@ -321,7 +308,7 @@ function PaymentsPageContent() {
                   {/* Bottom Section */}
                   <div className="flex items-center justify-between mt-4 pt-2">
                     <h3 className="text-2xl ml-1 font-semibold text-[#116114]">
-                      {formatCurrency(card.count)}
+                      {selectedCurrency} {card.count?.toLocaleString()}
                     </h3>
                     <p className="text-xs flex gap-2 items-center text-[#858C95]">
                       {card.subtitle}
@@ -340,24 +327,9 @@ function PaymentsPageContent() {
             <h2 className="text-lg font-medium">Payments breakdown</h2>
             <div className="flex items-center gap-2 rounded-full border border-gray-300 p-2 w-fit">
               <button
-                onClick={() =>
-                  setSelectedCurrency(selectedCurrency === "NGN" ? "" : "NGN")
-                }
+                onClick={() => setSelectedCurrency(!selectedCurrency)}
                 className={`p-1 rounded transition-colors ${
-                  selectedCurrency === "NGN"
-                    ? "bg-[#116114] text-white"
-                    : "hover:bg-gray-100"
-                }`}
-                title="Filter by NGN"
-              >
-                <TbCurrencyNaira className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() =>
-                  setSelectedCurrency(selectedCurrency === "USD" ? "" : "USD")
-                }
-                className={`p-1 rounded transition-colors ${
-                  selectedCurrency === "USD"
+                  selectedCurrency
                     ? "bg-[#116114] text-white"
                     : "hover:bg-gray-100"
                 }`}
@@ -368,8 +340,8 @@ function PaymentsPageContent() {
             </div>
           </div>
 
-          <div className="bg-white rounded-md shadow overflow-hidden">
-            <Table>
+          <div className="bg-white rounded-md shadow overflow-hidden w-[350px] mx-auto md:w-full">
+            <Table className="w-full">
               <TableHeader>
                 <TableRow>
                   <TableHead>Customer</TableHead>

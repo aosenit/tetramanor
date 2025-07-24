@@ -253,7 +253,10 @@ export default function EditRental() {
       formDataToSubmit.append("agencyFee", formData.agencyFee.toString());
       formDataToSubmit.append("cautionFee", formData.cautionFee.toString());
       formDataToSubmit.append("status", formData.status);
-      formDataToSubmit.append("isFurnished", formData.isFurnished.toString());
+      formDataToSubmit.append(
+        "isFurnished",
+        JSON.stringify(formData.isFurnished)
+      );
       // Add images as binary files directly to the array
       console.log("Uploaded images:", uploadedImages);
 

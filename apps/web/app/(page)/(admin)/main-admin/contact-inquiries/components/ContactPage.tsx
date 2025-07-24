@@ -21,6 +21,7 @@ import Loader from "@/components/Loader";
 import { LuInstagram } from "react-icons/lu";
 import { BsTwitterX, BsWhatsapp } from "react-icons/bs";
 import { SlSocialLinkedin } from "react-icons/sl";
+import { Breadcrumb } from "../../customers/components/Breadcrumb";
 
 interface ContactData {
   id: string;
@@ -173,11 +174,12 @@ export default function ContactPage() {
       <div className="border-b-2 border-gray-200 pb-4 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 text-[#858C95]">
-            <span>Admin</span>
-            <span className="text-xl text-[#858C95]">/</span>
-            <span className="font-medium text-xl text-[#116114]">
-              Contact Page
-            </span>
+            <Breadcrumb
+              items={[
+                { label: "Home", href: "/main-admin" },
+                { label: "Contact Page", href: "#" },
+              ]}
+            />
             {editMode && (
               <>
                 <span className="text-xl text-[#858C95]">/</span>
@@ -230,7 +232,7 @@ export default function ContactPage() {
           <Label htmlFor="email">Company Email</Label>
           <Input
             id="email"
-            value={formData.companyEmail}
+            value={formData?.companyEmail}
             onChange={(e) => handleInputChange("companyEmail", e.target.value)}
             disabled={!editMode}
             className={editMode ? "bg-white" : "bg-[#D9D9D9]"}
@@ -241,7 +243,7 @@ export default function ContactPage() {
           <Label htmlFor="phone">Phone number</Label>
           <Input
             id="phone"
-            value={formData.phoneNumber}
+            value={formData?.phoneNumber}
             onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
             disabled={!editMode}
             className={editMode ? "bg-white" : "bg-[#D9D9D9]"}
@@ -252,7 +254,7 @@ export default function ContactPage() {
           <Label htmlFor="whatsapp">Whatsapp number</Label>
           <Input
             id="whatsapp"
-            value={formData.whatsappNumber}
+            value={formData?.whatsappNumber}
             onChange={(e) =>
               handleInputChange("whatsappNumber", e.target.value)
             }
@@ -278,9 +280,9 @@ export default function ContactPage() {
           </div>
 
           {/* Display social media links when not in edit mode */}
-          {!editMode && formData.socialMedia.length > 0 && (
+          {!editMode && formData?.socialMedia?.length > 0 && (
             <div className="space-y-3">
-              {formData.socialMedia.map((link, index) => {
+              {formData?.socialMedia?.map((link, index) => {
                 const getIcon = (platform: string) => {
                   switch (platform.toLowerCase()) {
                     case "whatsapp":
@@ -326,7 +328,7 @@ export default function ContactPage() {
           )}
 
           {/* Show placeholder when no social links */}
-          {!editMode && formData.socialMedia.length === 0 && (
+          {!editMode && formData?.socialMedia?.length === 0 && (
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
               <div className="text-sm text-gray-500 text-center">
                 No social media links added
@@ -346,7 +348,7 @@ export default function ContactPage() {
                 </h3>
               </div>
               <Socials
-                socialLinks={formData.socialMedia}
+                socialLinks={formData?.socialMedia}
                 onSocialLinksChange={handleSocialLinksChange}
                 disabled={isUpdating}
               />
@@ -396,7 +398,7 @@ export default function ContactPage() {
               <Label htmlFor="map-embed">Map Embed Code</Label>
               <textarea
                 id="map-embed"
-                value={formData.mapEmbedCode}
+                value={formData?.mapEmbedCode}
                 onChange={(e) =>
                   handleInputChange("mapEmbedCode", e.target.value)
                 }
@@ -413,7 +415,7 @@ export default function ContactPage() {
           <Label htmlFor="office-address">Office address</Label>
           <Input
             id="office-address"
-            value={formData.officeAddress}
+            value={formData?.officeAddress}
             onChange={(e) => handleInputChange("officeAddress", e.target.value)}
             disabled={!editMode}
             className={editMode ? "bg-white" : "bg-[#D9D9D9]"}
@@ -430,19 +432,19 @@ export default function ContactPage() {
             }`}
             style={{ height: "300px" }}
           >
-            {selected === "embed" && formData.mapEmbedCode ? (
+            {selected === "embed" && formData?.mapEmbedCode ? (
               <div
                 className="w-full h-full"
-                dangerouslySetInnerHTML={{ __html: formData.mapEmbedCode }}
+                dangerouslySetInnerHTML={{ __html: formData?.mapEmbedCode }}
               />
-            ) : selected === "address" && formData.officeAddress ? (
+            ) : selected === "address" && formData?.officeAddress ? (
               <div className="w-full h-full flex items-center justify-center p-4">
                 <div className="text-center">
                   <div className="text-lg font-medium text-[#323539] mb-2">
                     Office Address
                   </div>
                   <div className="text-sm text-gray-600">
-                    {formData.officeAddress}
+                    {formData?.officeAddress}
                   </div>
                   <div className="mt-4 text-xs text-gray-500">
                     Address will be displayed on the contact page
@@ -486,10 +488,10 @@ export default function ContactPage() {
                   id={key}
                   value={
                     key.includes(".")
-                      ? formData[key.split(".")[0] as keyof ContactData]?.[
+                      ? formData?.[key.split(".")[0] as keyof ContactData]?.[
                           key.split(".")[1] as keyof any
                         ] || ""
-                      : formData[key as keyof ContactData] || ""
+                      : formData?.[key as keyof ContactData] || ""
                   }
                   onChange={(e) => handleInputChange(key, e.target.value)}
                   disabled={!editMode}
