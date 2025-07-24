@@ -25,6 +25,7 @@ interface Unit {
   propertyId: string;
   unitTypeId: string;
   price: number;
+  currency: string;
   unitCount: number;
   isRented: boolean;
   unitType: string;
@@ -296,7 +297,7 @@ export default function PropertyDashboard() {
 
                     <div className="flex gap-2 items-center">
                       <div className="font-medium text-sm">
-                        ₦{unit?.price?.toLocaleString()}
+                        {unit?.currency} {unit?.price?.toLocaleString()}
                       </div>
                     </div>
 
