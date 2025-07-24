@@ -1,9 +1,10 @@
 "use client";
-import Header from "./header";
+// import Header from "./header";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import one from "@/assets/portfolio/one.webp"
 import { Skeleton } from "@/components/ui/skeleton";
+import Header from "@/components/Header";
 const HomeHero = () => {
   // If you want to add loading/error logic, you can pass a prop or use context. For now, just add a skeleton fallback example:
   // Example: if (isLoading) return <Skeleton className="h-[60vh] w-full" />;

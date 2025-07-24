@@ -56,9 +56,9 @@ export default function Page({ params }: PageProps) {
   if (error || !property) return null;
   return (
     <div>
-      <div className="flex justify-end p-4">
+      <div className="flex pt-6 justify-end p-4">
         <button
-          className="flex items-center text-[#151515] font-medium text-sm hover:text-gray-900"
+          className="flex items-center ml-2 text-[#151515] font-medium text-xs hover:text-gray-900"
           onClick={handleShare}
         >
           <FiShare2 className="mr-1" />

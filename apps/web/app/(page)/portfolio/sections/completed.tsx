@@ -49,11 +49,8 @@ function Completed() {
                   image={properties[0].images[0]?.imageUrl}
                   title={properties[0].name}
                   location={properties[0].address}
-                  status={
-                    properties[0].status === "SOLDOUT"
-                      ? "Sold Out"
-                      : properties[0].status
-                  }
+                  constructionStatus={properties[0].constructionStatus}
+                  status={properties[0].status}
                   className="h-full min-h-[400px]"
                 />
               </div>
@@ -67,9 +64,8 @@ function Completed() {
                   image={property.images[0]?.imageUrl}
                   title={property.name}
                   location={property.address}
-                  status={
-                    property.status === "SOLDOUT" ? "Sold Out" : property.status
-                  }
+                  constructionStatus={property.constructionStatus}
+                  status={property.status}
                   className="h-full min-h-[400px]"
                 />
               ))}

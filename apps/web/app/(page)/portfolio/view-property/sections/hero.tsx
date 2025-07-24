@@ -28,6 +28,12 @@ const HomeHero = ({ property }: HeroProps) => {
         fill
         priority
       />
+      {property.status && (
+        <span className="absolute top-6 left-6 z-30 bg-[#FFFFFF4D] text-white px-4 py-2   font-medium text-xs shadow-md backdrop-blur-lg whitespace-nowrap uppercase tracking-wider">
+          {property.status.replace(/_/g, " ")}
+        </span>
+      )}
+
       <div className="absolute inset-0 bg-black opacity-60 z-10" />
       <div className="absolute inset-0 flex items-center z-20">
         <div className="container mx-auto px-4 md:px-8 lg:px-16">
@@ -61,7 +67,11 @@ const HomeHero = ({ property }: HeroProps) => {
         <Modal
           brochureId={property.document[0].id}
           brochureName={property.document[0].name}
-          imageUrl={property.images?.find(img => img.isPrimary)?.imageUrl || property.images?.[0]?.imageUrl || null}
+          imageUrl={
+            property.images?.find((img) => img.isPrimary)?.imageUrl ||
+            property.images?.[0]?.imageUrl ||
+            null
+          }
           onClose={() => setIsModalOpen(false)}
         />
       )}

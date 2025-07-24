@@ -39,7 +39,7 @@ const Header = () => {
   const navLinkClass = `text-sm lg:text-base font-medium transition-colors ${
     isScrolled
       ? "text-black hover:text-gray-800"
-      : "text-white hover:text-gray-50"
+      : "text-black hover:text-gray-800"
   }`;
 
   return (
@@ -51,12 +51,12 @@ const Header = () => {
       <div className="container mx-auto px-4 lg:px-16 py-3">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex pb-6 items-center">
             <Image src={tmlogo} alt="Tetramanor Logo" width={80} height={20} />
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden xl:flex items-center gap-6">
+          <nav className="hidden pb-6 xl:flex items-center gap-6">
             {navItems.map((item) =>
               item.name === "Solutions" ? (
                 <div
@@ -95,13 +95,13 @@ const Header = () => {
           </nav>
 
           {/* Desktop Auth Button */}
-          <div className="hidden xl:flex">
+          <div className="hidden pb-6 xl:flex">
             <Link
               href="/login"
               className={`px-6 py-2 text-sm font-medium rounded ${
                 isScrolled
                   ? "bg-[#116114] text-white hover:bg-green-700"
-                  : "bg-white text-black hover:bg-gray-100"
+                  : "bg-[#116114] text-white hover:bg-green-700"
               }`}
             >
               View Dashboard
