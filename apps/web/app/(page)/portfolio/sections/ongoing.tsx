@@ -31,7 +31,10 @@ function Ongoing() {
       {isLoading ? (
         <div className="grid md:grid-cols-2 gap-6">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-full min-h-[400px] bg-gray-200 rounded animate-pulse" />
+            <div
+              key={i}
+              className="h-full min-h-[400px] bg-gray-200 rounded animate-pulse"
+            />
           ))}
         </div>
       ) : error ? null : (
@@ -45,7 +48,8 @@ function Ongoing() {
                   image={properties[0].images[0]?.imageUrl}
                   title={properties[0].name}
                   location={properties[0].address}
-                  status={properties[0].constructionStatus === "ONGOING" ? "Ongoing" : properties[0].constructionStatus}
+                  status={properties[0].status}
+                  constructionStatus={properties[0].constructionStatus}
                   className="h-full min-h-[700px]"
                   slug={properties[0].id}
                 />
@@ -59,7 +63,8 @@ function Ongoing() {
                   image={property.images[0]?.imageUrl}
                   title={property.name}
                   location={property.address}
-                  status={property.constructionStatus === "ONGOING" ? "Ongoing" : property.constructionStatus}
+                  status={property.status}
+                  constructionStatus={property.constructionStatus}
                   className="flex-1"
                   slug={property.id}
                 />
@@ -67,7 +72,12 @@ function Ongoing() {
             </div>
           </div>
           <div className="flex justify-center mt-8">
-            <Button size="lg" onClick={() => router.push("/portfolio/view-more?type=ongoing")}>View More</Button>
+            <Button
+              size="lg"
+              onClick={() => router.push("/portfolio/view-more?type=ongoing")}
+            >
+              View More
+            </Button>
           </div>
         </>
       )}

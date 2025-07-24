@@ -9,6 +9,7 @@ export type PropertyCardProps = {
   title: string;
   location: string;
   status: string;
+  constructionStatus?: string;
   className?: string;
   slug: string;
 };
@@ -18,6 +19,7 @@ export default function PropertyCard({
   title,
   location,
   status,
+  constructionStatus,
   className = "",
   slug,
 }: PropertyCardProps) {
@@ -34,7 +36,9 @@ export default function PropertyCard({
   }
 
   return (
-    <div className={`relative rounded-xl overflow-hidden shadow-md group ${className} min-h-[300px]`}>
+    <div
+      className={`relative rounded-xl overflow-hidden shadow-md group ${className} min-h-[300px]`}
+    >
       <Image
         src={displayImage}
         alt={title}
@@ -42,8 +46,17 @@ export default function PropertyCard({
         fill
       />
       <div className="absolute inset-0 bg-black bg-opacity-40" />
-      <div className="absolute top-4 left-4 bg-white/20 text-white text-xs font-semibold px-4 py-1 rounded-full">
-        {status.toUpperCase()}
+      <div className="absolute top-4 left-4 flex gap-2 w-[calc(100%-2rem)] justify-between pr-4">
+        {constructionStatus && (
+          <span className="bg-white/20 text-white text-xs font-semibold px-4 py-1 rounded-full backdrop-blur-md">
+            {constructionStatus.replace(/_/g, " ").toUpperCase()}
+          </span>
+        )}
+        {status && (
+          <span className="bg-white/20 text-white text-xs font-semibold px-4 py-1 rounded-full backdrop-blur-md">
+            {status.replace(/_/g, " ").toUpperCase()}
+          </span>
+        )}
       </div>
       <div className="absolute bottom-4 left-4 right-4 text-white">
         <h3 className="text-lg font-bold">{title}</h3>
