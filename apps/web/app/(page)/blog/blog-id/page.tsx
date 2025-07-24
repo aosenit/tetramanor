@@ -9,9 +9,9 @@ function Page() {
     <div className="bg-[#fafafa]">
       <Hero />
       <div className="container mx-auto px-4 lg:px-16 py-12">
-        <AppSideBar>
+        {/* <AppSideBar> */}
           <SingleBlog />
-        </AppSideBar>
+        {/* </AppSideBar> */}
       </div>
       <Footer />
     </div>

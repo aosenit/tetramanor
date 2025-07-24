@@ -5,6 +5,7 @@ import placeholder from "@/assets/placeholder.svg";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
 import { MdKeyboardArrowLeft } from "react-icons/md";
+import Pagination from "./Pagination";
 
 const BlogSkeleton = () => (
   <div className="space-y-10">
@@ -39,6 +40,9 @@ export default function SingleBlog() {
         month: "short",
         day: "numeric",
       }),
+      images: (data.data.images || []).filter(
+        (img: any) => img.imageUrl !== data.data.coverImage?.imageUrl
+      ),
     };
   }
 
@@ -46,35 +50,33 @@ export default function SingleBlog() {
     <div>
       {isLoading ? (
         <BlogSkeleton />
-      ) : (
-        <div className="space-y-10">
-          <div className="h-full overflow-y-auto rounded-md">
+      ) : blog.images && blog.images.length > 0 ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+          {blog.images.map((img: any) => (
             <Image
-              src={blog?.image}
-              alt={blog?.title}
-              className="w-full object-cover"
-              width={1000}
-              height={1000}
+              key={img.id}
+              src={img.imageUrl}
+              alt={img.name || "Blog image"}
+              width={400}
+              height={300}
+              className="w-full h-48 object-cover rounded"
             />
-            <div className="space-y-4 py-12">
-              <h5 className="text-xl font-semibold">{blog?.title}</h5>
-              <div
-                className="text-black text-justify leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: blog?.content }}
-              />
-            </div>
-          </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center text-gray-500 py-12">
+          No images uploaded for this blog.
         </div>
       )}
       {/* go back to the previous page */}
       <button
-        className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-100 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex items-center gap-2 mt-4 px-3 py-2 bg-white border border-gray-100 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={() => router.back()}
       >
         <MdKeyboardArrowLeft />
         Back
       </button>
-      {/* <div className="">
+      {/* <div className="mt-6">
         <Pagination />
       </div> */}
     </div>
