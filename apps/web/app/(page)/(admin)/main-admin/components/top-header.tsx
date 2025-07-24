@@ -1,7 +1,6 @@
 "use client";
 
-import { Search, Bell, Menu, AlignJustify } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Bell, AlignJustify } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useSidebar } from "./sidebar";
@@ -34,13 +33,13 @@ export function TopHeader() {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="relative hidden sm:block">
+          {/* <div className="relative hidden sm:block">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder="Search properties, users or payments"
               className="pl-10 w-[300px] lg:w-[400px] bg-gray-700 border-gray-600 text-white placeholder-gray-400"
             />
-          </div>
+          </div> */}
 
           <Button
             variant="ghost"

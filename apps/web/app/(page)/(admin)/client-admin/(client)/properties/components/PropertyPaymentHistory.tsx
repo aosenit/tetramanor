@@ -52,7 +52,7 @@ const PropertyPaymentHistory: React.FC<PropertyPaymentHistoryProps> = ({
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="relative">
+          {/* <div className="relative">
             <input
               type="text"
               placeholder="Search..."
@@ -72,8 +72,8 @@ const PropertyPaymentHistory: React.FC<PropertyPaymentHistoryProps> = ({
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
-          </div>
-          <Button
+          </div> */}
+          {/* <Button
             variant="outline"
             size="sm"
             className="flex items-center gap-1"
@@ -96,7 +96,7 @@ const PropertyPaymentHistory: React.FC<PropertyPaymentHistoryProps> = ({
           </Button>
           <Button variant="outline" size="sm">
             Export
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -181,7 +181,7 @@ const PropertyPaymentHistory: React.FC<PropertyPaymentHistoryProps> = ({
                     {formatCurrency(payment.balanceRemaining)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-gray-400 hover:text-gray-500">
+                    {/* <button className="text-gray-400 hover:text-gray-500">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-5 w-5"
@@ -190,7 +190,7 @@ const PropertyPaymentHistory: React.FC<PropertyPaymentHistoryProps> = ({
                       >
                         <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
                       </svg>
-                    </button>
+                    </button> */}
                   </td>
                 </tr>
               ))

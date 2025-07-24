@@ -25,7 +25,7 @@ export default function PropertyUnitGallery({
           </p>
         </div>
       </div>
-      <div className="flex items-center gap-2 mb-6">
+      {/* <div className="flex items-center gap-2 mb-6">
         <Button variant="secondary" size="sm" className="rounded px-4">
           All
         </Button>
@@ -35,7 +35,7 @@ export default function PropertyUnitGallery({
         <Button variant="ghost" size="sm" className="rounded px-4">
           Videos
         </Button>
-      </div>
+      </div> */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {gallery && gallery.length > 0 ? (
           gallery.map((img) => (

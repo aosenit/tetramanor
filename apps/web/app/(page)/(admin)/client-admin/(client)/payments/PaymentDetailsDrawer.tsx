@@ -129,7 +129,7 @@ export default function PaymentDetailsDrawer({
   const handleDownloadPDF = () => {
     if (!payment) return;
 
-    setDownloadUrl(`customer/payments/${payment.id}/pdf`);
+    setDownloadUrl(`customer/payments/download/${payment.id}`);
 
     downloadPDF(undefined, {
       onSuccess: (data) => {

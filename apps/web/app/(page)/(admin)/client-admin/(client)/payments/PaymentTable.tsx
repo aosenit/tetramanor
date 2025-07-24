@@ -62,7 +62,7 @@ export function PaymentsTable() {
   };
 
   const handleDownloadPDF = (paymentId: string) => {
-    setDownloadUrl(`customer/payments/${paymentId}/pdf`);
+    setDownloadUrl(`customer/payments/download/${paymentId}`);
     downloadPDF(undefined, {
       onSuccess: (data) => {
         const blob = new Blob([data], { type: "application/pdf" });

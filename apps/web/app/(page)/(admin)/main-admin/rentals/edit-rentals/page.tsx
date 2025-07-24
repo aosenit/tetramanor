@@ -10,6 +10,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchData, useUploadPutData, useUploadData } from "@/hooks/useApi";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Breadcrumb } from "../../customers/components/Breadcrumb";
+import { Switch } from "@chakra-ui/react";
 
 // Validation schema
 const rentalSchema = z.object({
@@ -23,6 +25,7 @@ const rentalSchema = z.object({
   // unitAmount: z.number().min(1, "Unit amount must be at least 1"),
   status: z.enum(["RENTED", "NOT_RENTED"]),
   images: z.array(z.string()).optional(),
+  isFurnished: z.boolean().optional(),
 });
 
 type RentalFormData = z.infer<typeof rentalSchema>;
@@ -63,6 +66,7 @@ export default function EditRental() {
     // unitAmount: 1,
     status: "NOT_RENTED",
     images: [],
+    isFurnished: false,
   });
   const [errors, setErrors] = useState<Partial<RentalFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -79,7 +83,9 @@ export default function EditRental() {
   );
 
   // Fetch properties for dropdown
-  const { data: propertiesResponse } = useFetchData("admin/properties");
+  const { data: propertiesResponse } = useFetchData(
+    "admin/properties?limit=100"
+  );
 
   // API mutations
   const { mutateAsync: createRental, isPending: isCreating } =
@@ -95,7 +101,6 @@ export default function EditRental() {
   // Load rental data when editing
   useEffect(() => {
     if (rentalData && isEditMode) {
-      console.log("Rental data:", rentalData);
       setFormData({
         propertyId: rentalData?.data?.propertyId || "",
         apartmentType: rentalData?.data?.apartmentType || "",
@@ -107,6 +112,7 @@ export default function EditRental() {
         // unitAmount: rentalData?.data?.unitAmount || 1,
         status: rentalData?.data?.status || "NOT_RENTED",
         images: rentalData?.data?.images || [],
+        isFurnished: rentalData?.data?.isFurnished || false,
       });
 
       // Convert API images to UploadedImage format for display
@@ -247,7 +253,10 @@ export default function EditRental() {
       formDataToSubmit.append("agencyFee", formData.agencyFee.toString());
       formDataToSubmit.append("cautionFee", formData.cautionFee.toString());
       formDataToSubmit.append("status", formData.status);
-
+      formDataToSubmit.append(
+        "isFurnished",
+        JSON.stringify(formData.isFurnished)
+      );
       // Add images as binary files directly to the array
       console.log("Uploaded images:", uploadedImages);
 
@@ -321,19 +330,18 @@ export default function EditRental() {
   const propertyOptions = properties.map((property) => property.name);
   const apartmentTypeOptions = selectedProperty?.unitTypes || [];
   const frequencyOptions = ["Monthly", "Yearly", "Quarterly"];
-  const feeOptions = ["₦50,000", "₦100,000", "₦150,000"];
   const statusOptions = ["Not Rented", "Rented"];
 
   return (
     <div className="">
       {/* Breadcrumb */}
       <div className="border-b border-[#E5E5E7] pb-4">
-        <span className="text-[#323539] font-medium">
-          Rental Management &gt;&gt;&gt;{" "}
-        </span>
-        <span className="text-[#858C95] font-medium">
-          {isEditMode ? "Edit" : "Add"}
-        </span>
+        <Breadcrumb
+          items={[
+            { label: "Rental Management", href: "/main-admin/rentals" },
+            { label: isEditMode ? "Edit" : "Add", href: "#" },
+          ]}
+        />
       </div>
 
       {/* Basic Info */}
@@ -589,6 +597,23 @@ export default function EditRental() {
               handleInputChange("status", status);
             }}
           />
+        </div>
+
+        <div>
+          {/* Switch */}
+          <label className="block mb-1 text-sm text-[#323539] font-medium">
+            Furnished Status
+          </label>
+          <Switch
+            checked={formData.isFurnished}
+            colorScheme="green"
+            onChange={() =>
+              handleInputChange("isFurnished", !formData.isFurnished)
+            }
+          />
+          {errors.isFurnished && (
+            <p className="text-red-500 text-sm mt-1">{errors.isFurnished}</p>
+          )}
         </div>
 
         <h3 className="text-base py-4 font-medium text-[#116114]">

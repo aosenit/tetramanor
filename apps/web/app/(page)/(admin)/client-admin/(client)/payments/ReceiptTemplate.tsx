@@ -51,7 +51,7 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
 
   // Handle PDF download
   const handleDownloadPDF = () => {
-    setDownloadUrl(`customer/payments/${receiptId}/pdf`);
+    setDownloadUrl(`customer/payments/download/${receiptId}`);
 
     downloadPDF(undefined, {
       onSuccess: (data) => {

@@ -5,17 +5,15 @@ import {
   Loader2,
   AlertCircle,
   Home,
-  Camera,
   CheckCircle,
   XCircle,
   Clock,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { RiEditLine } from "react-icons/ri";
 import { MdArrowBackIosNew } from "react-icons/md";
 import AddUnitModal from "./UnitModal";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useFetchData, usePostData } from "@/hooks/useApi";
 import placeholder from "@/assets/placeholder.svg";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -27,7 +25,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,6 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 interface User {
   id: string;
@@ -46,7 +44,9 @@ interface User {
   phone: string;
   kycStatus: string;
   createdAt: string;
-  profileImage?: string;
+  profileImage?: {
+    imageUrl: string;
+  };
 }
 
 interface Property {
@@ -60,6 +60,11 @@ interface Property {
 interface KYCData {
   status: string;
   remark?: string;
+  documentType?: string;
+  documentId?: string;
+  document: {
+    imageUrl: string;
+  };
 }
 
 export default function Profile() {
@@ -70,10 +75,9 @@ export default function Profile() {
   const [kycRemark, setKycRemark] = useState("");
   const [isUpdatingKyc, setIsUpdatingKyc] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
-
+  const [kycDetailsModalOpen, setKycDetailsModalOpen] = useState(false);
   // Fetch user profile
   const {
     data: userData,
@@ -115,11 +119,6 @@ export default function Profile() {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  // Handle edit button click
-  const handleEditClick = () => {
-    fileInputRef.current?.click();
   };
 
   // Handle KYC status update
@@ -272,17 +271,14 @@ export default function Profile() {
   return (
     <div className="min-h-screen space-y-6">
       <div className="border-b border-[#E5E5E7] pb-4">
-        <div className="flex items-center space-x-1 text-[#858C95]">
-          <Link href="/main-admin/homepage/">
-            <span>Home</span>{" "}
-          </Link>
-          <span className="text-xl text-[#858C95]">/</span>
-          <span className="font-medium text-xl text-[#116114]">
-            Customer management
-          </span>
-        </div>
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/main-admin" },
+            { label: "Customer management", href: "#" },
+          ]}
+        />
       </div>
-      <div className="flex items-center justify-between">
+      <div className=" flex items-center justify-between flex-wrap gap-2">
         <div>
           <h1 className="font-medium text-[#858C95] mt-4">
             View user profile
@@ -308,19 +304,11 @@ export default function Profile() {
         </h3>
         <div className="max-w-xl rounded-t-xl space-y-4 p-6 bg-[#F4F4F4] flex flex-col items-center justify-center">
           <div className="relative flex items-center justify-center w-full">
-            <div className="absolute right-0 top-0">
-              <button
-                onClick={handleEditClick}
-                className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow duration-200"
-              >
-                <Camera className="text-[#858C95] h-4 w-4" />
-              </button>
-            </div>
             <Avatar className="h-20 w-20 bg-white border-4 border-white shadow-md">
               <AvatarImage
-                src={profileImage || user.profileImage}
+                src={user?.profileImage?.imageUrl || profileImage}
                 alt={user.name}
-                className="object-cover"
+                className="object-contain"
               />
               <AvatarFallback className="bg-white text-[#4C5560] text-2xl font-medium">
                 {getInitials(user.name)}
@@ -346,9 +334,9 @@ export default function Profile() {
             <p className="text-sm text-[#4C5560]">Phone number</p>
             <p className="font-medium text-[#181818] text-sm">{user.phone}</p>
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <p className="text-sm text-[#4C5560]">KYC status</p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap ">
               {kycLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
@@ -371,7 +359,17 @@ export default function Profile() {
                 }}
                 className="text-xs"
               >
-                Edit
+                Update status
+              </Button>
+
+              {/* button to view kyc details, this should open a modal with the kyc details */}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setKycDetailsModalOpen(true)}
+                className="text-xs"
+              >
+                KYC details
               </Button>
             </div>
           </div>
@@ -528,6 +526,44 @@ export default function Profile() {
               )}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* KYC Details Modal */}
+      <Dialog open={kycDetailsModalOpen} onOpenChange={setKycDetailsModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>KYC Details</DialogTitle>
+            <DialogDescription>
+              View the KYC details for {user?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Image
+              src={kyc?.document?.imageUrl || ""}
+              alt="KYC"
+              width={150}
+              height={150}
+              className="rounded-md object-contain"
+            />
+            <p className="text-sm text-[#4C5560]">
+              Document type: {kyc?.documentType}
+            </p>
+            <p className="text-sm text-[#4C5560]">
+              Document number: {kyc?.documentId}
+            </p>
+
+            {/* button to close this modal and open the kyc status update dialog */}
+            <Button
+              className="text-xs"
+              onClick={() => {
+                setKycDetailsModalOpen(false);
+                setKycDialogOpen(true);
+              }}
+            >
+              Update status
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

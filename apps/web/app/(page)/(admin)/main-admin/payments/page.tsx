@@ -20,20 +20,22 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import four from "@/assets/admin/customer/four.png";
 import icon from "@/assets/admin/home/five.svg";
 import five from "@/assets/admin/customer/five.svg";
-import Link from "next/link";
+
 import { FaAngleDown } from "react-icons/fa6";
 import { PiArrowArcLeftThin } from "react-icons/pi";
 import PaymentModal from "./components/RecieptModal";
 import PaymentSummaryModal from "./components/PaymentSummaryModal";
 import { useFetchData } from "@/hooks/useApi";
-import { toast } from "sonner";
+
 import Loader from "@/components/Loader";
+import { Breadcrumb } from "../customers/components/Breadcrumb";
 
 interface Payment {
   paymentDate: string;
   amountPaid: number;
   paymentType: string;
   paymentMode: string | null;
+  currency: string;
   customer: {
     name: string;
     email: string;
@@ -125,26 +127,45 @@ function PaymentsPageContent() {
   const [showSummary, setShowSummary] = useState(false);
   const [activeCard, setActiveCard] = useState<number | null>(0);
   const [search, setSearch] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState<boolean>(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Build API URL with filters
+  const buildApiUrl = () => {
+    const params = new URLSearchParams();
+    if (debouncedSearch) params.append("search", debouncedSearch);
+    if (selectedCurrency) params.append("currency", "USD");
+    return `admin/payments${params.toString() ? `?${params.toString()}` : ""}`;
+  };
 
   // Fetch payments data
   const {
     data: paymentsResponse,
     isLoading,
     error,
-  } = useFetchData("admin/payments");
+    refetch,
+  } = useFetchData(buildApiUrl());
 
-  const payments: Payment[] = paymentsResponse?.data || [];
+  const payments: Payment[] = paymentsResponse?.data?.payment || [];
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Refetch data when filters change
+  useEffect(() => {
+    refetch();
+  }, [debouncedSearch, selectedCurrency, refetch]);
 
   // Calculate totals
-  const totalAmountPaid = payments.reduce(
-    (sum, payment) => sum + payment.amountPaid,
-    0
-  );
-  const totalOutstanding = payments.reduce(
-    (sum, payment) => sum + (payment.purchase.price - payment.amountPaid),
-    0
-  );
+  const totalAmountPaid = paymentsResponse?.data?.amountPaid;
+  const totalOutstanding = paymentsResponse?.data?.remainingAmount;
 
   const cards = [
     {
@@ -165,22 +186,8 @@ function PaymentsPageContent() {
     },
   ];
 
-  // Filter payments based on search
-  const filteredPayments = payments.filter(
-    (payment) =>
-      payment.customer.name.toLowerCase().includes(search.toLowerCase()) ||
-      payment.property.name.toLowerCase().includes(search.toLowerCase()) ||
-      payment.paymentType.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  // Use payments directly since filtering is now done on the server
+  const filteredPayments = payments;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -220,11 +227,12 @@ function PaymentsPageContent() {
       <div className="">
         <div className="flex border-b border-[#E5E5E7] pb-4 items-center justify-between">
           <div className="flex items-center space-x-1  text-[#858C95]">
-            <span>Home</span>
-            <span className="text-xl text-[#858C95]">/</span>
-            <span className="font-medium text-xl text-[#116114]">
-              Payment Overview
-            </span>
+            <Breadcrumb
+              items={[
+                { label: "Home", href: "/main-admin" },
+                { label: "Payment Overview", href: "#" },
+              ]}
+            />
           </div>
           {/* <Button
             variant="outline"
@@ -237,14 +245,31 @@ function PaymentsPageContent() {
         </div>
       </div>
       <div className="space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#858C95] w-4 h-4" />
-          <Input
-            placeholder="Search by name / payment type / property"
-            className="pl-10 bg-[#E5E5E7] border-0"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <div className="grid grid-cols-1 md:flex gap-2 items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#858C95] w-4 h-4" />
+            <Input
+              placeholder="Search by name / payment type / property"
+              className="pl-10 bg-[#E5E5E7] border-0"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          {(search || selectedCurrency) && (
+            <div className="">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSearch("");
+                  setSelectedCurrency(false);
+                }}
+                className="text-xs hover:bg-gray-100"
+              >
+                Clear filters
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
@@ -283,7 +308,7 @@ function PaymentsPageContent() {
                   {/* Bottom Section */}
                   <div className="flex items-center justify-between mt-4 pt-2">
                     <h3 className="text-2xl ml-1 font-semibold text-[#116114]">
-                      {formatCurrency(card.count)}
+                      {selectedCurrency} {card.count?.toLocaleString()}
                     </h3>
                     <p className="text-xs flex gap-2 items-center text-[#858C95]">
                       {card.subtitle}
@@ -300,14 +325,23 @@ function PaymentsPageContent() {
         <div>
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-lg font-medium">Payments breakdown</h2>
-            {/* <div className="flex items-center gap-2 rounded-full border border-gray-300 p-2 w-fit">
-              <TbCurrencyNaira className="w-5 h-5 text-[#116114]" />
-              <DollarSign className="w-5 h-5 text-[#116114]" />
-            </div> */}
+            <div className="flex items-center gap-2 rounded-full border border-gray-300 p-2 w-fit">
+              <button
+                onClick={() => setSelectedCurrency(!selectedCurrency)}
+                className={`p-1 rounded transition-colors ${
+                  selectedCurrency
+                    ? "bg-[#116114] text-white"
+                    : "hover:bg-gray-100"
+                }`}
+                title="Filter by USD"
+              >
+                <DollarSign className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
-          <div className="bg-white rounded-md shadow overflow-hidden">
-            <Table>
+          <div className="bg-white rounded-md shadow overflow-hidden w-[350px] mx-auto md:w-full">
+            <Table className="w-full">
               <TableHeader>
                 <TableRow>
                   <TableHead>Customer</TableHead>
@@ -349,10 +383,12 @@ function PaymentsPageContent() {
                       </TableCell>
                       <TableCell>{payment.property.name}</TableCell>
                       <TableCell className="font-medium text-green-600">
-                        {formatCurrency(payment.amountPaid)}
+                        {payment?.currency}{" "}
+                        {payment.amountPaid?.toLocaleString()}
                       </TableCell>
                       <TableCell>
-                        {formatCurrency(payment.purchase.price)}
+                        {payment?.currency}{" "}
+                        {payment.purchase.price?.toLocaleString()}
                       </TableCell>
                       <TableCell>{formatDate(payment.paymentDate)}</TableCell>
                       <TableCell>

@@ -25,6 +25,7 @@ interface Unit {
   propertyId: string;
   unitTypeId: string;
   price: number;
+  currency: string;
   unitCount: number;
   isRented: boolean;
   unitType: string;
@@ -218,7 +219,7 @@ export default function PropertyDashboard() {
         {/* Tabs */}
         <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="grid w-fit grid-cols-2 mb-6">
-            <TabsTrigger value="owned">Owned</TabsTrigger>
+            <TabsTrigger value="owned">Not Rented</TabsTrigger>
             <TabsTrigger value="rented">Rented</TabsTrigger>
           </TabsList>
 
@@ -296,7 +297,7 @@ export default function PropertyDashboard() {
 
                     <div className="flex gap-2 items-center">
                       <div className="font-medium text-sm">
-                        ₦{unit?.price?.toLocaleString()}
+                        {unit?.currency} {unit?.price?.toLocaleString()}
                       </div>
                     </div>
 

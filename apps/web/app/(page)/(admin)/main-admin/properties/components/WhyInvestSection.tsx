@@ -1,10 +1,8 @@
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -40,7 +38,6 @@ export default function WhyInvestSection({
   handleRemoveAdvantage,
   errors,
 }: WhyInvestSectionProps) {
-  console.log(formData);
   return (
     <div className="mt-8 space-y-6">
       <h3 className="text-base font-medium text-[#116114]">Why Invest</h3>
@@ -78,7 +75,7 @@ export default function WhyInvestSection({
                   Remove
                 </Button>
               </div>
-              <p className="text-sm text-[#323539]">{adv.description}</p>
+              <p className="text-sm text-[#323539]">{adv?.description}</p>
             </div>
           ))}
         </div>
@@ -103,7 +100,7 @@ export default function WhyInvestSection({
             />
             <textarea
               placeholder="Description"
-              value={advantageDraft.description}
+              value={advantageDraft?.description}
               onChange={(e) =>
                 setAdvantageDraft({
                   ...advantageDraft,

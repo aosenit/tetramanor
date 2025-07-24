@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input";
 import seven from "@/assets/admin/seven.svg";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { TbCurrencyNaira } from "react-icons/tb";
+import { TbCurrencyDollar, TbCurrencyNaira } from "react-icons/tb";
 import { IoMdArrowDropdown } from "react-icons/io";
-import { PiFunnel } from "react-icons/pi";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAtomValue } from "jotai";
 import { purchasePropertyData } from "./PropertiesDetails";
@@ -32,12 +32,14 @@ interface Payment {
   purchaseId: string;
   createdAt: string;
   updatedAt: string;
+  currency: string;
 }
 
 interface PaymentHistoryData {
   remainingAmount: number;
   amountPaid: number;
   payments: Payment[];
+  currency: string;
 }
 
 export default function PaymentHistory() {
@@ -83,6 +85,8 @@ export default function PaymentHistory() {
   };
 
   const { payments, amountPaid, remainingAmount } = paymentHistoryData;
+
+  const currency = payments[0]?.currency;
 
   // Filter payments based on search (client-side filtering as backup)
   const filteredPayments =
@@ -159,7 +163,13 @@ export default function PaymentHistory() {
           </div>
           <div className="flex text-[#B3B3B3] items-center gap-1">
             <IoMdArrowDropdown />
-            <TbCurrencyNaira className="text-2xl mt-1" />
+            {currency === "NGN" ? (
+              <TbCurrencyNaira className="text-2xl mt-1" />
+            ) : currency === "USD" ? (
+              <TbCurrencyDollar className="text-2xl mt-1" />
+            ) : (
+              ""
+            )}
             <p className="text-[#116114] font-semibold text-2xl">
               {amountPaid.toLocaleString()}
             </p>
@@ -173,7 +183,13 @@ export default function PaymentHistory() {
           </div>
           <div className="flex text-[#B3B3B3] items-center gap-1">
             <IoMdArrowDropdown />
-            <TbCurrencyNaira className="text-2xl mt-1" />
+            {currency === "NGN" ? (
+              <TbCurrencyNaira className="text-2xl mt-1" />
+            ) : currency === "USD" ? (
+              <TbCurrencyDollar className="text-2xl mt-1" />
+            ) : (
+              ""
+            )}
             <p className="text-[#116114] font-semibold text-2xl">
               {remainingAmount.toLocaleString()}
             </p>
@@ -243,11 +259,15 @@ export default function PaymentHistory() {
               >
                 <div>{payment.paymentId}</div>
                 <div>{new Date(payment.paymentDate).toLocaleDateString()}</div>
-                <div>₦{payment.amountPaid.toLocaleString()}</div>
+                <div>
+                  {currency} {payment.amountPaid.toLocaleString()}
+                </div>
                 <div className="text-[#116114]">
                   {payment.paymentMode || "N/A"}
                 </div>
-                <div>₦{payment.balanceRemaining.toLocaleString()}</div>
+                <div>
+                  {currency} {payment.balanceRemaining.toLocaleString()}
+                </div>
               </div>
             ))}
           </>
