@@ -308,14 +308,14 @@ export default function Profile() {
         </h3>
         <div className="max-w-xl rounded-t-xl space-y-4 p-6 bg-[#F4F4F4] flex flex-col items-center justify-center">
           <div className="relative flex items-center justify-center w-full">
-            <div className="absolute right-0 top-0">
+            {/* <div className="absolute right-0 top-0">
               <button
                 onClick={handleEditClick}
                 className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow duration-200"
               >
                 <Camera className="text-[#858C95] h-4 w-4" />
               </button>
-            </div>
+            </div> */}
             <Avatar className="h-20 w-20 bg-white border-4 border-white shadow-md">
               <AvatarImage
                 src={profileImage || user.profileImage}

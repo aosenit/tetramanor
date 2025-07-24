@@ -17,7 +17,7 @@ import { useFetchData, usePostData } from "@/hooks/useApi";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 
-type paymentType = "OWNERSHIPT" | "RENT" | "INSTALLMENT";
+type paymentType = "OWNERSHIP" | "RENT" | "INSTALLMENT";
 
 type paymentMode = "BANK_TRANSFER" | "CASH" | "POS";
 
@@ -61,7 +61,7 @@ export default function AddPaymentModal({
     purchaseId: unitId || "",
     customerId: userId || "",
     propertyId: property?.property?.id || "",
-    paymentType: "OWNERSHIPT",
+    paymentType: "OWNERSHIP",
     amountPaid: "",
     balanceRemaining: "",
     paymentMode: "POS",
@@ -107,7 +107,7 @@ export default function AddPaymentModal({
         purchaseId: unitId || "",
         customerId: userId || "",
         propertyId: property?.property?.id || "",
-        paymentType: "OWNERSHIPT",
+        paymentType: "OWNERSHIP",
         amountPaid: "",
         balanceRemaining: "",
         paymentMode: "BANK_TRANSFER",
@@ -180,7 +180,7 @@ export default function AddPaymentModal({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="OWNERSHIPT">Ownership</SelectItem>
+                  <SelectItem value="OWNERSHIP">Ownership</SelectItem>
                   <SelectItem value="RENT">Rental</SelectItem>
                 </SelectContent>
               </Select>

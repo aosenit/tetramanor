@@ -218,7 +218,7 @@ export default function PropertyDashboard() {
         {/* Tabs */}
         <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="grid w-fit grid-cols-2 mb-6">
-            <TabsTrigger value="owned">Owned</TabsTrigger>
+            <TabsTrigger value="owned">Not Rented</TabsTrigger>
             <TabsTrigger value="rented">Rented</TabsTrigger>
           </TabsList>
 
