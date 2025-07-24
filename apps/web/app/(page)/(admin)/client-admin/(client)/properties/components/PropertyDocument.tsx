@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { EyeIcon } from "lucide-react";
 import React from "react";
 
 interface Document {
@@ -8,6 +8,7 @@ interface Document {
   size: string;
   url: string;
   createdAt: string;
+  imageUrl: string;
 }
 
 interface PropertyDocumentProps {
@@ -35,7 +36,7 @@ const PropertyDocument: React.FC<PropertyDocumentProps> = ({
             Access all your property-related documents.
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        {/* <div className="flex items-center gap-4">
           <div className="relative">
             <input
               type="text"
@@ -87,7 +88,7 @@ const PropertyDocument: React.FC<PropertyDocumentProps> = ({
           >
             Upload document
           </Button>
-        </div>
+        </div> */}
       </div>
 
       <div className="border rounded-md overflow-hidden">
@@ -112,7 +113,7 @@ const PropertyDocument: React.FC<PropertyDocumentProps> = ({
               >
                 Issued Date
               </th>
-              <th
+              {/* <th
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
@@ -123,7 +124,7 @@ const PropertyDocument: React.FC<PropertyDocumentProps> = ({
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
                 Size
-              </th>
+              </th> */}
               <th scope="col" className="relative px-6 py-3">
                 <span className="sr-only">Actions</span>
               </th>
@@ -151,22 +152,21 @@ const PropertyDocument: React.FC<PropertyDocumentProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(doc.createdAt)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {doc.type}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {doc.size}
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button className="text-gray-400 hover:text-gray-500">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
+                      <a
+                        href={doc.imageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
-                        <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                      </svg>
+                        <EyeIcon className="h-5 w-5" />
+                      </a>
                     </button>
                   </td>
                 </tr>

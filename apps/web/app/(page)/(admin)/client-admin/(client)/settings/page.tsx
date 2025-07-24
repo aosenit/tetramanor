@@ -413,6 +413,7 @@ export default function AccountSettings() {
                       displayPicture ||
                       "/placeholder.svg?height=64&width=64"
                     }
+                    className="object-contain"
                   />
                   <AvatarFallback className="text-lg font-semibold bg-gray-200">
                     {profileData?.name?.split(" ")[0]?.charAt(0)}
