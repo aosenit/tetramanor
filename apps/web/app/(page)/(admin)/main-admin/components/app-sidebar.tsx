@@ -30,14 +30,19 @@ import { usePathname, useRouter } from "next/navigation";
 import LogoutModal from "@/components/LogoutModal";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useUnreadNotifications } from "@/hooks/useNoti";
+import { Badge } from "@/components/ui/badge";
 
 export const route = "/main-admin";
 
 export function AppSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-
   const router = useRouter();
+
+  // Fetch unread notifications count
+  const { unreadCount } = useUnreadNotifications();
+
   return (
     <Sidebar className="border-r bg-[#323539] text-white">
       <SidebarHeader className="p-6">
@@ -92,11 +97,12 @@ export function AppSidebar() {
                 url: `${route}/contact-inquiries`,
                 icon: MessageSquare,
               },
-
               {
                 title: "Notifications",
                 url: `${route}/notifications`,
                 icon: Bell,
+                showBadge: true,
+                badgeCount: unreadCount,
               },
             ].map((item) => {
               // check if the pathname includes the item.url, except for when item.url ends with main-admin
@@ -112,10 +118,15 @@ export function AppSidebar() {
                   >
                     <Link
                       href={item.url}
-                      className="flex items-center gap-3 px-3 py-3 rounded-md"
+                      className="flex items-center gap-3 px-3 py-3 rounded-md relative"
                     >
                       <item.icon className="h-5 w-5" />
                       <span>{item.title}</span>
+                      {item.showBadge && item.badgeCount > 0 && (
+                        <Badge className="ml-auto bg-red-500 hover:bg-red-600 h-5 w-5 p-0 flex items-center justify-center rounded-full text-xs">
+                          {item.badgeCount}
+                        </Badge>
+                      )}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
