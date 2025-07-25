@@ -41,7 +41,11 @@ function TabTwo({ investments }: { investments: any[] }) {
     if (scrollRef.current) {
       const card = scrollRef.current.children[idx] as HTMLElement;
       if (card) {
-        card.scrollIntoView({ behavior: "smooth", inline: "start" });
+        card.scrollIntoView({
+          behavior: "smooth",
+          inline: "start",
+          block: "nearest",
+        });
       }
     }
   };
@@ -89,16 +93,26 @@ function TabTwo({ investments }: { investments: any[] }) {
           >
             <FaChevronLeft />
           </button>
-          <div className="flex overflow-x-auto gap-8 scrollbar-hide pb-2" ref={scrollRef}>
+          <div
+            className="flex overflow-x-auto gap-8 scrollbar-hide pb-2 overscroll-x-contain overflow-y-hidden"
+            ref={scrollRef}
+          >
             {investments.map((investment, idx) => (
-              <div key={idx} className="bg-[#f9f4f0] rounded-xl p-2 md:p-4 min-w-full max-w-full flex-shrink-0">
+              <div
+                key={idx}
+                className="bg-[#f9f4f0] rounded-xl p-2 md:p-4 min-w-full max-w-full flex-shrink-0"
+              >
                 <div className="grid md:grid-cols-2 gap-8">
                   <div className="flex items-center justify-center h-[350px]">
                     <div className="bg-amber-100 rounded-xl w-full h-[350px] flex items-center justify-center overflow-hidden">
                       <Image
                         src={getInvestmentImage(investment?.image)}
                         alt={investment?.projectName || ""}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
                         width={400}
                         height={300}
                       />
@@ -125,7 +139,8 @@ function TabTwo({ investments }: { investments: any[] }) {
                           <span className="text-sm font-semibold">
                             Estimated ROI:
                           </span>{" "}
-                          {investment?.estimatedROI || "Up to"}% on invested capital
+                          {investment?.estimatedROI || "Up to"}% on invested
+                          capital
                         </div>
                       </li>
                       <li className="flex items-start gap-2">
@@ -141,7 +156,9 @@ function TabTwo({ investments }: { investments: any[] }) {
                       <li className="flex items-start gap-2">
                         <FaCheck className="h-5 w-3 mt-0.5 flex-shrink-0 text-[#0B0A0A]" />
                         <div className="text-sm font-medium text-[#0B0A0A]">
-                          <span className="text-sm font-semibold">Duration:</span>{" "}
+                          <span className="text-sm font-semibold">
+                            Duration:
+                          </span>{" "}
                           {investment?.duration || "12"} months
                         </div>
                       </li>
@@ -167,8 +184,9 @@ function TabTwo({ investments }: { investments: any[] }) {
                         More benefits include:
                         <span className="text-[#116114] text-sm font-bold">
                           {" "}
-                          Profit Sharing, Higher Potential Returns, Long-term Growth,
-                          Portfolio Diversification, Real Estate Exposure.
+                          Profit Sharing, Higher Potential Returns, Long-term
+                          Growth, Portfolio Diversification, Real Estate
+                          Exposure.
                         </span>
                       </p>
                     </div>
