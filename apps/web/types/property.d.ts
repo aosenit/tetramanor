@@ -83,4 +83,61 @@ export interface PropertyResponse {
   message: string;
   data: PropertyData;
   statusCode: number;
+}
+
+export interface Rental {
+  id: string;
+  name: string;
+  address: string;
+  about: string;
+  featured: boolean;
+  featuredAt: string | null;
+  inquiryOptions: string[];
+  whyInvest: any[];
+  investmentAdvantages: any[];
+  deletedAt: string | null;
+  features: string[];
+  amenities: string[];
+  slug: string;
+  createdAt: string;
+  brochure: string | null;
+  constructionStatus: "ONGOING" | "COMPLETED";
+  createdById: string | null;
+  status: "AVAILABLE" | "SOLD_OUT";
+  unitAmount: number;
+  unitTypes: string[];
+  accountOfficerId: string | null;
+  coverImageId: string | null;
+  images: PropertyImage[];
+  rental: {
+    id: string;
+    propertyId: string;
+    apartmentType: string;
+    location: string;
+    rent: number;
+    frequency: string;
+    agencyFee: number;
+    cautionFee: number;
+    status: string;
+    isFurnished: boolean;
+    createdAt: string;
+    updatedAt: string;
+    highlight: boolean;
+    purchaseId: string | null;
+    images: PropertyImage[];
+  };
+}
+
+export interface RentalData {
+  items: Rental[];
+  page: number;
+  total: number;
+  limit: number;
+}
+
+export interface RentalResponse {
+  success: boolean;
+  message: string;
+  data: RentalData;
+  statusCode: number;
 } 

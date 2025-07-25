@@ -71,7 +71,10 @@ export default function Page({ params }: PageProps) {
       <MorePictures property={property} />
       <MapSection location={property.address} />
       <EconomicAdvantages property={property} />
-      <ScheduleInspection propertyTitle={property.name} />
+      <ScheduleInspection
+        propertyTitle={property.name}
+        propertyId={property.id}
+      />
       <Footer />
     </div>
   );
