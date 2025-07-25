@@ -227,7 +227,8 @@ const PropertyPaymentHistory: React.FC<PropertyPaymentHistoryProps> = ({
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {payment.currency} {payment.balanceRemaining}
+                        {payment.currency}{" "}
+                        {payment.balanceRemaining?.toLocaleString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <DropdownMenu>

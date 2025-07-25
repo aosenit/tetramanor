@@ -248,16 +248,8 @@ export default function PaymentDetailsDrawer({
                     </p>
                     <div className="space-y-1">
                       <p className="text-lg font-semibold text-gray-900">
-                        {formatCurrency(
-                          paymentDetails.data.totalAmountDue.ngn,
-                          "NGN"
-                        )}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {formatCurrency(
-                          paymentDetails.data.totalAmountDue.usd,
-                          "USD"
-                        )}
+                        {paymentDetails.data.currency} {""}
+                        {paymentDetails.data.totalAmountDue}
                       </p>
                     </div>
                   </div>
@@ -267,16 +259,8 @@ export default function PaymentDetailsDrawer({
                     <p className="text-gray-500 text-sm mb-2">Amount Paid</p>
                     <div className="space-y-1">
                       <p className="text-lg font-semibold text-green-600">
-                        {formatCurrency(
-                          paymentDetails.data.amountPaid.ngn,
-                          "NGN"
-                        )}
-                      </p>
-                      <p className="text-sm text-green-600">
-                        {formatCurrency(
-                          paymentDetails.data.amountPaid.usd,
-                          "USD"
-                        )}
+                        {paymentDetails.data.currency} {""}
+                        {paymentDetails.data.amountPaid}
                       </p>
                     </div>
                   </div>
@@ -286,16 +270,8 @@ export default function PaymentDetailsDrawer({
                     <p className="text-gray-500 text-sm mb-2">Balance Due</p>
                     <div className="space-y-1">
                       <p className="text-lg font-semibold text-orange-600">
-                        {formatCurrency(
-                          paymentDetails.data.balanceDue.ngn,
-                          "NGN"
-                        )}
-                      </p>
-                      <p className="text-sm text-orange-600">
-                        {formatCurrency(
-                          paymentDetails.data.balanceDue.usd,
-                          "USD"
-                        )}
+                        {paymentDetails.data.currency} {""}
+                        {paymentDetails.data.balanceDue}
                       </p>
                     </div>
                   </div>

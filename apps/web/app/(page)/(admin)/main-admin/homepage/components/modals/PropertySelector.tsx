@@ -45,7 +45,7 @@ export default function PropertySelector({
     queryKey: ["properties", type, searchTerm],
     queryFn: async ({ pageParam = 1 }) => {
       const response = await axiosInstance.get(
-        `${type === "property" ? "admin/properties" : "rentals"}?page=${pageParam}&limit=10${searchTerm ? `&search=${searchTerm}` : ""}`
+        `${type === "property" ? "admin/properties" : "rentals/all"}?page=${pageParam}&limit=10${searchTerm ? `&search=${searchTerm}` : ""}`
       );
       return response.data;
     },

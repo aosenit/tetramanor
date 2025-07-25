@@ -181,13 +181,7 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
                     scope="col"
                     className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Amount (₦)
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Amount ($)
+                    Amount ({paymentData.currency})
                   </th>
                 </tr>
               </thead>
@@ -197,10 +191,8 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
                     Total Amount Due
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
-                    {formatCurrency(paymentData.totalAmountDue.ngn, "NGN")}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
-                    {formatCurrency(paymentData.totalAmountDue.usd, "USD")}
+                    {paymentData.currency} {""}
+                    {paymentData.totalAmountDue?.toLocaleString()}
                   </td>
                 </tr>
                 <tr>
@@ -208,10 +200,8 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
                     Amount Paid
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 text-right font-medium">
-                    {formatCurrency(paymentData.amountPaid.ngn, "NGN")}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 text-right font-medium">
-                    {formatCurrency(paymentData.amountPaid.usd, "USD")}
+                    {paymentData.currency} {""}
+                    {paymentData.amountPaid?.toLocaleString()}
                   </td>
                 </tr>
                 <tr>
@@ -219,10 +209,8 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
                     Balance Due
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-600 text-right font-medium">
-                    {formatCurrency(paymentData.balanceDue.ngn, "NGN")}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-600 text-right font-medium">
-                    {formatCurrency(paymentData.balanceDue.usd, "USD")}
+                    {paymentData.currency} {""}
+                    {paymentData.balanceDue?.toLocaleString()}
                   </td>
                 </tr>
               </tbody>
