@@ -11,7 +11,7 @@ import { useFetchData, useUploadPutData, useUploadData } from "@/hooks/useApi";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Breadcrumb } from "../../customers/components/Breadcrumb";
-import { Switch } from "@chakra-ui/react";
+import { Switch } from "@/components/ui/switch";
 
 // Validation schema
 const rentalSchema = z.object({
@@ -606,8 +606,8 @@ export default function EditRental() {
           </label>
           <Switch
             checked={formData.isFurnished}
-            colorScheme="green"
-            onChange={() =>
+            color="green"
+            onCheckedChange={() =>
               handleInputChange("isFurnished", !formData.isFurnished)
             }
           />
