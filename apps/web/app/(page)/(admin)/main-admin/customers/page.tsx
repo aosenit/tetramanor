@@ -277,7 +277,7 @@ function CustomersPageContent() {
             <SelectContent>
               <SelectItem value="VERIFIED">Verified</SelectItem>
               <SelectItem value="PENDING">Pending</SelectItem>
-              <SelectItem value="UNVERIFIED">Unverified</SelectItem>
+              <SelectItem value="REJECTED">Rejected</SelectItem>
             </SelectContent>
           </Select>
 
