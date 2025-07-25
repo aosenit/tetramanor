@@ -31,24 +31,6 @@ type Payment = {
   paymentMode: string | null;
 };
 
-type PaymentDetails = {
-  paymentDate: string;
-  receiptNumber: string;
-  propertyName: string;
-  totalAmountDue: {
-    ngn: number;
-    usd: number;
-  };
-  amountPaid: {
-    ngn: number;
-    usd: number;
-  };
-  balanceDue: {
-    ngn: number;
-    usd: number;
-  };
-};
-
 interface PaymentDetailsDrawerProps {
   payment: Payment | null;
   open: boolean;

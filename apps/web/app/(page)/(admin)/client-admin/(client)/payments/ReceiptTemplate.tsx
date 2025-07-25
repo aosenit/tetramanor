@@ -2,18 +2,19 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
-import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import Image from "next/image";
 import logo from "@/assets/full-logo.png";
 import { useGetData, useGetExportData } from "@/hooks/useApi";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ReceiptTemplateProps {
   receiptId: string;
 }
 
 export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
+  const router = useRouter();
   const [downloadUrl, setDownloadUrl] = useState<string>("");
   const {
     mutate: fetchReceiptData,
@@ -250,12 +251,12 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
       </div>
 
       <div className="mt-6 text-center">
-        <Link
-          href="/client-admin/payments"
+        <button
+          onClick={() => router.back()}
           className="text-gray-500 hover:text-gray-700 underline text-sm"
         >
           Back to Payments
-        </Link>
+        </button>
       </div>
     </div>
   );

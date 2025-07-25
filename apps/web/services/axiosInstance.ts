@@ -93,9 +93,13 @@ const handleError = async (error: any) => {
     //   }
     //   return Promise.reject(refreshError);
     // }
-    toast.error("Unauthorized: Please log in again.");
-    localStorage.clear();
-    window.location.href = "/login";
+
+    if (!originalRequest.url.includes("login")) {
+      toast.error(data?.message || "Unauthorized: Please log in again.");
+    } else {
+      localStorage.clear();
+      window.location.href = "/login";
+    }
   }
 
   const messages: Record<number, string> = {

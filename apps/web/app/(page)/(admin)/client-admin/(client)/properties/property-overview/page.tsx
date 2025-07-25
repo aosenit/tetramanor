@@ -331,7 +331,7 @@ const PropertyOverview = () => {
                 className="gap-2 w-1/2 md:w-auto"
                 onClick={() => setActiveTab("owned")}
               >
-                Owned
+                Not Rented
               </Button>
               <Button
                 variant={activeTab === "rented" ? "outline" : "ghost"}
@@ -342,7 +342,7 @@ const PropertyOverview = () => {
                 Rented
               </Button>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 w-full md:w-auto">
+            {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 w-full md:w-auto">
               <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                 <DialogTrigger asChild>
                   <Button
@@ -449,7 +449,7 @@ const PropertyOverview = () => {
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full sm:w-64"
               />
-            </div>
+            </div> */}
           </div>
 
           {/* Table states */}
@@ -589,7 +589,7 @@ const PropertyOverview = () => {
                                   : "text-blue-600"
                               }`}
                             >
-                              {property.isRented ? "Rented" : "Owned"}
+                              {property.isRented ? "Rented" : "Not Rented"}
                             </span>
                           </td>
                           <td className="px-3 py-2 text-right">
