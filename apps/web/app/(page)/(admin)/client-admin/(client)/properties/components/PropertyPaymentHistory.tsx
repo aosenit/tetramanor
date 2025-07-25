@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Check, MoreHorizontal, Eye, FileText } from "lucide-react";
+import { MoreHorizontal, FileText } from "lucide-react";
 import Link from "next/link";
 
 interface PropertyPaymentHistoryProps {

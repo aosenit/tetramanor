@@ -149,10 +149,7 @@ export default function PropertyPage({ params }: { params: { id: string } }) {
           </TabsContent>
 
           <TabsContent value="payment-history">
-            <PropertyPaymentHistory
-              payments={data?.data?.payments}
-              purchaseId={purchaseId}
-            />
+            <PropertyPaymentHistory purchaseId={purchaseId} />
           </TabsContent>
 
           <TabsContent value="documents">
