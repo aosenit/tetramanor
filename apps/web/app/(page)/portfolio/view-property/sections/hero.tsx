@@ -16,7 +16,11 @@ interface HeroProps {
 
 const HomeHero = ({ property }: HeroProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const image = property.images?.find(img => img.isPrimary)?.imageUrl || property.images?.[0]?.imageUrl || placeholder;
+  const image =
+    property.coverImage?.imageUrl ||
+    property.images?.find((img) => img.isPrimary)?.imageUrl ||
+    property.images?.[0]?.imageUrl ||
+    placeholder;
   if (!property) return null;
   return (
     <section className="relative h-[60vh] overflow-hidden">
