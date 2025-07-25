@@ -79,7 +79,7 @@ export default function EditRental() {
 
   // Fetch rental data if in edit mode
   const { data: rentalData, isLoading: isLoadingRental } = useFetchData(
-    rentalId ? `rentals/${rentalId}` : null
+    rentalId ? `rentals/${rentalId}/details` : null
   );
 
   // Fetch properties for dropdown

@@ -51,7 +51,7 @@ function Details({ refetch }: DetailsProps) {
     isLoading,
     error,
     refetch: refetchRental,
-  } = useFetchData(rentalId ? `rentals/${rentalId}` : null);
+  } = useFetchData(rentalId ? `rentals/${rentalId}/details` : null);
 
   const [rental, setRental] = useState<any>(null);
   const [property, setProperty] = useState<any>(null);
