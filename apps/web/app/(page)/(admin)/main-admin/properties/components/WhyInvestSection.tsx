@@ -53,31 +53,35 @@ export default function WhyInvestSection({
         </div>
         {/* List of advantages as cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {formData?.whyInvest?.map((adv: any, idx: number) => (
-            <div
-              key={idx}
-              className="p-4 rounded-lg border bg-[#F8F9FA] cursor-pointer hover:shadow-md transition"
-              onClick={() => openEditAdvantageDialog(idx)}
-            >
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-semibold text-[#116114]">
-                  {adv.title}
-                </span>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveAdvantage(idx);
-                  }}
-                >
-                  Remove
-                </Button>
+          {formData?.whyInvest?.length === 0 && (
+            <p className="text-sm text-[#323539]">No why invest added yet</p>
+          )}
+          {formData?.whyInvest?.length > 0 &&
+            formData?.whyInvest?.map((adv: any, idx: number) => (
+              <div
+                key={idx}
+                className="p-4 rounded-lg border bg-[#F8F9FA] cursor-pointer hover:shadow-md transition"
+                onClick={() => openEditAdvantageDialog(idx)}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-semibold text-[#116114]">
+                    {adv.title}
+                  </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveAdvantage(idx);
+                    }}
+                  >
+                    Remove
+                  </Button>
+                </div>
+                <p className="text-sm text-[#323539]">{adv?.description}</p>
               </div>
-              <p className="text-sm text-[#323539]">{adv?.description}</p>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
       {/* Dialog for add/edit advantage */}

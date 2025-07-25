@@ -2,18 +2,19 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
-import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import Image from "next/image";
 import logo from "@/assets/full-logo.png";
 import { useGetData, useGetExportData } from "@/hooks/useApi";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ReceiptTemplateProps {
   receiptId: string;
 }
 
 export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
+  const router = useRouter();
   const [downloadUrl, setDownloadUrl] = useState<string>("");
   const {
     mutate: fetchReceiptData,
@@ -180,13 +181,7 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
                     scope="col"
                     className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Amount (₦)
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Amount ($)
+                    Amount ({paymentData.currency})
                   </th>
                 </tr>
               </thead>
@@ -196,10 +191,8 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
                     Total Amount Due
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
-                    {formatCurrency(paymentData.totalAmountDue.ngn, "NGN")}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
-                    {formatCurrency(paymentData.totalAmountDue.usd, "USD")}
+                    {paymentData.currency} {""}
+                    {paymentData.totalAmountDue?.toLocaleString()}
                   </td>
                 </tr>
                 <tr>
@@ -207,10 +200,8 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
                     Amount Paid
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 text-right font-medium">
-                    {formatCurrency(paymentData.amountPaid.ngn, "NGN")}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 text-right font-medium">
-                    {formatCurrency(paymentData.amountPaid.usd, "USD")}
+                    {paymentData.currency} {""}
+                    {paymentData.amountPaid?.toLocaleString()}
                   </td>
                 </tr>
                 <tr>
@@ -218,10 +209,8 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
                     Balance Due
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-600 text-right font-medium">
-                    {formatCurrency(paymentData.balanceDue.ngn, "NGN")}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-600 text-right font-medium">
-                    {formatCurrency(paymentData.balanceDue.usd, "USD")}
+                    {paymentData.currency} {""}
+                    {paymentData.balanceDue?.toLocaleString()}
                   </td>
                 </tr>
               </tbody>
@@ -250,12 +239,12 @@ export function ReceiptTemplate({ receiptId }: ReceiptTemplateProps) {
       </div>
 
       <div className="mt-6 text-center">
-        <Link
-          href="/client-admin/payments"
+        <button
+          onClick={() => router.back()}
           className="text-gray-500 hover:text-gray-700 underline text-sm"
         >
           Back to Payments
-        </Link>
+        </button>
       </div>
     </div>
   );

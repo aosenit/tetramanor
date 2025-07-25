@@ -51,7 +51,7 @@ function Details({ refetch }: DetailsProps) {
     isLoading,
     error,
     refetch: refetchRental,
-  } = useFetchData(rentalId ? `rentals/${rentalId}` : null);
+  } = useFetchData(rentalId ? `rentals/${rentalId}/details` : null);
 
   const [rental, setRental] = useState<any>(null);
   const [property, setProperty] = useState<any>(null);
@@ -194,6 +194,12 @@ function Details({ refetch }: DetailsProps) {
             <div className="flex items-center justify-between">
               <p className="text-[#181818]">Property name</p>
               <p className="text-[#181818]">{property?.name || "N/A"}</p>
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-[#181818]">Property furnished</p>
+              <p className="text-[#181818]">
+                {rentalData.data?.isFurnished ? "Yes" : "No"}
+              </p>
             </div>
             <div className="flex items-center justify-between">
               <p className="text-[#000000]">Status</p>

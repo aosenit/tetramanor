@@ -245,7 +245,7 @@ export default function InvestmentModal({
                 onDelete={() => setImageName("Featured Image")}
               /> */}
               <Image
-                src={post?.image?.[0].imageUrl}
+                src={post?.image?.[0]?.imageUrl}
                 alt="Featured Image"
                 width={100}
                 height={100}

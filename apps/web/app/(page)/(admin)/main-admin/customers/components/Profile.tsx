@@ -273,7 +273,7 @@ export default function Profile() {
       <div className="border-b border-[#E5E5E7] pb-4">
         <Breadcrumb
           items={[
-            { label: "Home", href: "/main-admin" },
+            { label: "Home", href: "/main-admin/customers" },
             { label: "Customer management", href: "#" },
           ]}
         />

@@ -34,10 +34,10 @@ export default function PropertyStatisticsChart({
             />
           </Suspense>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
+            {/* <div className="text-center">
               <div className="text-sm text-gray-500">Total Properties</div>
               <div className="text-4xl font-bold">{total}</div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

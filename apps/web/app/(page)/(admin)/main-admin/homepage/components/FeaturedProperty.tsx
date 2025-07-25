@@ -326,8 +326,6 @@ export default function FeaturedProperty() {
   const [showFeaturedDetail, setShowFeaturedDetail] = React.useState(false);
   const [showRentalDetail, setShowRentalDetail] = React.useState(false);
 
-  const router = useRouter();
-
   const {
     data,
     isLoading,
@@ -339,7 +337,7 @@ export default function FeaturedProperty() {
     isLoading: rentalLoading,
     error: rentalError,
     refetch: refetchRentals,
-  } = useFetchData("rentals?highlighted=true");
+  } = useFetchData("rentals/all/?highlighted=true");
 
   const { mutateAsync: removeFeaturedProperty, isPending: isRemovingFeatured } =
     usePostData("admin/properties/featured");
@@ -579,17 +577,17 @@ export default function FeaturedProperty() {
                 <p className="text-sm text-[#000000] font-medium">
                   Current -{" "}
                   <span className="text-[#116114] text-sm">
-                    {highlightedRental.property.name}
+                    {highlightedRental?.property?.name}
                   </span>{" "}
                   -{" "}
                   <span className="text-[#116114] text-sm">
-                    {highlightedRental.apartmentType.replace(/_/g, " ")}
+                    {highlightedRental?.apartmentType?.replace(/_/g, " ")}
                   </span>
                 </p>
 
                 <div className="flex gap-4 items-center">
                   <Image
-                    src={highlightedRental.property.images[0]?.imageUrl}
+                    src={highlightedRental?.property?.images?.[0]?.imageUrl}
                     alt="Featured property"
                     width={80}
                     height={80}
@@ -662,7 +660,7 @@ export default function FeaturedProperty() {
         onConfirm={handleRemoveHighlightedRental}
         isPending={isRemovingRental}
         title="Remove Highlighted Rental"
-        message={`Are you sure you want to remove "${highlightedRental?.property.name}" as the highlighted rental? This will no longer appear at the top of the homepage.`}
+        message={`Are you sure you want to remove "${highlightedRental?.property?.name}" as the highlighted rental? This will no longer appear at the top of the homepage.`}
         confirmText="Remove"
         cancelText="Cancel"
       />

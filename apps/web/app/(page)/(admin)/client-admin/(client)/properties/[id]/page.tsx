@@ -20,11 +20,11 @@ export default function PropertyPage({ params }: { params: { id: string } }) {
   // const id = searchParams.get("id");
   // const name = searchParams.get("name");
   // const type = searchParams.get("type");
-  const propertyId = params.id;
+  const purchaseId = params.id;
 
   // Fetch property details using the new endpoint
   const { data, isLoading, isError, error } = useFetchData(
-    propertyId ? `/customer/properties/purchase/${propertyId}` : ""
+    purchaseId ? `/customer/properties/purchase/${purchaseId}` : ""
   );
 
   const [property, setProperty] = useState<any>(null);
@@ -35,7 +35,7 @@ export default function PropertyPage({ params }: { params: { id: string } }) {
 
       // Transform the API data to match the expected structure
       const transformedProperty = {
-        id: propertyId,
+        id: purchaseId,
         name: propertyData.name || propertyData.property?.name || "Property",
         location: propertyData.property?.address || "Location not available",
         description: propertyData.property?.about || "No description available",
@@ -63,7 +63,7 @@ export default function PropertyPage({ params }: { params: { id: string } }) {
 
       setProperty(transformedProperty);
     }
-  }, [data, propertyId]);
+  }, [data, purchaseId]);
 
   if (isLoading) {
     return (
@@ -149,7 +149,7 @@ export default function PropertyPage({ params }: { params: { id: string } }) {
           </TabsContent>
 
           <TabsContent value="payment-history">
-            <PropertyPaymentHistory payments={data?.data?.payments} />
+            <PropertyPaymentHistory purchaseId={purchaseId} />
           </TabsContent>
 
           <TabsContent value="documents">

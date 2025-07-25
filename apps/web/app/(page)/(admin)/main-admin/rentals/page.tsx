@@ -95,7 +95,7 @@ export default function RentalsPage() {
     data: rentalsResponse,
     isLoading: rentalsLoading,
     refetch: refetchRentals,
-  } = useFetchData("rentals");
+  } = useFetchData("rentals/all");
 
   // Fetch stats data
   const {

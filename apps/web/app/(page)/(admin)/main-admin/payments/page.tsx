@@ -327,7 +327,7 @@ function PaymentsPageContent() {
             <h2 className="text-lg font-medium">Payments breakdown</h2>
             <div className="flex items-center gap-2 rounded-full border border-gray-300 p-2 w-fit">
               <button
-                onClick={() => setSelectedCurrency(!selectedCurrency)}
+                onClick={() => setSelectedCurrency(true)}
                 className={`p-1 rounded transition-colors ${
                   selectedCurrency
                     ? "bg-[#116114] text-white"
@@ -336,6 +336,17 @@ function PaymentsPageContent() {
                 title="Filter by USD"
               >
                 <DollarSign className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setSelectedCurrency(false)}
+                className={`p-1 rounded transition-colors ${
+                  !selectedCurrency
+                    ? "bg-[#116114] text-white"
+                    : "hover:bg-gray-100"
+                }`}
+                title="Filter by USD"
+              >
+                <TbCurrencyNaira className="w-5 h-5" />
               </button>
             </div>
           </div>

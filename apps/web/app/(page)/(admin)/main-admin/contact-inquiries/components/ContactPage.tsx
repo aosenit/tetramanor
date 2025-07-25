@@ -3,13 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RiEdit2Line } from "react-icons/ri";
-import { ChevronDown } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogOverlay,
-  DialogPortal,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";

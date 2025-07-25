@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useCallback } from "react";
-import { useRouter } from "next/navigation";
+
 import Details from "./components/Details";
 
 function RentalDetailsPage() {
-  const router = useRouter();
-
   // Create a comprehensive refetch function that can trigger multiple refetches
   const handleRefetch = useCallback(() => {
     // This function can be called to refresh both rental data and stats

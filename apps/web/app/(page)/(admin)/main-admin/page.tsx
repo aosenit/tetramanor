@@ -173,7 +173,8 @@ export default function Dashboard() {
               <div className="text-xl text-[#116114] font-bold">
                 {stats.totalProperties ?? 0}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground">Properties</p>
+              {/* <p className="text-xs text-muted-foreground">
                 <span className="text-[#116114] font-medium text-sm">
                   ({stats.totalUnitPurchased ?? 0}
                 </span>{" "}
@@ -183,7 +184,7 @@ export default function Dashboard() {
                 </span>{" "}
                 for sale{" "}
                 <span className="text-[#116114] font-medium text-sm">)</span>
-              </p>
+              </p> */}
             </CardContent>
           </Card>
 
@@ -196,11 +197,9 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="flex items-center gap-2">
               <div className="text-xl text-[#116114] font-bold">
-                ₦{stats.totalInvestments?.toLocaleString() ?? 0}
+                {stats.totalInvestments?.toLocaleString() ?? 0}
               </div>
-              <p className="text-xs text-[#4C5560] text-muted-foreground">
-                {stats.liveCampaign ?? 0} live campaigns
-              </p>
+              <p className="text-xs text-muted-foreground">Investments</p>
             </CardContent>
           </Card>
 

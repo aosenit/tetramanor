@@ -56,19 +56,38 @@ export default function Socials({
     },
   ];
 
-  // Update local state when props change (only on initial load)
+  // Normalize social links to use consistent platform names
+  const normalizeSocialLinks = (links: SocialLink[]) => {
+    return links.map((link) => {
+      const platformKey = link.platform.toLowerCase();
+      const platformConfig = socialPlatforms.find((p) => p.key === platformKey);
+      return {
+        ...link,
+        platform: platformConfig ? platformConfig.name : link.platform,
+      };
+    });
+  };
+
+  // Update local state when props change
   useEffect(() => {
-    setLocalSocialLinks(socialLinks);
-  }, []); // Only run once on mount
+    const normalizedLinks = normalizeSocialLinks(socialLinks);
+    setLocalSocialLinks(normalizedLinks);
+  }, [socialLinks]);
 
   const handleAddLink = (platform: string) => {
+    const platformConfig = socialPlatforms.find((p) => p.key === platform);
+    const platformName = platformConfig?.name || platform;
+
     const existingLink = localSocialLinks.find(
-      (link) => link.platform === platform
+      (link) => link.platform.toLowerCase() === platform.toLowerCase()
     );
+
     if (!existingLink) {
-      const platformConfig = socialPlatforms.find((p) => p.key === platform);
       const defaultUrl = platformConfig?.defaultUrl || "";
-      const newLinks = [...localSocialLinks, { platform, url: defaultUrl }];
+      const newLinks = [
+        ...localSocialLinks,
+        { platform: platformName, url: defaultUrl },
+      ];
       setLocalSocialLinks(newLinks);
       onSocialLinksChange(newLinks);
     }
@@ -76,7 +95,7 @@ export default function Socials({
 
   const handleRemoveLink = (platform: string) => {
     const newLinks = localSocialLinks.filter(
-      (link) => link.platform !== platform
+      (link) => link.platform.toLowerCase() !== platform.toLowerCase()
     );
     setLocalSocialLinks(newLinks);
     onSocialLinksChange(newLinks);
@@ -84,14 +103,18 @@ export default function Socials({
 
   const handleUrlChange = (platform: string, url: string) => {
     const newLinks = localSocialLinks.map((link) =>
-      link.platform === platform ? { ...link, url } : link
+      link.platform.toLowerCase() === platform.toLowerCase()
+        ? { ...link, url }
+        : link
     );
     setLocalSocialLinks(newLinks);
     onSocialLinksChange(newLinks);
   };
 
   const getLinkForPlatform = (platform: string) => {
-    return localSocialLinks.find((link) => link.platform === platform);
+    return localSocialLinks.find(
+      (link) => link.platform.toLowerCase() === platform.toLowerCase()
+    );
   };
 
   return (
