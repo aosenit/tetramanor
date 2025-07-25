@@ -21,7 +21,7 @@ const navItems = [
   { name: "Want to talk?", href: "/contact" },
 ];
 
-const Header = () => {
+const PortfolioHeader = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -39,7 +39,7 @@ const Header = () => {
   const navLinkClass = `text-sm lg:text-base font-medium transition-colors ${
     isScrolled
       ? "text-black hover:text-gray-800"
-      : "text-white hover:text-gray-100"
+      : "text-black hover:text-gray-800"
   }`;
 
   return (
@@ -185,4 +185,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default PortfolioHeader;

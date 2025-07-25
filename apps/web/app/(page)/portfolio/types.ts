@@ -1,7 +1,8 @@
 export interface Property {
     id: string;
     name: string;
-    address: string;
+  address: string;
+  coverImage: PropertyImage;
     about: string;
     featured: boolean;
     featuredAt: string | null;

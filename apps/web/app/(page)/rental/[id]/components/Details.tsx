@@ -1,22 +1,16 @@
 "use client";
 import Image from "next/image";
-import { FiShare2 } from "react-icons/fi";
-import Header from "@/app/(page)/portfolio/components/header";
 import { useParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
 import { useState } from "react";
 import MapSection from "@/app/(page)/portfolio/view-property/sections/map";
 import { FaHome } from "react-icons/fa";
-import { PiCarBatteryFill, PiCircleFill } from "react-icons/pi";
-import { MdGridOn, MdOutlineSecurity, MdDelete } from "react-icons/md";
-import { TbWindow } from "react-icons/tb";
-import { GiWaterDrop, GiTreehouse } from "react-icons/gi";
-import { FaBath } from "react-icons/fa";
-import { MdBed, MdKitchen, MdOutlineAcUnit, MdOutlineMicrowave, MdMeetingRoom, MdWindow } from "react-icons/md";
-import { PiBedBold } from "react-icons/pi";
 import { IoLocationOutline } from "react-icons/io5";
-import placeholder from "/assets/placeholder.jpg"
+import placeholder from "/assets/placeholder.jpg";
 import { useToast } from "@chakra-ui/react";
+import Link from "next/link";
+import PortfolioHeader from "@/app/(page)/portfolio/components/portfolioHeader";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 // Image mapping based on construction status
 const constructionImages = {
@@ -31,7 +25,7 @@ const fallbackImages = [placeholder];
 function PropertyDetailsSkeleton() {
   return (
     <div className="font-sans">
-      <Header />
+      <PortfolioHeader />
       <div className="container mx-auto px-4 md:px-6 lg:px-16 py-8 md:py-12">
         {/* Breadcrumb Skeleton */}
         <div className="flex flex-wrap items-center justify-between gap-2 p-4">
@@ -97,7 +91,7 @@ function PropertyDetailsSkeleton() {
 function PropertyNotFound() {
   return (
     <div className="font-sans">
-      <Header />
+      <PortfolioHeader />
       <div className="container mx-auto px-4 md:px-6 lg:px-16 py-8 md:py-12">
         <div className="flex flex-col items-center justify-center py-16 px-4">
           <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
@@ -110,12 +104,12 @@ function PropertyNotFound() {
             The property you're looking for doesn't exist or may have been
             removed.
           </p>
-          <a
+          <Link
             href="/rental"
             className="bg-green-700 text-white px-6 py-2 rounded-md hover:bg-green-800 transition-colors"
           >
             Back to Properties
-          </a>
+          </Link>
         </div>
       </div>
     </div>
@@ -124,156 +118,103 @@ function PropertyNotFound() {
 
 export default function PropertyDetails() {
   const params = useParams();
-  const propertyId = params.id as string;
+  const rentalId = params.id as string;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const toast = useToast();
 
   const { data, isLoading, error } = useFetchData(
-    `property/detail/${propertyId}`
+    `rentals/${rentalId}/details`
   );
 
-  // Get fallback images based on construction status
-  const getFallbackImages = (constructionStatus: string) => {
-    const images =
-      constructionImages[
-        constructionStatus as keyof typeof constructionImages
-      ] || fallbackImages;
-    return images;
-  };
+  // Format helpers
+  const formatCurrency = (value: number) =>
+    value ? `₦${value.toLocaleString()}` : "-";
+  const formatStatus = (status?: string) =>
+    status === "RENTED"
+      ? "Rented"
+      : status === "AVAILABLE"
+        ? "Available"
+        : status || "-";
+  const formatFurnished = (isFurnished?: boolean) =>
+    isFurnished === true ? "Furnished" : "Unfurnished";
 
-  // Get a fallback image for properties without images
-  const getFallbackImage = (propertyId: string) => {
-    const index = propertyId.charCodeAt(0) % fallbackImages.length;
-    return fallbackImages[index];
-  };
+  if (isLoading) return <PropertyDetailsSkeleton />;
+  if (error || data?.success === false) return <PropertyNotFound />;
 
-  // Get bedroom count from unit types
-  const getBedroomCount = (unitTypes: string[]) => {
-    const type = unitTypes[0] || "";
-    if (type.includes("FOUR_BEDROOM")) return 4;
-    if (type.includes("THREE_BEDROOM")) return 3;
-    if (type.includes("TWO_BEDROOM")) return 2;
-    if (type.includes("ONE_BEDROOM")) return 1;
-    if (type.includes("STUDIO")) return 1;
-    return 3; // default
-  };
+  const rental = data?.data;
+  const property = rental?.property;
+  const images =
+    rental?.images && rental.images.length > 0 ? rental.images : [];
+  const displayImages = images.map((img: any) => img.imageUrl);
 
-  // Loading state
-  if (isLoading) {
-    return <PropertyDetailsSkeleton />;
-  }
+  // Pricing details (directly from data)
+  const rent = rental?.rent ?? 0;
+  const agencyFee = rental?.agencyFee ?? 0;
+  const cautionFee = rental?.cautionFee ?? 0;
+  const serviceCharge = rental?.serviceCharge ?? 0;
+  const isFurnished = rental?.isFurnished;
+  const totalPackage = rent + agencyFee + cautionFee + (serviceCharge || 0);
 
-  // Error state
-  if (error || !data?.data) {
-    return <PropertyNotFound />;
-  }
+  // Features and amenities
+  const features = property?.features || [];
+  const amenities = property?.amenities || [];
 
-  const property = data.data;
-  const bedroomCount = getBedroomCount(property.unitTypes);
-
-  // Get images for display
-  const displayImages =
-    property.images.length > 0
-      ? property.images
-      : property.constructionStatus === "COMPLETED" ||
-          property.constructionStatus === "ONGOING"
-        ? getFallbackImages(property.constructionStatus)
-        : [getFallbackImage(property.id), ...fallbackImages.slice(1, 3)];
-
-  const featureIcons: Record<string, JSX.Element> = {
-    "POP Ceilings": <PiCircleFill className="text-green-600 mr-2" />,
-    "Vitrified & Granite Tiles": <MdGridOn className="text-green-600 mr-2" />,
-    "Vintage PVC French Windows": <TbWindow className="text-green-600 mr-2" />,
-    "24/7 Security": <MdOutlineSecurity className="text-green-600 mr-2" />,
-    "Backup Power Supply": <PiCarBatteryFill  className="text-green-600 mr-2" />,
-    "Treated Water System": <GiWaterDrop className="text-green-600 mr-2" />,
-    "High-Quality Kitchen Cabinets & Wardrobes": <MdKitchen className="text-green-600 mr-2" />,
-    "Premium Sanitary Fittings": <FaBath className="text-green-600 mr-2" />,
-    "Walk-in Closets": <MdMeetingRoom className="text-green-600 mr-2" />,
-    "Landscaping & Green Spaces": <GiTreehouse className="text-green-600 mr-2" />,
-    "Efficient Waste Disposal & Central Sewage Management": <MdDelete className="text-green-600 mr-2" />,
-  };
-
-  const amenityIcons: Record<string, JSX.Element> = {
-    "Mattress": <PiBedBold className="text-green-600 mr-2" />,
-    "Bed frame": <MdBed className="text-green-600 mr-2" />,
-    "Fridge": <MdKitchen className="text-green-600 mr-2" />,
-    "Air Conditioner": <MdOutlineAcUnit className="text-green-600 mr-2" />,
-    "Water Heater": <MdOutlineMicrowave className="text-green-600 mr-2" />,
-    "Tabletop Cooker": <MdOutlineMicrowave className="text-green-600 mr-2" />,
-    "Wardrobe": <MdMeetingRoom className="text-green-600 mr-2" />,
-    "Window Blinds": <MdWindow className="text-green-600 mr-2" />,
-  };
-
-  const handleShare = () => {
-    if (typeof window !== "undefined") {
-      navigator.clipboard.writeText(window.location.href);
-      toast({
-        title: "Link copied!",
-        description: "Page link copied to clipboard.",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
-    }
-  };
+  // Icon mapping (fallback to a generic icon if not found)
+  const genericIcon = (
+    <span className="inline-block w-4 h-4 bg-green-600 rounded mr-2" />
+  );
+  const featureIcons: Record<string, JSX.Element> = {};
+  const amenityIcons: Record<string, JSX.Element> = {};
 
   return (
     <div className="font-sans">
-      <Header />
-      <div className="container mx-auto px-4 md:px-6 lg:px-16 py-8 md:py-12">
-        <div className="flex flex-wrap items-center justify-between gap-2 p-4">
-          <div className="flex items-center text-xs text-[#646464] font-medium space-x-2">
-            <a href="/rental" className="hover:text-gray-700">
-              Rentals
-            </a>
-            <span>/</span>
-            <span className="text-[#0C0C0C] font-semibold">
-              {property.name}
-            </span>
-          </div>
-          <button className="flex items-center text-[#151515] font-medium text-sm hover:text-gray-900" onClick={handleShare}>
-            <FiShare2 className="mr-1" />
-            <span>Share</span>
-          </button>
-        </div>
+      <PortfolioHeader />
 
+      <div className="container mx-auto px-4 md:px-6 lg:px-16 py-8 md:py-12">
+        {/* Breadcrumb */}
+        <div className="mb-4">
+          <Breadcrumb
+            items={[
+              { label: "Rentals", href: "/rental" },
+              {
+                label: property?.name || rental?.apartmentType || "Property",
+                href: "#",
+                isActive: true,
+              },
+            ]}
+          />
+        </div>
+        {/* Image Gallery */}
         <div className="flex flex-col md:flex-row gap-4 p-4">
-          {/* Main image on the left */}
+          {/* Main image */}
           <div className="w-full md:w-2/3 relative">
-            <div className="absolute top-4 left-4 bg-gray-700 bg-opacity-70 text-white px-3 py-1 rounded-lg text-xs">
-              {property.constructionStatus}
+            {/* Furnished/Unfurnished badge */}
+            <div className="absolute top-4 left-4 z-10">
+              <span className="px-4 py-1 rounded-full bg-gray-800 text-white text-xs font-semibold shadow">
+                {formatFurnished(isFurnished).toUpperCase()}
+              </span>
             </div>
             <Image
-              src={
-                displayImages[0]
-                  ? typeof displayImages[0] === "string"
-                    ? displayImages[0]
-                    : displayImages[0].imageUrl
-                  : placeholder
-              }
-              alt={`${property.name} main view`}
+              src={displayImages[0] || placeholder}
+              alt={property?.name || "Property main view"}
               className="w-full h-[250px] sm:h-[300px] md:h-[400px] object-cover rounded"
               width={800}
               height={600}
             />
           </div>
-          {/* Side images stacked vertically on the right */}
+          {/* Side images */}
           <div className="w-full md:w-1/3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-1 gap-4">
             {Array.from({ length: 3 }).map((_, index) => {
               const img = displayImages[index + 1];
               const isLast = index === 2 && displayImages.length > 4;
               return isLast ? (
-                <div className="relative w-full h-[100px] sm:h-[120px]" key={index}>
+                <div
+                  className="relative w-full h-[100px] sm:h-[120px]"
+                  key={index}
+                >
                   <Image
-                    src={
-                      img
-                        ? typeof img === "string"
-                          ? img
-                          : img.imageUrl
-                        : placeholder
-                    }
-                    alt={`${property.name} view ${index + 2}`}
+                    src={img || placeholder}
+                    alt={`${property?.name || "Property"} view ${index + 2}`}
                     className="w-full h-full object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
                     width={400}
                     height={300}
@@ -287,14 +228,8 @@ export default function PropertyDetails() {
               ) : (
                 <Image
                   key={index}
-                  src={
-                    img
-                      ? typeof img === "string"
-                        ? img
-                        : img.imageUrl
-                      : placeholder
-                  }
-                  alt={`${property.name} view ${index + 2}`}
+                  src={img || placeholder}
+                  alt={`${property?.name || "Property"} view ${index + 2}`}
                   className="w-full h-[100px] sm:h-[120px] object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
                   width={400}
                   height={300}
@@ -306,118 +241,81 @@ export default function PropertyDetails() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8 p-4">
+          {/* Left: Info and Features */}
           <div className="w-full lg:w-2/3">
             <div className="flex items-center text-sm font-medium text-[#4D4E53] mb-2">
-              <IoLocationOutline  className="mr-1" />
-              <span>{property.address}</span>
+              <IoLocationOutline className="mr-1" />
+              <span>{property?.address}</span>
             </div>
-            <h1 className="text-2xl font-semibold mb-4">{property.name}</h1>
+            <h1 className="text-2xl font-semibold mb-2">{property?.name}</h1>
             <p className="text-[#0C0C0C] leading-relaxed text-sm mb-6">
-              {property.about}
+              {property?.about}
             </p>
+
             {/* Property Features */}
             <div className="mb-8 mt-10">
               <h2 className="text-xl font-semibold text-[#000000] mb-4">
                 Property Features
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-medium text-[#0B0A0A]">
-                {property.features.map((feature, index) => (
-                  <div className="flex items-center" key={index}>
-                    {featureIcons[feature] || <PiCircleFill className="text-green-600 mr-2" />}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-2 text-sm font-medium text-[#0B0A0A]">
+                {[...features, ...amenities].map((feature, idx) => (
+                  <div className="flex items-center" key={idx}>
+                    {featureIcons[feature] || genericIcon}
                     <span>{feature}</span>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Amenities */}
-            {property.amenities && property.amenities.length > 0 && (
-              <div className="mb-8 mt-10">
-                <h2 className="text-xl font-semibold text-[#000000] mb-4">
-                  Amenities
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-medium text-[#0B0A0A]">
-                  {property.amenities.map((amenity, index) => (
-                    <div className="flex items-center" key={index}>
-                      {amenityIcons[amenity] || <MdBed className="text-green-600 mr-2" />}
-                      <span>{amenity}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
+          {/* Right: Pricing Details */}
           <div className="w-full h-fit lg:w-1/3 bg-gray-50 border border-[#ECECEC] rounded">
             <h2 className="text-lg border-b border-[#ECECEC] text-[#151515] py-4 px-6 font-semibold">
-              Property Details
+              Pricing Details
             </h2>
             <div className="space-y-4 p-6">
               <div className="flex justify-between text-xs">
-                <span className="text-[#5C5C5C] font-medium">Bedrooms</span>
+                <span className="text-[#5C5C5C] font-medium">Rental Price</span>
                 <span className="text-[#000000] font-semibold">
-                  {bedroomCount}
+                  {formatCurrency(rent)}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-[#5C5C5C] font-medium">Agency Fee</span>
+                <span className="text-[#000000] font-semibold">
+                  {agencyFee ? `10% (${formatCurrency(agencyFee)})` : "-"}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-[#5C5C5C] font-medium">Caution Fee</span>
+                <span className="text-[#000000] font-semibold">
+                  {formatCurrency(cautionFee)}
                 </span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-[#5C5C5C] font-medium">
-                  Units Available
+                  Service Charge
                 </span>
                 <span className="text-[#000000] font-semibold">
-                  {property.unitAmount}
+                  {serviceCharge ? formatCurrency(serviceCharge) : "-"}
                 </span>
               </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-[#5C5C5C] font-medium">Unit Types</span>
-                <span className="text-[#000000] font-semibold">
-                  {property.unitTypes.length}
+              <div className="flex justify-between text-xs border-t pt-2 font-bold">
+                <span className="text-[#151515]">Total Package</span>
+                <span className="text-[#151515]">
+                  {formatCurrency(totalPackage)}
                 </span>
               </div>
-              {/* <div className="flex justify-between text-xs">
-                <span className="text-[#5C5C5C] font-medium">Status</span>
-                <span className="text-[#000000] font-semibold">
-                  {property.constructionStatus}
-                </span>
-              </div> */}
-            </div>
-
-            {/* Account Officer */}
-            <div className="mt-4">
-
-            {property.accountOfficer && (
-              <>
-                <h2 className="text-lg border  border-[#ECECEC] text-[#151515] py-4 px-6 font-semibold">
-                  Contact Officer
-                </h2>
-                <div className="space-y-4 p-6">
-                  <div className="text-xs">
-                    <div className="text-[#5C5C5C] font-medium mb-1">Name</div>
-                    <div className="text-[#000000] font-semibold">
-                      {property.accountOfficer.fullName}
-                    </div>
-                  </div>
-                  <div className="text-xs">
-                    <div className="text-[#5C5C5C] font-medium mb-1">Email</div>
-                    <div className="text-[#000000] font-semibold">
-                      {property.accountOfficer.email}
-                    </div>
-                  </div>
-                  <div className="text-xs">
-                    <div className="text-[#5C5C5C] font-medium mb-1">Phone</div>
-                    <div className="text-[#000000] font-semibold">
-                      {property.accountOfficer.phone}
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Location Map Section */}
-      <MapSection location={property.address} propertyName={property.name} />
+      <MapSection
+        location={rental?.location}
+        propertyName={rental?.apartmentType}
+      />
     </div>
   );
 }

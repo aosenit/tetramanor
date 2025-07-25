@@ -13,6 +13,7 @@ import { MdBed } from "react-icons/md";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
+import type { Rental } from "@/types/property";
 import placeholder from "@/assets/placeholder.svg";
 import { Input } from "@/components/ui/input";
 
@@ -188,10 +189,10 @@ export default function PropertyListing() {
   });
 
   const { data, isLoading, error } = useFetchData(
-    `property?${queryParams.toString()}`
+    `rentals?${queryParams.toString()}`
   );
 
-  const properties = data?.data?.items || [];
+  const rentals: Rental[] = data?.data?.items || [];
   const totalPages = data?.data?.total ? Math.ceil(data.data.total / limit) : 0;
 
   // Get a fallback image for properties without images
@@ -330,15 +331,15 @@ export default function PropertyListing() {
         </div>
 
         {/* Properties Grid */}
-        {properties.length === 0 ? (
+        {rentals.length === 0 ? (
           <EmptyState />
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {properties.map((property) => (
+              {rentals.map((rental) => (
                 <PropertyCard
-                  key={property.id}
-                  property={property}
+                  key={rental.id}
+                  rental={rental}
                   getFallbackImage={getFallbackImage}
                   getConstructionImage={getConstructionImage}
                 />
@@ -401,27 +402,28 @@ export default function PropertyListing() {
   );
 }
 
-interface PropertyCardProps {
-  property: Property;
+interface RentalCardProps {
+  rental: Rental;
   getFallbackImage: (id: string) => StaticImageData;
   getConstructionImage: (status: string) => StaticImageData;
 }
 
 function PropertyCard({
-  property,
+  rental,
   getFallbackImage,
   getConstructionImage,
-}: PropertyCardProps) {
+}: RentalCardProps) {
   const imageUrl =
-    property.images.length > 0
-      ? property.images[0]?.imageUrl
-      : property.constructionStatus === "COMPLETED" ||
-          property.constructionStatus === "ONGOING"
-        ? getConstructionImage(property.constructionStatus)
-        : getFallbackImage(property.id);
+    rental.images.length > 0
+      ? rental.images[0]?.imageUrl
+      : rental.constructionStatus === "COMPLETED" ||
+          rental.constructionStatus === "ONGOING"
+        ? getConstructionImage(rental.constructionStatus)
+        : getFallbackImage(rental.id);
 
-  const getBedroomCount = (unitTypes: string[]) => {
-    const type = unitTypes[0] || "";
+  // Rentals may not have unitTypes, so fallback to rental.rental.apartmentType
+  const getBedroomCount = (unitTypes: string[], apartmentType: string) => {
+    const type = unitTypes[0] || apartmentType || "";
     if (type.includes("FOUR_BEDROOM")) return 4;
     if (type.includes("THREE_BEDROOM")) return 3;
     if (type.includes("TWO_BEDROOM")) return 2;
@@ -429,20 +431,23 @@ function PropertyCard({
     return 3; // default
   };
 
-  const bedroomCount = getBedroomCount(property.unitTypes);
+  const bedroomCount = getBedroomCount(
+    rental.unitTypes,
+    rental.rental?.apartmentType
+  );
 
   return (
     <div className="overflow-hidden rounded-sm border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
       <div className="relative">
         <div className="absolute left-4 top-4 z-10 rounded-lg bg-gray-800/80 px-2 py-1 text-xs font-medium text-white">
-          {property.constructionStatus}
+          {rental.constructionStatus}
         </div>
         <div className="absolute right-4 top-4 z-10 rounded-lg bg-green-600/80 px-2 py-1 text-xs font-medium text-white">
-          {property.status}
+          {rental.status}
         </div>
         <Image
           src={imageUrl}
-          alt={property.name}
+          alt={rental.name}
           width={600}
           height={400}
           className="h-64 w-full object-cover"
@@ -451,16 +456,16 @@ function PropertyCard({
       <div className="p-5 bg-[#f1f4f1]">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <h3 className="text-lg font-semibold text-[#1D1D1D]">
-            {property.name}
+            {rental.name}
           </h3>
           <div className="flex items-center text-xs text-[#4D4E53]">
             <FaMapMarkerAlt className="mr-1 h-3 w-3" />
-            {property.address}
+            {rental.address}
           </div>
         </div>
 
         <p className="mt-2 text-sm text-gray-600 line-clamp-2">
-          {property.about}
+          {rental.about}
         </p>
 
         <div className="mt-4 flex flex-wrap gap-3">
@@ -470,26 +475,28 @@ function PropertyCard({
           </div>
           <div className="flex border-r-2 border-[#BBBCCD] items-center gap-2 font-medium text-xs text-[#4D4E53] px-3">
             <FaExpand className="text-[#CD6115] text-lg" />
-            <span>{property.unitAmount} Units</span>
+            <span>{rental.unitAmount} Units</span>
           </div>
           <div className="flex border-r-2 border-[#BBBCCD] items-center gap-2 font-medium text-xs text-[#4D4E53] px-3">
             <FaDoorOpen className="text-[#CD6115] text-lg" />
             <span>
-              {property.unitTypes[0]?.replace(/_/g, " ") || "Apartment"}
+              {rental.unitTypes[0]?.replace(/_/g, " ") ||
+                rental.rental?.apartmentType ||
+                "Apartment"}
             </span>
           </div>
         </div>
 
         <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <Link
-            href={`/rental/${property.id}`}
+            href={`/rental/${rental.rental.id}`}
             className="rounded bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-800 text-center"
           >
             View property
           </Link>
           <div className="text-right">
             <span className="text-2xl font-semibold text-black">
-              {property.unitAmount}
+              {rental.unitAmount}
             </span>
             <span className="text-[#2B2D2F] font-medium"> units available</span>
           </div>

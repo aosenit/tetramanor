@@ -3,6 +3,8 @@ import Image from "next/image";
 import { ReactNode } from "react";
 import { useState } from "react";
 import ten from "@/assets/rental/ten.webp";
+import { usePostData } from "@/hooks/useApi";
+import { useToast } from "@chakra-ui/react";
 
 export default function PropertyEnquiryForm() {
   const [formData, setFormData] = useState({
@@ -11,6 +13,9 @@ export default function PropertyEnquiryForm() {
     email: "",
     message: "",
   });
+
+  const toast = useToast();
+  const { mutate: sendEnquiry, isPending } = usePostData("contact/enquiry");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -21,8 +26,27 @@ export default function PropertyEnquiryForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    setFormData({ name: "", phone: "", email: "", message: "" });
+    sendEnquiry(formData, {
+      onSuccess: () => {
+        toast({
+          title: "Message sent!",
+          description: "Your enquiry has been sent successfully.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        setFormData({ name: "", phone: "", email: "", message: "" });
+      },
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to send enquiry. Please try again.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      },
+    });
   };
 
   return (
@@ -166,9 +190,10 @@ export default function PropertyEnquiryForm() {
 
               <button
                 type="submit"
-                className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+                className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isPending}
               >
-                Send message
+                {isPending ? "Sending..." : "Send message"}
               </button>
             </form>
           </div>

@@ -6,11 +6,18 @@ import Image from "next/image";
 import { FaPhone, FaEnvelope, FaCalendarAlt } from "react-icons/fa";
 import ten from "@/assets/portfolio/ten.webp"
 
+import { usePostData } from "@/hooks/useApi";
+import { useToast } from "@chakra-ui/react";
+
 interface ScheduleInspectionProps {
   propertyTitle?: string;
+  propertyId: string;
 }
 
-export default function ScheduleInspection({ propertyTitle = "TM HighGardens" }: ScheduleInspectionProps) {
+export default function ScheduleInspection({
+  propertyTitle = "TM HighGardens",
+  propertyId,
+}: ScheduleInspectionProps) {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -19,6 +26,9 @@ export default function ScheduleInspection({ propertyTitle = "TM HighGardens" }:
     property: propertyTitle,
   });
 
+  const toast = useToast();
+  const { mutate } = usePostData("property/book-inspection");
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -26,11 +36,42 @@ export default function ScheduleInspection({ propertyTitle = "TM HighGardens" }:
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    alert(
-      `Thank you! Your inspection for ${propertyTitle} has been scheduled. We'll contact you shortly to confirm.`
+    mutate(
+      {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        date: formData.date,
+        propertyId,
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Inspection scheduled!",
+            description: `Thank you! Your inspection for ${propertyTitle} has been scheduled. We'll contact you shortly to confirm.`,
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+          setFormData({
+            name: "",
+            phone: "",
+            email: "",
+            date: "",
+            property: propertyTitle,
+          });
+        },
+        onError: () => {
+          toast({
+            title: "Error",
+            description: "Failed to schedule inspection. Please try again.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        },
+      }
     );
-    setFormData({ name: "", phone: "", email: "", date: "", property: propertyTitle });
   };
 
   return (
@@ -47,9 +88,10 @@ export default function ScheduleInspection({ propertyTitle = "TM HighGardens" }:
           <div>
             <h2 className="text-4xl font-bold mb-6">Schedule an inspection</h2>
             <p className="text-lg text-gray-300">
-              Experience the luxury for yourself. Book a personalized tour of {propertyTitle} {""}
-              and explore our model apartments, premium finishes,
-              and world-class amenities.
+              Experience the luxury for yourself. Book a personalized tour of{" "}
+              {propertyTitle} {""}
+              and explore our model apartments, premium finishes, and
+              world-class amenities.
             </p>
           </div>
 

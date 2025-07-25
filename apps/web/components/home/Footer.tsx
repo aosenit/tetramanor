@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import Image from "next/image";
 import {
@@ -5,12 +6,23 @@ import {
   FaTwitter,
   FaYoutube,
   FaLinkedinIn,
+  FaInstagram,
+  FaWhatsapp,
 } from "react-icons/fa";
 import { IoLocationOutline } from "react-icons/io5";
 import Link from "next/link";
 import logo from "@/assets/home/logo.webp";
+import { useFetchData } from "@/hooks/useApi";
 
 export default function Footer() {
+  const { data } = useFetchData("contact");
+  const socialMedia = data?.data?.socialMedia || [];
+  const iconMap: Record<string, JSX.Element> = {
+    WhatsApp: <FaWhatsapp />,
+    LinkedIn: <FaLinkedinIn />,
+    X: <FaTwitter />,
+    Instagram: <FaInstagram />,
+  };
   return (
     <footer className="bg-[#252525] text-white pt-12">
       {/* ------------ Top section ------------ */}
@@ -87,18 +99,22 @@ export default function Footer() {
           <span className="text-gray-400 text-sm">© Tetramanor, 2025</span>
 
           <div className="flex gap-6 text-xl">
-            <a aria-label="Facebook" className="hover:text-gray-300" href="#">
-              <FaFacebookF />
-            </a>
-            <a aria-label="Twitter" className="hover:text-gray-300" href="#">
-              <FaTwitter />
-            </a>
-            <a aria-label="YouTube" className="hover:text-gray-300" href="#">
-              <FaYoutube />
-            </a>
-            <a aria-label="LinkedIn" className="hover:text-gray-300" href="#">
-              <FaLinkedinIn />
-            </a>
+            {socialMedia.map((item: any) => {
+              const icon = iconMap[item.platform];
+              if (!icon || !item.url) return null;
+              return (
+                <a
+                  key={item.platform}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={item.platform}
+                  className="hover:text-gray-300"
+                >
+                  {icon}
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>
