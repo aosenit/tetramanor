@@ -1,16 +1,28 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
-import logo from "@/assets/home/logo.webp"
+import logo from "@/assets/home/logo.webp";
 import React from "react";
 import {
   FaFacebookF,
   FaTwitter,
   FaYoutube,
   FaLinkedinIn,
+  FaInstagram,
+  FaWhatsapp,
 } from "react-icons/fa";
 import { IoLocationOutline } from "react-icons/io5";
+import { useFetchData } from "@/hooks/useApi";
 
 export default function Footer() {
+  const { data } = useFetchData("contact");
+  const socialMedia = data?.data?.socialMedia || [];
+  const iconMap: Record<string, JSX.Element> = {
+    WhatsApp: <FaWhatsapp />,
+    LinkedIn: <FaLinkedinIn />,
+    X: <FaTwitter />,
+    Instagram: <FaInstagram />,
+  };
   return (
     <footer className="text-[#252525] bg-[#F6F6F6] pt-12">
       <div className="container mx-auto flex flex-col lg:flex-row justify-between gap-12 px-4 md:px-8 lg:px-16 pb-8">
@@ -82,10 +94,21 @@ export default function Footer() {
             <span className="text-base">©</span> Tetramanor, 2025
           </div>
           <div className="flex justify-center gap-6 text-[#151515] text-xl">
-            <FaFacebookF />
-            <FaTwitter />
-            <FaYoutube />
-            <FaLinkedinIn />
+            {socialMedia.map((item: any) => {
+              const icon = iconMap[item.platform];
+              if (!icon || !item.url) return null;
+              return (
+                <a
+                  key={item.platform}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={item.platform}
+                >
+                  {icon}
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>

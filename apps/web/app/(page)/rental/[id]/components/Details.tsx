@@ -1,31 +1,16 @@
 "use client";
 import Image from "next/image";
-import { FiShare2 } from "react-icons/fi";
-import Header from "@/app/(page)/portfolio/components/header";
 import { useParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
-import type { Rental } from "@/types/property";
 import { useState } from "react";
 import MapSection from "@/app/(page)/portfolio/view-property/sections/map";
 import { FaHome } from "react-icons/fa";
-import { PiCarBatteryFill, PiCircleFill } from "react-icons/pi";
-import { MdGridOn, MdOutlineSecurity, MdDelete } from "react-icons/md";
-import { TbWindow } from "react-icons/tb";
-import { GiWaterDrop, GiTreehouse } from "react-icons/gi";
-import { FaBath } from "react-icons/fa";
-import {
-  MdBed,
-  MdKitchen,
-  MdOutlineAcUnit,
-  MdOutlineMicrowave,
-  MdMeetingRoom,
-  MdWindow,
-} from "react-icons/md";
-import { PiBedBold } from "react-icons/pi";
 import { IoLocationOutline } from "react-icons/io5";
 import placeholder from "/assets/placeholder.jpg";
 import { useToast } from "@chakra-ui/react";
 import Link from "next/link";
+import PortfolioHeader from "@/app/(page)/portfolio/components/portfolioHeader";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 // Image mapping based on construction status
 const constructionImages = {
@@ -40,7 +25,7 @@ const fallbackImages = [placeholder];
 function PropertyDetailsSkeleton() {
   return (
     <div className="font-sans">
-      <Header />
+      <PortfolioHeader />
       <div className="container mx-auto px-4 md:px-6 lg:px-16 py-8 md:py-12">
         {/* Breadcrumb Skeleton */}
         <div className="flex flex-wrap items-center justify-between gap-2 p-4">
@@ -106,7 +91,7 @@ function PropertyDetailsSkeleton() {
 function PropertyNotFound() {
   return (
     <div className="font-sans">
-      <Header />
+      <PortfolioHeader />
       <div className="container mx-auto px-4 md:px-6 lg:px-16 py-8 md:py-12">
         <div className="flex flex-col items-center justify-center py-16 px-4">
           <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
@@ -183,8 +168,22 @@ export default function PropertyDetails() {
 
   return (
     <div className="font-sans">
-      <Header />
+      <PortfolioHeader />
+
       <div className="container mx-auto px-4 md:px-6 lg:px-16 py-8 md:py-12">
+        {/* Breadcrumb */}
+        <div className="mb-4">
+          <Breadcrumb
+            items={[
+              { label: "Rentals", href: "/rental" },
+              {
+                label: property?.name || rental?.apartmentType || "Property",
+                href: "#",
+                isActive: true,
+              },
+            ]}
+          />
+        </div>
         {/* Image Gallery */}
         <div className="flex flex-col md:flex-row gap-4 p-4">
           {/* Main image */}

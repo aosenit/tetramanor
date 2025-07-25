@@ -3,12 +3,11 @@ import { useState } from "react";
 import Image from "next/image";
 import { CiLocationOn } from "react-icons/ci";
 import { motion } from "framer-motion";
-import Header from "../../components/header";
+import PortfolioHeader from "../../components/portfolioHeader";
 import Modal from "./modal";
 import placeholder from "@/assets/placeholder.jpg";
 import { Property } from "../../types";
 import { Skeleton } from "@/components/ui/skeleton";
-
 
 interface HeroProps {
   property: Property;
@@ -24,7 +23,7 @@ const HomeHero = ({ property }: HeroProps) => {
   if (!property) return null;
   return (
     <section className="relative h-[60vh] overflow-hidden">
-      <Header />
+      <PortfolioHeader />
       <Image
         src={image}
         alt={property.name}

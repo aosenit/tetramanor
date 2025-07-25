@@ -12,20 +12,23 @@ function PropertyCard({
   name,
   address,
   unitAmount,
-  unitTypes,
-  features,
-  images,
+  features = [],
+  images = [],
+  rental = {},
 }: any) {
-  const imageUrl = images?.find((img: any) => img.isPrimary)?.imageUrl || images?.[0]?.imageUrl || placeholder;
+  const imageUrl = images?.[0]?.imageUrl || placeholder;
   return (
     <div className="overflow-hidden h-full rounded-sm border border-gray-200 bg-white min-w-[320px] max-w-sm flex-shrink-0">
       <div className="relative">
-        <div className="absolute left-4 top-4 z-10 rounded-lg bg-gray-800/80 px-2 py-1 text-xs font-medium text-white">
-          UNFURNISHED
+        {/* Furnished/Unfurnished badge */}
+        <div className="absolute left-4 top-4 z-10">
+          <span className="px-4 py-1 rounded-full bg-gray-800 text-white text-xs font-semibold shadow">
+            {rental.isFurnished ? "FURNISHED" : "UNFURNISHED"}
+          </span>
         </div>
         <Image
           src={imageUrl}
-          alt={name}
+          alt={name || "Property"}
           width={600}
           height={400}
           className="h-64 w-full object-cover"
@@ -33,7 +36,9 @@ function PropertyCard({
       </div>
       <div className="p-6 bg-[#f1f4f1]">
         <div className="flex items-center justify-between">
-          <h3 className="xl:text-xl  truncate text-[#1D1D1D] font-semibold">{name}</h3>
+          <h3 className="xl:text-xl  truncate text-[#1D1D1D] font-semibold">
+            {name}
+          </h3>
           <div className="flex truncate items-center text-xs font-medium text-[#4D4E53]">
             <FaMapMarkerAlt className="mr-1 h-3 w-3" />
             {address}
@@ -42,9 +47,9 @@ function PropertyCard({
         <div className="mt-6  flex flex-wrap gap-3">
           <div className="flex border-r-2 font-medium text-xs text-[#4D4E53] border-[#BBBCCD] items-center gap-2  px-3 py-1">
             <MdBed className=" text-[#CD6115] text-lg" />
-            <span>{unitAmount} Beds</span>
+            <span>{unitAmount || 0} Beds</span>
           </div>
-          {features?.slice(0, 2).map((feature: string, index: number) => {
+          {features.slice(0, 2).map((feature: string, index: number) => {
             let Icon = FaShieldAlt;
             if (index === 0) Icon = FaExpand;
             else if (index === 1) Icon = FaDoorOpen;
@@ -61,12 +66,11 @@ function PropertyCard({
         </div>
         <div className="mt-6 flex items-center justify-between">
           <Link
-            href={`/rental/${id}`}
+            href={`/rental/${rental.id}`}
             className="rounded bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-800"
           >
             View property
           </Link>
-          {/* Price/period can be added here if available in backend */}
         </div>
       </div>
     </div>
@@ -74,8 +78,11 @@ function PropertyCard({
 }
 
 function ExploreMore() {
-  const { data, isLoading, error } = useFetchData("property", { page: 1, limit: 10 });
-  const properties = data?.data?.items || [];
+  const { data, isLoading, error } = useFetchData("rentals", {
+    page: 1,
+    limit: 10,
+  });
+  const items = data?.data?.items || [];
   return (
     <div className="container mx-auto px-4 lg:px-16 py-12 ">
       <h1 className="text-2xl text-black font-semibold text-center">
@@ -84,13 +91,16 @@ function ExploreMore() {
       {isLoading ? (
         <div className="flex overflow-x-auto gap-4 mt-10 pb-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="min-w-[320px] max-w-sm h-[400px] bg-gray-200 rounded animate-pulse" />
+            <div
+              key={i}
+              className="min-w-[320px] max-w-sm h-[400px] bg-gray-200 rounded animate-pulse"
+            />
           ))}
         </div>
       ) : error ? null : (
         <div className="flex overflow-x-auto gap-4 mt-10 scrollbar-hide pb-4">
-          {properties.map((property: any) => (
-            <PropertyCard key={property.id} {...property} />
+          {items.map((item: any) => (
+            <PropertyCard key={item.id} {...item} />
           ))}
         </div>
       )}
