@@ -196,8 +196,13 @@ export default function AddProperties() {
       if (propertyData?.data?.document) {
         setUploadedDocument(propertyData.data.document[0]);
       }
+
+      // Load existing banner/cover image if any
+      if (propertyData?.data?.coverImage) {
+        setUploadedBanner(propertyData.data.coverImage);
+      }
     }
-  }, [propertyData, isEditMode]);
+  }, [propertyData, isEditMode, propertyId]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({

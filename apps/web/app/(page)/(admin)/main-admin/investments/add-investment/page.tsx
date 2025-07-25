@@ -365,7 +365,7 @@ function AddInvestmentContent() {
             options={[
               { label: "NGN", icon: <PiCurrencyNgn /> },
               { label: "USD", icon: <PiCurrencyCircleDollar /> },
-              { label: "EUR", icon: <PiCurrencyEur /> },
+              // { label: "EUR", icon: <PiCurrencyEur /> },
             ]}
             selected={formData.currency}
             onSelect={(value) => handleInputChange("currency", value)}
@@ -462,6 +462,7 @@ function AddInvestmentContent() {
                 >
                   <p className="font-medium text-[#181818]">{benefit}</p>
                   <Button
+                    type="button"
                     variant="ghost"
                     size="sm"
                     onClick={() => removeBenefit(index)}

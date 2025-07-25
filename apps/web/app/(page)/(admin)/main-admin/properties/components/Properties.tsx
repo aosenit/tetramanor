@@ -415,7 +415,7 @@ export default function PropertyManagement() {
                           className="text-xs text-[#323539]"
                           onClick={() =>
                             router.push(
-                              `/main-admin/properties/property-details?id=${property.id}&edit=true`
+                              `/main-admin/properties/add-properties?id=${property.id}`
                             )
                           }
                         >
