@@ -25,6 +25,8 @@ import { usePathname } from "next/navigation";
 import { route } from "./app-sidebar";
 import Image from "next/image";
 import logo from "@/assets/tmlogo.png";
+import { useUnreadNotifications } from "@/hooks/useNoti";
+import { Badge } from "@/components/ui/badge";
 
 const menuItems = [
   {
@@ -76,12 +78,16 @@ const menuItems = [
     title: "Notifications",
     url: `${route}/notifications`,
     icon: Bell,
+    showBadge: true,
   },
 ];
 
 export function MobileNav() {
   const { openMobile, setOpenMobile } = useSidebar();
   const pathname = usePathname();
+
+  // Fetch unread notifications count
+  const { unreadCount } = useUnreadNotifications();
 
   return (
     <Sheet open={openMobile} onOpenChange={setOpenMobile}>
@@ -120,6 +126,11 @@ export function MobileNav() {
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.title}</span>
+                  {item.showBadge && unreadCount > 0 && (
+                    <Badge className="ml-auto bg-red-500 hover:bg-red-600 h-5 w-5 p-0 flex items-center justify-center rounded-full text-xs">
+                      {unreadCount}
+                    </Badge>
+                  )}
                 </Link>
               );
             })}

@@ -4,13 +4,20 @@ import { Bell, AlignJustify } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useSidebar } from "./sidebar";
-import { useFetchData } from "@/hooks/useApi";
+import { useUnreadNotifications } from "@/hooks/useNoti";
+import { useRouter } from "next/navigation";
 
 export function TopHeader() {
   const { toggleSidebar, setOpenMobile } = useSidebar();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const router = useRouter();
 
-  const { data: notifications } = useFetchData("notifications");
+  // Fetch unread notifications count
+  const { unreadCount } = useUnreadNotifications();
+
+  const handleNotificationClick = () => {
+    router.push("/main-admin/notifications");
+  };
 
   return (
     <header className="bg-[#323539] border-b border-gray-700 px-6 py-4">
@@ -45,11 +52,12 @@ export function TopHeader() {
             variant="ghost"
             size="icon"
             className="block relative text-white hover:bg-gray-700"
+            onClick={handleNotificationClick}
           >
             <Bell className="" />
-            {notifications?.length > 0 && (
+            {unreadCount > 0 && (
               <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
-                {notifications?.length}
+                {unreadCount}
               </Badge>
             )}
           </Button>

@@ -12,6 +12,7 @@ import { useFetchData, usePutData } from "@/hooks/useApi";
 import { axiosInstance } from "@/services/axiosInstance";
 import { Input } from "@/components/ui/input";
 import Loader from "@/components/Loader";
+import { useUpdateUnreadCount } from "@/hooks/useNoti";
 
 interface Notification {
   id: string;
@@ -29,6 +30,8 @@ export default function NotificationsPage() {
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
   const [isMarkingOne, setIsMarkingOne] = useState(false);
+
+  const { updateCount } = useUpdateUnreadCount();
 
   // Fetch notifications based on filter and search
   const {
@@ -95,6 +98,8 @@ export default function NotificationsPage() {
       await markAllAsRead({});
       toast.success("All notifications marked as read");
       refetch();
+      // Update global unread count
+      updateCount(0);
     } catch (error) {
       console.error("Error marking all as read:", error);
       toast.error("Failed to mark all notifications as read");
@@ -107,6 +112,9 @@ export default function NotificationsPage() {
       await axiosInstance.put(`notifications/${notificationId}/read`, {});
       toast.success("Notification marked as read");
       refetch();
+      // Update global unread count
+      const newUnreadCount = Math.max(0, totalUnread - 1);
+      updateCount(newUnreadCount);
     } catch (error) {
       console.error("Error marking notification as read:", error);
       toast.error("Failed to mark notification as read");
@@ -115,63 +123,42 @@ export default function NotificationsPage() {
     }
   };
 
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    // Get the date parts for comparison
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-    const notificationDay = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate()
-    );
-
-    // For today's notifications, show relative time
-    if (notificationDay.getTime() === today.getTime()) {
-      if (diffInSeconds < 60) return "Just now";
-      if (diffInSeconds < 3600)
-        return `${Math.floor(diffInSeconds / 60)}min ago`;
-      if (diffInSeconds < 86400)
-        return `${Math.floor(diffInSeconds / 3600)}hr ago`;
+  // Update global unread count when data changes
+  useEffect(() => {
+    if (notificationsResponse?.data?.items) {
+      const unreadCount = notificationsResponse.data.items.filter(
+        (n: Notification) => n.status === "UNREAD"
+      ).length;
+      updateCount(unreadCount);
     }
-
-    // For yesterday's notifications, show "Yesterday" with time
-    if (notificationDay.getTime() === yesterday.getTime()) {
-      return `Yesterday at ${date.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      })}`;
-    }
-
-    // For older notifications, show the actual date
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
+  }, [notificationsResponse, updateCount]);
 
   const handleSearch = (value: string) => {
     setSearch(value);
-    setPage(1); // Reset to first page when searching
+    setPage(1);
   };
 
   const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setPage(newPage);
-    }
+    setPage(newPage);
   };
 
-  // Reset page when filter or search changes
-  useEffect(() => {
-    setPage(1);
-  }, [filter, search]);
+  const formatTime = (timeString: string) => {
+    const date = new Date(timeString);
+    const now = new Date();
+    const diffInMinutes = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60)
+    );
 
-  const groupedNotifications = groupNotificationsByDate(notifications);
+    if (diffInMinutes < 1) return "Just now";
+    if (diffInMinutes < 60) return `${diffInMinutes}min ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   const renderNotifications = (list: Notification[]) =>
     list.map((notification) => (
@@ -197,7 +184,7 @@ export default function NotificationsPage() {
           <p className="text-[#868686] text-xs mt-1">{notification.message}</p>
         </div>
         <div className="flex items-center gap-2">
-        <div className="text-xs text-[#868686] whitespace-nowrap">
+          <div className="text-xs text-[#868686] whitespace-nowrap">
             {formatTime(notification.createdAt)}
           </div>
           {notification.status === "UNREAD" && (
@@ -217,7 +204,7 @@ export default function NotificationsPage() {
         </div>
       </div>
     ));
-  
+
   if (isLoading) {
     return <Loader />;
   }
@@ -276,53 +263,69 @@ export default function NotificationsPage() {
         </Button>
       </div>
 
-      <div className="space-y-8">
-        {Object.keys(groupedNotifications).length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No notifications found</p>
-          </div>
+      {/* Notifications List */}
+      <div className="space-y-4">
+        {filter === "all" ? (
+          <>
+            {Object.keys(groupNotificationsByDate(notifications)).length ===
+            0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No notifications found.
+              </div>
+            ) : (
+              Object.entries(groupNotificationsByDate(notifications)).map(
+                ([category, list]) => (
+                  <div key={category}>
+                    <h3 className="text-sm font-medium text-gray-500 mb-2 capitalize">
+                      {category}
+                    </h3>
+                    <div className="space-y-2">{renderNotifications(list)}</div>
+                  </div>
+                )
+              )
+            )}
+          </>
         ) : (
-          ["today", "yesterday", "older"].map((category) => {
-            const list = groupedNotifications[category] || [];
-          if (list.length === 0) return null;
-          return (
-            <div key={category}>
-              <h2 className="text-sm font-medium text-gray-500 mb-4 uppercase">
-                {category}
-              </h2>
-              <div className="space-y-4">{renderNotifications(list)}</div>
-            </div>
-          );
-          })
+          <>
+            {notifications.filter((n) => n.status === "UNREAD").length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No unread notifications.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {renderNotifications(
+                  notifications.filter((n) => n.status === "UNREAD")
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between border-t border-gray-200 pt-4">
+        <div className="flex items-center justify-between">
           <div className="text-sm text-gray-500">
-            Page {currentPage} of {totalPages} •{" "}
-            {notificationsResponse?.data?.total || 0} total notifications
+            Page {currentPage} of {totalPages}
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage <= 1 || isLoading}
+              disabled={currentPage === 1}
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="h-4 w-4" />
               Previous
             </Button>
-            <span className="text-sm text-gray-500 px-2">{currentPage}</span>
             <Button
               variant="outline"
               size="sm"
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage >= totalPages || isLoading}
+              disabled={currentPage === totalPages}
             >
               Next
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
