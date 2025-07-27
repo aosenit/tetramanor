@@ -255,7 +255,7 @@ export default function PropertyDetails() {
             {/* Property Features */}
             <div className="mb-8 mt-10">
               <h2 className="text-xl font-semibold text-[#000000] mb-4">
-                Property Features
+                Rental Features
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-2 text-sm font-medium text-[#0B0A0A]">
                 {[...features, ...amenities].map((feature, idx) => (
@@ -283,7 +283,7 @@ export default function PropertyDetails() {
               <div className="flex justify-between text-xs">
                 <span className="text-[#5C5C5C] font-medium">Agency Fee</span>
                 <span className="text-[#000000] font-semibold">
-                  {agencyFee ? `10% (${formatCurrency(agencyFee)})` : "-"}
+                  {agencyFee ? `${formatCurrency(agencyFee)}` : "-"}
                 </span>
               </div>
               <div className="flex justify-between text-xs">

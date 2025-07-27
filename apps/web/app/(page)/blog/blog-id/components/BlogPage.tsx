@@ -51,18 +51,27 @@ export default function SingleBlog() {
       {isLoading ? (
         <BlogSkeleton />
       ) : blog.images && blog.images.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          {blog.images.map((img: any) => (
-            <Image
-              key={img.id}
-              src={img.imageUrl}
-              alt={img.name || "Blog image"}
-              width={400}
-              height={300}
-              className="w-full h-48 object-cover rounded"
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            {blog.images.map((img: any) => (
+              <Image
+                key={img.id}
+                src={img.imageUrl}
+                alt={img.name || "Blog image"}
+                width={400}
+                height={300}
+                className="w-full h-48 object-cover rounded"
+              />
+            ))}
+          </div>
+          {/* Blog content below images */}
+          {blog.content && (
+            <div
+              className="prose max-w-none mt-8"
+              dangerouslySetInnerHTML={{ __html: blog.content }}
             />
-          ))}
-        </div>
+          )}
+        </>
       ) : (
         <div className="text-center text-gray-500 py-12">
           No images uploaded for this blog.
