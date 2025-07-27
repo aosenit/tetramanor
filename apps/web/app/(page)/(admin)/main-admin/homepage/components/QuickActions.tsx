@@ -24,7 +24,7 @@ export default function QuickActions() {
       <Button
         variant="outline"
         className="h-12 w-fit text-sm text-[#858C95] rounded-lg justify-start"
-        onClick={() => router.push("/main-admin/investments")}
+        onClick={() => router.push("/main-admin/investments/add-investment/")}
       >
         Add new investment
         <IoMdArrowRoundForward className="h-4 w-4 mr-2" />
@@ -32,7 +32,7 @@ export default function QuickActions() {
       <Button
         variant="outline"
         className="h-12 w-fit text-sm text-[#858C95] rounded-lg justify-start"
-        onClick={() => router.push("/main-admin/rentals")}
+        onClick={() => router.push("/main-admin/rentals/edit-rentals")}
       >
         Add new rental
         <IoMdArrowRoundForward className="h-4 w-4 mr-2" />

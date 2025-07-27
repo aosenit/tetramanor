@@ -219,7 +219,7 @@ export default function NotificationsPage() {
       </div>
 
       {/* Search Bar */}
-      <div className="relative">
+      {/* <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
         <Input
           type="text"
@@ -228,7 +228,7 @@ export default function NotificationsPage() {
           onChange={(e) => handleSearch(e.target.value)}
           className="pl-10 pr-4"
         />
-      </div>
+      </div> */}
 
       <div className="flex justify-between items-center border-b border-gray-200 pb-4">
         <div className="flex gap-4">

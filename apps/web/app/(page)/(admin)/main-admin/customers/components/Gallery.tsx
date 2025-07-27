@@ -12,6 +12,8 @@ import { ErrorState, LoadingState } from "./NoDataStates";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { X } from "lucide-react";
 
 interface GalleryImage {
   id: string;
@@ -26,6 +28,8 @@ export default function Gallery() {
   const userId = searchParams.get("userId");
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data, isLoading, error, refetch } = useFetchData(
     unitId && userId
@@ -68,6 +72,16 @@ export default function Gallery() {
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleImageClick = (image: GalleryImage) => {
+    setSelectedImage(image);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
   };
 
   useEffect(() => {
@@ -154,7 +168,10 @@ export default function Gallery() {
               </Button>
             </div>
 
-            <div className="aspect-[4/3] relative">
+            <div
+              className="aspect-[4/3] relative cursor-pointer hover:shadow-md transition-shadow duration-200 rounded-lg overflow-hidden"
+              onClick={() => handleImageClick(image)}
+            >
               <Image
                 src={image.imageUrl}
                 alt={image.alt}
@@ -189,6 +206,43 @@ export default function Gallery() {
         <MdArrowBackIosNew />
         Back
       </button>
+
+      {/* Image Preview Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-4xl w-full p-0 bg-white rounded-lg shadow-lg border-none">
+          <div className="relative">
+            {/* Close button */}
+            <button
+              onClick={handleCloseModal}
+              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors duration-200"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            {/* Image */}
+            {selectedImage && (
+              <div className="relative">
+                <Image
+                  src={selectedImage.imageUrl}
+                  alt={selectedImage.alt}
+                  width={1200}
+                  height={800}
+                  className="w-full h-auto max-h-[80vh] object-contain"
+                />
+
+                {/* Image info */}
+                {selectedImage.alt && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                    <h3 className="text-white font-medium text-lg">
+                      {selectedImage.alt}
+                    </h3>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
