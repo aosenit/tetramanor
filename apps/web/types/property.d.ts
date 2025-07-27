@@ -90,6 +90,7 @@ export interface Rental {
   name: string;
   address: string;
   about: string;
+  isFurnished: boolean;
   featured: boolean;
   featuredAt: string | null;
   inquiryOptions: string[];

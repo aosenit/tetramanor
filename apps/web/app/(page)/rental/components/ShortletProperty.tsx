@@ -282,7 +282,7 @@ export default function PropertyListing() {
             onSubmit={handleSearch}
             className="flex flex-col md:flex-row items-center justify-between gap-4"
           >
-            <div className="relative w-full md:max-w-md">
+            <div className="relative w-full">
               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 type="search"
@@ -292,7 +292,7 @@ export default function PropertyListing() {
                 className="w-full rounded-md border bg-white border-gray-300 py-2 pl-10 pr-4 focus:border-gray-500 focus:outline-none"
               />
             </div>
-            <div className="flex items-center gap-2 ">
+            {/* <div className="flex items-center gap-2 ">
               <div className="rounded-md border bg-white border-gray-300 px-5">
                 <select
                   value={filters.propertyStatus}
@@ -326,7 +326,7 @@ export default function PropertyListing() {
               >
                 Clear
               </button>
-            </div>
+            </div> */}
           </form>
         </div>
 
@@ -436,11 +436,16 @@ function PropertyCard({
     rental.rental?.apartmentType
   );
 
+  // Determine furnished status
+  const isFurnished = rental.rental?.isFurnished ?? rental.isFurnished;
+  const furnishedLabel = isFurnished ? "Furnished" : "Unfurnished";
+
   return (
     <div className="overflow-hidden rounded-sm border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
       <div className="relative">
+        {/* Replace constructionStatus badge with furnished status */}
         <div className="absolute left-4 top-4 z-10 rounded-lg bg-gray-800/80 px-2 py-1 text-xs font-medium text-white">
-          {rental.constructionStatus}
+          {furnishedLabel}
         </div>
         <div className="absolute right-4 top-4 z-10 rounded-lg bg-green-600/80 px-2 py-1 text-xs font-medium text-white">
           {rental.status}

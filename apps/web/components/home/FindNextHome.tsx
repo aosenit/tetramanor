@@ -47,6 +47,7 @@ type Property = {
   accountOfficer: any | null;
   images: PropertyImage[];
   document: any[];
+  rental: Rental;
 };
 
 type Rental = {
@@ -81,8 +82,10 @@ type RentalsResponse = {
 export default function FindNextHome() {
   const router = useRouter();
   const { data, isLoading, error } = useFetchData("/rentals?highlighted=true");
-  const rental = (data as RentalsResponse | undefined)?.data.items?.[0];
-  const property = rental?.property;
+  // Updated extraction logic to match API response
+  const property = (data as any)?.data.items?.[0];
+  const rental = property?.rental;
+
   return (
     <section className=" w-full container mx-auto px-4 lg:px-16 py-12">
       <div className="flex flex-col gap-8">
@@ -119,7 +122,7 @@ export default function FindNextHome() {
               <Skeleton className="h-10 w-32" />
             </div>
           </div>
-        ) : error || !rental || !property ? null : (
+        ) : error || !property || !rental ? null : (
           <div className="relative w-full max-w-full h-[500px] lg:h-[600px] rounded-[5px] overflow-hidden">
             <Image
               src={

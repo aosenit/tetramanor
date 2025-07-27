@@ -67,7 +67,7 @@ const HomeHero = () => {
               setModalOpen(true);
             }}
           >
-            <div className="flex items-center py-3 px-4 md:px-6 border-r border-white/30">
+            {/* <div className="flex items-center py-3 px-4 md:px-6 border-r border-white/30">
               <label className="text-white text-sm md:text-base mr-2 whitespace-nowrap">
                 Property type
               </label>
@@ -77,7 +77,7 @@ const HomeHero = () => {
                 onChange={(e) => setPropertyType(e.target.value)}
                 className="bg-transparent outline-none text-white placeholder-white text-sm md:text-base w-32"
               />
-            </div>
+            </div> */}
             <div className="flex items-center py-3 px-4 md:px-6 border-r border-white/10 flex-1">
               <input
                 type="text"
