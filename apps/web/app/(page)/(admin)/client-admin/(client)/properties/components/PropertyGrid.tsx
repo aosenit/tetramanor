@@ -80,14 +80,11 @@ export function PropertyGrid() {
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
           No properties found
         </h3>
-        <p className="text-gray-500 mb-6 max-w-md">
-          You haven't purchased any properties yet. Start your investment
-          journey by exploring available properties.
-        </p>
-        <Link href="/investment">
+        <p className="text-gray-500 mb-6 max-w-md">No properties found</p>
+        <Link href="/client-admin/dashboard">
           <Button className="flex items-center space-x-2">
             <Package className="w-4 h-4" />
-            <span>Explore Properties</span>
+            <span>Go to Home</span>
           </Button>
         </Link>
       </div>

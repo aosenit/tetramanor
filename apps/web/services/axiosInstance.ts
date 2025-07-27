@@ -32,39 +32,6 @@ const attachToken = (config: any) => {
 let isShowingError = false;
 const errorResetTimeout = 5000; // 5 seconds
 
-const getRefreshToken = () => localStorage.getItem("Refresh-token")?.trim();
-
-const refreshToken = async () => {
-  const rToken = getRefreshToken();
-  if (!rToken) {
-    throw new Error("No refresh token available");
-  }
-
-  try {
-    const response = await axios.post(
-      `${baseUrl}/auth/verifystate`,
-      {},
-      {
-        headers: {
-          "x-Refresh-Token": `Bearer ${rToken}`,
-        },
-      }
-    );
-
-    const { accessToken: token } = response.data?.detail || {};
-
-    if (!token) {
-      throw new Error("Invalid token response");
-    }
-
-    setToken(token, rToken);
-    return token;
-  } catch (error: any) {
-    localStorage.clear();
-    throw error;
-  }
-};
-
 const handleError = async (error: any) => {
   if (!error.response) {
     if (error.message === "Network Error") {
@@ -80,23 +47,20 @@ const handleError = async (error: any) => {
 
   // Handle 401 errors with token refresh
   if ((status === 401 || status === 502) && !originalRequest._retry) {
-    // originalRequest._retry = true;
-    // try {
-    //   const newToken = await refreshToken();
-    //   originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
-    //   return axiosInstance(originalRequest);
-    // } catch (refreshError) {
-    //   if (!originalRequest.url.includes("login")) {
-    //     // localStorage.clear();
-    //     // window.location.href = "/login";
-    //     toast.error("Unauthorized: Please log in again.");
-    //   }
-    //   return Promise.reject(refreshError);
-    // }
+    // clear all toasts
+    toast.dismiss();
 
-    if (!originalRequest.url.includes("login")) {
-      toast.error(data?.message || "Unauthorized: Please log in again.");
+    // Check if we're already on the login page
+    const isOnLoginPage = window.location.pathname === "/login/";
+
+    if (isOnLoginPage) {
+      // Already on login page, just show toast
+      console.log("on login page");
+      toast.error(
+        data?.message || "Login failed. Please check your credentials."
+      );
     } else {
+      // Not on login page, redirect to login
       localStorage.clear();
       window.location.href = "/login";
     }

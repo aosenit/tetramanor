@@ -50,7 +50,13 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      const response = await login(data);
+      // Trim email and password before sending
+      const trimmedData = {
+        email: data.email.trim(),
+        password: data.password.trim(),
+      };
+
+      const response = await login(trimmedData);
       if (response) {
         const { token, ...user } = response.data;
         localStorage.setItem("token", token);
@@ -61,6 +67,7 @@ export default function LoginPage() {
         } else {
           router.push("/client-admin/dashboard");
         }
+        toast.success(response.data.message || "Login successful");
       }
     } catch (error) {
       console.log(error);

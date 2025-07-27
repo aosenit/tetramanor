@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { PageHeader } from "./components/PageHeader";
 import { PropertyGrid } from "./components/PropertyGrid";
 
@@ -8,7 +9,9 @@ export default function Home() {
         title="Properties"
         description="Manage all your owned or rented properties in one place."
       />
-      <PropertyGrid />
+      <Suspense fallback={<div>Loading...</div>}>
+        <PropertyGrid />
+      </Suspense>
     </main>
   );
 }

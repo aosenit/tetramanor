@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  X,
+  // X,
   Receipt,
   CheckCircle,
   AlertTriangle,
   FileUp,
   Bell,
   Loader2,
-  Search,
+  // Search,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -25,7 +25,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+// import { Input } from "@/components/ui/input";
 import { useFetchData, usePutData } from "@/hooks/useApi";
 import { axiosInstance } from "@/services/axiosInstance";
 import { toast } from "sonner";
@@ -46,7 +46,7 @@ export function NotificationsPanel() {
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  const [search, setSearch] = useState("");
+  // const [search, setSearch] = useState("");
   const [isMarkingOne, setIsMarkingOne] = useState(false);
 
   // Fetch notifications based on filter and search
@@ -56,8 +56,8 @@ export function NotificationsPanel() {
     error,
     refetch,
   } = useFetchData(
-    `notifications?page=${page}&limit=${limit}${filter === "unread" ? "&status=UNREAD" : ""}${search ? `&search=${search}` : ""}`,
-    { page, filter, search }
+    `notifications?page=${page}&limit=${limit}${filter === "unread" ? "&status=UNREAD" : ""}`,
+    { page, filter }
   );
 
   const { mutateAsync: markAllAsRead, isPending: isMarkingAll } = usePutData(
@@ -175,10 +175,10 @@ export function NotificationsPanel() {
     });
   };
 
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    setPage(1); // Reset to first page when searching
-  };
+  // const handleSearch = (value: string) => {
+  //   setSearch(value);
+  //   setPage(1); // Reset to first page when searching
+  // };
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -189,7 +189,7 @@ export function NotificationsPanel() {
   // Reset page when filter or search changes
   useEffect(() => {
     setPage(1);
-  }, [filter, search]);
+  }, [filter]);
 
   const getNotificationIcon = (type: string) => {
     switch (type?.toLowerCase()) {
@@ -245,7 +245,7 @@ export function NotificationsPanel() {
         </DialogHeader>
 
         {/* Search Bar */}
-        <div className="px-4 pt-4">
+        {/* <div className="px-4 pt-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
@@ -260,7 +260,7 @@ export function NotificationsPanel() {
               <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 animate-spin" />
             )}
           </div>
-        </div>
+        </div> */}
 
         <Tabs
           value={filter}
@@ -351,11 +351,6 @@ export function NotificationsPanel() {
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     No notifications found
                   </h3>
-                  <p className="text-gray-500">
-                    {search
-                      ? `No notifications match "${search}"`
-                      : "You're all caught up! No new notifications."}
-                  </p>
                 </div>
               ) : (
                 ["today", "yesterday", "older"].map((category) => {

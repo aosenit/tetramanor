@@ -428,10 +428,13 @@ export default function AccountSettings() {
                     variant="outline"
                     className="flex items-center gap-2"
                     asChild
+                    disabled={uploadProfileImageMutation.isPending}
                   >
                     <span>
                       <Upload className="h-4 w-4" />
-                      Upload
+                      {uploadProfileImageMutation.isPending
+                        ? "Uploading..."
+                        : "Upload"}
                     </span>
                   </Button>
                   <input
@@ -589,8 +592,7 @@ export default function AccountSettings() {
               <Dialog open={isKycModalOpen} onOpenChange={setIsKycModalOpen}>
                 <DialogTrigger asChild>
                   <div className="lg:w-[60%] ">
-                    {kycStatus?.toLowerCase() === "pending" ||
-                    kycStatus?.toLowerCase() === "unverified" ? (
+                    {kycStatus?.toLowerCase() !== "verified" ? (
                       <Button
                         className="bg-[var(--primary-green)] hover:bg-green-700"
                         disabled={isLoadingKyc}
