@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Breadcrumb } from "../../customers/components/Breadcrumb";
 import { Switch } from "@/components/ui/switch";
+import { X } from "lucide-react";
 
 // Validation schema
 const rentalSchema = z.object({
@@ -357,12 +358,14 @@ export default function EditRental() {
           <label className="block mb-1 text-sm text-[#323539] font-medium">
             Property name
           </label>
+          {/* disabled if edit mode */}
           <Dropdown
             options={propertyOptions}
             value={
               properties.find((p) => p.id === formData.propertyId)?.name || ""
             }
             onChange={handlePropertyChange}
+            disabled={isEditMode}
           />
           {errors.propertyId && (
             <p className="text-red-500 text-sm mt-1">{errors.propertyId}</p>
@@ -565,13 +568,12 @@ export default function EditRental() {
                       alt={image.name}
                       className="w-full h-32 object-cover rounded-lg"
                     />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(image.id)}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      ×
-                    </button>
+                    <div className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                      <X
+                        className="w-4 h-4"
+                        onClick={() => removeImage(image.id)}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
