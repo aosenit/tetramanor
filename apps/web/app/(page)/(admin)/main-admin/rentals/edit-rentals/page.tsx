@@ -7,7 +7,12 @@ import Link from "next/link";
 import TagInputGroup from "../../properties/components/PropertyFeaturesForm";
 import Dropdown from "./components/Dropdown";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useFetchData, useUploadPutData, useUploadData } from "@/hooks/useApi";
+import {
+  useFetchData,
+  useUploadPutData,
+  useUploadData,
+  useDeleteData,
+} from "@/hooks/useApi";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Breadcrumb } from "../../customers/components/Breadcrumb";
@@ -78,6 +83,9 @@ export default function EditRental() {
   const [features, setFeatures] = useState<string[]>([]);
   const [amenities, setAmenities] = useState<string[]>([]);
 
+  // state for id of image to delete
+  const [imageIdToDelete, setImageIdToDelete] = useState<string | null>(null);
+
   // Fetch rental data if in edit mode
   const { data: rentalData, isLoading: isLoadingRental } = useFetchData(
     rentalId ? `rentals/${rentalId}/details` : null
@@ -95,6 +103,11 @@ export default function EditRental() {
   const { mutateAsync: updateRental, isPending: isUpdating } = useUploadPutData(
     rentalId ? `rentals/${rentalId}` : null
   );
+
+  const { mutateAsync: deleteRentalImage, isPending: isDeletingImage } =
+    useDeleteData(
+      rentalId && imageIdToDelete ? `upload/images/${imageIdToDelete}` : null
+    );
 
   // Extract properties from response
   const properties: Property[] = propertiesResponse?.data?.items || [];
@@ -178,11 +191,8 @@ export default function EditRental() {
   const handleFileUpload = (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
-    console.log("Files selected:", files.length);
-
     // Convert files to UploadedImage format for display
     const newImages: UploadedImage[] = Array.from(files).map((file, index) => {
-      console.log("Processing file:", file.name, file.size, file.type);
       return {
         id: `temp-${Date.now()}-${index}`,
         imageUrl: URL.createObjectURL(file),
@@ -196,14 +206,30 @@ export default function EditRental() {
   };
 
   // Remove image
-  const removeImage = (imageId: string) => {
-    setUploadedImages((prev) => {
-      const imageToRemove = prev.find((img) => img.id === imageId);
-      if (imageToRemove) {
-        URL.revokeObjectURL(imageToRemove.imageUrl);
+  const removeImage = async (imageId: string) => {
+    setImageIdToDelete(imageId);
+
+    const handleUploadedImages = (imageId: string) => {
+      setUploadedImages((prev) => {
+        const imageToRemove = prev.find((img) => img.id === imageId);
+        if (imageToRemove) {
+          URL.revokeObjectURL(imageToRemove.imageUrl);
+        }
+        return prev.filter((img) => img.id !== imageId);
+      });
+    };
+
+    if (isEditMode) {
+      try {
+        await deleteRentalImage();
+        handleUploadedImages(imageId);
+        toast.success("Image deleted successfully");
+      } catch (error) {
+        console.log(error);
       }
-      return prev.filter((img) => img.id !== imageId);
-    });
+    } else {
+      handleUploadedImages(imageId);
+    }
   };
 
   // Validate form data
@@ -266,17 +292,12 @@ export default function EditRental() {
         // In edit mode, we need to handle existing images and new images separately
         uploadedImages.forEach((image) => {
           if (image.file) {
-            // New image - send as binary file
             console.log(
               "Adding new image to FormData:",
               image.name,
               image.file
             );
             formDataToSubmit.append("images", image.file);
-          } else if (image.id) {
-            // Existing image - send the ID to keep it
-            console.log("Keeping existing image:", image.id);
-            formDataToSubmit.append("existingImageIds", image.id);
           }
         });
       } else {
@@ -514,7 +535,15 @@ export default function EditRental() {
         </div>
 
         {/* Images Upload */}
-        <div>
+        <div
+          className={`${isDeletingImage ? "opacity-50 cursor-not-allowed" : ""}`}
+        >
+          {isDeletingImage && (
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              <span>Deleting image...</span>
+            </div>
+          )}
           <label className="block mb-1 text-sm text-[#323539] font-medium">
             Property Images
           </label>
