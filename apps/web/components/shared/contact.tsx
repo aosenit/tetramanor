@@ -1,8 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
-import twelve from "@/assets/services/twelve.webp"
+import { useState } from "react";
+import twelve from "@/assets/services/twelve.webp";
 
 export default function ContactSection() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleContactClick = () => {
+    setIsLoading(true);
+    // Simulate loading for navigation
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  };
+
   return (
     <section className="relative w-full h-[337px] overflow-hidden">
       {/* Background Image */}
@@ -26,9 +37,36 @@ export default function ContactSection() {
         </p>
         <Link
           href="/contact"
-          className="bg-green-700 hover:bg-green-800 text-white font-medium py-3 px-8 rounded-md transition-colors duration-300"
+          onClick={handleContactClick}
+          className="bg-green-700 hover:bg-green-800 text-white font-medium py-3 px-8 rounded-md transition-colors duration-300 inline-flex items-center justify-center"
         >
-          Contact us
+          {isLoading ? (
+            <span className="flex items-center justify-center">
+              <svg
+                className="animate-spin h-5 w-5 mr-2 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8z"
+                ></path>
+              </svg>
+              Loading...
+            </span>
+          ) : (
+            "Contact us"
+          )}
         </Link>
       </div>
     </section>
