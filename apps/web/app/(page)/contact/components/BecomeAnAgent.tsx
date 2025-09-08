@@ -8,6 +8,7 @@ import d from "@/assets/investment/icons/d.webp";
 import { IoMdMail } from "react-icons/io";
 import { MdCall } from "react-icons/md";
 import { useFetchData } from "@/hooks/useApi";
+import { Button } from "@/components/ui/button";
 
 const steps = [
   {
@@ -33,12 +34,13 @@ const steps = [
       "Represent a reputable and respected real estate name in Nigeria.",
   },
 ];
+
 function BecomeAnAgent() {
-  // Fetch contact info
   const {
     data: contactResponse,
     isLoading: isContactLoading,
     error: contactError,
+    refetch,
   } = useFetchData("contact");
 
   const agent = contactResponse?.data?.agentInquiry;
@@ -55,27 +57,41 @@ function BecomeAnAgent() {
               Launch your real estate career with Tetramanor
             </p>
           </div>
+
           <div className="flex flex-col gap-4 lg:flex-row">
-            <p className="flex items-center gap-4">
-              <span className="text-green-700">
-                <MdCall />
-              </span>
-              {isContactLoading ? (
-                <span className="inline-block w-24 h-4 bg-gray-200 rounded animate-pulse" />
-              ) : (
-                agent?.phone || null
-              )}
-            </p>
-            <p className="flex items-center gap-4">
-              <span className="text-green-700">
-                <IoMdMail />
-              </span>{" "}
-              {isContactLoading ? (
-                <span className="inline-block w-32 h-4 bg-gray-200 rounded animate-pulse" />
-              ) : (
-                agent?.email || null
-              )}
-            </p>
+            {contactError ? (
+              <div className="text-center space-y-3">
+                <p className="text-red-500 text-sm">
+                  Failed to load contact info.
+                </p>
+                <Button onClick={() => refetch()} variant="default" size="sm">
+                  Try Again
+                </Button>
+              </div>
+            ) : (
+              <>
+                <p className="flex items-center gap-4">
+                  <span className="text-green-700">
+                    <MdCall />
+                  </span>
+                  {isContactLoading ? (
+                    <span className="inline-block w-24 h-4 bg-gray-200 rounded animate-pulse" />
+                  ) : (
+                    agent?.phone || null
+                  )}
+                </p>
+                <p className="flex items-center gap-4">
+                  <span className="text-green-700">
+                    <IoMdMail />
+                  </span>
+                  {isContactLoading ? (
+                    <span className="inline-block w-32 h-4 bg-gray-200 rounded animate-pulse" />
+                  ) : (
+                    agent?.email || null
+                  )}
+                </p>
+              </>
+            )}
           </div>
         </div>
 

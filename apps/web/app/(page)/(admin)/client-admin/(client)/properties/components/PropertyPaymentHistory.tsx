@@ -49,8 +49,8 @@ const PropertyPaymentHistory: React.FC<PropertyPaymentHistoryProps> = ({
         window.URL.revokeObjectURL(url);
         toast.success("PDF downloaded successfully");
       },
-      onError: () => {
-        toast.error("Failed to download PDF");
+      onError: (error) => {
+        toast.error(error?.message || "Failed to download PDF");
       },
     });
   };

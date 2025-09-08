@@ -96,7 +96,6 @@ const HomeHero = () => {
           </form>
         </div>
       </div>
-      {/* Modal for property results */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>

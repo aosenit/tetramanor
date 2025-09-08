@@ -1,11 +1,10 @@
 import React from "react";
 import Image from "next/image";
-import six from "@/assets/about/icons/six.webp"
-import seven from "@/assets/about/icons/seven.webp"
-import eight from "@/assets/about/icons/eight.webp"
-import nine from "@/assets/about/icons/nine.webp"
-import ten from "@/assets/about/icons/ten.webp"
-import eleven from "@/assets/about/icons/eleven.webp"
+import eight from "@/assets/about/icons/eight.webp";
+import nine from "@/assets/about/icons/nine.webp";
+import ten from "@/assets/about/icons/ten.webp";
+import eleven from "@/assets/about/icons/eleven.webp";
+import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa";
 
 const features = [
   {
@@ -41,31 +40,21 @@ function TetramoreCode() {
           This is the promise we make to our clients:
         </p>
       </div>
-      <div className="mt-6 space-y-2 text-center">
-        <Image
-          src={six}
-          alt="icon"
-          className="text-black md:ml-[100px] lg:ml-[200px] xl:ml-[460px]"
-          width={20}
-          height={20}
-        />
-        <p className="text-sm text-[#202020]">
-        We will not compromise our standards for any reason whatsoever.
-        </p>
-        <p className="text-sm text-[#202020]">
-          We will not extort our clients to make a profit.
-        </p>
-        <p className="text-sm text-[#202020]">
-          We will not sell to our clients spaces we are not willing to live in
-          ourselves.
-        </p>
-        <Image
-          src={seven}
-          alt="icon"
-          className="ml-[340px] md:ml-[600px] lg:ml-[700px] xl:ml-[950px]"
-          width={20}
-          height={20}
-        />
+      <div className="mt-6 relative max-w-xs  mx-auto">
+        {/* Opening quote */}
+        <FaQuoteLeft className="absolute -top-4 -left-4 text-2xl text-[#202020]" />
+
+        <blockquote className="text-center italic text-sm text-[#202020] space-y-2">
+          <p>We will not compromise our standards for any reason whatsoever.</p>
+          <p>We will not extort our clients to make a profit.</p>
+          <p>
+            We will not sell to our clients spaces we are not willing to live in
+            ourselves.
+          </p>
+        </blockquote>
+
+        {/* Closing quote */}
+        <FaQuoteRight className="absolute -bottom-4 -right-4 text-2xl text-[#202020]" />
       </div>
 
       <div className="grid  sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-10">

@@ -67,21 +67,11 @@ type Rental = {
   [key: string]: any;
 };
 
-type RentalsResponse = {
-  data: {
-    items: Rental[];
-    limit: number;
-    page: number;
-    total: number;
-  };
-  message: string;
-  statusCode: number;
-  success: boolean;
-};
+
 
 export default function FindNextHome() {
   const router = useRouter();
-  const { data, isLoading, error } = useFetchData("/rentals?highlighted=true");
+  const { data, isLoading, error,  } = useFetchData("/rentals?highlighted=true");
   // Updated extraction logic to match API response
   const property = (data as any)?.data.items?.[0];
   const rental = property?.rental;

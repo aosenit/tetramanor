@@ -13,6 +13,7 @@ import { useToast } from "@chakra-ui/react";
 import { useFetchData } from "@/hooks/useApi";
 import { Property } from "../../types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 interface PageProps {
   params: { id: string };
@@ -38,6 +39,7 @@ export default function Page({ params }: PageProps) {
   );
   const property: Property = data?.data;
 
+  // Loading skeleton
   if (isLoading) {
     return (
       <div>
@@ -53,7 +55,43 @@ export default function Page({ params }: PageProps) {
       </div>
     );
   }
-  if (error || !property) return null;
+
+  // Error handling
+  if (error) {
+    return (
+      <div className="py-16 container mx-auto px-4 text-center">
+        <h2 className="text-2xl font-bold text-red-600 mb-4">
+          Something went wrong
+        </h2>
+        <p className="text-gray-600 mb-6">
+          We couldn’t load this property right now. Please try again later.
+        </p>
+        <Button variant="outline" onClick={() => window.location.reload()}>
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  // No property found
+  if (!property) {
+    return (
+      <div className="py-16 container mx-auto px-4 text-center">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          Property not found
+        </h2>
+        <p className="text-gray-600 mb-6">
+          The property you are looking for might have been removed or doesn’t
+          exist.
+        </p>
+        <Button variant="outline" onClick={() => window.history.back()}>
+          Go Back
+        </Button>
+      </div>
+    );
+  }
+
+  // Main content
   return (
     <div>
       <div className="flex pt-6 justify-end p-4">
