@@ -1,11 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import {
-  PiCurrencyNgn,
-  PiCurrencyCircleDollar,
-  PiCurrencyEur,
-} from "react-icons/pi";
+import { PiCurrencyNgn, PiCurrencyCircleDollar } from "react-icons/pi";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +13,12 @@ import { MdArrowBackIosNew } from "react-icons/md";
 import { Save, Loader2, X, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useUploadData, useFetchData, useUploadPutData } from "@/hooks/useApi";
+import {
+  useUploadData,
+  useFetchData,
+  useUploadPutData,
+  useDeleteData,
+} from "@/hooks/useApi";
 import { CustomDropdown } from "./components/CustomDropdown";
 import Image from "next/image";
 import Loader from "@/components/Loader";
@@ -61,6 +62,7 @@ function AddInvestmentContent() {
   const investmentId = searchParams.get("id");
   const isEditing = !!investmentId;
 
+  const [imageIdToDelete, setImageIdToDelete] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [imageName, setImageName] = useState("Featured Image");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -88,6 +90,13 @@ function AddInvestmentContent() {
     isPending: isUpdating,
     error: updateError,
   } = useUploadPutData(`investments/${investmentId}`);
+
+  const { mutateAsync: deleteInvestmentImage, isPending: isDeletingImage } =
+    useDeleteData(
+      investmentId && imageIdToDelete
+        ? `upload/images/${imageIdToDelete}`
+        : null
+    );
 
   // Load investment data into form when editing
   useEffect(() => {
@@ -143,13 +152,46 @@ function AddInvestmentContent() {
     }
   };
 
-  const handleRemoveImage = () => {
-    setFormData((prev) => ({
-      ...prev,
-      featuredImage: undefined,
-    }));
-    setImagePreview(null);
-    setImageName("Featured Image");
+  const handleRemoveImage = async (imageId?: string) => {
+    if (isEditing) {
+      // If imageId is provided, use it; otherwise use the current image from investment data
+      const idToDelete = imageId || investmentResponse?.data?.image[0]?.id;
+
+      if (idToDelete) {
+        try {
+          setImageIdToDelete(idToDelete);
+          await deleteInvestmentImage();
+          setImagePreview(null);
+          setImageName("Featured Image");
+          setImageIdToDelete(null);
+
+          // Remove the featuredImage from form data if it exists
+          setFormData((prev) => ({
+            ...prev,
+            featuredImage: undefined,
+          }));
+        } catch (error) {
+          console.error("Error deleting image:", error);
+          setImageIdToDelete(null);
+        }
+      } else {
+        // If no server image to delete, just clear the preview (newly uploaded image)
+        setImagePreview(null);
+        setImageName("Featured Image");
+        setFormData((prev) => ({
+          ...prev,
+          featuredImage: undefined,
+        }));
+      }
+    } else {
+      // For new investments, just clear the preview and form data
+      setImagePreview(null);
+      setImageName("Featured Image");
+      setFormData((prev) => ({
+        ...prev,
+        featuredImage: undefined,
+      }));
+    }
   };
 
   // Benefits handlers
@@ -529,8 +571,11 @@ function AddInvestmentContent() {
                     type="button"
                     variant="destructive"
                     size="sm"
-                    onClick={handleRemoveImage}
+                    onClick={() =>
+                      handleRemoveImage(investmentResponse?.data?.image[0]?.id)
+                    }
                     className="absolute -top-2 -right-2 w-6 h-6 p-0 rounded-full"
+                    disabled={isDeletingImage}
                   >
                     <X className="w-4 h-4" />
                   </Button>

@@ -9,6 +9,7 @@ import {
   usePutData,
   useFetchData,
   useUploadData,
+  useDeleteData,
 } from "@/hooks/useApi";
 import PropertyInfoSection from "./PropertyInfoSection";
 import UnitDescriptionSection from "./UnitDescriptionSection";
@@ -122,6 +123,7 @@ export default function AddProperties() {
   const [errors, setErrors] = useState<Partial<PropertyFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [imageIdToDelete, setImageIdToDelete] = useState<string | null>(null);
   const [uploadedDocument, setUploadedDocument] =
     useState<UploadedDocument | null>(null);
   const [customUnitType, setCustomUnitType] = useState("");
@@ -166,6 +168,11 @@ export default function AddProperties() {
     useUploadData("upload/images");
   const { mutateAsync: uploadDocument, isPending: isUploadingDocument } =
     useUploadData("upload/document");
+
+  const { mutateAsync: deleteInvestmentImage, isPending: isDeletingImage } =
+    useDeleteData(
+      propertyId && imageIdToDelete ? `upload/images/${imageIdToDelete}` : null
+    );
 
   // Load property data when editing
   useEffect(() => {
@@ -279,12 +286,28 @@ export default function AddProperties() {
   };
 
   // Remove uploaded image
-  const removeImage = (imageId: string) => {
-    setUploadedImages((prev) => prev.filter((img) => img.id !== imageId));
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images.filter((id) => id !== imageId),
-    }));
+  const removeImage = async (imageId: string) => {
+    // update when isedit
+    if (isEditMode) {
+      try {
+        setImageIdToDelete(imageId);
+        await deleteInvestmentImage();
+        setImageIdToDelete(null);
+        setUploadedImages((prev) => prev.filter((img) => img.id !== imageId));
+        setFormData((prev) => ({
+          ...prev,
+          images: prev.images.filter((id) => id !== imageId),
+        }));
+      } catch (error) {
+        console.error("Error deleting image:", error);
+      }
+    } else {
+      setUploadedImages((prev) => prev.filter((img) => img.id !== imageId));
+      setFormData((prev) => ({
+        ...prev,
+        images: prev.images.filter((id) => id !== imageId),
+      }));
+    }
   };
 
   // Remove uploaded document
@@ -647,6 +670,7 @@ export default function AddProperties() {
               removeImage={removeImage}
               removeBanner={removeBanner}
               removeDocument={removeDocument}
+              isDeletingImage={isDeletingImage}
             />
           </div>
 

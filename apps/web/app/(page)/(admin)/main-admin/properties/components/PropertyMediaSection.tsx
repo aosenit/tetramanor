@@ -1,3 +1,5 @@
+import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@chakra-ui/react";
 import { Upload, X } from "lucide-react";
 
 import React from "react";
@@ -33,6 +35,7 @@ type PropertyMediaSectionProps = {
   removeImage: (id: string) => void;
   removeBanner: () => void;
   removeDocument: () => void;
+  isDeletingImage: boolean;
 };
 
 export default function PropertyMediaSection({
@@ -47,6 +50,7 @@ export default function PropertyMediaSection({
   removeImage,
   removeBanner,
   removeDocument,
+  isDeletingImage,
 }: PropertyMediaSectionProps) {
   return (
     <div className="mt-8">
@@ -79,11 +83,17 @@ export default function PropertyMediaSection({
             <div className="flex flex-wrap gap-2 mt-4">
               {uploadedImages.map((image, index) => (
                 <div key={image.id} className="relative group w-16 h-16">
-                  <img
-                    src={image.imageUrl}
-                    alt={image.name}
-                    className="w-full h-full object-cover rounded-md border"
-                  />
+                  {isDeletingImage ? (
+                    <div className="absolute top-1 right-1">
+                      <Skeleton className="w-14 h-16 " />
+                    </div>
+                  ) : (
+                    <img
+                      src={image.imageUrl}
+                      alt={image.name}
+                      className="w-full h-full object-cover rounded-md border"
+                    />
+                  )}
                   <button
                     type="button"
                     onClick={() => removeImage(image.id)}
