@@ -1,8 +1,16 @@
 import Image from "next/image";
 import React, { useRef } from "react";
-import { useDisclosure, Modal, ModalOverlay, ModalContent, ModalCloseButton, ModalBody } from "@chakra-ui/react";
+import {
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
+  ModalBody,
+} from "@chakra-ui/react";
 import { useFetchData } from "@/hooks/useApi";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { Button } from "@/components/ui/button"; // ✅ your reusable button
 
 type CampaignImage = {
   id: string;
@@ -38,10 +46,11 @@ type CampaignsResponse = {
 };
 
 export default function OngoingCampaigns() {
-  const { data, isLoading, error } = useFetchData("/campaigns");
+  const { data, isLoading, error, refetch } = useFetchData("/campaigns"); // ✅ added refetch
   const campaigns = (data as CampaignsResponse | undefined)?.data || [];
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedCampaign, setSelectedCampaign] = React.useState<Campaign | null>(null);
+  const [selectedCampaign, setSelectedCampaign] =
+    React.useState<Campaign | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const showArrows = campaigns.length > 3;
@@ -56,7 +65,10 @@ export default function OngoingCampaigns() {
       const { scrollLeft, clientWidth } = scrollRef.current;
       const scrollAmount = clientWidth * 0.8;
       scrollRef.current.scrollTo({
-        left: direction === "left" ? scrollLeft - scrollAmount : scrollLeft + scrollAmount,
+        left:
+          direction === "left"
+            ? scrollLeft - scrollAmount
+            : scrollLeft + scrollAmount,
         behavior: "smooth",
       });
     }
@@ -85,8 +97,21 @@ export default function OngoingCampaigns() {
       </section>
     );
   }
+
   if (error) {
-    return null;
+    return (
+      <section className="bg-white w-full">
+        <div className="container mx-auto px-4 lg:px-16 py-12 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-red-600 mb-4">
+            Failed to load campaigns
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Something went wrong while fetching campaigns. Please try again.
+          </p>
+          <Button onClick={() => refetch()}>Try Again</Button>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -119,7 +144,7 @@ export default function OngoingCampaigns() {
             style={{ WebkitOverflowScrolling: "touch" }}
             ref={scrollRef}
           >
-            {campaigns.map((c, i) => (
+            {campaigns.map((c) => (
               <div
                 key={c.id}
                 className="relative min-w-[220px] sm:min-w-[250px] md:min-w-[260px] lg:min-w-[280px] aspect-[3/4] cursor-pointer"

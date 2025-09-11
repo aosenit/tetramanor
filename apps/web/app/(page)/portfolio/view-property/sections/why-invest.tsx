@@ -17,7 +17,7 @@ export default function WhyInvest({ property }: WhyInvestProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           <div className="relative h-[400px] lg:h-[500px] rounded-lg overflow-hidden">
             <Image
-              src={property.images?.[0]?.imageUrl || placeholder}
+              src={property.images?.[2]?.imageUrl || placeholder}
               alt={property.name || "Property image"}
               fill
               className="object-cover"
@@ -35,7 +35,9 @@ export default function WhyInvest({ property }: WhyInvestProps) {
                       <FaCheck className="h-5 w-5 text-[#116114]" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold mb-1">{adv.title}</h3>
+                      <h3 className="text-xl font-semibold mb-1">
+                        {adv.title}
+                      </h3>
                       <p className="text-[#5c5c5c]">{adv.description}</p>
                     </div>
                   </div>

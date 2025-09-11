@@ -2,17 +2,19 @@
 import React from "react";
 import PropertyCard from "../components/property-card";
 import { useFetchData } from "@/hooks/useApi";
-import type { PropertyResponse, PropertyItem } from "@/types/property";
+import type { PropertyItem } from "@/types/property";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 function Completed() {
   const router = useRouter();
+
   // Fetch completed properties (limit 3)
   const {
     data: propertyResponse,
     isLoading,
     error,
+    refetch, // ✅ add refetch
   } = useFetchData("property", {
     page: 1,
     limit: 3,
@@ -24,10 +26,11 @@ function Completed() {
   const properties: PropertyItem[] = propertyResponse?.data?.items || [];
 
   return (
-    <section className="py-16 container mx-auto px-4 lg:px-16 bg-white ">
-      <h2 className="text-3xl md:text-4xl font-bold mb-10 text-gray-900 ">
+    <section className="py-16 container mx-auto px-4 lg:px-16 bg-white">
+      <h2 className="text-3xl md:text-4xl font-bold mb-10 text-gray-900">
         Completed Projects
       </h2>
+
       {isLoading ? (
         <div className="grid gap-6">
           {[...Array(3)].map((_, i) => (
@@ -37,7 +40,20 @@ function Completed() {
             />
           ))}
         </div>
-      ) : error ? null : (
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-12 space-y-4 text-center">
+          <p className="text-red-500 font-medium">
+            Failed to load completed projects.
+          </p>
+          <Button onClick={() => refetch()} size="sm">
+            Try Again
+          </Button>
+        </div>
+      ) : properties.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+          <p>No completed projects available at the moment.</p>
+        </div>
+      ) : (
         <>
           <div className="grid gap-6">
             {/* Top: First card spans full width */}
@@ -55,6 +71,7 @@ function Completed() {
                 />
               </div>
             )}
+
             {/* Bottom: Next two cards side by side */}
             <div className="grid md:grid-cols-2 gap-6">
               {properties.slice(1, 3).map((property) => (
@@ -71,6 +88,7 @@ function Completed() {
               ))}
             </div>
           </div>
+
           <div className="flex justify-center mt-8">
             <Button
               size="lg"

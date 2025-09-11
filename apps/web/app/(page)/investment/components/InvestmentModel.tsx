@@ -4,6 +4,7 @@ import { useState } from "react";
 import TabOne from "./TabOne";
 import TabTwo from "./TabTwo";
 import { useFetchData } from "@/hooks/useApi";
+import { Button } from "@/components/ui/button"; 
 
 // Skeleton Loading Component
 const InvestmentModelSkeleton = () => (
@@ -11,19 +12,12 @@ const InvestmentModelSkeleton = () => (
     <div className="bg-[#f9f4f0] rounded-xl p-2 md:p-4">
       <div className="grid md:grid-cols-2 gap-8">
         <div className="space-y-4">
-          {/* Icon skeleton */}
           <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-
-          {/* Title skeleton */}
           <div className="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
-
-          {/* Description skeleton */}
           <div className="space-y-2">
             <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
             <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
           </div>
-
-          {/* List items skeleton */}
           <div className="space-y-3 mt-6">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="flex items-start gap-2">
@@ -32,22 +26,16 @@ const InvestmentModelSkeleton = () => (
               </div>
             ))}
           </div>
-
-          {/* Benefits skeleton */}
           <div className="space-y-2 mt-6">
             <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
             <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
           </div>
         </div>
-
-        {/* Image skeleton */}
         <div className="flex items-center justify-center">
           <div className="bg-gray-200 rounded-xl w-full h-64 animate-pulse"></div>
         </div>
       </div>
     </div>
-
-    {/* How it works skeleton */}
     <div className="space-y-6">
       <div className="h-8 bg-gray-200 rounded w-48 animate-pulse"></div>
       <div className="grid grid-cols-1 mt-8 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -65,10 +53,10 @@ const InvestmentModelSkeleton = () => (
 
 export default function InvestmentModels() {
   const [activeTab, setActiveTab] = useState("fixed-roi");
-  const { data, isLoading, error } = useFetchData("investments");
 
-  // Defensive: data?.data is the array of investments
+  const { data, isLoading, error, refetch } = useFetchData("investments"); // ✅ added refetch
   const investments = data?.data || [];
+
   const fixedROI = investments.filter(
     (inv: any) => inv.investmentType === "FIXED_ROI"
   );
@@ -84,10 +72,12 @@ export default function InvestmentModels() {
             INVESTMENT MODELS
           </p>
         </div>
+
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-center md:text-left">
             Choose the Investment Model That Fits Your Goals
           </h1>
+
           <div className="inline-flex items-center justify-center rounded-md p-1 self-center md:self-auto">
             <button
               onClick={() => setActiveTab("fixed-roi")}
@@ -111,9 +101,21 @@ export default function InvestmentModels() {
             </button>
           </div>
         </div>
+
         <div>
           {isLoading && <InvestmentModelSkeleton />}
-          {error && null}
+
+          {error && (
+            <div className="flex flex-col items-center justify-center text-center space-y-3 py-8">
+              <p className="text-red-500 font-medium">
+                Failed to load investment models.
+              </p>
+              <Button onClick={() => refetch()} size="sm" variant="default">
+                Try Again
+              </Button>
+            </div>
+          )}
+
           {!isLoading && !error && (
             <>
               {activeTab === "fixed-roi" && <TabOne investments={fixedROI} />}

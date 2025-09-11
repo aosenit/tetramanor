@@ -1,14 +1,19 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { FaDoorOpen, FaExpand, FaMapMarkerAlt, FaShieldAlt } from "react-icons/fa";
+import {
+  FaDoorOpen,
+  FaExpand,
+  FaMapMarkerAlt,
+  FaShieldAlt,
+} from "react-icons/fa";
 import { MdBed } from "react-icons/md";
 import Link from "next/link";
 import { useFetchData } from "@/hooks/useApi";
+import { Button } from "@/components/ui/button";
 import placeholder from "@/assets/placeholder.jpg";
 
 function PropertyCard({
-  id,
   name,
   address,
   unitAmount,
@@ -36,7 +41,7 @@ function PropertyCard({
       </div>
       <div className="p-6 bg-[#f1f4f1]">
         <div className="flex items-center justify-between">
-          <h3 className="xl:text-xl  truncate text-[#1D1D1D] font-semibold">
+          <h3 className="xl:text-xl truncate text-[#1D1D1D] font-semibold">
             {name}
           </h3>
           <div className="flex truncate items-center text-xs font-medium text-[#4D4E53]">
@@ -44,8 +49,8 @@ function PropertyCard({
             {address}
           </div>
         </div>
-        <div className="mt-6  flex flex-wrap gap-3">
-          <div className="flex border-r-2 font-medium text-xs text-[#4D4E53] border-[#BBBCCD] items-center gap-2  px-3 py-1">
+        <div className="mt-6 flex flex-wrap gap-3">
+          <div className="flex border-r-2 font-medium text-xs text-[#4D4E53] border-[#BBBCCD] items-center gap-2 px-3 py-1">
             <MdBed className=" text-[#CD6115] text-lg" />
             <span>{unitAmount || 0} Beds</span>
           </div>
@@ -56,7 +61,7 @@ function PropertyCard({
             return (
               <div
                 key={index}
-                className="flex border-r-2 border-[#BBBCCD] items-center gap-2  font-medium text-xs text-[#4D4E53] px-3"
+                className="flex border-r-2 border-[#BBBCCD] items-center gap-2 font-medium text-xs text-[#4D4E53] px-3"
               >
                 <Icon className="text-[#CD6115] text-lg" />
                 <span>{feature}</span>
@@ -78,16 +83,19 @@ function PropertyCard({
 }
 
 function ExploreMore() {
-  const { data, isLoading, error } = useFetchData("rentals", {
+  const { data, isLoading, error, refetch } = useFetchData("rentals", {
     page: 1,
     limit: 10,
   });
+
   const items = data?.data?.items || [];
+
   return (
-    <div className="container mx-auto px-4 lg:px-16 py-12 ">
+    <div className="container mx-auto px-4 lg:px-16 py-12">
       <h1 className="text-2xl text-black font-semibold text-center">
         Explore More Properties
       </h1>
+
       {isLoading ? (
         <div className="flex overflow-x-auto gap-4 mt-10 pb-4">
           {[...Array(3)].map((_, i) => (
@@ -97,7 +105,20 @@ function ExploreMore() {
             />
           ))}
         </div>
-      ) : error ? null : (
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-12 space-y-4 text-center">
+          <p className="text-red-500 font-medium">
+            Failed to load properties. Please try again.
+          </p>
+          <Button onClick={() => refetch()} size="sm">
+            Try Again
+          </Button>
+        </div>
+      ) : items.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+          <p>No properties available at the moment.</p>
+        </div>
+      ) : (
         <div className="flex overflow-x-auto gap-4 mt-10 scrollbar-hide pb-4">
           {items.map((item: any) => (
             <PropertyCard key={item.id} {...item} />

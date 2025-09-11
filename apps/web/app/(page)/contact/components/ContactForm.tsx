@@ -1,6 +1,6 @@
 "use client";
 
-import { usePostData } from "@/hooks/useApi";
+import { usePostData, useFetchData } from "@/hooks/useApi";
 import React from "react";
 import { FaLocationDot, FaPhone } from "react-icons/fa6";
 import { IoMdMail } from "react-icons/io";
@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { useFetchData } from "@/hooks/useApi";
 import type { ContactResponse, ContactData } from "@/types/contact";
 
 const contactFormSchema = z.object({
@@ -56,14 +55,14 @@ function ContactForm() {
     <div className="container mx-auto px-4 lg:px-16 py-12">
       <section className="">
         <div className=" space-y-10">
-          <div className="rounded-lg  flex flex-col gap-8">
+          <div className="rounded-lg flex flex-col gap-8">
             <div className="bg-white">
               <div>
                 <h3 className="text-2xl font-semibold text-[#151515] rounded-sm p-6 border ">
                   Contact Information
                 </h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 border  gap-6 p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 border gap-6 p-6">
                 {isContactLoading ? (
                   <div className="flex gap-4">
                     {[...Array(3)].map((_, i) => (
@@ -73,7 +72,17 @@ function ContactForm() {
                       />
                     ))}
                   </div>
-                ) : contactError ? null : contact ? (
+                ) : contactError ? (
+                  <div className="col-span-full flex flex-col items-center text-center text-red-500 space-y-4">
+                    <p>Failed to load contact information.</p>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                    >
+                      Try Again
+                    </button>
+                  </div>
+                ) : contact ? (
                   <>
                     {/* Phone */}
                     <a
@@ -101,7 +110,9 @@ function ContactForm() {
                     <a
                       href={
                         contact.mapEmbedCode ||
-                        `https://maps.google.com/?q=${encodeURIComponent(contact.officeAddress)}`
+                        `https://maps.google.com/?q=${encodeURIComponent(
+                          contact.officeAddress
+                        )}`
                       }
                       target="_blank"
                       rel="noopener noreferrer"
@@ -116,18 +127,10 @@ function ContactForm() {
                   <p>No contact info available.</p>
                 )}
               </div>
-              {/* Optionally render social media links */}
-              {/* {contact?.socialMedia?.length ? (
-                <div className="flex flex-wrap gap-4 p-6 pt-0">
-                  {contact.socialMedia.map((sm) => (
-                    <a key={sm.platform} href={sm.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                      {sm.platform}
-                    </a>
-                  ))}
-                </div>
-              ) : null} */}
             </div>
           </div>
+
+          {/* Contact Form */}
           <div className=" bg-white rounded-lg ">
             <h2 className="text-2xl font-semibold text-[#151515] rounded-sm p-6 border ">
               Send us a message

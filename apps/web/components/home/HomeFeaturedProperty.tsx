@@ -1,7 +1,6 @@
-// apps/web/components/home/HomeFeaturedProperty.tsx
 "use client";
 import Modal from "@/app/(page)/portfolio/view-property/sections/modal";
-import { Button } from "@chakra-ui/react";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -59,7 +58,6 @@ type FeaturedPropertyResponse = {
 };
 
 export default function HomeFeaturedProperty() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalProps, setModalProps] = useState<{
     id: string;
     name: string;
@@ -67,10 +65,10 @@ export default function HomeFeaturedProperty() {
   } | null>(null);
   const router = useRouter();
 
-  const { data, isLoading, error } = useFetchData("/property/featured");
+  const { data, isLoading, error, refetch } =
+    useFetchData("/property/featured");
   const featured = (data as FeaturedPropertyResponse | undefined)?.data;
   const imageUrl = featured?.images?.[0]?.imageUrl;
-
   if (isLoading) {
     return (
       <section className="w-full container mx-auto px-4 lg:px-16 py-12">
@@ -88,15 +86,35 @@ export default function HomeFeaturedProperty() {
       </section>
     );
   }
-
-  if (error || !featured) {
-    return null;
+  if (error) {
+    return (
+      <section className="w-full container mx-auto px-4 lg:px-16 py-12">
+        <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+          <p className="text-gray-700 font-medium">
+            Failed to load featured property. Please try again.
+          </p>
+          <Button onClick={() => refetch()}>Try Again</Button>
+        </div>
+      </section>
+    );
   }
-
+  if (!featured) {
+    return (
+      <section className="w-full container mx-auto px-4 lg:px-16 py-12">
+        <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+          <p className="text-gray-700 font-medium">
+            No featured property available right now.
+          </p>
+          <Button onClick={() => router.push("/portfolio")}>
+            Browse Portfolio
+          </Button>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="w-full container mx-auto px-4 lg:px-16 py-12">
       <div className="flex flex-col lg:flex-row gap-12 items-start">
-        {/* Left: Image with Overlay */}
         <div className="relative w-full lg:w-[55%] h-[400px] sm:h-[500px] lg:h-[610px]">
           {imageUrl ? (
             <Image
@@ -112,7 +130,6 @@ export default function HomeFeaturedProperty() {
               No image available
             </div>
           )}
-          {/* Overlay Card */}
           <div className="absolute left-1/2 -translate-x-1/2 bottom-6 w-[95%] sm:w-[90%] bg-black/50 rounded-xl p-6 sm:p-8 flex flex-col gap-6 sm:gap-8 shadow-lg">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
@@ -123,7 +140,6 @@ export default function HomeFeaturedProperty() {
                   {featured.name}
                 </div>
               </div>
-              {/* Only show Download Brochure button if document exists */}
               {featured.document && featured.document.length > 0 && (
                 <Button
                   onClick={() => {
@@ -141,6 +157,7 @@ export default function HomeFeaturedProperty() {
                 </Button>
               )}
             </div>
+
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-white text-center">
               {[
                 { label: "Square metres", value: "10 million" },
@@ -157,8 +174,6 @@ export default function HomeFeaturedProperty() {
             </div>
           </div>
         </div>
-
-        {/* Right: Content */}
         <div className="w-full lg:w-[45%] flex flex-col gap-6">
           <h2 className="text-3xl md:text-4xl font-extrabold text-[#CD6115] leading-tight">
             Own the View Others Can Only Dream Of
@@ -167,8 +182,7 @@ export default function HomeFeaturedProperty() {
             <p>{featured.about}</p>
           </div>
           <Button
-            colorScheme="green"
-            className="bg-primary text-white font-semibold rounded px-8 py-3 shadow-none text-base w-fit"
+            className="bg-primary text-white font-semibold rounded px-8 py-3 text-base w-fit"
             onClick={() => router.push("/portfolio")}
           >
             View more

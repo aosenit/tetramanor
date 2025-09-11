@@ -33,35 +33,6 @@ const fallbackImages = [
   placeholder,
 ];
 
-interface Property {
-  id: string;
-  name: string;
-  address: string;
-  about: string;
-  featured: boolean;
-  featuredAt: string;
-  inquiryOptions: string[];
-  whyInvest: {
-    title: string;
-    advantages: Array<{
-      title: string;
-      description: string;
-    }>;
-    description: string;
-  };
-  features: string[];
-  amenities: string[];
-  createdAt: string;
-  brochure: string;
-  constructionStatus: "ONGOING" | "COMPLETED";
-  accountOfficerId: string | null;
-  createdById: string;
-  status: "AVAILABLE" | "SOLD_OUT";
-  unitAmount: number;
-  unitTypes: string[];
-  images: Array<{ imageUrl: string }>;
-  document: string[];
-}
 
 // Loading Skeleton Component
 function PropertyCardSkeleton() {
@@ -101,7 +72,7 @@ function EmptyState() {
         No properties found
       </h3>
       <p className="text-gray-600 text-center max-w-md mb-6">
-        We couldn't find any properties matching your search criteria. Try
+        We couldn&apos;t find any properties matching your search criteria. Try
         adjusting your filters or search terms.
       </p>
       <button
@@ -188,7 +159,7 @@ export default function PropertyListing() {
     ...(currentSortOrder && { sortOrder: currentSortOrder }),
   });
 
-  const { data, isLoading, error } = useFetchData(
+  const { data, isLoading, error, refetch } = useFetchData(
     `rentals?${queryParams.toString()}`
   );
 
@@ -220,32 +191,6 @@ export default function PropertyListing() {
     updateURLParams({ search: searchTerm, page: 1 });
   };
 
-  const handleFilterChange = (filterType: string, value: string) => {
-    const newFilters = { ...filters, [filterType]: value };
-    setFilters(newFilters);
-    updateURLParams({
-      [filterType]: value,
-      page: 1,
-    });
-  };
-
-  const clearFilters = () => {
-    setSearchTerm("");
-    setFilters({
-      propertyStatus: "",
-      constructionStatus: "",
-      sortBy: "",
-      sortOrder: "desc",
-    });
-    updateURLParams({
-      search: "",
-      propertyStatus: "",
-      constructionStatus: "",
-      sortBy: "",
-      sortOrder: "desc",
-      page: 1,
-    });
-  };
 
   if (isLoading) {
     return (
@@ -257,7 +202,19 @@ export default function PropertyListing() {
     );
   }
   if (error) {
-    return null;
+    return (
+      <div className="flex flex-col items-center justify-center py-16 space-y-4">
+        <p className="text-red-500 font-medium">
+          Failed to load properties. Please try again.
+        </p>
+        <button
+          onClick={() => refetch()}
+          className="bg-green-700 text-white px-6 py-2 rounded-md hover:bg-green-800 transition-colors"
+        >
+          Try Again
+        </button>
+      </div>
+    );
   }
 
   return (

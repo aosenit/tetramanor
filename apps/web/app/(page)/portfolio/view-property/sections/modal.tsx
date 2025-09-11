@@ -4,6 +4,7 @@ import Image from "next/image";
 import { IoClose } from "react-icons/io5";
 import placeholder from "@/assets/placeholder.jpg";
 import { usePostExportData } from "@/hooks/useApi";
+import { useToast } from "@chakra-ui/react";
 
 const Modal = ({
   onClose,
@@ -23,6 +24,8 @@ const Modal = ({
     date: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const toast = useToast();
+
   const {
     mutate: downloadBrochure,
     isPending,
@@ -43,13 +46,22 @@ const Modal = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
     if (!brochureId) {
+      toast({
+        title: "No brochure available",
+        description: "This brochure cannot be downloaded right now.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
       setIsSubmitting(false);
       return;
     }
+
     downloadBrochure(
       {
         name: formData.name,
@@ -67,11 +79,25 @@ const Modal = ({
           link.click();
           document.body.removeChild(link);
           window.URL.revokeObjectURL(url);
+
           setFormData({ name: "", phone: "", email: "", date: "" });
+          toast({
+            title: "Download started",
+            description: "Your brochure is being downloaded.",
+            status: "success",
+            duration: 2000,
+            isClosable: true,
+          });
           onClose();
         },
         onError: () => {
-          // Optionally show error toast here
+          toast({
+            title: "Download failed",
+            description: "Something went wrong while downloading the brochure.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
         },
         onSettled: () => {
           setIsSubmitting(false);
@@ -199,11 +225,18 @@ const Modal = ({
                         d="M4 12a8 8 0 018-8v8z"
                       ></path>
                     </svg>
+                    Processing...
                   </span>
                 ) : (
                   "Download"
                 )}
               </button>
+
+              {isError && (
+                <p className="text-sm text-red-600 text-center">
+                  Failed to process your request. Please try again.
+                </p>
+              )}
             </form>
           </div>
         </div>
