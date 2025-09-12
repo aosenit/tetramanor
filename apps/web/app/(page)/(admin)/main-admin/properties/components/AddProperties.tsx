@@ -124,6 +124,8 @@ export default function AddProperties() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [imageIdToDelete, setImageIdToDelete] = useState<string | null>(null);
+
+  const [bannerIdToDelete, setBannerIdToDelete] = useState<string | null>(null);
   const [uploadedDocument, setUploadedDocument] =
     useState<UploadedDocument | null>(null);
   const [customUnitType, setCustomUnitType] = useState("");
@@ -169,9 +171,13 @@ export default function AddProperties() {
   const { mutateAsync: uploadDocument, isPending: isUploadingDocument } =
     useUploadData("upload/document");
 
-  const { mutateAsync: deleteInvestmentImage, isPending: isDeletingImage } =
+  const { mutateAsync: deletePropertyImage, isPending: isDeletingImage } =
     useDeleteData(
-      propertyId && imageIdToDelete ? `upload/images/${imageIdToDelete}` : null
+      propertyId
+        ? imageIdToDelete
+          ? `upload/images/${imageIdToDelete}`
+          : `upload/images/${bannerIdToDelete}`
+        : null
     );
 
   // Load property data when editing
@@ -291,7 +297,7 @@ export default function AddProperties() {
     if (isEditMode) {
       try {
         setImageIdToDelete(imageId);
-        await deleteInvestmentImage();
+        await deletePropertyImage();
         setImageIdToDelete(null);
         setUploadedImages((prev) => prev.filter((img) => img.id !== imageId));
         setFormData((prev) => ({
@@ -335,7 +341,17 @@ export default function AddProperties() {
       toast.error("Failed to upload banner");
     }
   };
-  const removeBanner = () => setUploadedBanner(null);
+  const removeBanner = async (id: string) => {
+    // use the deleteimage endpoint for banners too
+    if (id) {
+      setBannerIdToDelete(id);
+      await deletePropertyImage();
+      setBannerIdToDelete(null);
+      setUploadedBanner(null);
+    } else {
+      setUploadedBanner(null);
+    }
+  };
 
   // Validate form data
   const validateForm = (): boolean => {
