@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import five from "@/assets/admin/home/five.svg";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Loader2, Eye, Trash2, Edit } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import {
   Select,
   SelectContent,

@@ -352,7 +352,7 @@ export default function EditRental() {
   const propertyOptions = properties.map((property) => property.name);
   const apartmentTypeOptions = selectedProperty?.unitTypes || [];
   const frequencyOptions = ["Monthly", "Yearly", "Quarterly"];
-  const statusOptions = ["Not Rented", "Rented"];
+  const statusOptions = ["Available", "Not Available"];
 
   return (
     <div className="">
@@ -617,14 +617,14 @@ export default function EditRental() {
           <Dropdown
             options={statusOptions}
             value={
-              statusOptions.find(
-                (s) => s.toUpperCase().replace(" ", "_") === formData.status
-              ) || ""
+              formData.status === "NOT_RENTED"
+                ? "Available"
+                : formData.status === "RENTED"
+                  ? "Not Available"
+                  : ""
             }
             onChange={(value) => {
-              const status = value.toUpperCase().replace(" ", "_") as
-                | "RENTED"
-                | "NOT_RENTED";
+              const status = value === "Available" ? "NOT_RENTED" : "RENTED";
               handleInputChange("status", status);
             }}
           />
