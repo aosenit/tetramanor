@@ -17,6 +17,7 @@ import {
 import Image from "next/image";
 import RichTextEditor from "./RichTextEditor";
 import Link from "next/link";
+import { Textarea } from "@/components/ui/textarea";
 
 interface UploadedImage {
   id: string;
@@ -50,6 +51,9 @@ interface BlogPost {
   createdAt: string;
   updatedAt: string;
   author?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
 }
 
 export default function EditBlog() {
@@ -71,7 +75,9 @@ export default function EditBlog() {
     content?: string;
     images?: string;
   }>({});
-
+  const [metaTitle, setMetaTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const [metaKeywords, setMetaKeywords] = useState("");
   const { mutateAsync: uploadImages, isPending: isUploadingImages } =
     useUploadData("upload/images");
   const { mutateAsync: createBlog, isPending: isCreating } =
@@ -95,6 +101,9 @@ export default function EditBlog() {
       setContent(blogPost.content || "");
       setFeatured(blogPost.featured || false);
       setStatus(blogPost.status || "DRAFT");
+      setMetaTitle(blogPost.metaTitle || "");
+      setMetaDescription(blogPost.metaDescription || "");
+      setMetaKeywords(blogPost.metaKeywords || "");
       // Handle coverImage (single object)
       const coverImagesData = blogPost.coverImage
         ? [
@@ -126,12 +135,24 @@ export default function EditBlog() {
   }, [isEditing, blogPostResponse]);
 
   const validateFields = () => {
-    const errors: { title?: string; content?: string; images?: string } = {};
+    const errors: {
+      title?: string;
+      content?: string;
+      images?: string;
+      metaTitle?: string;
+      metaDescription?: string;
+      metaKeywords?: string;
+    } = {};
     if (!isEditing) {
       if (!title.trim()) errors.title = "Title is required";
       if (!content.trim()) errors.content = "Content is required";
       if (coverImages.length === 0 && galleryImages.length === 0)
         errors.images = "At least one image is required";
+      if (!metaTitle.trim()) errors.metaTitle = "Meta title is required";
+      if (!metaDescription.trim())
+        errors.metaDescription = "Meta description is required";
+      if (!metaKeywords.trim())
+        errors.metaKeywords = "Meta keywords are required";
     }
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -150,6 +171,9 @@ export default function EditBlog() {
         status: status || "DRAFT",
         coverImage: coverImages.length > 0 ? coverImages[0].id : null,
         images: galleryImages.map((img) => img.id),
+        metaTitle: metaTitle.trim(),
+        metaDescription: metaDescription.trim(),
+        metaKeywords: metaKeywords.trim(),
       };
       if (isEditing) {
         await updateBlog(payload);
@@ -302,6 +326,48 @@ export default function EditBlog() {
                   {validationErrors.content}
                 </p>
               )}
+            </div>
+
+            {/* Meta Title */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                Meta Title
+              </Label>
+              <Input
+                id="metaTitle"
+                value={metaTitle}
+                onChange={(e) => setMetaTitle(e.target.value)}
+                className="w-full border-gray-300 focus:border-[#116114] focus:ring-[#116114]"
+                placeholder="Enter a meta title..."
+              />
+            </div>
+
+            {/* Meta Description */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                Meta Description
+              </Label>
+              <Textarea
+                id="metaDescription"
+                value={metaDescription}
+                onChange={(e) => setMetaDescription(e.target.value)}
+                className="w-full border-gray-300 focus:border-[#116114] focus:ring-[#116114]"
+                placeholder="Enter a meta description..."
+              />
+            </div>
+
+            {/* Meta Keywords */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                Meta Keywords
+              </Label>
+              <Input
+                id="metaKeywords"
+                value={metaKeywords}
+                onChange={(e) => setMetaKeywords(e.target.value)}
+                className="w-full border-gray-300 focus:border-[#116114] focus:ring-[#116114]"
+                placeholder="Meta Keywords (comma separated)"
+              />
             </div>
           </div>
 

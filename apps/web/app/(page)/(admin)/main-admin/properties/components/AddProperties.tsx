@@ -53,6 +53,10 @@ const propertySchema = z.object({
   documentId: z.string().optional(),
   constructionStatus: z.enum(["ONGOING", "COMPLETED", "PLANNED"]),
   accountOfficerId: z.string().optional(),
+  paymentThreshold: z
+    .number()
+    .min(0, "Payment threshold must be a positive number")
+    .optional(),
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -96,6 +100,7 @@ const defaultFormData: PropertyFormData = {
   documentId: "",
   constructionStatus: "ONGOING",
   accountOfficerId: "",
+  paymentThreshold: 0,
 };
 
 const unitTypeOptions = [
@@ -198,6 +203,7 @@ export default function AddProperties() {
         documentId: propertyData?.data?.document[0]?.id || "",
         constructionStatus: propertyData?.data?.constructionStatus || "ONGOING",
         accountOfficerId: propertyData?.data?.accountOfficerId || "",
+        paymentThreshold: propertyData?.data?.paymentThreshold || 0,
       });
 
       // Load existing images if any
@@ -443,6 +449,14 @@ export default function AddProperties() {
       cleanedFormData.accountOfficerId.trim() !== ""
     ) {
       payload.accountOfficerId = cleanedFormData.accountOfficerId;
+    }
+
+    // Payment threshold (optional)
+    if (
+      cleanedFormData.paymentThreshold &&
+      cleanedFormData.paymentThreshold > 0
+    ) {
+      payload.paymentThreshold = cleanedFormData.paymentThreshold;
     }
 
     try {

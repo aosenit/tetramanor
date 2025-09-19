@@ -144,8 +144,14 @@ export default function EditRental() {
         setUploadedImages([]);
       }
 
-      setFeatures(rentalData?.data?.property?.features || []);
-      setAmenities(rentalData?.data?.property?.amenities || []);
+      const propertyFeatures = rentalData?.data?.property?.features || [];
+      const propertyAmenities = rentalData?.data?.property?.amenities || [];
+
+      console.log("Loading features:", propertyFeatures);
+      console.log("Loading amenities:", propertyAmenities);
+
+      setFeatures(propertyFeatures);
+      setAmenities(propertyAmenities);
     }
   }, [rentalData, isEditMode]);
 
@@ -284,6 +290,12 @@ export default function EditRental() {
         "isFurnished",
         JSON.stringify(formData.isFurnished)
       );
+
+      // Add features and amenities
+      console.log("Submitting features:", features);
+      console.log("Submitting amenities:", amenities);
+      formDataToSubmit.append("features", JSON.stringify(features));
+      formDataToSubmit.append("amenities", JSON.stringify(amenities));
       // Add images as binary files directly to the array
       console.log("Uploaded images:", uploadedImages);
 
