@@ -138,7 +138,7 @@ export default function PropertyInfoSection({
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <Label
             htmlFor="account-officer"
             className="text-sm font-medium text-[#323539]"
@@ -178,7 +178,7 @@ export default function PropertyInfoSection({
               )}
             </SelectContent>
           </Select>
-        </div>
+        </div> */}
       </div>
     </div>
   );
