@@ -1,12 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Header from "../../portfolio/components/header";
-import one from "@/assets/investment/one.webp"
+import InvestmentModal from "./InvestmentModal";
+import { Button } from "@/components/ui/button";
+import one from "@/assets/investment/one.webp";
 const HomeHero = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
-    <section className="relative h-[60vh] overflow-hidden">
+    <section className="relative h-[70vh] overflow-hidden">
       <Header />
       <Image
         src={one}
@@ -29,10 +34,28 @@ const HomeHero = () => {
         </motion.h1>
 
         <p className="text-white text-base md:text-xl mt-4 max-w-2xl">
-          High-ROI opportunities in Nigeria's thriving property market, powered
-          by Tetramanor's proven expertise.
+          High-ROI opportunities in Nigeria&apos;s thriving property market,
+          powered by Tetramanor&apos;s proven expertise.
         </p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+          viewport={{ once: true }}
+          className="mt-8"
+        >
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            size="lg"
+            className="bg-green-700 hover:bg-green-800 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            Invest Now
+          </Button>
+        </motion.div>
       </div>
+
+      <InvestmentModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </section>
   );
 };
