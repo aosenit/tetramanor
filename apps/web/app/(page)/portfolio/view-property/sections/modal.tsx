@@ -5,6 +5,7 @@ import { IoClose } from "react-icons/io5";
 import placeholder from "@/assets/placeholder.jpg";
 import { usePostExportData } from "@/hooks/useApi";
 import { useToast } from "@chakra-ui/react";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 const Modal = ({
   onClose,
@@ -44,6 +45,10 @@ const Modal = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePhoneChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, phone: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -166,15 +171,12 @@ const Modal = ({
                     htmlFor="phone"
                     className="block text-gray-700 mb-2 text-sm"
                   >
-                    Phone number
+                    Phone number *
                   </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
+                  <PhoneInput
                     value={formData.phone}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#116114]"
+                    onChange={handlePhoneChange}
+                    placeholder="Enter phone number"
                     required
                   />
                 </div>

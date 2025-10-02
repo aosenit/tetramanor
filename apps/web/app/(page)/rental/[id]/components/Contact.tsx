@@ -5,6 +5,7 @@ import { useState } from "react";
 import ten from "@/assets/rental/ten.webp";
 import { usePostData } from "@/hooks/useApi";
 import { useToast } from "@chakra-ui/react";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 export default function PropertyEnquiryForm() {
   const [formData, setFormData] = useState({
@@ -22,6 +23,10 @@ export default function PropertyEnquiryForm() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePhoneChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, phone: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -138,15 +143,12 @@ export default function PropertyEnquiryForm() {
                     htmlFor="phone"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Phone number
+                    Phone number *
                   </label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
+                  <PhoneInput
                     value={formData.phone}
-                    onChange={handleChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    onChange={handlePhoneChange}
+                    placeholder="Enter phone number"
                     required
                   />
                 </div>

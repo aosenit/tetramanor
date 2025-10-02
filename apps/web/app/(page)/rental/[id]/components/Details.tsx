@@ -130,10 +130,10 @@ export default function PropertyDetails() {
   const formatCurrency = (value: number) =>
     value ? `₦${value.toLocaleString()}` : "-";
   const formatStatus = (status?: string) =>
-    status === "RENTED"
-      ? "Rented"
-      : status === "AVAILABLE"
-        ? "Available"
+    status === "AVAILABLE"
+      ? "Available"
+      : status === "SOLD_OUT"
+        ? "Not Available"
         : status || "-";
   const formatFurnished = (isFurnished?: boolean) =>
     isFurnished === true ? "Furnished" : "Unfurnished";
