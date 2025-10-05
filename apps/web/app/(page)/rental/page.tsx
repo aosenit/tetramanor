@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import HomeHero from "./components/Hero";
 import Footer from "@/components/home/Footer";
-import PropertyListing from "./components/ShortletProperty";
+import RentalListing from "./components/RentalListing";
 import Loader from "@/components/Loader";
 
 const RentalPage = () => {
@@ -9,7 +9,7 @@ const RentalPage = () => {
     <>
       <HomeHero />
       <Suspense fallback={<Loader />}>
-        <PropertyListing />
+        <RentalListing />
       </Suspense>
       <Footer />
     </>

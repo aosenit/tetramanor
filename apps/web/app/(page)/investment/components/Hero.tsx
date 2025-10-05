@@ -5,7 +5,6 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import Header from "../../portfolio/components/header";
 import InvestmentModal from "./InvestmentModal";
-import { Button } from "@/components/ui/button";
 import one from "@/assets/investment/one.webp";
 const HomeHero = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,17 +44,17 @@ const HomeHero = () => {
           viewport={{ once: true }}
           className="mt-8"
         >
-          <Button
+          {/* <Button
             onClick={() => setIsModalOpen(true)}
             size="lg"
             className="bg-green-700 hover:bg-green-800 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             Invest Now
-          </Button>
+          </Button> */}
         </motion.div>
       </div>
-
-      <InvestmentModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+      {/* 
+      <InvestmentModal open={isModalOpen} onOpenChange={setIsModalOpen} /> */}
     </section>
   );
 };
