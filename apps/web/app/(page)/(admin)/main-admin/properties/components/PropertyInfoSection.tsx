@@ -14,8 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 type PropertyInfoSectionProps = {
   formData: any;
   errors: any;
-  accountOfficersData: any;
-  isLoadingAccountOfficers: boolean;
+  accountOfficersData?: any;
+  isLoadingAccountOfficers?: boolean;
   handleInputChange: (field: string, value: any) => void;
   handleInquiryOptionChange: (option: string, checked: boolean) => void;
   inquiryOptions: { value: string; label: string }[];
@@ -24,8 +24,6 @@ type PropertyInfoSectionProps = {
 export default function PropertyInfoSection({
   formData,
   errors,
-  accountOfficersData,
-  isLoadingAccountOfficers,
   handleInputChange,
   handleInquiryOptionChange,
   inquiryOptions,
