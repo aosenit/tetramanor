@@ -18,7 +18,7 @@ interface PropertyDetailProps {
 // Loading Skeleton Component
 function PropertyDetailSkeleton() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pt-20">
       <div className="container mx-auto px-4 lg:px-16 py-8">
         {/* Back Button */}
         <div className="mb-6">
@@ -83,7 +83,7 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
 
   if (error || !property) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 pt-20">
         <div className="container mx-auto px-4 lg:px-16 py-8">
           <div className="flex flex-col items-center justify-center py-16 space-y-4">
             <p className="text-red-500 font-medium">
@@ -113,7 +113,7 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
     .map((img) => img.imageUrl);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pt-20">
       <div className="container mx-auto px-4 lg:px-16 py-8">
         {/* Back Button */}
         <div className="mb-6">
