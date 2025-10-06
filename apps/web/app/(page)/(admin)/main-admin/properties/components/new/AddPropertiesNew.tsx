@@ -23,7 +23,7 @@ import UnitDescriptionSection from "./UnitDescriptionSectionNew";
 import WhyInvestSection from "../WhyInvestSection";
 
 // Validation schema
-const unitSchema = z.object({
+export const unitSchema = z.object({
 	unitType: z.string().min(1, "unit type is required"),
 	numberOfUnits: z.number().min(0, "Number of units is required"),
 	price: z.number().min(0, "Number of units is required"),
