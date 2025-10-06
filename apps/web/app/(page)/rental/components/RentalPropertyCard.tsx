@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaMapMarkerAlt, FaBed, FaDoorOpen } from "react-icons/fa";
+import { FaMapMarkerAlt, FaDoorOpen } from "react-icons/fa";
 import { RentalListingItem } from "@/types/property";
 import placeholder from "@/assets/placeholder.svg";
 
@@ -13,27 +13,21 @@ interface RentalPropertyCardProps {
 
 const RentalPropertyCard: React.FC<RentalPropertyCardProps> = ({ rental }) => {
   // Get the main image - prefer coverImage, then first image, then placeholder
-  const mainImage = rental.coverImage || rental.images[0] || placeholder;
-
-  // Get bedroom count from apartment type
-  const getBedroomCount = (apartmentTypes: string[]) => {
-    const type = apartmentTypes[0] || "";
-    if (type.includes("1 bedroom")) return 1;
-    if (type.includes("2 bedroom")) return 2;
-    if (type.includes("3 bedroom")) return 3;
-    if (type.includes("4 bedroom")) return 4;
-    return 2; // default
-  };
-
-  const bedroomCount = getBedroomCount(rental.apartmentType);
+  const mainImage =
+    rental.coverImage?.imageUrl || rental.images[0]?.imageUrl || placeholder;
 
   // Format category for display
   const formatCategory = (category: string) => {
-    return category.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+    return category
+      .replace(/_/g, " ")
+      .toLowerCase()
+      .replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
   // Get primary category
-  const primaryCategory = rental.categories[0] ? formatCategory(rental.categories[0]) : "Standard";
+  const primaryCategory = rental.categories[0]
+    ? formatCategory(rental.categories[0])
+    : "Standard";
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 group">
@@ -43,12 +37,12 @@ const RentalPropertyCard: React.FC<RentalPropertyCardProps> = ({ rental }) => {
         <div className="absolute left-4 top-4 z-10 rounded-lg bg-gray-800/80 px-3 py-1 text-xs font-medium text-white">
           {primaryCategory}
         </div>
-        
+
         {/* Status Badge */}
         <div className="absolute right-4 top-4 z-10 rounded-lg bg-green-600/80 px-3 py-1 text-xs font-medium text-white">
           Available
         </div>
-        
+
         <div className="h-64 w-full overflow-hidden">
           <Image
             src={mainImage}
@@ -75,10 +69,6 @@ const RentalPropertyCard: React.FC<RentalPropertyCardProps> = ({ rental }) => {
 
         {/* Property Details */}
         <div className="flex flex-wrap gap-3 mb-4">
-          <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-full border border-[#BBBCCD]">
-            <FaBed className="text-[#CD6115] text-sm" />
-            <span className="text-xs font-medium text-[#4D4E53]">{bedroomCount} Beds</span>
-          </div>
           <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-full border border-[#BBBCCD]">
             <FaDoorOpen className="text-[#CD6115] text-sm" />
             <span className="text-xs font-medium text-[#4D4E53]">

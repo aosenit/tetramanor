@@ -7,7 +7,7 @@ import { RentalPropertyDetail } from "@/types/property";
 import ApartmentCard from "./ApartmentCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FaMapMarkerAlt, FaArrowLeft, FaHome } from "react-icons/fa";
+import { FaMapMarkerAlt, FaArrowLeft } from "react-icons/fa";
 import Link from "next/link";
 import placeholder from "@/assets/placeholder.svg";
 
@@ -46,10 +46,12 @@ function PropertyDetailSkeleton() {
 
         {/* Apartments Grid */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-900">Available Apartments</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg border border-gray-200 p-6">
+              <div
+                key={i}
+                className="bg-white rounded-lg border border-gray-200 p-6"
+              >
                 <Skeleton className="h-6 w-2/3 mb-2" />
                 <Skeleton className="h-4 w-1/2 mb-4" />
                 <Skeleton className="h-16 w-full mb-4" />
@@ -67,7 +69,6 @@ function PropertyDetailSkeleton() {
     </div>
   );
 }
-
 
 export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
   const { data, isLoading, error, refetch } = useFetchData(
@@ -93,9 +94,7 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
                 Try Again
               </Button>
               <Link href="/rental">
-                <Button variant="outline">
-                  Back to Rentals
-                </Button>
+                <Button variant="outline">Back to Rentals</Button>
               </Link>
             </div>
           </div>
@@ -104,8 +103,14 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
     );
   }
 
-  const mainImage = property.coverImage || property.images[0] || placeholder;
-  const otherImages = property.images.filter(img => img !== mainImage).slice(0, 3);
+  const mainImage =
+    property.coverImage?.imageUrl ||
+    property.images[0]?.imageUrl ||
+    placeholder;
+  const otherImages = property.images
+    .filter((img) => img.imageUrl !== mainImage)
+    .slice(0, 3)
+    .map((img) => img.imageUrl);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -136,7 +141,10 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
               {otherImages.length > 0 && (
                 <div className="grid grid-cols-3 gap-2">
                   {otherImages.map((image, index) => (
-                    <div key={index} className="relative h-16 w-full rounded overflow-hidden">
+                    <div
+                      key={index}
+                      className="relative h-16 w-full rounded overflow-hidden"
+                    >
                       <Image
                         src={image}
                         alt={`${property.name} ${index + 2}`}
@@ -168,30 +176,50 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="text-gray-600">Total Units:</span>
-                    <span className="ml-2 font-semibold">{property.rental.length}</span>
+                    <span className="ml-2 font-semibold">
+                      {property.rental.length}
+                    </span>
                   </div>
                   <div>
                     <span className="text-gray-600">Available Units:</span>
                     <span className="ml-2 font-semibold text-green-600">
-                      {property.rental.filter(unit => unit.status === 'AVAILABLE').length}
+                      {
+                        property.rental.filter(
+                          (unit) => unit.status === "AVAILABLE"
+                        ).length
+                      }
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">
+                      Total Available Units:
+                    </span>
+                    <span className="ml-2 font-semibold text-green-600">
+                      {property.rental
+                        .filter((unit) => unit.status === "AVAILABLE")
+                        .reduce((sum, unit) => sum + unit.numberOfUnits, 0)}
                     </span>
                   </div>
                   <div className="col-span-2">
                     <span className="text-gray-600">Unit Types:</span>
                     <span className="ml-2 font-semibold">
-                      {Array.from(new Set(property.rental.map(unit => unit.apartmentType))).join(', ')}
+                      {Array.from(
+                        new Set(
+                          property.rental.map((unit) => unit.apartmentType)
+                        )
+                      ).join(", ")}
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="flex gap-3">
-                <Button className="bg-green-700 hover:bg-green-800 text-white">
-                  Contact Agent
-                </Button>
-                <Button variant="outline">
-                  Download Brochure
-                </Button>
+                <Link href="/contact">
+                  <Button className="bg-green-700 hover:bg-green-800 text-white">
+                    Contact Agent
+                  </Button>
+                </Link>
+                <Button variant="outline">Download Brochure</Button>
               </div>
             </div>
           </div>
@@ -201,19 +229,21 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-gray-900">
-              Available Apartments ({property.rental.length})
+              Rental Units ({property.rental.length})
             </h2>
             <div className="text-sm text-gray-600">
-              Showing all available rental units
+              Showing all rental units
             </div>
           </div>
 
           {property.rental.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">No apartments available at this time.</p>
+              <p className="text-gray-500">
+                No apartments available at this time.
+              </p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
               {property.rental.map((apartment) => (
                 <ApartmentCard key={apartment.id} apartment={apartment} />
               ))}

@@ -148,8 +148,8 @@ export interface RentalListingItem {
   id: string;
   name: string;
   address: string;
-  coverImage: string | null;
-  images: string[];
+  coverImage: PropertyImage | null;
+  images: PropertyImage[];
   amenities: string[];
   features: string[];
   categories: string[];
@@ -198,7 +198,7 @@ export interface RentalUnit {
   description: string;
   numberOfUnits: number;
   cautionFee: number;
-  status: string;
+  status: "AVAILABLE" | "NOT_AVAILABLE";
   unitCategory: string;
   features: string[];
   amenities: string[];
@@ -216,8 +216,8 @@ export interface RentalPropertyDetail {
   name: string;
   address: string;
   slug: string | null;
-  coverImage: string | null;
-  images: string[];
+  coverImage: PropertyImage | null;
+  images: PropertyImage[];
   rental: RentalUnit[];
 }
 
