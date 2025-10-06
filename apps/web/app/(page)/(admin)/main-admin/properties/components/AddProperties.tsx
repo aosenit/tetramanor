@@ -53,6 +53,10 @@ const propertySchema = z.object({
   documentId: z.string().optional(),
   constructionStatus: z.enum(["ONGOING", "COMPLETED", "PLANNED"]),
   accountOfficerId: z.string().optional(),
+  paymentThreshold: z
+    .number()
+    .min(0, "Payment threshold must be a positive number")
+    .optional(),
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -96,6 +100,7 @@ const defaultFormData: PropertyFormData = {
   documentId: "",
   constructionStatus: "ONGOING",
   accountOfficerId: "",
+  paymentThreshold: 0,
 };
 
 const unitTypeOptions = [
@@ -124,6 +129,8 @@ export default function AddProperties() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [imageIdToDelete, setImageIdToDelete] = useState<string | null>(null);
+
+  const [bannerIdToDelete, setBannerIdToDelete] = useState<string | null>(null);
   const [uploadedDocument, setUploadedDocument] =
     useState<UploadedDocument | null>(null);
   const [customUnitType, setCustomUnitType] = useState("");
@@ -169,9 +176,13 @@ export default function AddProperties() {
   const { mutateAsync: uploadDocument, isPending: isUploadingDocument } =
     useUploadData("upload/document");
 
-  const { mutateAsync: deleteInvestmentImage, isPending: isDeletingImage } =
+  const { mutateAsync: deletePropertyImage, isPending: isDeletingImage } =
     useDeleteData(
-      propertyId && imageIdToDelete ? `upload/images/${imageIdToDelete}` : null
+      propertyId
+        ? imageIdToDelete
+          ? `upload/images/${imageIdToDelete}`
+          : `upload/images/${bannerIdToDelete}`
+        : null
     );
 
   // Load property data when editing
@@ -192,6 +203,7 @@ export default function AddProperties() {
         documentId: propertyData?.data?.document[0]?.id || "",
         constructionStatus: propertyData?.data?.constructionStatus || "ONGOING",
         accountOfficerId: propertyData?.data?.accountOfficerId || "",
+        paymentThreshold: propertyData?.data?.paymentThreshold || 0,
       });
 
       // Load existing images if any
@@ -291,7 +303,7 @@ export default function AddProperties() {
     if (isEditMode) {
       try {
         setImageIdToDelete(imageId);
-        await deleteInvestmentImage();
+        await deletePropertyImage();
         setImageIdToDelete(null);
         setUploadedImages((prev) => prev.filter((img) => img.id !== imageId));
         setFormData((prev) => ({
@@ -335,7 +347,17 @@ export default function AddProperties() {
       toast.error("Failed to upload banner");
     }
   };
-  const removeBanner = () => setUploadedBanner(null);
+  const removeBanner = async (id: string) => {
+    // use the deleteimage endpoint for banners too
+    if (id) {
+      setBannerIdToDelete(id);
+      await deletePropertyImage();
+      setBannerIdToDelete(null);
+      setUploadedBanner(null);
+    } else {
+      setUploadedBanner(null);
+    }
+  };
 
   // Validate form data
   const validateForm = (): boolean => {
@@ -427,6 +449,14 @@ export default function AddProperties() {
       cleanedFormData.accountOfficerId.trim() !== ""
     ) {
       payload.accountOfficerId = cleanedFormData.accountOfficerId;
+    }
+
+    // Payment threshold (optional)
+    if (
+      cleanedFormData.paymentThreshold &&
+      cleanedFormData.paymentThreshold > 0
+    ) {
+      payload.paymentThreshold = cleanedFormData.paymentThreshold;
     }
 
     try {
@@ -592,7 +622,7 @@ export default function AddProperties() {
             />
           </div>
 
-          <div className="bg-white mt-4 p-6">
+          <div className="bg-white mt-4 p-6 space-y-4">
             <UnitDescriptionSection
               formData={formData}
               errors={errors}

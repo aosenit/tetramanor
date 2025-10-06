@@ -14,8 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 type PropertyInfoSectionProps = {
   formData: any;
   errors: any;
-  accountOfficersData: any;
-  isLoadingAccountOfficers: boolean;
+  accountOfficersData?: any;
+  isLoadingAccountOfficers?: boolean;
   handleInputChange: (field: string, value: any) => void;
   handleInquiryOptionChange: (option: string, checked: boolean) => void;
   inquiryOptions: { value: string; label: string }[];
@@ -24,8 +24,6 @@ type PropertyInfoSectionProps = {
 export default function PropertyInfoSection({
   formData,
   errors,
-  accountOfficersData,
-  isLoadingAccountOfficers,
   handleInputChange,
   handleInquiryOptionChange,
   inquiryOptions,
@@ -140,6 +138,37 @@ export default function PropertyInfoSection({
         </div>
         <div className="space-y-2">
           <Label
+            htmlFor="payment-threshold"
+            className="text-sm font-medium text-[#323539]"
+          >
+            Payment Threshold (Optional)
+          </Label>
+          <Input
+            id="payment-threshold"
+            type="number"
+            min="0"
+            step="0.01"
+            value={formData.paymentThreshold || ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === "") {
+                handleInputChange("paymentThreshold", 0);
+              } else {
+                const numValue = parseFloat(value);
+                if (!isNaN(numValue) && numValue >= 0) {
+                  handleInputChange("paymentThreshold", numValue);
+                }
+              }
+            }}
+            className={`w-full border bg-[#E5E5E7] py-4 ${errors.paymentThreshold ? "border-red-500" : "border-[#116114]"}`}
+            placeholder="0"
+          />
+          {errors.paymentThreshold && (
+            <p className="text-red-500 text-sm">{errors.paymentThreshold}</p>
+          )}
+        </div>
+        {/* <div className="space-y-2">
+          <Label
             htmlFor="account-officer"
             className="text-sm font-medium text-[#323539]"
           >
@@ -178,7 +207,7 @@ export default function PropertyInfoSection({
               )}
             </SelectContent>
           </Select>
-        </div>
+        </div> */}
       </div>
     </div>
   );

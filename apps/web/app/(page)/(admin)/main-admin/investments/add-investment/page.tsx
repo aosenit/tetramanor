@@ -37,7 +37,6 @@ interface FormData {
   featuredImage?: File;
   offerEndDate: string;
   projectSize?: string;
-  numberOfPartners?: string;
   benefits: string[];
 }
 
@@ -52,7 +51,6 @@ const defaultFormData: FormData = {
   description: "",
   offerEndDate: "",
   projectSize: "",
-  numberOfPartners: "",
   benefits: [],
 };
 
@@ -115,7 +113,6 @@ function AddInvestmentContent() {
           ? new Date(investment.offerEndDate).toISOString().split("T")[0]
           : "",
         projectSize: investment.projectSize || 0,
-        numberOfPartners: investment.numberOfPartners || 0,
         benefits: investment.benefits || [],
       });
 
@@ -427,21 +424,22 @@ function AddInvestmentContent() {
           </div>
         </div>
 
-        {/* Offer End Date */}
-        <div>
-          <label className="block mb-1 text-sm text-[#323539] font-medium">
-            Offer End Date
-          </label>
-          <Input
-            type="date"
-            className="bg-[#E5E5E7] border-none"
-            value={formData.offerEndDate}
-            onChange={(e) => handleInputChange("offerEndDate", e.target.value)}
-          />
-        </div>
-
         {/* Project Size & Number of Partners */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Offer End Date */}
+          <div>
+            <label className="block mb-1 text-sm text-[#323539] font-medium">
+              Offer End Date
+            </label>
+            <Input
+              type="date"
+              className="bg-[#E5E5E7] border-none"
+              value={formData.offerEndDate}
+              onChange={(e) =>
+                handleInputChange("offerEndDate", e.target.value)
+              }
+            />
+          </div>
           <div>
             <label className="block mb-1 text-sm text-[#323539] font-medium">
               Project Size
@@ -454,23 +452,6 @@ function AddInvestmentContent() {
               onChange={(e) =>
                 handleInputChange(
                   "projectSize",
-                  parseFloat(e.target.value) || 0
-                )
-              }
-            />
-          </div>
-          <div>
-            <label className="block mb-1 text-sm text-[#323539] font-medium">
-              Number of Partners
-            </label>
-            <Input
-              type="number"
-              placeholder="Enter number of partners"
-              className="bg-[#E5E5E7] border-none"
-              value={formData.numberOfPartners}
-              onChange={(e) =>
-                handleInputChange(
-                  "numberOfPartners",
                   parseFloat(e.target.value) || 0
                 )
               }

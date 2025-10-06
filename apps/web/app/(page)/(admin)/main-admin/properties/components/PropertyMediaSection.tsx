@@ -33,7 +33,7 @@ type PropertyMediaSectionProps = {
   handleDocumentUpload: (files: FileList | null) => void;
   handleBannerUpload: (files: FileList | null) => void;
   removeImage: (id: string) => void;
-  removeBanner: () => void;
+  removeBanner: (id: string) => void;
   removeDocument: () => void;
   isDeletingImage: boolean;
 };
@@ -186,14 +186,18 @@ export default function PropertyMediaSection({
           {/* Uploaded Banner */}
           {uploadedBanner && (
             <div className="flex items-center gap-2 mt-4">
-              <img
-                src={uploadedBanner.imageUrl}
-                alt={uploadedBanner.name}
-                className="h-16 rounded-md border"
-              />
+              {isDeletingImage ? (
+                <Skeleton className="h-16 w-16 rounded-md border" />
+              ) : (
+                <img
+                  src={uploadedBanner.imageUrl}
+                  alt={uploadedBanner.name}
+                  className="h-16 rounded-md border"
+                />
+              )}
               <button
                 type="button"
-                onClick={removeBanner}
+                onClick={() => removeBanner(uploadedBanner.id)}
                 className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
               >
                 <X className="w-4 h-4" />

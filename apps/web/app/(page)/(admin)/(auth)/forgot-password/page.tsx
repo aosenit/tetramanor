@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePostData } from "@/hooks/useApi";
+import Link from "next/link";
 
 // ✅ Zod schema
 const schema = z.object({
@@ -81,6 +82,10 @@ export default function ForgotPasswordPage() {
             <p className="text-red-500 text-sm">{errors.email.message}</p>
           )}
         </div>
+
+        <Link className="flex justify-end" href={"/login"}>
+          <p className="text-sm opacity-85 hover:opacity-100">Back to Login?</p>
+        </Link>
 
         <Button
           type="submit"

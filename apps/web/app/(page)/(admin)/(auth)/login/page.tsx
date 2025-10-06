@@ -1,8 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +23,7 @@ import icon from "@/assets/key.png";
 import Image from "next/image";
 import { usePostData } from "@/hooks/useApi";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -37,6 +36,7 @@ const adminEmail = "super_admin@example.com";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const { mutateAsync: login, isPending } = usePostData("auth/login");
   const router = useRouter();
 
@@ -47,6 +47,15 @@ export default function LoginPage() {
       password: "",
     },
   });
+
+  // Load saved email from localStorage on component mount
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      form.setValue("email", savedEmail);
+      setRememberMe(true);
+    }
+  }, [form]);
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
@@ -61,6 +70,13 @@ export default function LoginPage() {
         const { token, ...user } = response.data;
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
+
+        // Handle remember me functionality
+        if (rememberMe) {
+          localStorage.setItem("rememberedEmail", trimmedData.email);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+        }
 
         if (user.email.trim() === adminEmail.trim()) {
           router.push("/main-admin");
@@ -137,6 +153,22 @@ export default function LoginPage() {
                         <Eye className="h-4 w-4" />
                       )}
                     </button>
+                  </div>
+                </FormControl>
+
+                {/* remember me checkbox */}
+                <FormControl>
+                  <div className="pt-2 flex gap-1 items-center">
+                    <Checkbox
+                      id="remember-me"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) =>
+                        setRememberMe(checked as boolean)
+                      }
+                    />
+                    <label htmlFor="remember-me" className="text-sm">
+                      Remember me?
+                    </label>
                   </div>
                 </FormControl>
                 <FormMessage />

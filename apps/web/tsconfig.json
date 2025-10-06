@@ -26,17 +26,19 @@
     ]
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "app/**/*.ts",
-    "app/**/*.tsx",
-    "components/**/*.ts",
-    "components/**/*.tsx",
-    "next-env.d.ts",
-    "next.config.mjs",
-    "dist/types/**/*.ts"
-, "app/(page)/(admin)/main-admin/customers/properties-details"  ],
+		"**/*.ts",
+		"**/*.tsx",
+		".next/types/**/*.ts",
+		"app/**/*.ts",
+		"app/**/*.tsx",
+		"components/**/*.ts",
+		"components/**/*.tsx",
+		"next-env.d.ts",
+		"next.config.mjs",
+		"dist/types/**/*.ts",
+		"app/(page)/(admin)/main-admin/customers/properties-details",
+		"global.d.ts"
+	],
   "exclude": [
     "node_modules"
   ]

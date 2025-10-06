@@ -7,10 +7,9 @@ import Header from "../../portfolio/components/header";
 import InvestmentModal from "./InvestmentModal";
 import one from "@/assets/investment/one.webp";
 const HomeHero = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const router = useRouter();
   return (
-    <section className="relative h-[70vh] overflow-hidden">
+    <section className="relative h-[60vh] overflow-hidden">
       <Header />
       <Image
         src={one}
@@ -33,8 +32,8 @@ const HomeHero = () => {
         </motion.h1>
 
         <p className="text-white text-base md:text-xl mt-4 max-w-2xl">
-          High-ROI opportunities in Nigeria&apos;s thriving property market,
-          powered by Tetramanor&apos;s proven expertise.
+          High-ROI opportunities in Nigeria's thriving property market, powered
+          by Tetramanor's proven expertise.
         </p>
 
         <motion.div
