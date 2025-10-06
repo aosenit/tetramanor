@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 // import AddProperties from "../components/AddProperties";
 import { Loader2 } from "lucide-react";
 import AddPropertiesNew from "../components/new/AddPropertiesNew";
