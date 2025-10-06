@@ -18,6 +18,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useIsMobile } from "../hooks/use-mobile";
+// Re-export the InputProps type to avoid the export error
+import type { InputProps } from "@/components/ui/input";
+export type SidebarInputProps = InputProps;
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -332,9 +335,10 @@ const SidebarInset = React.forwardRef<
 });
 SidebarInset.displayName = "SidebarInset";
 
+
 const SidebarInput = React.forwardRef<
   React.ElementRef<typeof Input>,
-  React.ComponentProps<typeof Input>
+  SidebarInputProps
 >(({ className, ...props }, ref) => {
   return (
     <Input
