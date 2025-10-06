@@ -622,7 +622,7 @@ export default function AddProperties() {
             />
           </div>
 
-          <div className="bg-white mt-4 p-6">
+          <div className="bg-white mt-4 p-6 space-y-4">
             <UnitDescriptionSection
               formData={formData}
               errors={errors}
