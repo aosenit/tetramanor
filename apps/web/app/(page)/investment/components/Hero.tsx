@@ -8,6 +8,7 @@ import one from "@/assets/investment/one.webp";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
+
 const HomeHero = () => {
   const router = useRouter();
   return (
