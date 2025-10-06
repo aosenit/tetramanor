@@ -1,18 +1,21 @@
 import React from "react";
-import PropertyDetails from "./components/Details";
+import PropertyDetail from "./components/PropertyDetail";
 import Footer from "@/components/home/Footer";
-import PropertyEnquiryForm from "./components/Contact";
-import ExploreMore from "./components/ExploreMore";
+import Header from "../../portfolio/components/header";
 
-function page() {
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+function page({ params }: PageProps) {
   return (
-    <div className="bg-[#fafafa] pt-10">
-      <PropertyDetails />
-      {/* <MapSection /> */}
-      <PropertyEnquiryForm />
-      <ExploreMore />
+    <>
+      <Header />
+      <PropertyDetail propertyId={params.id} />
       <Footer />
-    </div>
+    </>
   );
 }
 

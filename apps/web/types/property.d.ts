@@ -141,4 +141,89 @@ export interface RentalResponse {
   message: string;
   data: RentalData;
   statusCode: number;
+}
+
+// New rental listing types based on /rentals/listing endpoint
+export interface RentalListingItem {
+  id: string;
+  name: string;
+  address: string;
+  coverImage: PropertyImage | null;
+  images: PropertyImage[];
+  amenities: string[];
+  features: string[];
+  categories: string[];
+  apartmentType: string[];
+}
+
+export interface RentalListingData {
+  success: boolean;
+  message: string;
+  data: RentalListingItem[];
+  statusCode: number;
+}
+
+// Rental property detail types based on /rentals/listing/{propertyId} endpoint
+export interface PropertyUnit {
+  id: string;
+  propertyId: string;
+  unitType: string;
+  numberOfUnits: number;
+  unitPrice: number;
+  priceThreshold: number;
+  description: string;
+  availableUnits: number;
+  currency: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DollarPrice {
+  rentFee: number;
+  agencyFee: number;
+  cautionFee: number;
+  currency: string;
+  unitPrice: number;
+}
+
+export interface RentalUnit {
+  id: string;
+  propertyId: string;
+  apartmentType: string;
+  location: string;
+  rentFee: number;
+  frequency: string;
+  propertyUnitId: string;
+  agencyFee: number;
+  description: string;
+  numberOfUnits: number;
+  cautionFee: number;
+  status: "AVAILABLE" | "NOT_AVAILABLE";
+  unitCategory: string;
+  features: string[];
+  amenities: string[];
+  createdAt: string;
+  updatedAt: string;
+  highlight: boolean;
+  purchaseId: string | null;
+  contactDetails: any | null;
+  propertyUnit: PropertyUnit;
+  dollarPrice: DollarPrice;
+}
+
+export interface RentalPropertyDetail {
+  id: string;
+  name: string;
+  address: string;
+  slug: string | null;
+  coverImage: PropertyImage | null;
+  images: PropertyImage[];
+  rental: RentalUnit[];
+}
+
+export interface RentalPropertyDetailResponse {
+  success: boolean;
+  message: string;
+  data: RentalPropertyDetail;
+  statusCode: number;
 } 

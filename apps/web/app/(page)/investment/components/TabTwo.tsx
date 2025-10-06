@@ -3,11 +3,13 @@ import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { FaCheck, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
+import { Button } from "@/components/ui/button";
 import a from "@/assets/investment/icons/a.webp";
 import b from "@/assets/investment/icons/b.webp";
 import c from "@/assets/investment/icons/c.webp";
 import d from "@/assets/investment/icons/d.webp";
 import four from "@/assets/investment/four.webp";
+import InvestmentDetailsModal from "./InvestmentDetailsModal";
 
 const steps = [
   {
@@ -36,6 +38,8 @@ const steps = [
 function TabTwo({ investments }: { investments: any[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [current, setCurrent] = useState(0);
+  const [selectedInvestment, setSelectedInvestment] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const scrollToIndex = (idx: number) => {
     if (scrollRef.current) {
@@ -190,6 +194,19 @@ function TabTwo({ investments }: { investments: any[] }) {
                         </span>
                       </p>
                     </div>
+
+                    {/* Invest Now Button */}
+                    <div className="mt-8">
+                      <Button
+                        onClick={() => {
+                          setSelectedInvestment(investment);
+                          setIsModalOpen(true);
+                        }}
+                        className="w-full bg-green-700 hover:bg-green-800 text-white font-semibold py-3"
+                      >
+                        Invest Now
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -227,6 +244,16 @@ function TabTwo({ investments }: { investments: any[] }) {
           ))}
         </div>
       </div>
+
+      {/* Investment Details Modal */}
+      <InvestmentDetailsModal
+        investment={selectedInvestment}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedInvestment(null);
+        }}
+      />
     </div>
   );
 }
