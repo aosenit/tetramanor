@@ -7,7 +7,7 @@ import Header from "../../portfolio/components/header";
 import InvestmentModal from "./InvestmentModal";
 import one from "@/assets/investment/one.webp";
 const HomeHero = () => {
-  const router = useRouter();
+  // const router = useRouter();
   return (
     <section className="relative h-[60vh] overflow-hidden">
       <Header />
