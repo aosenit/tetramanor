@@ -2,12 +2,13 @@
 import React from "react";
 import Image from "next/image";
 import { IoIosBriefcase } from "react-icons/io";
-import { FaTag } from "react-icons/fa";
+import { FaTag, FaNewspaper } from "react-icons/fa";
 import Pagination from "./Pagination";
 import Link from "next/link";
 import placeholder from "@/assets/placeholder.svg";
 import { useFetchData } from "@/hooks/useApi";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 const BlogSkeleton = () => (
   <div className="space-y-10">
@@ -32,7 +33,7 @@ const BlogSkeleton = () => (
 );
 
 const Blogs: React.FC = () => {
-  const { data, isLoading } = useFetchData("blogs");
+  const { data, isLoading, error, refetch } = useFetchData("blogs");
   let blogPosts = [];
 
   if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
@@ -68,7 +69,55 @@ const Blogs: React.FC = () => {
       </div>
     );
   }
-  if (!blogPosts || blogPosts.length === 0) return null;
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4 bg-white rounded-lg shadow-sm border-2 border-red-100">
+        <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-6">
+          <FaNewspaper className="w-12 h-12 text-red-500" />
+        </div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          Failed to Load Blog Posts
+        </h3>
+        <p className="text-gray-600 text-center max-w-md mb-6">
+          We couldn't load the blog posts right now. Please check your internet
+          connection and try again.
+        </p>
+        <Button
+          onClick={() => refetch()}
+          className="bg-[#116114] hover:bg-[#0d4d10] text-white"
+        >
+          Try Again
+        </Button>
+      </div>
+    );
+  }
+
+  // Empty state when no blogs are available
+  if (!blogPosts || blogPosts.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4 bg-white rounded-lg shadow-sm">
+        <div className="w-24 h-24 bg-[#E8F5E8] rounded-full flex items-center justify-center mb-6">
+          <FaNewspaper className="w-12 h-12 text-[#116114]" />
+        </div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          No Blog Posts Available
+        </h3>
+        <p className="text-gray-600 text-center max-w-md mb-6">
+          We don't have any blog posts published at the moment. Check back soon
+          for insights, updates, and articles about real estate and property
+          investment.
+        </p>
+        <Button
+          onClick={() => window.location.reload()}
+          className="bg-[#116114] hover:bg-[#0d4d10] text-white"
+        >
+          Refresh Page
+        </Button>
+      </div>
+    );
+  }
   return (
     <div>
       <div className="space-y-10">

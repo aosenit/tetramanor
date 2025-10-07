@@ -9,7 +9,8 @@ import ScheduleInspection from "../sections/schedule-inspection";
 import Footer from "@/components/home/Footer";
 import MapSection from "../sections/map";
 import { FiShare2 } from "react-icons/fi";
-import { useToast } from "@chakra-ui/react";
+import { ToastProvider, useToast } from "@/components/ui/toast-notification";
+import { shareProperty } from "@/lib/shareUtils";
 import { useFetchData } from "@/hooks/useApi";
 import { Property } from "../../types";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,25 +20,32 @@ interface PageProps {
   params: { id: string };
 }
 
-export default function Page({ params }: PageProps) {
-  const toast = useToast();
-  const handleShare = () => {
-    if (typeof window !== "undefined") {
-      navigator.clipboard.writeText(window.location.href);
-      toast({
-        title: "Link copied!",
-        description: "Page link copied to clipboard.",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
-    }
-  };
+function PageContent({ params }: PageProps) {
+  const { showToast } = useToast();
 
   const { data, isLoading, error } = useFetchData(
     `property/detail/${params.id}`
   );
   const property: Property = data?.data;
+
+  const handleShare = async () => {
+    if (!property) return;
+
+    const success = await shareProperty(property.name, property.id);
+    if (success) {
+      showToast(
+        "Shared successfully!",
+        "Property link has been shared or copied to clipboard.",
+        "success"
+      );
+    } else {
+      showToast(
+        "Failed to share",
+        "Could not share the property. Please try again.",
+        "error"
+      );
+    }
+  };
 
   // Loading skeleton
   if (isLoading) {
@@ -64,7 +72,7 @@ export default function Page({ params }: PageProps) {
           Something went wrong
         </h2>
         <p className="text-gray-600 mb-6">
-          We couldn’t load this property right now. Please try again later.
+          We couldn't load this property right now. Please try again later.
         </p>
         <Button variant="outline" onClick={() => window.location.reload()}>
           Retry
@@ -81,7 +89,7 @@ export default function Page({ params }: PageProps) {
           Property not found
         </h2>
         <p className="text-gray-600 mb-6">
-          The property you are looking for might have been removed or doesn’t
+          The property you are looking for might have been removed or doesn't
           exist.
         </p>
         <Button variant="outline" onClick={() => window.history.back()}>
@@ -96,7 +104,7 @@ export default function Page({ params }: PageProps) {
     <div>
       <div className="flex pt-6 justify-end p-4">
         <button
-          className="flex items-center ml-2 text-[#151515] font-medium text-xs hover:text-gray-900"
+          className="flex items-center ml-2 text-[#151515] font-medium text-xs hover:text-[#116114] transition-colors"
           onClick={handleShare}
         >
           <FiShare2 className="mr-1" />
@@ -115,5 +123,13 @@ export default function Page({ params }: PageProps) {
       />
       <Footer />
     </div>
+  );
+}
+
+export default function Page({ params }: PageProps) {
+  return (
+    <ToastProvider>
+      <PageContent params={params} />
+    </ToastProvider>
   );
 }

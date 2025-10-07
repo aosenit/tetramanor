@@ -288,7 +288,7 @@ export default function PropertyDetailsModal({
                       {apartment.propertyUnit.numberOfUnits}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  {/* <div className="flex justify-between">
                     <span className="text-gray-600">Price Threshold:</span>
                     <span className="font-medium">
                       {formatCurrency(
@@ -296,7 +296,7 @@ export default function PropertyDetailsModal({
                         apartment.propertyUnit.currency as Currency
                       )}
                     </span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

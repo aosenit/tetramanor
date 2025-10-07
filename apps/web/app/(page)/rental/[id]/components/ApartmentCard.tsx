@@ -73,33 +73,32 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({ apartment }) => {
   const bedroomCount = getBedroomCount(apartment.apartmentType);
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+    <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b border-gray-100">
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+      <div className="bg-gradient-to-r from-[#116114] to-[#0d4d10] p-4 text-white">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h3 className="text-lg font-bold mb-1">
               {apartment.apartmentType}
             </h3>
-            <div className="flex items-center text-sm text-gray-600">
-              <FaMapMarkerAlt className="mr-1 h-3 w-3 text-[#CD6115]" />
+            <div className="flex items-center text-sm text-white/90">
+              <FaMapMarkerAlt className="mr-1 h-3 w-3" />
               <span>{apartment.location}</span>
             </div>
           </div>
-          <div className="text-right w-full">
-            <div
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium  justify-center ${
-                apartment.status === "AVAILABLE"
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-              }`}
-            >
-              <FaCheckCircle className="mr-1 h-3 w-3" />
-              {apartment.status === "AVAILABLE" ? "Available" : "Not Available"}
-            </div>
+          <div
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold ${
+              apartment.status === "AVAILABLE"
+                ? "bg-white text-[#116114]"
+                : "bg-red-500 text-white"
+            }`}
+          >
+            {apartment.status === "AVAILABLE" ? "Available" : "Unavailable"}
           </div>
         </div>
+      </div>
 
+      <div className="p-6 border-b border-gray-100">
         {/* Description */}
         <p className="text-sm text-gray-600 line-clamp-3 mb-4">
           {apartment.description}
@@ -249,27 +248,27 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({ apartment }) => {
           </div>
         )}
         <div className="mt-6 flex flex-col gap-3">
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            variant="outline"
-            className="w-full"
-          >
-            View Details
-          </Button>
           {apartment.status === "AVAILABLE" ? (
             <Link href="/login" className="w-full">
-              <Button className="w-full bg-green-700 hover:bg-green-800 text-white">
-                Rent This Apartment
+              <Button className="w-full bg-[#116114] hover:bg-[#0d4d10] text-white font-semibold">
+                Rent This Unit
               </Button>
             </Link>
           ) : (
             <Button
-              className="w-full bg-gray-400 text-gray-600 cursor-not-allowed"
+              className="w-full bg-gray-300 text-gray-600 cursor-not-allowed"
               disabled
             >
               Not Available
             </Button>
           )}
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            variant="outline"
+            className="w-full border-[#116114] text-[#116114] hover:bg-[#116114] hover:text-white"
+          >
+            View Full Details
+          </Button>
         </div>
       </div>
       <PropertyDetailsModal
