@@ -5,20 +5,25 @@ import { RentalUnit } from "@/types/property";
 import { FaBed, FaCalendarAlt, FaMapMarkerAlt, FaCheckCircle } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import PropertyDetailsModal from "./PropertyDetailsModal";
+import RentalInquiryModal from "./RentalInquiryModal";
 import SimpleCurrencyToggle from "@/components/ui/SimpleCurrencyToggle";
 import {
   convertCurrency,
   formatCurrency,
   Currency,
 } from "@/lib/simpleCurrencyConverter";
-import Link from "next/link";
 
 interface ApartmentCardProps {
   apartment: RentalUnit;
+  propertyName?: string;
 }
 
-const ApartmentCard: React.FC<ApartmentCardProps> = ({ apartment }) => {
+const ApartmentCard: React.FC<ApartmentCardProps> = ({
+  apartment,
+  propertyName,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
   const [displayCurrency, setDisplayCurrency] = useState<Currency>("USD");
 
   // Get the best available price and currency for each fee
@@ -249,11 +254,12 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({ apartment }) => {
         )}
         <div className="mt-6 flex flex-col gap-3">
           {apartment.status === "AVAILABLE" ? (
-            <Link href="/login" className="w-full">
-              <Button className="w-full bg-[#116114] hover:bg-[#0d4d10] text-white font-semibold">
-                Rent This Unit
-              </Button>
-            </Link>
+            <Button
+              onClick={() => setIsInquiryModalOpen(true)}
+              className="w-full bg-[#116114] hover:bg-[#0d4d10] text-white font-semibold"
+            >
+              Rent This Unit
+            </Button>
           ) : (
             <Button
               className="w-full bg-gray-300 text-gray-600 cursor-not-allowed"
@@ -275,6 +281,12 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({ apartment }) => {
         apartment={apartment}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+      <RentalInquiryModal
+        apartment={apartment}
+        propertyName={propertyName}
+        isOpen={isInquiryModalOpen}
+        onClose={() => setIsInquiryModalOpen(false)}
       />
     </div>
   );

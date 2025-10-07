@@ -1,13 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import React, { useState } from "react";
 import { useFetchData } from "@/hooks/useApi";
 import { RentalListingItem } from "@/types/property";
 import RentalPropertyCard from "./RentalPropertyCard";
 import FilterSidebar from "./FilterSidebar";
 import QuickFilters from "./QuickFilters";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -16,8 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FaSearch, FaHome, FaFilter, FaTh, FaList } from "react-icons/fa";
-import { SlidersHorizontal, X } from "lucide-react";
+import { FaHome, FaTh, FaList } from "react-icons/fa";
+import { SlidersHorizontal } from "lucide-react";
 
 // Loading Skeleton Component
 function PropertyCardSkeleton() {
@@ -43,6 +41,67 @@ function PropertyCardSkeleton() {
           <div className="h-5 bg-gray-300 rounded-full w-14"></div>
         </div>
         <div className="h-8 bg-gray-300 rounded w-full"></div>
+      </div>
+    </div>
+  );
+}
+
+// Filter Sidebar Skeleton Component
+function FilterSidebarSkeleton() {
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 animate-pulse">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200 flex items-center gap-2">
+        <div className="w-5 h-5 bg-gray-300 rounded"></div>
+        <div className="h-5 bg-gray-300 rounded w-20"></div>
+      </div>
+
+      <div className="p-4 space-y-6">
+        {/* Property Type Section */}
+        <div className="space-y-3">
+          <div className="h-4 bg-gray-300 rounded w-24"></div>
+          <div className="h-10 bg-gray-200 rounded"></div>
+        </div>
+
+        {/* Location Section */}
+        <div className="space-y-3">
+          <div className="h-4 bg-gray-300 rounded w-20"></div>
+          <div className="h-10 bg-gray-200 rounded"></div>
+        </div>
+
+        {/* Price Range Section */}
+        <div className="space-y-3">
+          <div className="h-4 bg-gray-300 rounded w-32"></div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <div className="h-3 bg-gray-300 rounded w-16 mb-1"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+            </div>
+            <div>
+              <div className="h-3 bg-gray-300 rounded w-16 mb-1"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Furnishing Section */}
+        <div className="space-y-3">
+          <div className="h-4 bg-gray-300 rounded w-20"></div>
+          <div className="h-10 bg-gray-200 rounded"></div>
+        </div>
+
+        {/* Amenities Section */}
+        <div className="space-y-3">
+          <div className="h-4 bg-gray-300 rounded w-20"></div>
+          <div className="space-y-2">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-gray-300 rounded"></div>
+                <div className="h-3 bg-gray-200 rounded flex-1"></div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -74,15 +133,6 @@ function EmptyState() {
 }
 
 export default function RentalListing() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  // Get current search term from URL params
-  const currentSearch = searchParams.get("search") || "";
-
-  // Local state for search input
-  const [searchTerm, setSearchTerm] = useState(currentSearch);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [sortBy, setSortBy] = useState("recent");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -98,35 +148,7 @@ export default function RentalListing() {
     amenities: [] as string[],
   });
 
-  // Update local state when URL params change
-  useEffect(() => {
-    setSearchTerm(currentSearch);
-  }, [currentSearch]);
-
-  // Function to update URL params
-  const updateURLParams = (params: Record<string, string>) => {
-    const newSearchParams = new URLSearchParams(searchParams.toString());
-
-    Object.entries(params).forEach(([key, value]) => {
-      if (value === "") {
-        newSearchParams.delete(key);
-      } else {
-        newSearchParams.set(key, value);
-      }
-    });
-
-    router.push(`${pathname}?${newSearchParams.toString()}`);
-  };
-
-  // Build query parameters for API
-  const queryParams = new URLSearchParams();
-  if (currentSearch) {
-    queryParams.set("search", currentSearch);
-  }
-
-  const { data, isLoading, error, refetch } = useFetchData(
-    `rentals/listing${queryParams.toString() ? `?${queryParams.toString()}` : ""}`
-  );
+  const { data, isLoading, error, refetch } = useFetchData("rentals/listing");
 
   let rentals: RentalListingItem[] = data?.data || [];
 
@@ -175,16 +197,6 @@ export default function RentalListing() {
     }
   });
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateURLParams({ search: searchTerm });
-  };
-
-  const clearSearch = () => {
-    setSearchTerm("");
-    updateURLParams({ search: "" });
-  };
-
   const clearAllFilters = () => {
     setFilters({
       category: "",
@@ -210,37 +222,60 @@ export default function RentalListing() {
     return (
       <div className="min-h-screen bg-[#FAFAFA]">
         <div className="container mx-auto px-4 lg:px-16 py-8">
-          {/* Header Section */}
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Property for Rent in Lagos
-            </h1>
-            <p className="text-gray-600 text-base md:text-lg">
-              Discover our curated selection of premium rental properties across
-              Lagos.
-            </p>
+          {/* Header Skeleton */}
+          <div className="mb-8 animate-pulse">
+            <div className="h-10 bg-gray-300 rounded w-64 mb-2"></div>
+            <div className="h-6 bg-gray-200 rounded w-96"></div>
           </div>
 
-          {/* Search Section */}
-          <div className="mb-6">
-            <form onSubmit={handleSearch} className="relative">
-              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input
-                type="search"
-                placeholder="Search by location, property name, or keywords..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-lg border bg-white border-gray-300 py-3 pl-12 pr-4 text-base focus:border-[#116114] focus:ring-2 focus:ring-[#116114]/20"
-              />
-            </form>
-          </div>
-
-          {/* Loading Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-1">
-              <div className="h-96 bg-white rounded-lg border border-gray-200 animate-pulse"></div>
+          {/* Quick Filters Skeleton */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6 animate-pulse">
+            <div className="space-y-4">
+              <div>
+                <div className="h-4 bg-gray-300 rounded w-24 mb-3"></div>
+                <div className="flex flex-wrap gap-2">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="h-8 bg-gray-200 rounded w-24"></div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="h-4 bg-gray-300 rounded w-20 mb-3"></div>
+                <div className="flex flex-wrap gap-2">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-8 bg-gray-200 rounded w-20"></div>
+                  ))}
+                </div>
+              </div>
             </div>
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Sidebar Skeleton */}
+            <div className="hidden lg:block lg:col-span-1">
+              <div className="sticky top-4">
+                <FilterSidebarSkeleton />
+              </div>
+            </div>
+
+            {/* Properties Grid Skeleton */}
             <div className="lg:col-span-3">
+              {/* Toolbar Skeleton */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6 animate-pulse">
+                <div className="flex items-center justify-between">
+                  <div className="h-6 bg-gray-300 rounded w-32"></div>
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 bg-gray-200 rounded w-40"></div>
+                    <div className="hidden sm:flex gap-1 border border-gray-300 rounded-md p-1">
+                      <div className="w-10 h-10 bg-gray-200 rounded"></div>
+                      <div className="w-10 h-10 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Property Cards Skeleton */}
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
                   <PropertyCardSkeleton key={i} />
@@ -288,9 +323,7 @@ export default function RentalListing() {
             our curated selection.
           </p>
         </div>
-
-        {/* Search Section */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <form onSubmit={handleSearch} className="relative">
             <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <Input
@@ -311,7 +344,7 @@ export default function RentalListing() {
               </button>
             )}
           </form>
-        </div>
+        </div> */}
 
         {/* Quick Filters */}
         <QuickFilters
@@ -364,7 +397,6 @@ export default function RentalListing() {
                       {rentals.length}
                     </span>{" "}
                     {rentals.length === 1 ? "property" : "properties"}
-                    {currentSearch && ` for "${currentSearch}"`}
                   </p>
                 </div>
 

@@ -112,7 +112,7 @@ export default function FilterSidebar({
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-sm border border-gray-200 ${isMobile ? "h-full overflow-y-auto" : ""}`}
+      className={`bg-white rounded-lg shadow-sm border border-gray-200 ${isMobile ? "h-full overflow-y-auto scrollbar-hide" : ""}`}
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
@@ -144,7 +144,10 @@ export default function FilterSidebar({
           <Select
             value={filters.apartmentType || "all"}
             onValueChange={(value) =>
-              onFilterChange({ ...filters, apartmentType: value === "all" ? "" : value })
+              onFilterChange({
+                ...filters,
+                apartmentType: value === "all" ? "" : value,
+              })
             }
           >
             <SelectTrigger className="w-full">
@@ -169,7 +172,10 @@ export default function FilterSidebar({
           <Select
             value={filters.location || "all"}
             onValueChange={(value) =>
-              onFilterChange({ ...filters, location: value === "all" ? "" : value })
+              onFilterChange({
+                ...filters,
+                location: value === "all" ? "" : value,
+              })
             }
           >
             <SelectTrigger className="w-full">
@@ -197,7 +203,10 @@ export default function FilterSidebar({
               <Select
                 value={filters.minPrice || "none"}
                 onValueChange={(value) =>
-                  onFilterChange({ ...filters, minPrice: value === "none" ? "" : value })
+                  onFilterChange({
+                    ...filters,
+                    minPrice: value === "none" ? "" : value,
+                  })
                 }
               >
                 <SelectTrigger className="w-full">
@@ -205,7 +214,10 @@ export default function FilterSidebar({
                 </SelectTrigger>
                 <SelectContent>
                   {priceRanges.map((range) => (
-                    <SelectItem key={range.value || "none"} value={range.value || "none"}>
+                    <SelectItem
+                      key={range.value || "none"}
+                      value={range.value || "none"}
+                    >
                       {range.label}
                     </SelectItem>
                   ))}
@@ -217,7 +229,10 @@ export default function FilterSidebar({
               <Select
                 value={filters.maxPrice || "none"}
                 onValueChange={(value) =>
-                  onFilterChange({ ...filters, maxPrice: value === "none" ? "" : value })
+                  onFilterChange({
+                    ...filters,
+                    maxPrice: value === "none" ? "" : value,
+                  })
                 }
               >
                 <SelectTrigger className="w-full">
@@ -225,7 +240,10 @@ export default function FilterSidebar({
                 </SelectTrigger>
                 <SelectContent>
                   {maxPriceRanges.map((range) => (
-                    <SelectItem key={range.value || "none"} value={range.value || "none"}>
+                    <SelectItem
+                      key={range.value || "none"}
+                      value={range.value || "none"}
+                    >
                       {range.label}
                     </SelectItem>
                   ))}
@@ -243,7 +261,10 @@ export default function FilterSidebar({
           <Select
             value={filters.furnishing || "any"}
             onValueChange={(value) =>
-              onFilterChange({ ...filters, furnishing: value === "any" ? "" : value })
+              onFilterChange({
+                ...filters,
+                furnishing: value === "any" ? "" : value,
+              })
             }
           >
             <SelectTrigger className="w-full">
@@ -262,7 +283,7 @@ export default function FilterSidebar({
           <Label className="text-sm font-semibold text-gray-900">
             Amenities
           </Label>
-          <div className="space-y-2 max-h-64 overflow-y-auto">
+          <div className="space-y-2 max-h-64 overflow-y-auto scrollbar-hide">
             {popularAmenities.map((amenity) => (
               <div key={amenity} className="flex items-center space-x-2">
                 <Checkbox

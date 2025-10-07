@@ -340,7 +340,11 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
               ) : (
                 <div className="grid md:grid-cols-2 gap-6">
                   {property.rental.map((apartment) => (
-                    <ApartmentCard key={apartment.id} apartment={apartment} />
+                    <ApartmentCard
+                      key={apartment.id}
+                      apartment={apartment}
+                      propertyName={property.name}
+                    />
                   ))}
                 </div>
               )}

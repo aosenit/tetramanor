@@ -42,7 +42,7 @@ export default function PropertyStats({ rentals }: PropertyStatsProps) {
       </p>
 
       {/* Property Types Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto scrollbar-hide">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
