@@ -293,7 +293,7 @@ export default function PropertyDetailsModal({
                     <span className="font-medium">
                       {formatCurrency(
                         apartment.propertyUnit.priceThreshold,
-                        apartment.propertyUnit.currency
+                        apartment.propertyUnit.currency as Currency
                       )}
                     </span>
                   </div>
