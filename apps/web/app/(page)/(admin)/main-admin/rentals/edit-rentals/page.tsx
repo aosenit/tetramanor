@@ -979,6 +979,7 @@ export default function EditRental() {
 			}
 			return false;
 		}
+		
 	};
 
 	// Handle form submission
@@ -990,6 +991,7 @@ export default function EditRental() {
 			toast.error("Please fix the errors in the form");
 			return;
 		}
+
 
 		setIsSubmitting(true);
 

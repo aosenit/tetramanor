@@ -181,7 +181,7 @@ export default function RentalsPage() {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     });
-
+console.log(rentals)
 
     switch (frequency) {
       case "MONTHLY":
