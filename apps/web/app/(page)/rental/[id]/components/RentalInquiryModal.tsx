@@ -1,13 +1,35 @@
 "use client";
 
 import React, { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RentalUnit } from "@/types/property";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaSpinner } from "react-icons/fa";
+import { usePostData } from "@/hooks/useApi";
+import { useToast } from "@/components/ui/toast-notification";
+import PhoneInput from "@/components/ui/PhoneInput";
+
+// Validation schema
+const rentalRequestSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  phone: z
+    .string()
+    .min(1, "Phone number is required")
+    .regex(
+      /^\+\d{7,15}$/,
+      "Please enter a valid phone number with country code"
+    ),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+
+type RentalRequestData = z.infer<typeof rentalRequestSchema>;
 
 interface RentalInquiryModalProps {
   isOpen: boolean;
@@ -22,40 +44,57 @@ export default function RentalInquiryModal({
   apartment,
   propertyName,
 }: RentalInquiryModalProps) {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    moveInDate: "",
-    message: `I am interested in renting the ${apartment.apartmentType} unit at ${propertyName || "this property"}. Please contact me with more details.`,
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutateAsync: submitRentalRequest, isPending } =
+    usePostData("rentals/request");
+  const { showToast } = useToast();
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset,
+  } = useForm<RentalRequestData>({
+    resolver: zodResolver(rentalRequestSchema),
+    defaultValues: {
+      message: `I am interested in renting the ${apartment.apartmentType} unit at ${propertyName || "this property"}. Please contact me with more details.`,
+    },
+  });
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const onSubmit = async (data: RentalRequestData) => {
+    try {
+      await submitRentalRequest({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        message: data.message,
+        rentalId: apartment.id,
+      });
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
       setIsSuccess(true);
-      
+      showToast(
+        "Rental Request Sent!",
+        "Thank you for your interest. Our team will contact you within 24 hours.",
+        "success"
+      );
+
       // Reset after 3 seconds
       setTimeout(() => {
         setIsSuccess(false);
+        reset();
         onClose();
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          moveInDate: "",
-          message: `I am interested in renting the ${apartment.apartmentType} unit at ${propertyName || "this property"}. Please contact me with more details.`,
-        });
       }, 3000);
-    }, 1500);
+    } catch (error) {
+      console.error("Failed to submit rental request:", error);
+      showToast(
+        "Failed to Send",
+        "Failed to submit rental request. Please try again.",
+        "error"
+      );
+    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -129,7 +168,8 @@ export default function RentalInquiryModal({
                 <div>
                   <span className="text-gray-600">Rent Fee:</span>
                   <p className="font-semibold text-gray-900">
-                    {formatCurrency(apartment.rentFee)} / {apartment.frequency.toLowerCase()}
+                    {formatCurrency(apartment.rentFee)} /{" "}
+                    {apartment.frequency.toLowerCase()}
                   </p>
                 </div>
                 <div>
@@ -142,92 +182,99 @@ export default function RentalInquiryModal({
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <Label htmlFor="name" className="text-sm font-semibold text-gray-700 mb-2">
+                  <Label
+                    htmlFor="name"
+                    className="text-sm font-semibold text-gray-700 mb-2"
+                  >
                     Full Name <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="name"
                     type="text"
                     placeholder="John Doe"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    className="mt-1"
-                    required
+                    {...register("name")}
+                    className={`mt-1 ${errors.name ? "border-red-500" : ""}`}
                   />
+                  {errors.name && (
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors.name.message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
-                  <Label htmlFor="email" className="text-sm font-semibold text-gray-700 mb-2">
+                  <Label
+                    htmlFor="email"
+                    className="text-sm font-semibold text-gray-700 mb-2"
+                  >
                     Email Address <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="john@example.com"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    className="mt-1"
-                    required
+                    {...register("email")}
+                    className={`mt-1 ${errors.email ? "border-red-500" : ""}`}
                   />
+                  {errors.email && (
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-5">
                 <div>
-                  <Label htmlFor="phone" className="text-sm font-semibold text-gray-700 mb-2">
+                  <Label
+                    htmlFor="phone"
+                    className="text-sm font-semibold text-gray-700 mb-2"
+                  >
                     Phone Number <span className="text-red-500">*</span>
                   </Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="+234 801 234 5678"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    className="mt-1"
-                    required
+                  <Controller
+                    name="phone"
+                    control={control}
+                    render={({ field }) => (
+                      <PhoneInput
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        placeholder="Enter phone number"
+                        error={!!errors.phone}
+                        required
+                      />
+                    )}
                   />
-                </div>
-
-                <div>
-                  <Label htmlFor="moveInDate" className="text-sm font-semibold text-gray-700 mb-2">
-                    Preferred Move-in Date
-                  </Label>
-                  <Input
-                    id="moveInDate"
-                    type="date"
-                    value={formData.moveInDate}
-                    onChange={(e) =>
-                      setFormData({ ...formData, moveInDate: e.target.value })
-                    }
-                    className="mt-1"
-                    min={new Date().toISOString().split("T")[0]}
-                  />
+                  {errors.phone && (
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors.phone.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="message" className="text-sm font-semibold text-gray-700 mb-2">
-                  Additional Message
+                <Label
+                  htmlFor="message"
+                  className="text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Message <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
                   id="message"
                   placeholder="Tell us more about your requirements..."
-                  value={formData.message}
-                  onChange={(e) =>
-                    setFormData({ ...formData, message: e.target.value })
-                  }
-                  className="mt-1 min-h-[120px]"
+                  {...register("message")}
+                  className={`mt-1 min-h-[120px] ${errors.message ? "border-red-500" : ""}`}
                   rows={5}
                 />
+                {errors.message && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.message.message}
+                  </p>
+                )}
               </div>
 
               {/* Action Buttons */}
@@ -237,18 +284,18 @@ export default function RentalInquiryModal({
                   variant="outline"
                   onClick={onClose}
                   className="flex-1 border-gray-300"
-                  disabled={isSubmitting}
+                  disabled={isPending}
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   className="flex-1 bg-[#116114] hover:bg-[#0d4d10] text-white font-semibold"
-                  disabled={isSubmitting}
+                  disabled={isPending}
                 >
-                  {isSubmitting ? (
+                  {isPending ? (
                     <>
-                      <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
                       Sending...
                     </>
                   ) : (

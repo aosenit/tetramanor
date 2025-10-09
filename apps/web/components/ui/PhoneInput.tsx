@@ -340,11 +340,15 @@ export default function PhoneInput({
 
   return (
     <div className={cn("relative", className)}>
-      <div className={cn(
-        "flex items-center border rounded-md bg-background transition-all duration-200",
-        error ? "border-red-500 focus-within:ring-2 focus-within:ring-red-500 focus-within:border-red-500" : "border-input focus-within:ring-2 focus-within:ring-[#116114] focus-within:border-[#116114]",
-        disabled && "opacity-50 cursor-not-allowed bg-muted"
-      )}>
+      <div
+        className={cn(
+          "flex items-center border rounded-md bg-background transition-all duration-200",
+          error
+            ? "border-red-500 focus-within:ring-2 focus-within:ring-red-500 focus-within:border-red-500"
+            : "border-input focus-within:ring-2 focus-within:ring-[#116114] focus-within:border-[#116114]",
+          disabled && "opacity-50 cursor-not-allowed bg-muted"
+        )}
+      >
         {/* Country Code Dropdown */}
         <Button
           type="button"
@@ -362,21 +366,21 @@ export default function PhoneInput({
             <span className="text-base">{selectedCountry.flag}</span>
             <span className="font-semibold">{selectedCountry.code}</span>
           </span>
-          <ChevronDown className={cn(
-            "h-4 w-4 ml-1 transition-transform duration-200",
-            isDropdownOpen && "rotate-180"
-          )} />
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 ml-1 transition-transform duration-200",
+              isDropdownOpen && "rotate-180"
+            )}
+          />
         </Button>
 
         {/* Phone Number Input */}
-        <Input
-          {...inputProps}
-        />
+        <Input {...inputProps} />
       </div>
 
       {/* Country Dropdown */}
       {isDropdownOpen && (
-        <div 
+        <div
           className="absolute top-full left-0 z-50 w-72 mt-2 bg-popover border border-border rounded-lg shadow-xl max-h-80 overflow-hidden"
           onKeyDown={handleKeyDown}
         >
@@ -390,7 +394,7 @@ export default function PhoneInput({
               autoFocus
             />
           </div>
-          <div className="max-h-64 overflow-y-auto">
+          <div className="max-h-64 overflow-y-auto scrollbar-hide">
             {filteredCountries.length > 0 ? (
               filteredCountries.map((country, index) => (
                 <Button
@@ -402,13 +406,19 @@ export default function PhoneInput({
                   className={cn(
                     "w-full justify-start gap-3 px-4 py-3 text-sm h-auto transition-colors duration-150",
                     "hover:bg-accent focus:bg-accent",
-                    selectedCountry.code === country.code && "bg-[#e8f5e8] text-[#116114] hover:bg-[#e8f5e8]",
-                    index === highlightedIndex && "bg-accent border-l-2 border-[#116114]"
+                    selectedCountry.code === country.code &&
+                      "bg-[#e8f5e8] text-[#116114] hover:bg-[#e8f5e8]",
+                    index === highlightedIndex &&
+                      "bg-accent border-l-2 border-[#116114]"
                   )}
                 >
                   <span className="text-lg flex-shrink-0">{country.flag}</span>
-                  <span className="font-semibold text-foreground flex-shrink-0 w-12">{country.code}</span>
-                  <span className="text-muted-foreground truncate">{country.country}</span>
+                  <span className="font-semibold text-foreground flex-shrink-0 w-12">
+                    {country.code}
+                  </span>
+                  <span className="text-muted-foreground truncate">
+                    {country.country}
+                  </span>
                 </Button>
               ))
             ) : (

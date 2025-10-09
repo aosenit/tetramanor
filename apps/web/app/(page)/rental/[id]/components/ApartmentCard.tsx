@@ -6,12 +6,14 @@ import { FaBed, FaCalendarAlt, FaMapMarkerAlt, FaCheckCircle } from "react-icons
 import { Button } from "@/components/ui/button";
 import PropertyDetailsModal from "./PropertyDetailsModal";
 import RentalInquiryModal from "./RentalInquiryModal";
+import ContactModal from "./ContactModal";
+import ScheduleInspectionModal from "./ScheduleInspectionModal";
 import SimpleCurrencyToggle from "@/components/ui/SimpleCurrencyToggle";
 import {
-  convertCurrency,
-  formatCurrency,
   Currency,
-} from "@/lib/simpleCurrencyConverter";
+  useCurrencyConverter,
+  formatCurrency,
+} from "@/hooks/useCurrencyConverter";
 
 interface ApartmentCardProps {
   apartment: RentalUnit;
@@ -24,7 +26,10 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
   const [displayCurrency, setDisplayCurrency] = useState<Currency>("USD");
+  const { convertCurrencySync } = useCurrencyConverter();
 
   // Get the best available price and currency for each fee
   const getBestPrice = (ngnAmount: number, usdAmount: number) => {
@@ -44,7 +49,7 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
       return formatCurrency(amount, originalCurrency);
     }
 
-    const convertedAmount = convertCurrency(
+    const convertedAmount = convertCurrencySync(
       amount,
       originalCurrency,
       displayCurrency
@@ -281,12 +286,35 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
         apartment={apartment}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onContactClick={() => {
+          setIsModalOpen(false);
+          setIsContactModalOpen(true);
+        }}
+        onScheduleInspectionClick={() => {
+          setIsModalOpen(false);
+          setIsInspectionModalOpen(true);
+        }}
+        onRentClick={() => {
+          setIsModalOpen(false);
+          setIsInquiryModalOpen(true);
+        }}
       />
       <RentalInquiryModal
         apartment={apartment}
         propertyName={propertyName}
         isOpen={isInquiryModalOpen}
         onClose={() => setIsInquiryModalOpen(false)}
+      />
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        propertyName={apartment.apartmentType}
+      />
+      <ScheduleInspectionModal
+        isOpen={isInspectionModalOpen}
+        onClose={() => setIsInspectionModalOpen(false)}
+        propertyId={apartment.id}
+        propertyName={apartment.apartmentType}
       />
     </div>
   );

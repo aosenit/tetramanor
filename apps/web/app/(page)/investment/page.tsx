@@ -5,17 +5,20 @@ import InvestmentOpportunities from "./components/InvestmentOpportunities";
 import InvestmentModels from "./components/InvestmentModel";
 // import HowItWorks from "./components/TabOne";
 import WhyPartnerWithTetramore from "./components/WhyPartnerWithTetramore";
+import { ToastProvider } from "@/components/ui/toast-notification";
 
 function Page() {
   return (
-    <div className="bg-[#fafafa]">
-      <Hero />
-      <InvestmentOpportunities />
-      <InvestmentModels />
-      {/* <RoiCalculator /> */}
-      <WhyPartnerWithTetramore />
-      <Footer />
-    </div>
+    <ToastProvider>
+      <div className="bg-[#fafafa]">
+        <Hero />
+        <InvestmentOpportunities />
+        <InvestmentModels />
+        {/* <RoiCalculator /> */}
+        <WhyPartnerWithTetramore />
+        <Footer />
+      </div>
+    </ToastProvider>
   );
 }
 

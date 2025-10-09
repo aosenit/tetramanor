@@ -94,11 +94,7 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
 
     const success = await shareProperty(property.name, property.id);
     if (success) {
-      showToast(
-        "Shared successfully!",
-        "Property link has been shared or copied to clipboard.",
-        "success"
-      );
+      showToast("Property link has been  copied to clipboard.", "success");
     } else {
       showToast(
         "Failed to share",
@@ -110,13 +106,13 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
 
   const handleSave = () => {
     setIsSaved(!isSaved);
-    showToast(
-      isSaved ? "Removed from favorites" : "Added to favorites",
-      isSaved
-        ? "Property removed from your favorites."
-        : "Property saved to your favorites.",
-      "success"
-    );
+    // showToast(
+    //   isSaved ? "Removed from favorites" : "Added to favorites",
+    //   isSaved
+    //     ? "Property removed from your favorites."
+    //     : "Property saved to your favorites.",
+    //   "success"
+    // );
   };
 
   if (isLoading) {
