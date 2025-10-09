@@ -8,7 +8,7 @@ import EconomicAdvantages from "../sections/economic-advantages";
 import ScheduleInspection from "../sections/schedule-inspection";
 import Footer from "@/components/home/Footer";
 import MapSection from "../sections/map";
-import { FiShare2 } from "react-icons/fi";
+import { FiShare2, FiArrowLeft, FiHeart } from "react-icons/fi";
 import { ToastProvider, useToast } from "@/components/ui/toast-notification";
 import { shareProperty } from "@/lib/shareUtils";
 import { useFetchData } from "@/hooks/useApi";
@@ -22,6 +22,7 @@ interface PageProps {
 
 function PageContent({ params }: PageProps) {
   const { showToast } = useToast();
+  const [isFavorited, setIsFavorited] = React.useState(false);
 
   const { data, isLoading, error } = useFetchData(
     `property/detail/${params.id}`
@@ -47,12 +48,31 @@ function PageContent({ params }: PageProps) {
     }
   };
 
+  const handleFavorite = () => {
+    setIsFavorited(!isFavorited);
+    showToast(
+      isFavorited ? "Removed from favorites" : "Added to favorites",
+      isFavorited
+        ? "Property has been removed from your favorites."
+        : "Property has been added to your favorites.",
+      "success"
+    );
+  };
+
+  const handleBackToPortfolio = () => {
+    window.history.back();
+  };
+
   // Loading skeleton
   if (isLoading) {
     return (
       <div>
-        <div className="flex justify-end p-4">
-          <Skeleton className="h-8 w-32 mb-4" />
+        <div className="flex justify-between items-center p-4">
+          <Skeleton className="h-8 w-32" />
+          <div className="flex gap-2">
+            <Skeleton className="h-8 w-8" />
+            <Skeleton className="h-8 w-8" />
+          </div>
         </div>
         <div className="p-8">
           <Skeleton className="h-10 w-1/2 mb-4" />
@@ -72,7 +92,7 @@ function PageContent({ params }: PageProps) {
           Something went wrong
         </h2>
         <p className="text-gray-600 mb-6">
-          We couldn't load this property right now. Please try again later.
+          We couldn&apos;t load this property right now. Please try again later.
         </p>
         <Button variant="outline" onClick={() => window.location.reload()}>
           Retry
@@ -89,8 +109,8 @@ function PageContent({ params }: PageProps) {
           Property not found
         </h2>
         <p className="text-gray-600 mb-6">
-          The property you are looking for might have been removed or doesn't
-          exist.
+          The property you are looking for might have been removed or
+          doesn&apos;t exist.
         </p>
         <Button variant="outline" onClick={() => window.history.back()}>
           Go Back
@@ -99,19 +119,43 @@ function PageContent({ params }: PageProps) {
     );
   }
 
-  // Main content
   return (
     <div>
-      <div className="flex pt-6 justify-end p-4">
-        <button
-          className="flex items-center ml-2 text-[#151515] font-medium text-xs hover:text-[#116114] transition-colors"
-          onClick={handleShare}
-        >
-          <FiShare2 className="mr-1" />
-          <span>Share</span>
-        </button>
-      </div>
+      <div className="pt-14">
+
       <Hero property={property} />
+      </div>
+      <div className="flex justify-between items-center p-4">
+        <button
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-[#151515] font-medium text-sm hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
+          onClick={handleBackToPortfolio}
+        >
+          <FiArrowLeft className="w-4 h-4" />
+          <span>Back to Portfolio</span>
+        </button>
+
+        <div className="flex items-center gap-2">
+          <button
+            className="flex items-center justify-center w-10 h-10 bg-white border border-gray-200 rounded-lg text-[#151515] hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
+            onClick={handleShare}
+          >
+            <FiShare2 className="w-4 h-4" />
+          </button>
+
+          <button
+            className={`flex items-center justify-center w-10 h-10 bg-white border border-gray-200 rounded-lg transition-all duration-200 ${
+              isFavorited
+                ? "text-red-500 border-red-200 bg-red-50"
+                : "text-[#151515] hover:border-gray-300 hover:bg-gray-50"
+            }`}
+            onClick={handleFavorite}
+          >
+            <FiHeart
+              className={`w-4 h-4 ${isFavorited ? "fill-current" : ""}`}
+            />
+          </button>
+        </div>
+      </div>
       <AboutProperty property={property} />
       <WhyInvest property={property} />
       <MorePictures property={property} />

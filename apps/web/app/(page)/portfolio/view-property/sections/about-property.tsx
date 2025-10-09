@@ -30,16 +30,14 @@ export default function AboutProperty({ property }: AboutPropertyProps) {
                 {property.unitTypes.map((type, idx) => (
                   <li className="flex items-center" key={idx}>
                     <FaCheck className="h-5 w-5 text-[#116114] mr-2 flex-shrink-0" />
-                    <span>
-                      {typeof type === "string" ? type : type?.name || ""}
-                    </span>
+                    <span>{type}</span>
                   </li>
                 ))}
               </ul>
             </>
           )}
         </div>
-        <div className="relative h-[400px] lg:h-auto rounded-lg overflow-hidden">
+        <div className="relative h-[400px] lg:h-full rounded-lg overflow-hidden">
           <Image
             src={
               property.images?.find((img) => img.isPrimary)?.imageUrl ||
@@ -60,11 +58,9 @@ export default function AboutProperty({ property }: AboutPropertyProps) {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {property.features?.map((feature, idx) => (
-            <div className="flex items-start" key={idx}>
+            <div className="flex items-start" key={feature.id || idx}>
               <FaCheck className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-              <span>
-                {typeof feature === "string" ? feature : feature?.name || ""}
-              </span>
+              <span>{feature.name}</span>
             </div>
           ))}
         </div>
@@ -79,11 +75,9 @@ export default function AboutProperty({ property }: AboutPropertyProps) {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {property.amenities?.map((amenity, idx) => (
-            <div className="flex items-start" key={idx}>
+            <div className="flex items-start" key={amenity.id || idx}>
               <FaCheck className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-              <span>
-                {typeof amenity === "string" ? amenity : amenity?.name || ""}
-              </span>
+              <span>{amenity.name}</span>
             </div>
           ))}
         </div>

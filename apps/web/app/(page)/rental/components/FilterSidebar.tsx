@@ -107,7 +107,6 @@ export default function FilterSidebar({
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
         <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-[#116114]" />
           <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
           {activeFilterCount > 0 && (
             <span className="bg-[#116114] text-white text-xs px-2 py-1 rounded-full">

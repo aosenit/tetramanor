@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useFetchData } from "@/hooks/useApi";
 import { RentalListingItem } from "@/types/property";
-import RentalPropertyCard from "./RentalPropertyCard";
+import RentalPropertyCardNew from "./RentalPropertyCardNew";
 import FilterSidebar from "./FilterSidebar";
 import QuickFilters from "./QuickFilters";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FaHome, FaTh, FaList } from "react-icons/fa";
+import { FaHome } from "react-icons/fa";
 import { SlidersHorizontal } from "lucide-react";
 
 // Loading Skeleton Component
@@ -135,7 +135,6 @@ function EmptyState() {
 export default function RentalListing() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [sortBy, setSortBy] = useState("recent");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   // Filter state
   const [filters, setFilters] = useState({
@@ -307,7 +306,7 @@ export default function RentalListing() {
               </div>
 
               {/* Property Cards Skeleton */}
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {[...Array(6)].map((_, i) => (
                   <PropertyCardSkeleton key={i} />
                 ))}
@@ -449,32 +448,6 @@ export default function RentalListing() {
                       <SelectItem value="name-desc">Name (Z-A)</SelectItem>
                     </SelectContent>
                   </Select>
-
-                  {/* View Mode Toggle */}
-                  <div className="hidden sm:flex items-center gap-1 border border-gray-300 rounded-md p-1">
-                    <button
-                      onClick={() => setViewMode("grid")}
-                      className={`p-2 rounded ${
-                        viewMode === "grid"
-                          ? "bg-[#116114] text-white"
-                          : "text-gray-600 hover:bg-gray-100"
-                      }`}
-                      aria-label="Grid view"
-                    >
-                      <FaTh className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setViewMode("list")}
-                      className={`p-2 rounded ${
-                        viewMode === "list"
-                          ? "bg-[#116114] text-white"
-                          : "text-gray-600 hover:bg-gray-100"
-                      }`}
-                      aria-label="List view"
-                    >
-                      <FaList className="w-4 h-4" />
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
@@ -483,18 +456,12 @@ export default function RentalListing() {
             {rentals.length === 0 ? (
               <EmptyState />
             ) : (
-              <div
-                className={
-                  viewMode === "grid"
-                    ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
-                    : "flex flex-col gap-4"
-                }
-              >
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {rentals.map((rental) => (
-                  <RentalPropertyCard
+                  <RentalPropertyCardNew
                     key={rental.id}
                     rental={rental}
-                    viewMode={viewMode}
+                    className="w-full"
                   />
                 ))}
               </div>
