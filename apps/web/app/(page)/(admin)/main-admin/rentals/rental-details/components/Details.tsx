@@ -55,7 +55,7 @@ function Details({ refetch }: DetailsProps) {
 
   const [rental, setRental] = useState<any>(null);
   const [property, setProperty] = useState<any>(null);
-
+console.log(property);
   useEffect(() => {
     if (rentalData?.data) {
       setRental(rentalData.data);

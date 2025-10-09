@@ -4,15 +4,22 @@ import { usePostData, useFetchData } from "@/hooks/useApi";
 import React from "react";
 import { FaLocationDot, FaPhone } from "react-icons/fa6";
 import { IoMdMail } from "react-icons/io";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import type { ContactResponse, ContactData } from "@/types/contact";
+import type { ContactData } from "@/types/contact";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  phone: z
+    .string()
+    .min(1, "Phone number is required")
+    .regex(
+      /^\+\d{7,15}$/,
+      "Please enter a valid phone number with country code"
+    ),
   email: z.string().email("Please enter a valid email address"),
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
@@ -35,6 +42,7 @@ function ContactForm() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
     reset,
   } = useForm<ContactFormData>({
@@ -163,14 +171,21 @@ function ContactForm() {
                     className="text-xs font-semibold text-[#313131]"
                     htmlFor="phone"
                   >
-                    Phone Number
+                    Phone Number *
                   </label>
-                  <input
-                    {...register("phone")}
-                    type="text"
-                    className={`border bg-[#fbfbfb] p-3 rounded-sm col-span-1 ${
-                      errors.phone ? "border-red-500" : ""
-                    }`}
+                  <Controller
+                    name="phone"
+                    control={control}
+                    render={({ field }) => (
+                      <PhoneInput
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        placeholder="Enter phone number"
+                        error={!!errors.phone}
+                        required
+                        className="col-span-1"
+                      />
+                    )}
                   />
                   {errors.phone && (
                     <span className="text-red-500 text-xs">

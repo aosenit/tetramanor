@@ -8,6 +8,7 @@ import ten from "@/assets/portfolio/ten.webp"
 
 import { usePostData } from "@/hooks/useApi";
 import { useToast } from "@chakra-ui/react";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 interface ScheduleInspectionProps {
   propertyTitle?: string;
@@ -26,16 +27,83 @@ export default function ScheduleInspection({
     property: propertyTitle,
   });
 
+  const [blockedDates, setBlockedDates] = useState<string[]>([]);
+
   const toast = useToast();
   const { mutate, isPending } = usePostData("property/book-inspection");
+  const isWeekday = (dateString: string): boolean => {
+    const date = new Date(dateString);
+    const day = date.getDay();
+    return day >= 1 && day <= 6;
+  };
+  const isDateBlocked = (dateString: string): boolean => {
+    return blockedDates.includes(dateString);
+  };
+  const getMinDate = (): string => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    if (name === "date") {
+      if (value && !isWeekday(value)) {
+        toast({
+          title: "Invalid Date",
+          description:
+            "Inspections are only available Monday through Saturday.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      if (value && isDateBlocked(value)) {
+        toast({
+          title: "Date Not Available",
+          description: "This date has already been selected for inspection.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePhoneChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, phone: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isWeekday(formData.date)) {
+      toast({
+        title: "Invalid Date",
+        description: "Inspections are only available Monday through Saturday.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    if (isDateBlocked(formData.date)) {
+      toast({
+        title: "Date Not Available",
+        description: "This date has already been selected for inspection.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     mutate(
       {
         name: formData.name,
@@ -46,9 +114,11 @@ export default function ScheduleInspection({
       },
       {
         onSuccess: () => {
+          setBlockedDates((prev) => [...prev, formData.date]);
+
           toast({
             title: "Inspection scheduled!",
-            description: `Thank you! Your inspection for ${propertyTitle} has been scheduled. We'll contact you shortly to confirm.`,
+            description: `Thank you! Your inspection for ${propertyTitle} has been scheduled for ${new Date(formData.date).toLocaleDateString()}. We'll contact you shortly to confirm.`,
             status: "success",
             duration: 3000,
             isClosable: true,
@@ -114,7 +184,6 @@ export default function ScheduleInspection({
           </div>
         </div>
 
-        {/* Right side - Form */}
         <div className="bg-white p-8 rounded-lg shadow-lg text-black">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -134,15 +203,12 @@ export default function ScheduleInspection({
               </div>
               <div>
                 <label htmlFor="phone" className="block text-gray-700 mb-2">
-                  Phone number
+                  Phone number *
                 </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
+                <PhoneInput
                   value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#116114]"
+                  onChange={handlePhoneChange}
+                  placeholder="Enter phone number"
                   required
                 />
               </div>
@@ -165,7 +231,7 @@ export default function ScheduleInspection({
 
             <div>
               <label htmlFor="date" className="block text-gray-700 mb-2">
-                Date
+                Preferred Inspection Date *
               </label>
               <div className="relative">
                 <input
@@ -174,11 +240,21 @@ export default function ScheduleInspection({
                   name="date"
                   value={formData.date}
                   onChange={handleChange}
+                  min={getMinDate()}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#116114]"
                   required
                 />
                 <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Inspections available Monday through Saturday only
+              </p>
+              {blockedDates.length > 0 && (
+                <p className="text-sm text-orange-600 mt-1">
+                  {blockedDates.length} date{blockedDates.length > 1 ? "s" : ""}{" "}
+                  already booked
+                </p>
+              )}
             </div>
 
             <button
