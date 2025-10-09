@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FaCalendarAlt, FaSpinner } from "react-icons/fa";
-import PhoneInput from "@/components/ui/PhoneInput";
+import PhoneInputV2 from "@/components/ui/PhoneInputV2";
 
 // Validation schema
 const inspectionFormSchema = z.object({
@@ -155,7 +155,10 @@ export default function ScheduleInspectionModal({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="name"
+                className="text-sm font-medium text-gray-700"
+              >
                 Name <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -171,14 +174,17 @@ export default function ScheduleInspectionModal({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="phone"
+                className="text-sm font-medium text-gray-700"
+              >
                 Phone Number <span className="text-red-500">*</span>
               </Label>
               <Controller
                 name="phone"
                 control={control}
                 render={({ field }) => (
-                  <PhoneInput
+                  <PhoneInputV2
                     value={field.value || ""}
                     onChange={field.onChange}
                     placeholder="Enter phone number"
@@ -194,7 +200,10 @@ export default function ScheduleInspectionModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="email"
+              className="text-sm font-medium text-gray-700"
+            >
               Email Address <span className="text-red-500">*</span>
             </Label>
             <Input

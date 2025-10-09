@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { FaLocationDot, FaPhone, FaSpinner } from "react-icons/fa6";
 import { IoMdMail } from "react-icons/io";
 import type { ContactData } from "@/types/contact";
-import PhoneInput from "@/components/ui/PhoneInput";
+import PhoneInputV2 from "@/components/ui/PhoneInputV2";
 
 // Validation schema
 const contactFormSchema = z.object({
@@ -48,7 +48,8 @@ export default function ContactModal({
   onClose,
   propertyName,
 }: ContactModalProps) {
-  const { mutateAsync: sendMessage, isPending } = usePostData("contact/enquiry");
+  const { mutateAsync: sendMessage, isPending } =
+    usePostData("contact/enquiry");
   const { showToast } = useToast();
 
   // Fetch contact info
@@ -121,7 +122,10 @@ export default function ContactModal({
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+                  <Label
+                    htmlFor="name"
+                    className="text-sm font-medium text-gray-700"
+                  >
                     Name <span className="text-red-500">*</span>
                   </Label>
                   <Input
@@ -132,19 +136,24 @@ export default function ContactModal({
                     className={errors.name ? "border-red-500" : ""}
                   />
                   {errors.name && (
-                    <p className="text-sm text-red-500">{errors.name.message}</p>
+                    <p className="text-sm text-red-500">
+                      {errors.name.message}
+                    </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                  <Label
+                    htmlFor="phone"
+                    className="text-sm font-medium text-gray-700"
+                  >
                     Phone Number <span className="text-red-500">*</span>
                   </Label>
                   <Controller
                     name="phone"
                     control={control}
                     render={({ field }) => (
-                      <PhoneInput
+                      <PhoneInputV2
                         value={field.value || ""}
                         onChange={field.onChange}
                         placeholder="Enter phone number"
@@ -154,13 +163,18 @@ export default function ContactModal({
                     )}
                   />
                   {errors.phone && (
-                    <p className="text-sm text-red-500">{errors.phone.message}</p>
+                    <p className="text-sm text-red-500">
+                      {errors.phone.message}
+                    </p>
                   )}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                <Label
+                  htmlFor="email"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Email Address <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -176,7 +190,10 @@ export default function ContactModal({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="message" className="text-sm font-medium text-gray-700">
+                <Label
+                  htmlFor="message"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Message <span className="text-red-500">*</span>
                 </Label>
                 <textarea
@@ -188,7 +205,9 @@ export default function ContactModal({
                   placeholder="Tell us how we can help you..."
                 />
                 {errors.message && (
-                  <p className="text-sm text-red-500">{errors.message.message}</p>
+                  <p className="text-sm text-red-500">
+                    {errors.message.message}
+                  </p>
                 )}
               </div>
 

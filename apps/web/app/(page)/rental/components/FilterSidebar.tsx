@@ -30,41 +30,27 @@ interface FilterSidebarProps {
   onClearFilters: () => void;
   isMobile?: boolean;
   onClose?: () => void;
+  apartmentTypes?: string[];
+  categories?: string[];
+  locations?: string[];
+  amenities?: string[];
 }
 
-const apartmentTypes = [
-  { value: "STUDIO", label: "Studio" },
-  { value: "ONE_BEDROOM", label: "1 Bedroom" },
-  { value: "TWO_BEDROOM", label: "2 Bedrooms" },
-  { value: "THREE_BEDROOM", label: "3 Bedrooms" },
-  { value: "FOUR_BEDROOM", label: "4 Bedrooms" },
-  { value: "FIVE_BEDROOM", label: "5+ Bedrooms" },
-];
+// Helper function to format apartment type labels
+const formatApartmentType = (type: string) => {
+  return type
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
 
-const locations = [
-  "Lekki",
-  "Victoria Island",
-  "Ikoyi",
-  "Ikeja",
-  "Yaba",
-  "Surulere",
-  "Ajah",
-  "Banana Island",
-  "Parkview Estate",
-];
-
-const popularAmenities = [
-  "24/7 Power Supply",
-  "Swimming Pool",
-  "Gym",
-  "Security",
-  "Parking",
-  "Elevator",
-  "WiFi",
-  "Air Conditioning",
-  "Generator",
-  "Water Supply",
-];
+// Helper function to format category labels
+const formatCategory = (category: string) => {
+  return category
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
 
 const priceRanges = [
   { value: "none", label: "No Min" },
@@ -92,6 +78,10 @@ export default function FilterSidebar({
   onClearFilters,
   isMobile = false,
   onClose,
+  apartmentTypes = [],
+  categories = [],
+  locations = [],
+  amenities = [],
 }: FilterSidebarProps) {
   const handleAmenityToggle = (amenity: string) => {
     const newAmenities = filters.amenities.includes(amenity)
@@ -156,8 +146,8 @@ export default function FilterSidebar({
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
               {apartmentTypes.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
-                  {type.label}
+                <SelectItem key={type} value={type}>
+                  {formatApartmentType(type)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -272,8 +262,11 @@ export default function FilterSidebar({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="any">Any</SelectItem>
-              <SelectItem value="furnished">Furnished</SelectItem>
-              <SelectItem value="unfurnished">Unfurnished</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {formatCategory(category)}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -284,22 +277,26 @@ export default function FilterSidebar({
             Amenities
           </Label>
           <div className="space-y-2 max-h-64 overflow-y-auto scrollbar-hide">
-            {popularAmenities.map((amenity) => (
-              <div key={amenity} className="flex items-center space-x-2">
-                <Checkbox
-                  id={amenity}
-                  checked={filters.amenities.includes(amenity)}
-                  onCheckedChange={() => handleAmenityToggle(amenity)}
-                  className="data-[state=checked]:bg-[#116114] data-[state=checked]:border-[#116114]"
-                />
-                <label
-                  htmlFor={amenity}
-                  className="text-sm text-gray-700 cursor-pointer"
-                >
-                  {amenity}
-                </label>
-              </div>
-            ))}
+            {amenities.length > 0 ? (
+              amenities.map((amenity) => (
+                <div key={amenity} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={amenity}
+                    checked={filters.amenities.includes(amenity)}
+                    onCheckedChange={() => handleAmenityToggle(amenity)}
+                    className="data-[state=checked]:bg-[#116114] data-[state=checked]:border-[#116114]"
+                  />
+                  <label
+                    htmlFor={amenity}
+                    className="text-sm text-gray-700 cursor-pointer"
+                  >
+                    {amenity}
+                  </label>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No amenities available</p>
+            )}
           </div>
         </div>
 

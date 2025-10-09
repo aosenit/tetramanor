@@ -152,28 +152,59 @@ export default function RentalListing() {
 
   let rentals: RentalListingItem[] = data?.data || [];
 
+  // Extract unique categories and apartment types from backend data
+  const uniqueCategories = Array.from(
+    new Set(rentals.flatMap((rental) => rental.categories || []))
+  ).filter(Boolean);
+
+  const uniqueApartmentTypes = Array.from(
+    new Set(rentals.flatMap((rental) => rental.apartmentType || []))
+  ).filter(Boolean);
+
+  // Extract unique amenities from backend data
+  const uniqueAmenities = Array.from(
+    new Set(rentals.flatMap((rental) => rental.amenities || []))
+  ).filter(Boolean);
+
+  // Extract unique locations from backend data
+  const uniqueLocations = Array.from(
+    new Set(
+      rentals.map((rental) => {
+        // Extract location from address (e.g., "Mende, Maryland." -> "Mende")
+        const addressParts = rental.address?.split(",") || [];
+        return addressParts[0]?.trim();
+      })
+    )
+  ).filter(Boolean);
+
   // Apply client-side filtering
   rentals = rentals.filter((rental) => {
+    // Filter by category (furnishing type)
+    if (filters.category && !rental.categories?.includes(filters.category)) {
+      return false;
+    }
+
     // Filter by apartment type
     if (
       filters.apartmentType &&
-      !rental.apartmentType.includes(filters.apartmentType)
+      !rental.apartmentType?.includes(filters.apartmentType)
     ) {
       return false;
     }
 
     // Filter by location
-    if (
-      filters.location &&
-      !rental.address.toLowerCase().includes(filters.location.toLowerCase())
-    ) {
-      return false;
+    if (filters.location) {
+      const addressParts = rental.address?.split(",") || [];
+      const firstLocation = addressParts[0]?.trim().toLowerCase();
+      if (!firstLocation?.includes(filters.location.toLowerCase())) {
+        return false;
+      }
     }
 
     // Filter by amenities
     if (filters.amenities.length > 0) {
       const hasAllAmenities = filters.amenities.every((amenity) =>
-        rental.amenities.some((rentalAmenity) =>
+        rental.amenities?.some((rentalAmenity) =>
           rentalAmenity.toLowerCase().includes(amenity.toLowerCase())
         )
       );
@@ -349,13 +380,15 @@ export default function RentalListing() {
         {/* Quick Filters */}
         <QuickFilters
           activeType={filters.apartmentType}
-          activeFurnishing={filters.furnishing}
+          activeFurnishing={filters.category}
           onTypeChange={(type) =>
             setFilters({ ...filters, apartmentType: type })
           }
           onFurnishingChange={(furnishing) =>
-            setFilters({ ...filters, furnishing })
+            setFilters({ ...filters, category: furnishing })
           }
+          apartmentTypes={uniqueApartmentTypes}
+          categories={uniqueCategories}
         />
 
         {/* Main Content Area with Sidebar */}
@@ -367,6 +400,10 @@ export default function RentalListing() {
                 filters={filters}
                 onFilterChange={setFilters}
                 onClearFilters={clearAllFilters}
+                apartmentTypes={uniqueApartmentTypes}
+                categories={uniqueCategories}
+                locations={uniqueLocations}
+                amenities={uniqueAmenities}
               />
             </div>
           </div>
@@ -479,6 +516,10 @@ export default function RentalListing() {
                 onClearFilters={clearAllFilters}
                 isMobile
                 onClose={() => setShowMobileFilters(false)}
+                apartmentTypes={uniqueApartmentTypes}
+                categories={uniqueCategories}
+                locations={uniqueLocations}
+                amenities={uniqueAmenities}
               />
             </div>
           </div>

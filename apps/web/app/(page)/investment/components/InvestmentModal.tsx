@@ -28,7 +28,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import PhoneInput from "@/components/ui/PhoneInput";
+import PhoneInputV2 from "@/components/ui/PhoneInputV2";
 
 interface InvestmentFormData {
   fullName: string;
@@ -63,14 +63,14 @@ const InvestmentModal = ({ open, onOpenChange }: InvestmentModalProps) => {
 
   const onSubmit = async (data: InvestmentFormData) => {
     setIsSubmitting(true);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       console.log("Investment inquiry submitted:", data);
       setIsSubmitted(true);
-      
+
       // Reset form after successful submission
       setTimeout(() => {
         form.reset();
@@ -113,7 +113,8 @@ const InvestmentModal = ({ open, onOpenChange }: InvestmentModalProps) => {
               Thank You!
             </h3>
             <p className="text-gray-600">
-              Your investment inquiry has been submitted successfully. Our team will contact you within 24 hours.
+              Your investment inquiry has been submitted successfully. Our team
+              will contact you within 24 hours.
             </p>
           </motion.div>
         </DialogContent>
@@ -129,7 +130,8 @@ const InvestmentModal = ({ open, onOpenChange }: InvestmentModalProps) => {
             Start Your Investment Journey
           </DialogTitle>
           <DialogDescription className="text-center text-gray-600">
-            Fill in your details and let us help you find the perfect investment opportunity
+            Fill in your details and let us help you find the perfect investment
+            opportunity
           </DialogDescription>
         </DialogHeader>
 
@@ -179,18 +181,19 @@ const InvestmentModal = ({ open, onOpenChange }: InvestmentModalProps) => {
               <FormField
                 control={form.control}
                 name="phone"
-                rules={{ 
+                rules={{
                   required: "Phone number is required",
                   pattern: {
                     value: /^\+\d{7,15}$/,
-                    message: "Please enter a valid phone number with country code"
-                  }
+                    message:
+                      "Please enter a valid phone number with country code",
+                  },
                 }}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone Number *</FormLabel>
                     <FormControl>
-                      <PhoneInput
+                      <PhoneInputV2
                         value={field.value}
                         onChange={field.onChange}
                         placeholder="Enter your phone number"
@@ -210,19 +213,32 @@ const InvestmentModal = ({ open, onOpenChange }: InvestmentModalProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Investment Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select investment type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="residential">Residential Properties</SelectItem>
-                        <SelectItem value="commercial">Commercial Properties</SelectItem>
+                        <SelectItem value="residential">
+                          Residential Properties
+                        </SelectItem>
+                        <SelectItem value="commercial">
+                          Commercial Properties
+                        </SelectItem>
                         <SelectItem value="land">Land Development</SelectItem>
-                        <SelectItem value="rental">Rental Properties</SelectItem>
-                        <SelectItem value="luxury">Luxury Properties</SelectItem>
-                        <SelectItem value="mixed-use">Mixed-Use Development</SelectItem>
+                        <SelectItem value="rental">
+                          Rental Properties
+                        </SelectItem>
+                        <SelectItem value="luxury">
+                          Luxury Properties
+                        </SelectItem>
+                        <SelectItem value="mixed-use">
+                          Mixed-Use Development
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -237,19 +253,34 @@ const InvestmentModal = ({ open, onOpenChange }: InvestmentModalProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Budget Range</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select budget range" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="under-10m">Under ₦10 Million</SelectItem>
-                        <SelectItem value="10m-25m">₦10M - ₦25 Million</SelectItem>
-                        <SelectItem value="25m-50m">₦25M - ₦50 Million</SelectItem>
-                        <SelectItem value="50m-100m">₦50M - ₦100 Million</SelectItem>
-                        <SelectItem value="100m-250m">₦100M - ₦250 Million</SelectItem>
-                        <SelectItem value="over-250m">Over ₦250 Million</SelectItem>
+                        <SelectItem value="under-10m">
+                          Under ₦10 Million
+                        </SelectItem>
+                        <SelectItem value="10m-25m">
+                          ₦10M - ₦25 Million
+                        </SelectItem>
+                        <SelectItem value="25m-50m">
+                          ₦25M - ₦50 Million
+                        </SelectItem>
+                        <SelectItem value="50m-100m">
+                          ₦50M - ₦100 Million
+                        </SelectItem>
+                        <SelectItem value="100m-250m">
+                          ₦100M - ₦250 Million
+                        </SelectItem>
+                        <SelectItem value="over-250m">
+                          Over ₦250 Million
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -264,7 +295,10 @@ const InvestmentModal = ({ open, onOpenChange }: InvestmentModalProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Preferred Location</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select preferred location" />
@@ -273,7 +307,9 @@ const InvestmentModal = ({ open, onOpenChange }: InvestmentModalProps) => {
                       <SelectContent>
                         <SelectItem value="lagos">Lagos</SelectItem>
                         <SelectItem value="abuja">Abuja</SelectItem>
-                        <SelectItem value="port-harcourt">Port Harcourt</SelectItem>
+                        <SelectItem value="port-harcourt">
+                          Port Harcourt
+                        </SelectItem>
                         <SelectItem value="kano">Kano</SelectItem>
                         <SelectItem value="ibadan">Ibadan</SelectItem>
                         <SelectItem value="enugu">Enugu</SelectItem>

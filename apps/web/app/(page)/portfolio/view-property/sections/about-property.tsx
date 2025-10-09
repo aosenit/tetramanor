@@ -20,9 +20,7 @@ export default function AboutProperty({ property }: AboutPropertyProps) {
           <h1 className="text-3xl font-bold mb-4 text-[#0b0a0a]">
             About {property.name}
           </h1>
-          <p className="text-[#0c0c0c] mb-6">
-            {property.about}
-          </p>
+          <p className="text-[#0c0c0c] mb-6">{property.about}</p>
           {property.unitTypes?.length > 0 && (
             <>
               <p className="text-[#0c0c0c] mb-4">
@@ -32,7 +30,9 @@ export default function AboutProperty({ property }: AboutPropertyProps) {
                 {property.unitTypes.map((type, idx) => (
                   <li className="flex items-center" key={idx}>
                     <FaCheck className="h-5 w-5 text-[#116114] mr-2 flex-shrink-0" />
-                    <span>{type}</span>
+                    <span>
+                      {typeof type === "string" ? type : type?.name || ""}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -41,7 +41,11 @@ export default function AboutProperty({ property }: AboutPropertyProps) {
         </div>
         <div className="relative h-[400px] lg:h-auto rounded-lg overflow-hidden">
           <Image
-            src={property.images?.find(img => img.isPrimary)?.imageUrl || property.images?.[0]?.imageUrl || placeholder}
+            src={
+              property.images?.find((img) => img.isPrimary)?.imageUrl ||
+              property.images?.[0]?.imageUrl ||
+              placeholder
+            }
             alt={`${property.name} luxury residential building`}
             fill
             className="object-cover"
@@ -51,27 +55,35 @@ export default function AboutProperty({ property }: AboutPropertyProps) {
       <div className="mb-16">
         <h2 className="text-2xl font-bold mb-4 text-[#0b0a0a]">Key Features</h2>
         <p className="text-[#0c0c0c] mb-6">
-          {property.name} blends sophisticated aesthetics with superior craftsmanship, featuring:
+          {property.name} blends sophisticated aesthetics with superior
+          craftsmanship, featuring:
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {property.features?.map((feature, idx) => (
             <div className="flex items-start" key={idx}>
               <FaCheck className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-              <span>{feature}</span>
+              <span>
+                {typeof feature === "string" ? feature : feature?.name || ""}
+              </span>
             </div>
           ))}
         </div>
       </div>
       <div>
-        <h2 className="text-2xl font-bold mb-4 text-[#0b0a0a]">World-Class Amenities</h2>
+        <h2 className="text-2xl font-bold mb-4 text-[#0b0a0a]">
+          World-Class Amenities
+        </h2>
         <p className="text-[#0c0c0c] mb-6">
-          Residents of {property.name} enjoy exclusive access to state-of-the-art facilities, including
+          Residents of {property.name} enjoy exclusive access to
+          state-of-the-art facilities, including
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {property.amenities?.map((amenity, idx) => (
             <div className="flex items-start" key={idx}>
               <FaCheck className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
-              <span>{amenity}</span>
+              <span>
+                {typeof amenity === "string" ? amenity : amenity?.name || ""}
+              </span>
             </div>
           ))}
         </div>

@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import type { ContactData } from "@/types/contact";
-import PhoneInput from "@/components/ui/PhoneInput";
+import PhoneInputV2 from "@/components/ui/PhoneInputV2";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -177,7 +177,7 @@ function ContactForm() {
                     name="phone"
                     control={control}
                     render={({ field }) => (
-                      <PhoneInput
+                      <PhoneInputV2
                         value={field.value || ""}
                         onChange={field.onChange}
                         placeholder="Enter phone number"

@@ -13,7 +13,7 @@ import { RentalUnit } from "@/types/property";
 import { FaCheckCircle, FaSpinner } from "react-icons/fa";
 import { usePostData } from "@/hooks/useApi";
 import { useToast } from "@/components/ui/toast-notification";
-import PhoneInput from "@/components/ui/PhoneInput";
+import PhoneInputV2 from "@/components/ui/PhoneInputV2";
 
 // Validation schema
 const rentalRequestSchema = z.object({
@@ -239,7 +239,7 @@ export default function RentalInquiryModal({
                     name="phone"
                     control={control}
                     render={({ field }) => (
-                      <PhoneInput
+                      <PhoneInputV2
                         value={field.value || ""}
                         onChange={field.onChange}
                         placeholder="Enter phone number"
