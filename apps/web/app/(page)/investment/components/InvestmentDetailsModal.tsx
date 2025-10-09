@@ -98,32 +98,20 @@ export default function InvestmentDetailsModal({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gray-900">
-            Investment Inquiry - {investment.projectName || 'Investment Opportunity'}
+            Investment Inquiry -{" "}
+            {investment.projectName || "Investment Opportunity"}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Brief Investment Info */}
-          <div className="bg-green-50 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Investment Opportunity</h3>
-            <div className="text-sm text-gray-700">
-              <p><strong>Type:</strong> {investment.investmentType === 'FIXED_ROI' ? 'Fixed ROI' : 'Equity-Based'}</p>
-              <p><strong>Minimum Investment:</strong> {formatCurrency(investment.minAmount || 50000000)}</p>
-              <p><strong>Duration:</strong> {investment.duration || '12'} months</p>
-            </div>
-          </div>
-
           {/* Investor Details Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="bg-blue-50 rounded-lg p-4 mb-4">
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">Your Investment Details</h3>
-              <p className="text-sm text-blue-800">
-                Please provide your details below. Our investment team will contact you within 24-48 hours to discuss your investment goals and next steps.
-              </p>
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label htmlFor="fullName" className="text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="fullName"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Full Name *
                 </label>
                 <div className="relative">
@@ -142,7 +130,10 @@ export default function InvestmentDetailsModal({
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="email"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Email Address *
                 </label>
                 <div className="relative">
@@ -163,7 +154,10 @@ export default function InvestmentDetailsModal({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="phone"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Phone Number *
                 </label>
                 <div className="relative">
@@ -182,7 +176,10 @@ export default function InvestmentDetailsModal({
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="investmentAmount" className="text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="investmentAmount"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Investment Amount *
                 </label>
                 <div className="relative">
@@ -203,7 +200,10 @@ export default function InvestmentDetailsModal({
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="message" className="text-sm font-medium text-gray-700">
+              <label
+                htmlFor="message"
+                className="text-sm font-medium text-gray-700"
+              >
                 Additional Message
               </label>
               <textarea
@@ -219,12 +219,19 @@ export default function InvestmentDetailsModal({
 
             {/* Terms and Conditions */}
             <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-gray-900 mb-2">What happens next?</h4>
+              <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                What happens next?
+              </h4>
               <ul className="text-xs text-gray-700 space-y-1">
                 <li>• Our investment team will review your inquiry</li>
                 <li>• You'll receive a call within 24-48 hours</li>
-                <li>• We'll discuss your investment goals and risk tolerance</li>
-                <li>• Detailed project information and documentation will be shared</li>
+                <li>
+                  • We'll discuss your investment goals and risk tolerance
+                </li>
+                <li>
+                  • Detailed project information and documentation will be
+                  shared
+                </li>
                 <li>• Investment terms and next steps will be finalized</li>
               </ul>
             </div>
@@ -245,7 +252,7 @@ export default function InvestmentDetailsModal({
                 className="bg-green-700 hover:bg-green-800 text-white flex-1"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Submitting...' : 'Submit Investment Request'}
+                {isSubmitting ? "Submitting..." : "Submit Investment Request"}
               </Button>
             </div>
           </form>

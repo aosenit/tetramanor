@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
 import { Skeleton } from "@/components/ui/skeleton";
+import placeholder from "@/assets/placeholder.jpg";
 
 type FeaturedPropertyImage = {
   id: string;
@@ -68,7 +69,7 @@ export default function HomeFeaturedProperty() {
   const { data, isLoading, error, refetch } =
     useFetchData("/property/featured");
   const featured = (data as FeaturedPropertyResponse | undefined)?.data;
-  const imageUrl = featured?.images?.[0]?.imageUrl;
+  const imageUrl = featured?.images?.[0]?.imageUrl || placeholder.src;
   if (isLoading) {
     return (
       <section className="w-full container mx-auto px-4 lg:px-16 py-12">
@@ -116,20 +117,14 @@ export default function HomeFeaturedProperty() {
     <section className="w-full container mx-auto px-4 lg:px-16 py-12">
       <div className="flex flex-col lg:flex-row gap-12 items-start">
         <div className="relative w-full lg:w-[55%] h-[400px] sm:h-[500px] lg:h-[610px]">
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={featured.name}
-              className="rounded-xl object-cover"
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 55vw"
-              priority
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-200 rounded-xl flex items-center justify-center text-gray-500">
-              No image available
-            </div>
-          )}
+          <Image
+            src={imageUrl}
+            alt={featured.name}
+            className="rounded-xl object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 55vw"
+            priority
+          />
           <div className="absolute left-1/2 -translate-x-1/2 bottom-6 w-[95%] sm:w-[90%] bg-black/50 rounded-xl p-6 sm:p-8 flex flex-col gap-6 sm:gap-8 shadow-lg">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>

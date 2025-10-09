@@ -121,7 +121,7 @@ export default function PropertyDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-hide">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gray-900">
             {apartment.apartmentType} - Detailed Information
@@ -288,7 +288,7 @@ export default function PropertyDetailsModal({
                       {apartment.propertyUnit.numberOfUnits}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  {/* <div className="flex justify-between">
                     <span className="text-gray-600">Price Threshold:</span>
                     <span className="font-medium">
                       {formatCurrency(
@@ -296,7 +296,7 @@ export default function PropertyDetailsModal({
                         apartment.propertyUnit.currency as Currency
                       )}
                     </span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
