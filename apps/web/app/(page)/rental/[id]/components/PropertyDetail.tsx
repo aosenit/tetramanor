@@ -119,6 +119,7 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
     );
   };
 
+
   if (isLoading) {
     return <PropertyDetailSkeleton />;
   }
