@@ -37,7 +37,7 @@ function PropertyDetailSkeleton() {
 
         {/* Property Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
               <Skeleton className="h-48 w-full rounded-lg mb-4" />
               <div className="grid grid-cols-3 gap-2">
@@ -56,7 +56,7 @@ function PropertyDetailSkeleton() {
 
         {/* Apartments Grid */}
         <div className="space-y-6">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
@@ -334,7 +334,7 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
                   </p>
                 </div>
               ) : (
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {property.rental.map((apartment) => (
                     <ApartmentCard
                       key={apartment.id}

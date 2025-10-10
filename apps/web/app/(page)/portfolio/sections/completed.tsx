@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
-import PropertyCard from "../components/property-card";
+import PropertyCardNew from "../components/property-card-new";
 import { useFetchData } from "@/hooks/useApi";
-import type { PropertyItem } from "@/types/property";
+import type { Property } from "../types";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
@@ -23,7 +23,7 @@ function Completed() {
     sortOrder: "desc",
   });
 
-  const properties: PropertyItem[] = propertyResponse?.data?.items || [];
+  const properties: Property[] = propertyResponse?.data?.items || [];
 
   return (
     <section className="py-16 container mx-auto px-4 lg:px-16 bg-white">
@@ -55,38 +55,14 @@ function Completed() {
         </div>
       ) : (
         <>
-          <div className="grid gap-6">
-            {/* Top: First card spans full width */}
-            {properties[0] && (
-              <div className="w-full">
-                <PropertyCard
-                  key={properties[0].id}
-                  slug={properties[0].id}
-                  image={properties[0].images[0]?.imageUrl}
-                  title={properties[0].name}
-                  location={properties[0].address}
-                  constructionStatus={properties[0].constructionStatus}
-                  status={properties[0].status}
-                  className="h-full min-h-[400px]"
-                />
-              </div>
-            )}
-
-            {/* Bottom: Next two cards side by side */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {properties.slice(1, 3).map((property) => (
-                <PropertyCard
-                  key={property.id}
-                  slug={property.id}
-                  image={property.images[0]?.imageUrl}
-                  title={property.name}
-                  location={property.address}
-                  constructionStatus={property.constructionStatus}
-                  status={property.status}
-                  className="h-full min-h-[400px]"
-                />
-              ))}
-            </div>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            {properties.map((property) => (
+              <PropertyCardNew
+                key={property.id}
+                property={property}
+                className="w-full"
+              />
+            ))}
           </div>
 
           <div className="flex justify-center mt-8">

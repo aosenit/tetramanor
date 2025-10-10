@@ -2,9 +2,9 @@
 import React from "react";
 import { useSearchParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
-import PropertyCard from "../components/property-card";
+import PropertyCardNew from "../components/property-card-new";
 import { Button } from "@/components/ui/button";
-import type { PropertyItem } from "@/types/property";
+import type { Property } from "../types";
 
 export default function ViewMorePortfolio() {
   const searchParams = useSearchParams();
@@ -24,7 +24,7 @@ export default function ViewMorePortfolio() {
     sortOrder: "desc",
   });
 
-  const properties: PropertyItem[] = propertyResponse?.data?.items || [];
+  const properties: Property[] = propertyResponse?.data?.items || [];
 
   return (
     <section className="py-16 container mx-auto px-4 lg:px-16 bg-white">
@@ -33,11 +33,11 @@ export default function ViewMorePortfolio() {
       </h2>
 
       {isLoading ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="h-full min-h-[400px] bg-gray-200 rounded animate-pulse"
+              className="h-full min-h-[300px] bg-gray-200 rounded animate-pulse"
             />
           ))}
         </div>
@@ -55,20 +55,12 @@ export default function ViewMorePortfolio() {
           No {isOngoing ? "ongoing" : "completed"} projects found.
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {properties.map((property) => (
-            <PropertyCard
+            <PropertyCardNew
               key={property.id}
-              image={property.images[0]?.imageUrl}
-              title={property.name}
-              location={property.address}
-              status={
-                property.constructionStatus === "ONGOING"
-                  ? "Ongoing"
-                  : property.status
-              }
-              className="h-full min-h-[400px]"
-              slug={property.id}
+              property={property}
+              className="w-full"
             />
           ))}
         </div>
