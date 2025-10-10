@@ -18,6 +18,7 @@ interface ApartmentCardProps {
 }
 
 const ApartmentCard: React.FC<ApartmentCardProps> = ({ apartment }) => {
+  console.log(apartment);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [displayCurrency, setDisplayCurrency] = useState<Currency>("USD");
 

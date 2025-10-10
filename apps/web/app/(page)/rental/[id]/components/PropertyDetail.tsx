@@ -76,7 +76,6 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
   );
 
   const property: RentalPropertyDetail | null = data?.data || null;
-
   if (isLoading) {
     return <PropertyDetailSkeleton />;
   }

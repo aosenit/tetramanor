@@ -21,57 +21,9 @@ import PropertyInfoSection from "../PropertyInfoSection";
 import PropertyMediaSection from "../PropertyMediaSection";
 import UnitDescriptionSection from "./UnitDescriptionSectionNew";
 import WhyInvestSection from "../WhyInvestSection";
+import { propertySchema, unitSchema } from "@/lib/schema";
 
 // Validation schema
-export const unitSchema = z.object({
-	unitType: z.string().min(1, "unit type is required"),
-	numberOfUnits: z.number().min(0, "Number of units is required"),
-	price: z.number().min(0, "Number of units is required"),
-	priceThreshold: z
-		.number()
-		.min(0, "Payment threshold must be a positive number")
-		.optional(),
-	description: z.string().optional(),
-	currency: z.enum(["USD", "NGN", "EUR", "GBP"]),
-});
-
-export const propertySchema = z.object({
-	name: z.string().min(1, "Property name is required"),
-	address: z.string().min(1, "Address is required"),
-	about: z.string().min(1, "About property is required"),
-	//   unitAmount: z.number().min(1, "Number of units must be at least 1"),
-	unitTypes: z.array(z.string()).optional(),
-	units: z.array(unitSchema),
-	inquiryOptions: z
-		.array(z.string())
-		.min(1, "At least one inquiry option is required"),
-	whyInvest: z
-		.array(
-			z.object({
-				title: z.string().min(1, "Investment title is required"),
-				description: z.string().min(1, "Investment description is required"),
-			})
-		)
-		.optional(),
-	investmentAdvantages: z
-		.array(
-			z.object({
-				title: z.string().min(1, "Advantage title is required"),
-				description: z.string().min(1, "Advantage description is required"),
-			})
-		)
-		.optional(),
-	features: z.array(z.string()),
-	amenities: z.array(z.string()),
-	images: z.array(z.string()),
-	documentId: z.string().optional(),
-	constructionStatus: z.enum(["ONGOING", "COMPLETED", "PLANNED"]),
-	accountOfficerId: z.string().optional(),
-	paymentThreshold: z
-		.number()
-		.min(0, "Payment threshold must be a positive number")
-		.optional(),
-});
 
 type PropertyFormData = z.infer<typeof propertySchema>;
 type UnitsFormProp = z.infer<typeof unitSchema>;
@@ -93,31 +45,6 @@ interface UploadedDocument {
 	docType: string;
 }
 
-const defaultFormData: PropertyFormData = {
-	name: "",
-	address: "",
-	about: "",
-	// unitAmount: 1,
-	// unitTypes: [],
-	units: [],
-	inquiryOptions: ["INQUIRY_FORM"],
-	whyInvest: [],
-	investmentAdvantages: [],
-	features: [
-		"24/7 Security",
-		"Parking Space",
-		"Power Backup",
-		"Water Supply",
-		"Internet Connectivity",
-	],
-	amenities: ["Swimming Pool", "Gym", "Garden", "Playground", "Security Guard"],
-	images: [],
-	documentId: "",
-	constructionStatus: "ONGOING",
-	accountOfficerId: "",
-	paymentThreshold: 0,
-};
-
 const unitTypeOptions = [
 	"THREE_BEDROOM_APARTMENT",
 	"TWO_BEDROOM_APARTMENT",
@@ -138,6 +65,41 @@ export default function AddProperties() {
 	const searchParams = useSearchParams();
 	const propertyId = searchParams.get("id");
 	const isEditMode = !!propertyId;
+
+	const { data: specs } = useFetchData("/admin/property-specs");
+	const { features, amenities } = specs?.data || {};
+	console.log(specs);
+
+	const defaultFormData: PropertyFormData = {
+		name: "",
+		address: "",
+		about: "",
+		// unitAmount: 1,
+		// unitTypes: [],
+		units: [],
+		inquiryOptions: ["INQUIRY_FORM"],
+		whyInvest: [],
+		investmentAdvantages: [],
+		features: [
+			"24/7 Security",
+			"Parking Space",
+			"Power Backup",
+			"Water Supply",
+			"Internet Connectivity",
+		],
+		amenities: [
+			"Swimming Pool",
+			"Gym",
+			"Garden",
+			"Playground",
+			"Security Guard",
+		],
+		images: [],
+		documentId: "",
+		constructionStatus: "ONGOING",
+		accountOfficerId: "",
+		paymentThreshold: 0,
+	};
 
 	const [formData, setFormData] = useState<PropertyFormData>(defaultFormData);
 	const [errors, setErrors] = useState<Partial<PropertyFormData>>({});
@@ -210,7 +172,7 @@ export default function AddProperties() {
 	const { data: propertyData, isLoading: isLoadingProperty } = useFetchData(
 		propertyId ? `admin/properties/${propertyId}` : null
 	);
-
+	console.log(propertyData?.data);
 	// Fetch account officers
 	const { data: accountOfficersData, isLoading: isLoadingAccountOfficers } =
 		useFetchData("account-officers");
