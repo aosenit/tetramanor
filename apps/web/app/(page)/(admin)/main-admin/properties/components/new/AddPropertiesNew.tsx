@@ -131,17 +131,25 @@ export default function AddProperties() {
 
 	// console.log(initialFeatures);
 	useEffect(() => {
-		if (initialFeatures || initialAmenities)
+		if (!isEditMode && (initialFeatures || initialAmenities)) {
 			setSelectedFeatures(initialFeatures);
-		setSelectedAmenites(initialAmenities);
-	}, [features,amenities]);
+			setSelectedAmenites(initialAmenities);
+		}
+	}, [features, amenities, isEditMode]);
 
 	useEffect(() => {
-		setFormData((prev) => ({
-			...prev,
-			features: selectedFeatures,
-			amenities: selectedAmenities,
-		}));
+		const featureIds = selectedFeatures.map((f: any) =>
+			typeof f === "string" ? f : f.id
+		);
+		const amenityIds = selectedAmenities.map((a: any) =>
+			typeof a === "string" ? a : a.id
+		);
+
+		handleInputChange("features", featureIds);
+		handleInputChange("amenities", amenityIds);
+
+		console.log("Selected feature IDs:", featureIds);
+		console.log("Selected amenity IDs:", amenityIds);
 	}, [selectedFeatures, selectedAmenities]);
 
 	const handleAddUnitsForm = () => {
@@ -205,6 +213,7 @@ export default function AddProperties() {
 		);
 
 	// Load property data when editing
+	console.log(formData);
 	useEffect(() => {
 		if (propertyData && isEditMode) {
 			setFormData({
@@ -446,12 +455,11 @@ export default function AddProperties() {
 		// }
 
 		setIsSubmitting(true);
-
+		
 		// Filter out empty features and amenities
 		const cleanedFormData = {
 			...formData,
-			features: selectedFeatures,
-			amenities: selectedAmenities,
+
 			whyInvest: formData?.whyInvest?.filter(
 				(adv) => adv?.title?.trim() !== "" && adv?.description?.trim() !== ""
 			),
@@ -474,8 +482,9 @@ export default function AddProperties() {
 		payload.whyInvest = cleanedFormData.whyInvest;
 		payload.investmentAdvantages = cleanedFormData.investmentAdvantages;
 		payload.constructionStatus = cleanedFormData.constructionStatus;
-		payload.features = cleanedFormData.features;
-		payload.amenities = cleanedFormData.amenities;
+		payload.features = formData.features;
+		payload.amenities = formData.amenities;
+
 
 		// Images as array of strings of ids
 		if (uploadedImages.length > 0) {

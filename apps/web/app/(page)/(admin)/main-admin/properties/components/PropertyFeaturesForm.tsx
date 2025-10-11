@@ -56,12 +56,21 @@ export default function TagInputGroup({
 			>
 				{value?.map((tag: any) => (
 					<span
-						key={tag?.id|| tag}
+						key={tag?.id || tag}
 						className="flex items-center px-3 py-1 rounded-full border border-gray-300 text-sm bg-white uppercase"
 					>
-						{tag.id ?
-							<img src={tag.icon} alt={""} className="w-6 h-6" />
-						:	tag}
+						{tag.id &&
+							(tag.icon === "" ?
+								//  <img src={item.icon} alt={item.name} />
+								<p className="text-green-600 font-semibold">{`TM  ${tag.name}`}</p>
+							:	<div className="flex gap-2 items-center text-green-700">
+									<img
+										src={tag.icon}
+										alt={tag.name}
+										className="mr-2 h-7 w-7"
+									/>
+									<p>{tag.name}</p>
+								</div>)}
 
 						{!disabled && (
 							<button

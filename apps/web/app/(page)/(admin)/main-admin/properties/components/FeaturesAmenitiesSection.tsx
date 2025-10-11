@@ -4,7 +4,7 @@ import { useFetchData } from "@/hooks/useApi";
 
 type FeaturesAmenitiesSectionProps = {
 	formData: any;
-	handleInputChange: (field: string, value: any) => void;
+	handleInputChange?: (field: string, value: any) => void;
 	errors: any;
 	selectedFeatures: any[];
 	selectedAmenities: any[];
@@ -14,7 +14,6 @@ type FeaturesAmenitiesSectionProps = {
 
 export default function FeaturesAmenitiesSection({
 	formData,
-	handleInputChange,
 	errors,
 	selectedAmenities,
 	setSelectedFeatures,
