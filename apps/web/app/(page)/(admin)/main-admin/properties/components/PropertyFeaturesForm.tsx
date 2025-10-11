@@ -5,8 +5,8 @@ import React, { useState } from "react";
 interface TagInputGroupProps {
 	label: string;
 	placeholder?: string;
-	value: string[];
-	onChange: (tags: string[]) => void;
+	value: any[];
+	onChange: (tags: any[]) => void;
 	required?: boolean;
 	errorMessage?: string;
 	disabled?: boolean; // ✅ added
@@ -38,7 +38,7 @@ export default function TagInputGroup({
 		}
 	};
 
-	const removeTag = (tag: string) => {
+	const removeTag = (tag: any) => {
 		if (disabled) return;
 		onChange(value.filter((t) => t !== tag));
 	};
@@ -54,13 +54,15 @@ export default function TagInputGroup({
 					showError ? "border border-red-500" : ""
 				} ${disabled ? "opacity-70 cursor-not-allowed" : ""}`}
 			>
-				{value?.map((tag) => (
+				{value?.map((tag: any) => (
 					<span
-						key={tag}
+						key={tag?.id|| tag}
 						className="flex items-center px-3 py-1 rounded-full border border-gray-300 text-sm bg-white uppercase"
 					>
-						{/* {tag || <img src={tag} alt={""} />} */}
-						{tag}
+						{tag.id ?
+							<img src={tag.icon} alt={""} className="w-6 h-6" />
+						:	tag}
+
 						{!disabled && (
 							<button
 								type="button"
