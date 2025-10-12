@@ -41,7 +41,7 @@ export default function UnitDescriptionSection({
 	// Get the specific unit for this form
 	const currentUnit = formData.units?.[unitIndex] ?? {
 		numberOfUnits: 0,
-		price: 0,
+		unitPrice: 0,
 		currency: "NGN",
 		unitType: "",
 		description: "",
@@ -160,9 +160,9 @@ export default function UnitDescriptionSection({
 						<Input
 							required
 							type="number"
-							value={currentUnit.price || ""}
+							value={currentUnit.unitPrice || ""}
 							onChange={(e) =>
-								handleUnitFieldChange("price", Number(e.target.value) || 0)
+								handleUnitFieldChange("unitPrice", Number(e.target.value) || 0)
 							}
 							placeholder="Enter price"
 							className={`bg-[#E5E5E7] border !py-5 ${

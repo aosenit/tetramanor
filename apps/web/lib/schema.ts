@@ -3,7 +3,7 @@ import z from "zod";
 export const unitSchema = z.object({
     unitType: z.string().min(1, "unit type is required"),
     numberOfUnits: z.number().min(0, "Number of units is required"),
-    price: z.number().min(0, "Number of units is required"),
+    unitPrice: z.number().min(0, "Number of units is required"),
     priceThreshold: z
         .number()
         .min(0, "Payment threshold must be a positive number")

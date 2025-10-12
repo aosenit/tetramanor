@@ -1,8 +1,8 @@
 type Props = {
 	item: any;
-	array: any;
+	array?: any;
 };
-function IconDisplay({ item, array }: Props) {
+function IconDisplay({ item}: Props) {
 	// const display = item.id && array.find((obj) => obj.id === item.id);
 
 	// console.log(item);
