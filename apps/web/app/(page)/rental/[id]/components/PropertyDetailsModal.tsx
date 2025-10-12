@@ -279,7 +279,9 @@ export default function PropertyDetailsModal({
                   <div className="flex justify-between">
                     <span className="text-gray-600">Available Units:</span>
                     <span className="font-medium">
-                      {apartment.propertyUnit.availableUnits}
+                      {apartment.propertyUnit.availableUnits === 0
+                        ? "Unavailable"
+                        : apartment.propertyUnit.availableUnits}
                     </span>
                   </div>
                   <div className="flex justify-between">

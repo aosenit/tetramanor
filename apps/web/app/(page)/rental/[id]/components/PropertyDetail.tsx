@@ -218,7 +218,9 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
                     <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-lg">
                       <FaCheckCircle className="text-green-600" />
                       <span className="text-sm font-semibold text-gray-900">
-                        {availableUnits.length} Available
+                        {availableUnits.length === 0
+                          ? "Unavailable"
+                          : `${availableUnits.length} Available`}
                       </span>
                     </div>
                   </div>

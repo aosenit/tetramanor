@@ -190,7 +190,9 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Available Units:</span>
             <span className="font-semibold text-gray-900">
-              {apartment.numberOfUnits}
+              {apartment.numberOfUnits === 0
+                ? "Unavailable"
+                : apartment.numberOfUnits}
             </span>
           </div>
         </div>
