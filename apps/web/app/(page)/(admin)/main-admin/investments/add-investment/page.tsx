@@ -28,7 +28,7 @@ interface FormData {
   investmentType: string;
   estimatedROI: number;
   minAmount: number;
-  duration: string;
+  duration: number;
   status: string;
   currency: string;
   description: string;
@@ -45,7 +45,7 @@ const defaultFormData: FormData = {
   investmentType: "FIXED_ROI",
   estimatedROI: 0,
   minAmount: 0,
-  duration: "",
+  duration: 0,
   status: "DRAFT",
   currency: "NGN",
   description: "",
@@ -108,7 +108,7 @@ function AddInvestmentContent() {
         investmentType: investment.investmentType || "FIXED_ROI",
         estimatedROI: investment.estimatedROI || 0,
         minAmount: investment.minAmount || 0,
-        duration: investment.duration || "",
+        duration: investment.duration || 0,
         status: investment.status || "DRAFT",
         currency: investment.currency || "NGN",
         description: investment.description || "",
@@ -422,13 +422,21 @@ function AddInvestmentContent() {
 
           <div>
             <label className="block mb-1 text-sm text-[#323539] font-medium">
-              Duration *
+              Duration (Months) *
             </label>
             <Input
-              placeholder="e.g., 12 months"
+              type="number"
+              placeholder="e.g., 12"
               className="bg-[#E5E5E7] border-none"
-              value={formData.duration}
-              onChange={(e) => handleInputChange("duration", e.target.value)}
+              value={formData.duration || ""}
+              onChange={(e) => {
+                const value =
+                  e.target.value === "" ? 0 : parseInt(e.target.value);
+                if (!isNaN(value) && value >= 0) {
+                  handleInputChange("duration", value);
+                }
+              }}
+              min={0}
               required
             />
           </div>

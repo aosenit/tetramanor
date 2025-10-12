@@ -38,7 +38,7 @@ interface Investment {
   investmentType: "FIXED_ROI" | "EQUITY_SHARE";
   estimatedROI: number;
   minAmount: number;
-  duration: string;
+  duration: number;
   status: "PUBLISHED" | "UNPUBLISHED";
   currency: string;
   description: string;
@@ -240,12 +240,21 @@ function InvestmentsPageContent() {
   // Format currency
   const formatCurrency = (amount: number, currency: string) => {
     if (!amount) return "N/A";
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: currency || "NGN",
+
+    const currencySymbols: Record<string, string> = {
+      NGN: "₦",
+      USD: "$",
+      EUR: "€",
+      GBP: "£",
+    };
+
+    const symbol = currencySymbols[currency] || currency;
+    const formattedAmount = amount.toLocaleString("en-US", {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(amount);
+    });
+
+    return `${symbol}${formattedAmount}`;
   };
 
   // Refetch data when URL parameters change
@@ -462,7 +471,8 @@ function InvestmentsPageContent() {
                             )}
                           </TableCell>
                           <TableCell style={{ color: cellTextColor }}>
-                            {investment.duration}
+                            {investment.duration}{" "}
+                            {investment.duration === 1 ? "month" : "months"}
                           </TableCell>
                           <TableCell style={{ color: statusColor }}>
                             {getStatusDisplayName(investment.status)}
