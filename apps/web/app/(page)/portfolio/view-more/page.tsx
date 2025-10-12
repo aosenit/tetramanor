@@ -33,11 +33,11 @@ export default function ViewMorePortfolio() {
       </h2>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="h-full min-h-[300px] bg-gray-200 rounded animate-pulse"
+              className="h-64 bg-gray-200 rounded-lg animate-pulse"
             />
           ))}
         </div>
@@ -55,7 +55,7 @@ export default function ViewMorePortfolio() {
           No {isOngoing ? "ongoing" : "completed"} projects found.
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {properties.map((property) => (
             <PropertyCardNew
               key={property.id}

@@ -90,12 +90,12 @@ const RentalPropertyCard: React.FC<RentalPropertyCardProps> = ({
 
                   {rental.amenities.length > 0 && (
                     <div className="flex flex-wrap gap-2">
-                      {rental.amenities.slice(0, 4).map((amenity, index) => (
+                      {rental.amenities.slice(0, 4).map((amenity) => (
                         <span
-                          key={index}
+                          key={amenity.id}
                           className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
                         >
-                          {amenity}
+                          {amenity.name}
                         </span>
                       ))}
                       {rental.amenities.length > 4 && (
@@ -186,14 +186,21 @@ const RentalPropertyCard: React.FC<RentalPropertyCardProps> = ({
             {/* Amenities Preview */}
             {rental.amenities.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-3">
-                {rental.amenities.slice(0, 3).map((amenity, index) => (
-                  <span
-                    key={index}
-                    className="text-xs bg-gray-50 text-gray-700 px-2 py-1 rounded border border-gray-200"
-                  >
-                    {amenity}
-                  </span>
-                ))}
+                {rental.amenities.slice(0, 3).map((amenity, index) => {
+                  // Handle both string and object formats
+                  const isString = typeof amenity === "string";
+                  const amenityName = isString ? amenity : amenity.name;
+                  const amenityKey = isString ? `amenity-${index}` : amenity.id;
+
+                  return (
+                    <span
+                      key={amenityKey}
+                      className="text-xs bg-gray-50 text-gray-700 px-2 py-1 rounded border border-gray-200"
+                    >
+                      {amenityName}
+                    </span>
+                  );
+                })}
                 {rental.amenities.length > 3 && (
                   <span className="text-xs text-gray-500 px-2 py-1 font-medium">
                     +{rental.amenities.length - 3}

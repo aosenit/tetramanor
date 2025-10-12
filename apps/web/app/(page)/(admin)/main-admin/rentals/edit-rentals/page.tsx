@@ -713,7 +713,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Breadcrumb } from "../../customers/components/Breadcrumb";
 import { X } from "lucide-react";
-import { unitSchema } from "../../properties/components/new/AddPropertiesNew";
+import { unitSchema } from "@/lib/schema";
+
 
 // Validation schema
 const rentalSchema = z.object({
@@ -730,6 +731,9 @@ const rentalSchema = z.object({
 	availableUnits: z
 		.number()
 		.min(0, "Available units must be a non-negative number"),
+	numberOfUnits: z
+		.number()
+		.min(0, "number of units must be a non-negative number"),
 	currency: z.enum(["NGN", "USD", "EUR", "GBP"]),
 	unitCategory: z.enum([
 		"STANDARD_FURNISHED",
@@ -738,7 +742,7 @@ const rentalSchema = z.object({
 	]),
 });
 
-type RentalFormData = z.infer<typeof rentalSchema>;
+type RentalFormData = z.infer<typeof rentalSchema>; 
 type UnitsFormProp = z.infer<typeof unitSchema>;
 type UnitsFormProps = UnitsFormProp & {
 	id?: string;
@@ -783,6 +787,7 @@ export default function EditRental() {
 		status: "NOT_AVAILABLE",
 		images: [],
 		availableUnits: 0,
+		numberOfUnits:0,
 		currency: "NGN",
 		unitCategory: "UNFURNISHED",
 	});
@@ -804,7 +809,7 @@ export default function EditRental() {
 	const { data: propertiesResponse } = useFetchData(
 		"admin/properties?limit=100"
 	);
-
+	
 	// API mutations
 	const { mutateAsync: createRental, isPending: isCreating } =
 		useUploadData("rentals");
@@ -820,7 +825,7 @@ export default function EditRental() {
 
 	// Extract properties from response
 	const properties: Property[] = propertiesResponse?.data?.items || [];
-
+	
 	// Load rental data when editing
 	useEffect(() => {
 		if (rentalData && isEditMode) {
@@ -830,7 +835,7 @@ export default function EditRental() {
 				propertyId: rental?.propertyId || "",
 				apartmentType: rental?.apartmentType || "",
 				location: rental?.location || "",
-				rent: rental?.rent || 0,
+				rent: rental?.rentFee || 0,
 				frequency: rental?.frequency || "MONTHLY",
 				agencyFee: rental?.agencyFee || 0,
 				cautionFee: rental?.cautionFee || 0,
@@ -838,12 +843,15 @@ export default function EditRental() {
 				images: rental?.images || [],
 				isFurnished: rental?.isFurnished || false,
 				availableUnits: rental?.availableUnits || 0,
+				numberOfUnits: rental?.numberOfUnits || 0,
 				currency: rental?.currency || "NGN",
 				unitCategory: rental?.unitCategory || "UNFURNISHED",
+				
 			});
 
 			// Set selected property for edit mode
 			const property = properties.find((p) => p.id === rental?.propertyId);
+			console.log(rentalData.data)
 			if (property) {
 				setSelectedProperty(property);
 			}
@@ -866,8 +874,7 @@ export default function EditRental() {
 			const propertyFeatures = rental?.property?.features || [];
 			const propertyAmenities = rental?.property?.amenities || [];
 
-			console.log("Loading features:", propertyFeatures);
-			console.log("Loading amenities:", propertyAmenities);
+			
 
 			setFeatures(propertyFeatures);
 			setAmenities(propertyAmenities);
@@ -1003,6 +1010,7 @@ export default function EditRental() {
 				setIsSubmitting(false);
 				return;
 			}
+			
 
 			const numberOfUnitsOfType =
 				selectedProperty?.units?.filter(
@@ -1012,7 +1020,7 @@ export default function EditRental() {
 			const formDataToSubmit = new FormData();
 			// Add all form fields as strings
 
-			formDataToSubmit.append("propertyUnitId", selectedUnit.id|| "");
+			formDataToSubmit.append("propertyUnitId", selectedUnit.id || "");
 			formDataToSubmit.append("numberOfUnits", numberOfUnitsOfType.toString());
 			formDataToSubmit.append("propertyId", formData.propertyId);
 			formDataToSubmit.append("apartmentType", formData.apartmentType);
@@ -1030,10 +1038,9 @@ export default function EditRental() {
 			formDataToSubmit.append("unitCategory", formData.unitCategory); // ✅ keep only this one
 
 			// Add features and amenities
-			console.log("Submitting features:", features);
-			console.log("Submitting amenities:", amenities);
-			formDataToSubmit.append("features", JSON.stringify(features));
-			formDataToSubmit.append("amenities", JSON.stringify(amenities));
+			
+			// formDataToSubmit.append("features", JSON.stringify(features));
+			// formDataToSubmit.append("amenities", JSON.stringify(amenities));
 
 			// Handle images for edit vs create mode
 			console.log("Uploaded images:", uploadedImages);
@@ -1086,6 +1093,26 @@ export default function EditRental() {
 		}
 	};
 
+	// Convert properties to dropdown options
+	console.log(selectedProperty);
+	const propertyOptions = properties.map((property) => property.name);
+	const apartmentTypeOptions =
+		selectedProperty?.units?.map((unit) => unit.unitType) || [];
+
+	const frequencyOptions = ["Monthly", "Yearly", "Quarterly", "Semi-anually"];
+	const currencyOptions = ["NGN", "USD", "EUR", "GBP"];
+	const statusOptions = ["Available", "Not Available"];
+	const unitCategories = [
+		"STANDARD_FURNISHED",
+		"LUXURY_FURNISHED",
+		"UNFURNISHED",
+	];
+	useEffect(() => {
+		setFeatures(selectedProperty?.features);
+		setAmenities(selectedProperty?.amenities);
+	}, [selectedProperty]);
+	console.log("Apartment type options:", apartmentTypeOptions);
+
 	// Loading state for edit mode
 	if (isEditMode && isLoadingRental) {
 		return (
@@ -1097,20 +1124,6 @@ export default function EditRental() {
 			</div>
 		);
 	}
-
-	// Convert properties to dropdown options
-	const propertyOptions = properties.map((property) => property.name);
-	const apartmentTypeOptions =
-		selectedProperty?.units?.map((unit) => unit.unitType) || [];
-	const frequencyOptions = ["Monthly", "Yearly", "Quarterly", "Semi-anually"];
-	const currencyOptions = ["NGN", "USD", "EUR", "GBP"];
-	const statusOptions = ["Available", "Not Available"];
-	const unitCategories = [
-		"STANDARD_FURNISHED",
-		"LUXURY_FURNISHED",
-		"UNFURNISHED",
-	];
-	console.log("Apartment type options:", apartmentTypeOptions);
 
 	return (
 		<div className="">
@@ -1185,7 +1198,7 @@ export default function EditRental() {
 						Available units
 					</label>
 					<Input
-						value={formData.availableUnits}
+						value={formData.numberOfUnits}
 						type="number"
 						onChange={(e) =>
 							handleInputChange(
@@ -1450,11 +1463,13 @@ export default function EditRental() {
 					value={features}
 					onChange={setFeatures}
 					required
+					disabled
 				/>
 				<TagInputGroup
 					label="Amenities"
 					value={amenities}
 					onChange={setAmenities}
+					disabled
 					required
 				/>
 

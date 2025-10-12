@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FaCalendarAlt, FaSpinner } from "react-icons/fa";
+import { FaSpinner } from "react-icons/fa";
 import PhoneInputV2 from "@/components/ui/PhoneInputV2";
 
 // Validation schema
@@ -77,11 +77,27 @@ export default function ScheduleInspectionModal({
   };
 
   const getMinDate = (): string => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split("T")[0];
   };
 
   const onSubmit = async (data: InspectionFormData) => {
+    // Validate date is not in the past or today
+    const selectedDate = new Date(data.date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate <= today) {
+      showToast(
+        "Invalid Date",
+        "Please select a date starting from tomorrow.",
+        "error"
+      );
+      return;
+    }
+
     // Validate date is a weekday
     if (!isWeekday(data.date)) {
       showToast(
@@ -222,7 +238,7 @@ export default function ScheduleInspectionModal({
             <Label htmlFor="date" className="text-sm font-medium text-gray-700">
               Preferred Inspection Date <span className="text-red-500">*</span>
             </Label>
-            <div className="relative">
+            <div className="">
               <Input
                 id="date"
                 type="date"
@@ -230,13 +246,14 @@ export default function ScheduleInspectionModal({
                 min={getMinDate()}
                 className={errors.date ? "border-red-500" : ""}
               />
-              <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+              {/* <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" /> */}
             </div>
             {errors.date && (
               <p className="text-sm text-red-500">{errors.date.message}</p>
             )}
             <p className="text-sm text-gray-500">
-              Inspections available Monday through Saturday only
+              Inspections available Monday through Saturday only. Must be
+              scheduled at least 1 day in advance.
             </p>
             {blockedDates.length > 0 && (
               <p className="text-sm text-orange-600">

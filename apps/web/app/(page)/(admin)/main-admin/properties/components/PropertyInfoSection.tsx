@@ -58,7 +58,7 @@ export default function PropertyInfoSection({
               <div key={option.value} className="flex items-center space-x-2">
                 <Checkbox
                   id={option.value}
-                  checked={formData.inquiryOptions.includes(option.value)}
+                  checked={formData.inquiryOptions?.includes(option.value)}
                   onCheckedChange={(checked) =>
                     handleInquiryOptionChange(option.value, checked as boolean)
                   }

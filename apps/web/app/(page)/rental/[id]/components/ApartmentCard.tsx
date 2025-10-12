@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { RentalUnit } from "@/types/property";
-import { FaBed, FaCalendarAlt, FaMapMarkerAlt, FaCheckCircle } from "react-icons/fa";
+import { FaBed, FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import PropertyDetailsModal from "./PropertyDetailsModal";
 import RentalInquiryModal from "./RentalInquiryModal";
@@ -28,59 +28,8 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
   const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
-  const [displayCurrency, setDisplayCurrency] = useState<Currency>("USD");
+  const [displayCurrency, setDisplayCurrency] = useState<Currency>("NGN");
   const { convertCurrencySync } = useCurrencyConverter();
-
-  // Get the best available price and currency for each fee
-  const getBestPrice = (ngnAmount: number, usdAmount: number) => {
-    // If USD amount is available and greater than 0, use it
-    if (usdAmount > 0) {
-      return { amount: usdAmount, originalCurrency: "USD" as Currency };
-    }
-    // Otherwise use NGN amount
-    return { amount: ngnAmount, originalCurrency: "NGN" as Currency };
-  };
-
-  // Convert and format price for display
-  const formatPrice = (ngnAmount: number, usdAmount: number) => {
-    const { amount, originalCurrency } = getBestPrice(ngnAmount, usdAmount);
-
-    if (displayCurrency === originalCurrency) {
-      return formatCurrency(amount, originalCurrency);
-    }
-
-    const convertedAmount = convertCurrencySync(
-      amount,
-      originalCurrency,
-      displayCurrency
-    );
-    return formatCurrency(convertedAmount, displayCurrency);
-  };
-
-  // Check if price is converted
-  const isPriceConverted = (ngnAmount: number, usdAmount: number) => {
-    const { originalCurrency } = getBestPrice(ngnAmount, usdAmount);
-    return displayCurrency !== originalCurrency;
-  };
-
-  // Format category
-  const formatCategory = (category: string) => {
-    return category
-      .replace(/_/g, " ")
-      .toLowerCase()
-      .replace(/\b\w/g, (l) => l.toUpperCase());
-  };
-
-  // Get bedroom count from apartment type
-  const getBedroomCount = (apartmentType: string) => {
-    if (apartmentType.includes("1 bedroom")) return 1;
-    if (apartmentType.includes("2 bedroom")) return 2;
-    if (apartmentType.includes("3 bedroom")) return 3;
-    if (apartmentType.includes("4 bedroom")) return 4;
-    return 2; // default
-  };
-
-  const bedroomCount = getBedroomCount(apartment.apartmentType);
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -117,17 +66,8 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
         {/* Property Details */}
         <div className="flex flex-wrap gap-4 text-sm">
           <div className="flex items-center text-gray-600">
-            <FaBed className="mr-2 h-4 w-4 text-[#CD6115]" />
-            <span>{bedroomCount} Bedrooms</span>
-          </div>
-          <div className="flex items-center text-gray-600">
             <FaCalendarAlt className="mr-2 h-4 w-4 text-[#CD6115]" />
             <span>{apartment.frequency}</span>
-          </div>
-          <div className="flex items-center text-gray-600">
-            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-              {formatCategory(apartment.unitCategory)}
-            </span>
           </div>
         </div>
       </div>
@@ -146,65 +86,58 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
             <span className="text-sm text-gray-600">
               Rent Fee ({apartment.frequency.toLowerCase()}):
             </span>
-            <div className="flex items-center gap-1">
-              <span className="font-semibold text-gray-900">
-                {formatPrice(apartment.rentFee, apartment.dollarPrice.rentFee)}
-              </span>
-              {isPriceConverted(
-                apartment.rentFee,
-                apartment.dollarPrice.rentFee
-              ) && (
-                <span className="text-xs text-blue-600 bg-blue-100 px-1 py-0.5 rounded">
-                  ~
-                </span>
-              )}
-            </div>
+            <span className="font-semibold text-gray-900">
+              {displayCurrency === "NGN"
+                ? formatCurrency(apartment.rentFee, "NGN")
+                : formatCurrency(
+                    convertCurrencySync(
+                      apartment.rentFee,
+                      "NGN",
+                      displayCurrency
+                    ),
+                    displayCurrency
+                  )}
+            </span>
           </div>
 
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Agency Fee:</span>
-            <div className="flex items-center gap-1">
-              <span className="font-semibold text-gray-900">
-                {formatPrice(
-                  apartment.agencyFee,
-                  apartment.dollarPrice.agencyFee
-                )}
-              </span>
-              {isPriceConverted(
-                apartment.agencyFee,
-                apartment.dollarPrice.agencyFee
-              ) && (
-                <span className="text-xs text-blue-600 bg-blue-100 px-1 py-0.5 rounded">
-                  ~
-                </span>
-              )}
-            </div>
+            <span className="font-semibold text-gray-900">
+              {displayCurrency === "NGN"
+                ? formatCurrency(apartment.agencyFee, "NGN")
+                : formatCurrency(
+                    convertCurrencySync(
+                      apartment.agencyFee,
+                      "NGN",
+                      displayCurrency
+                    ),
+                    displayCurrency
+                  )}
+            </span>
           </div>
 
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Caution Fee:</span>
-            <div className="flex items-center gap-1">
-              <span className="font-semibold text-gray-900">
-                {formatPrice(
-                  apartment.cautionFee,
-                  apartment.dollarPrice.cautionFee
-                )}
-              </span>
-              {isPriceConverted(
-                apartment.cautionFee,
-                apartment.dollarPrice.cautionFee
-              ) && (
-                <span className="text-xs text-blue-600 bg-blue-100 px-1 py-0.5 rounded">
-                  ~
-                </span>
-              )}
-            </div>
+            <span className="font-semibold text-gray-900">
+              {displayCurrency === "NGN"
+                ? formatCurrency(apartment.cautionFee, "NGN")
+                : formatCurrency(
+                    convertCurrencySync(
+                      apartment.cautionFee,
+                      "NGN",
+                      displayCurrency
+                    ),
+                    displayCurrency
+                  )}
+            </span>
           </div>
 
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Available Units:</span>
+            <span className="text-sm text-gray-600">Number of Units:</span>
             <span className="font-semibold text-gray-900">
-              {apartment.numberOfUnits}
+              {apartment.numberOfUnits === 0
+                ? "Unavailable"
+                : apartment.numberOfUnits}
             </span>
           </div>
         </div>
@@ -216,14 +149,23 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
                   Features:
                 </h4>
                 <div className="flex flex-wrap gap-1">
-                  {apartment.features.slice(0, 3).map((feature, index) => (
-                    <span
-                      key={index}
-                      className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
-                    >
-                      {feature}
-                    </span>
-                  ))}
+                  {apartment.features.slice(0, 3).map((feature, index) => {
+                    // Handle both string and object formats
+                    const isString = typeof feature === "string";
+                    const featureName = isString ? feature : feature.name;
+                    const featureKey = isString
+                      ? `feature-${index}`
+                      : feature.id;
+
+                    return (
+                      <span
+                        key={featureKey}
+                        className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
+                      >
+                        {featureName}
+                      </span>
+                    );
+                  })}
                   {apartment.features.length > 3 && (
                     <span className="text-xs text-gray-500 px-2 py-1">
                       +{apartment.features.length - 3} more
@@ -239,14 +181,23 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
                   Amenities:
                 </h4>
                 <div className="flex flex-wrap gap-1">
-                  {apartment.amenities.slice(0, 3).map((amenity, index) => (
-                    <span
-                      key={index}
-                      className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full"
-                    >
-                      {amenity}
-                    </span>
-                  ))}
+                  {apartment.amenities.slice(0, 3).map((amenity, index) => {
+                    // Handle both string and object formats
+                    const isString = typeof amenity === "string";
+                    const amenityName = isString ? amenity : amenity.name;
+                    const amenityKey = isString
+                      ? `amenity-${index}`
+                      : amenity.id;
+
+                    return (
+                      <span
+                        key={amenityKey}
+                        className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full"
+                      >
+                        {amenityName}
+                      </span>
+                    );
+                  })}
                   {apartment.amenities.length > 3 && (
                     <span className="text-xs text-gray-500 px-2 py-1">
                       +{apartment.amenities.length - 3} more
@@ -309,6 +260,7 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
         propertyName={apartment.apartmentType}
+        rentalId={apartment.id}
       />
       <ScheduleInspectionModal
         isOpen={isInspectionModalOpen}

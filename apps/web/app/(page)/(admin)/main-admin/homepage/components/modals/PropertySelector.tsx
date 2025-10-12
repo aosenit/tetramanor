@@ -267,15 +267,17 @@ export default function PropertySelector({
                             name:
                               type === "property"
                                 ? property.name
-                                : property.property.name,
+                                : property.property?.name || property.name,
                             location:
                               type === "property"
                                 ? property.address
-                                : property.property.address,
+                                : property.property?.address ||
+                                  property.address,
                             rooms:
                               type === "property"
-                                ? property.unitTypes.join(", ") || "N/A"
-                                : property.property.unitTypes.join(", ") ||
+                                ? property.unitTypes?.join(", ") || "N/A"
+                                : property.property?.unitTypes?.join(", ") ||
+                                  property.unitTypes?.join(", ") ||
                                   "N/A",
                             status:
                               type === "property"
@@ -283,14 +285,18 @@ export default function PropertySelector({
                                 : property.status,
                             furnished:
                               type === "property"
-                                ? property.features.includes("FURNISHED")
-                                : property.property.features.includes(
+                                ? property.features?.includes("FURNISHED") ||
+                                  false
+                                : property.property?.features?.includes(
                                     "FURNISHED"
-                                  ),
+                                  ) ||
+                                  property.features?.includes("FURNISHED") ||
+                                  false,
                             image:
                               type === "property"
-                                ? property.images[0]?.imageUrl
-                                : property.property.images[0]?.imageUrl,
+                                ? property.images?.[0]?.imageUrl
+                                : property.property?.images?.[0]?.imageUrl ||
+                                  property.images?.[0]?.imageUrl,
                           }}
                           isSelected={
                             type === "property"

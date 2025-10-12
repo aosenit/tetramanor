@@ -16,10 +16,8 @@ const contactFormSchema = z.object({
   phone: z
     .string()
     .min(1, "Phone number is required")
-    .regex(
-      /^\+\d{7,15}$/,
-      "Please enter a valid phone number with country code"
-    ),
+    .min(7, "Phone number must be at least 7 digits")
+    .max(20, "Phone number is too long"),
   email: z.string().email("Please enter a valid email address"),
   message: z.string().min(10, "Message must be at least 10 characters"),
 });

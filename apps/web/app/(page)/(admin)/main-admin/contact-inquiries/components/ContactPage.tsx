@@ -68,7 +68,15 @@ export default function ContactPage() {
   // Update form data when API data is loaded
   useEffect(() => {
     if (data && data.success) {
-      setFormData(data.data);
+      setFormData({
+        ...data.data,
+        mapEmbedCode: data.data.mapEmbedCode || "",
+        officeAddress: data.data.officeAddress || "",
+        companyEmail: data.data.companyEmail || "",
+        phoneNumber: data.data.phoneNumber || "",
+        whatsappNumber: data.data.whatsappNumber || "",
+        socialMedia: data.data.socialMedia || [],
+      });
     }
   }, [data]);
 

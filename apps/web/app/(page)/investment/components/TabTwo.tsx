@@ -9,6 +9,7 @@ import b from "@/assets/investment/icons/b.webp";
 import c from "@/assets/investment/icons/c.webp";
 import d from "@/assets/investment/icons/d.webp";
 import four from "@/assets/investment/four.webp";
+import RoiCalculator from "./RoiCalculator";
 import InvestmentDetailsModal from "./InvestmentDetailsModal";
 
 const steps = [
@@ -35,10 +36,24 @@ const steps = [
   },
 ];
 
-function TabTwo({ investments }: { investments: any[] }) {
+interface Investment {
+  id: string;
+  projectName: string;
+  description: string;
+  estimatedROI: number;
+  minAmount: number;
+  currency: string;
+  duration: number;
+  status: string;
+  investmentType: string;
+  image?: Array<{ imageUrl: string; isPrimary?: boolean }>;
+}
+
+function TabTwo({ investments }: { investments: Investment[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [current, setCurrent] = useState(0);
-  const [selectedInvestment, setSelectedInvestment] = useState<any>(null);
+  const [selectedInvestment, setSelectedInvestment] =
+    useState<Investment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const scrollToIndex = (idx: number) => {
@@ -89,14 +104,16 @@ function TabTwo({ investments }: { investments: any[] }) {
     <div>
       <div className="space-y-12">
         <div className="relative">
-          <button
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
-            onClick={handlePrev}
-            disabled={current === 0}
-            aria-label="Previous"
-          >
-            <FaChevronLeft />
-          </button>
+          {investments.length > 1 && (
+            <button
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
+              onClick={handlePrev}
+              disabled={current === 0}
+              aria-label="Previous"
+            >
+              <FaChevronLeft />
+            </button>
+          )}
           <div
             className="flex overflow-x-auto gap-8 scrollbar-hide pb-2 overscroll-x-contain overflow-y-hidden"
             ref={scrollRef}
@@ -212,14 +229,16 @@ function TabTwo({ investments }: { investments: any[] }) {
               </div>
             ))}
           </div>
-          <button
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
-            onClick={handleNext}
-            disabled={current === investments.length - 1}
-            aria-label="Next"
-          >
-            <FaChevronRight />
-          </button>
+          {investments.length > 1 && (
+            <button
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
+              onClick={handleNext}
+              disabled={current === investments.length - 1}
+              aria-label="Next"
+            >
+              <FaChevronRight />
+            </button>
+          )}
         </div>
       </div>
       <div className="mt-10">
@@ -243,6 +262,9 @@ function TabTwo({ investments }: { investments: any[] }) {
             </div>
           ))}
         </div>
+      </div>
+      <div className="mt-16">
+        <RoiCalculator />
       </div>
 
       {/* Investment Details Modal */}

@@ -64,6 +64,9 @@ function AddInvestmentContent() {
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [imageName, setImageName] = useState("Featured Image");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [submitAction, setSubmitAction] = useState<"publish" | "draft" | null>(
+    null
+  );
 
   // Benefits state
   const [newBenefit, setNewBenefit] = useState("");
@@ -211,6 +214,7 @@ function AddInvestmentContent() {
 
   const handleSubmit = (e: React.FormEvent, action: "publish" | "draft") => {
     e.preventDefault();
+    setSubmitAction(action);
 
     const submitData = {
       ...formData,
@@ -240,12 +244,18 @@ function AddInvestmentContent() {
         onSuccess: () => {
           router.push("/main-admin/investments");
         },
+        onError: () => {
+          setSubmitAction(null);
+        },
       });
     } else {
       // For creating, use POST request with multipart form data
       createInvestment(formDataToSend, {
         onSuccess: () => {
           router.push("/main-admin/investments");
+        },
+        onError: () => {
+          setSubmitAction(null);
         },
       });
     }
@@ -574,7 +584,7 @@ function AddInvestmentContent() {
               onClick={(e) => handleSubmit(e, "draft")}
               disabled={isSubmitting}
             >
-              {isSubmitting ? (
+              {submitAction === "draft" && isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Saving...
@@ -591,10 +601,10 @@ function AddInvestmentContent() {
               className="bg-[#116114] hover:bg-[#116114] text-white text-sm px-8 py-2 rounded"
               disabled={isSubmitting}
             >
-              {isSubmitting ? (
+              {submitAction === "publish" && isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {isEditing ? "Updating..." : "Creating..."}
+                  {isEditing ? "Updating..." : "Publishing..."}
                 </>
               ) : (
                 <>

@@ -59,7 +59,7 @@ export default function AdvantagesOfInvestmentSection({
         </div>
         {/* List of advantages as cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {formData.investmentAdvantages.map((adv: any, idx: number) => (
+          {formData.investmentAdvantages?.map((adv: any, idx: number) => (
             <div
               key={idx}
               className="p-4 rounded-lg border bg-[#F8F9FA] cursor-pointer hover:shadow-md transition"

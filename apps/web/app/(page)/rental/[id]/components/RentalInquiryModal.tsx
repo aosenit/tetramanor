@@ -22,10 +22,8 @@ const rentalRequestSchema = z.object({
   phone: z
     .string()
     .min(1, "Phone number is required")
-    .regex(
-      /^\+\d{7,15}$/,
-      "Please enter a valid phone number with country code"
-    ),
+    .min(7, "Phone number must be at least 7 digits")
+    .max(20, "Phone number is too long"),
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
@@ -175,7 +173,9 @@ export default function RentalInquiryModal({
                 <div>
                   <span className="text-gray-600">Available Units:</span>
                   <p className="font-semibold text-gray-900">
-                    {apartment.numberOfUnits}
+                    {apartment.numberOfUnits === 0
+                      ? "Unavailable"
+                      : apartment.numberOfUnits}
                   </p>
                 </div>
               </div>

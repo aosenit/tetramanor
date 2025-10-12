@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -21,57 +21,9 @@ import PropertyInfoSection from "../PropertyInfoSection";
 import PropertyMediaSection from "../PropertyMediaSection";
 import UnitDescriptionSection from "./UnitDescriptionSectionNew";
 import WhyInvestSection from "../WhyInvestSection";
+import { propertySchema, unitSchema } from "@/lib/schema";
 
 // Validation schema
-export const unitSchema = z.object({
-	unitType: z.string().min(1, "unit type is required"),
-	numberOfUnits: z.number().min(0, "Number of units is required"),
-	price: z.number().min(0, "Number of units is required"),
-	priceThreshold: z
-		.number()
-		.min(0, "Payment threshold must be a positive number")
-		.optional(),
-	description: z.string().optional(),
-	currency: z.enum(["USD", "NGN", "EUR", "GBP"]),
-});
-
-export const propertySchema = z.object({
-	name: z.string().min(1, "Property name is required"),
-	address: z.string().min(1, "Address is required"),
-	about: z.string().min(1, "About property is required"),
-	//   unitAmount: z.number().min(1, "Number of units must be at least 1"),
-	unitTypes: z.array(z.string()).optional(),
-	units: z.array(unitSchema),
-	inquiryOptions: z
-		.array(z.string())
-		.min(1, "At least one inquiry option is required"),
-	whyInvest: z
-		.array(
-			z.object({
-				title: z.string().min(1, "Investment title is required"),
-				description: z.string().min(1, "Investment description is required"),
-			})
-		)
-		.optional(),
-	investmentAdvantages: z
-		.array(
-			z.object({
-				title: z.string().min(1, "Advantage title is required"),
-				description: z.string().min(1, "Advantage description is required"),
-			})
-		)
-		.optional(),
-	features: z.array(z.string()),
-	amenities: z.array(z.string()),
-	images: z.array(z.string()),
-	documentId: z.string().optional(),
-	constructionStatus: z.enum(["ONGOING", "COMPLETED", "PLANNED"]),
-	accountOfficerId: z.string().optional(),
-	paymentThreshold: z
-		.number()
-		.min(0, "Payment threshold must be a positive number")
-		.optional(),
-});
 
 type PropertyFormData = z.infer<typeof propertySchema>;
 type UnitsFormProp = z.infer<typeof unitSchema>;
@@ -93,31 +45,6 @@ interface UploadedDocument {
 	docType: string;
 }
 
-const defaultFormData: PropertyFormData = {
-	name: "",
-	address: "",
-	about: "",
-	// unitAmount: 1,
-	// unitTypes: [],
-	units: [],
-	inquiryOptions: ["INQUIRY_FORM"],
-	whyInvest: [],
-	investmentAdvantages: [],
-	features: [
-		"24/7 Security",
-		"Parking Space",
-		"Power Backup",
-		"Water Supply",
-		"Internet Connectivity",
-	],
-	amenities: ["Swimming Pool", "Gym", "Garden", "Playground", "Security Guard"],
-	images: [],
-	documentId: "",
-	constructionStatus: "ONGOING",
-	accountOfficerId: "",
-	paymentThreshold: 0,
-};
-
 const unitTypeOptions = [
 	"THREE_BEDROOM_APARTMENT",
 	"TWO_BEDROOM_APARTMENT",
@@ -138,6 +65,27 @@ export default function AddProperties() {
 	const searchParams = useSearchParams();
 	const propertyId = searchParams.get("id");
 	const isEditMode = !!propertyId;
+
+	const { data: specs } = useFetchData("/admin/property-specs");
+	const { features, amenities } = specs?.data || {};
+	console.log(specs);
+
+	const defaultFormData: PropertyFormData = {
+		name: "",
+		address: "",
+		about: "",
+		units: [],
+		inquiryOptions: ["INQUIRY_FORM"],
+		whyInvest: [],
+		investmentAdvantages: [],
+		features: [],
+		amenities: [],
+		images: [],
+		documentId: "",
+		constructionStatus: "ONGOING",
+		accountOfficerId: "",
+		paymentThreshold: 0,
+	};
 
 	const [formData, setFormData] = useState<PropertyFormData>(defaultFormData);
 	const [errors, setErrors] = useState<Partial<PropertyFormData>>({});
@@ -176,6 +124,34 @@ export default function AddProperties() {
 			currency: "USD",
 		},
 	]);
+	const initialFeatures = features?.filter((item: any) => item.icon !== "");
+	const initialAmenities = amenities?.filter((item: any) => item.icon !== "");
+	const [selectedFeatures, setSelectedFeatures] = useState([]);
+	const [selectedAmenities, setSelectedAmenites] = useState([]);
+
+	// console.log(initialFeatures);
+	useEffect(() => {
+		if (!isEditMode && (initialFeatures || initialAmenities)) {
+			setSelectedFeatures(initialFeatures);
+			setSelectedAmenites(initialAmenities);
+		}
+	}, [features, amenities, isEditMode]);
+
+	useEffect(() => {
+		const featureIds = selectedFeatures.map((f: any) =>
+			typeof f === "string" ? f : f.id
+		);
+		const amenityIds = selectedAmenities.map((a: any) =>
+			typeof a === "string" ? a : a.id
+		);
+
+		handleInputChange("features", featureIds);
+		handleInputChange("amenities", amenityIds);
+
+		console.log("Selected feature IDs:", featureIds);
+		console.log("Selected amenity IDs:", amenityIds);
+	}, [selectedFeatures, selectedAmenities]);
+
 	const handleAddUnitsForm = () => {
 		setUnitsForm((prev) => [
 			...prev,
@@ -210,7 +186,7 @@ export default function AddProperties() {
 	const { data: propertyData, isLoading: isLoadingProperty } = useFetchData(
 		propertyId ? `admin/properties/${propertyId}` : null
 	);
-
+	console.log(propertyData?.data);
 	// Fetch account officers
 	const { data: accountOfficersData, isLoading: isLoadingAccountOfficers } =
 		useFetchData("account-officers");
@@ -237,6 +213,7 @@ export default function AddProperties() {
 		);
 
 	// Load property data when editing
+	console.log(formData);
 	useEffect(() => {
 		if (propertyData && isEditMode) {
 			setFormData({
@@ -478,12 +455,11 @@ export default function AddProperties() {
 		// }
 
 		setIsSubmitting(true);
-
+		
 		// Filter out empty features and amenities
 		const cleanedFormData = {
 			...formData,
-			features: formData?.features?.filter((f) => f.trim() !== ""),
-			amenities: formData?.amenities?.filter((a) => a.trim() !== ""),
+
 			whyInvest: formData?.whyInvest?.filter(
 				(adv) => adv?.title?.trim() !== "" && adv?.description?.trim() !== ""
 			),
@@ -499,16 +475,16 @@ export default function AddProperties() {
 		payload.name = cleanedFormData.name;
 		payload.address = cleanedFormData.address;
 		payload.about = cleanedFormData.about;
-		// payload.unitAmount = cleanedFormData.unitAmount;
-		// payload.unitTypes = cleanedFormData.unitTypes;
+
 		payload.units = cleanedFormData.units;
 
 		payload.inquiryOptions = cleanedFormData.inquiryOptions;
 		payload.whyInvest = cleanedFormData.whyInvest;
 		payload.investmentAdvantages = cleanedFormData.investmentAdvantages;
 		payload.constructionStatus = cleanedFormData.constructionStatus;
-		payload.features = cleanedFormData.features;
-		payload.amenities = cleanedFormData.amenities;
+		payload.features = formData.features;
+		payload.amenities = formData.amenities;
+
 
 		// Images as array of strings of ids
 		if (uploadedImages.length > 0) {
@@ -558,21 +534,6 @@ export default function AddProperties() {
 		}
 	};
 
-	// Add handler to add custom unit type
-	// const handleAddCustomUnitType = () => {
-	// 	const trimmed = customUnitType.trim();
-	// 	if (trimmed && !formData.unitTypes.includes(trimmed)) {
-	// 		handleInputChange("unitTypes", [...formData.unitTypes, trimmed]);
-	// 		setCustomUnitType("");
-	// 	}
-	// };
-
-	// const handleRemoveUnitType = (type: string) => {
-	// 	handleInputChange(
-	// 		"unitTypes",
-	// 		formData.unitTypes.filter((t) => t !== type)
-	// 	);
-	// };
 	const handleAddCustomUnitType = () => {
 		const trimmed = customUnitType.trim();
 		if (!trimmed) return;
@@ -796,6 +757,10 @@ export default function AddProperties() {
 							formData={formData}
 							handleInputChange={handleInputChange}
 							errors={errors}
+							selectedFeatures={selectedFeatures}
+							selectedAmenities={selectedAmenities}
+							setSelectedFeatures={setSelectedFeatures}
+							setSelectedAmenities={setSelectedAmenites}
 						/>
 					</div>
 
