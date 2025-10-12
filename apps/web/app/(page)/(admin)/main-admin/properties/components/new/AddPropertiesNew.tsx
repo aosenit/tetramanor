@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -74,26 +74,12 @@ export default function AddProperties() {
 		name: "",
 		address: "",
 		about: "",
-		// unitAmount: 1,
-		// unitTypes: [],
 		units: [],
 		inquiryOptions: ["INQUIRY_FORM"],
 		whyInvest: [],
 		investmentAdvantages: [],
-		features: [
-			"24/7 Security",
-			"Parking Space",
-			"Power Backup",
-			"Water Supply",
-			"Internet Connectivity",
-		],
-		amenities: [
-			"Swimming Pool",
-			"Gym",
-			"Garden",
-			"Playground",
-			"Security Guard",
-		],
+		features: [],
+		amenities: [],
 		images: [],
 		documentId: "",
 		constructionStatus: "ONGOING",
@@ -138,6 +124,34 @@ export default function AddProperties() {
 			currency: "USD",
 		},
 	]);
+	const initialFeatures = features?.filter((item: any) => item.icon !== "");
+	const initialAmenities = amenities?.filter((item: any) => item.icon !== "");
+	const [selectedFeatures, setSelectedFeatures] = useState([]);
+	const [selectedAmenities, setSelectedAmenites] = useState([]);
+
+	// console.log(initialFeatures);
+	useEffect(() => {
+		if (!isEditMode && (initialFeatures || initialAmenities)) {
+			setSelectedFeatures(initialFeatures);
+			setSelectedAmenites(initialAmenities);
+		}
+	}, [features, amenities, isEditMode]);
+
+	useEffect(() => {
+		const featureIds = selectedFeatures.map((f: any) =>
+			typeof f === "string" ? f : f.id
+		);
+		const amenityIds = selectedAmenities.map((a: any) =>
+			typeof a === "string" ? a : a.id
+		);
+
+		handleInputChange("features", featureIds);
+		handleInputChange("amenities", amenityIds);
+
+		console.log("Selected feature IDs:", featureIds);
+		console.log("Selected amenity IDs:", amenityIds);
+	}, [selectedFeatures, selectedAmenities]);
+
 	const handleAddUnitsForm = () => {
 		setUnitsForm((prev) => [
 			...prev,
@@ -199,6 +213,7 @@ export default function AddProperties() {
 		);
 
 	// Load property data when editing
+	console.log(formData);
 	useEffect(() => {
 		if (propertyData && isEditMode) {
 			setFormData({
@@ -440,12 +455,11 @@ export default function AddProperties() {
 		// }
 
 		setIsSubmitting(true);
-
+		
 		// Filter out empty features and amenities
 		const cleanedFormData = {
 			...formData,
-			features: formData?.features?.filter((f) => f.trim() !== ""),
-			amenities: formData?.amenities?.filter((a) => a.trim() !== ""),
+
 			whyInvest: formData?.whyInvest?.filter(
 				(adv) => adv?.title?.trim() !== "" && adv?.description?.trim() !== ""
 			),
@@ -461,16 +475,16 @@ export default function AddProperties() {
 		payload.name = cleanedFormData.name;
 		payload.address = cleanedFormData.address;
 		payload.about = cleanedFormData.about;
-		// payload.unitAmount = cleanedFormData.unitAmount;
-		// payload.unitTypes = cleanedFormData.unitTypes;
+
 		payload.units = cleanedFormData.units;
 
 		payload.inquiryOptions = cleanedFormData.inquiryOptions;
 		payload.whyInvest = cleanedFormData.whyInvest;
 		payload.investmentAdvantages = cleanedFormData.investmentAdvantages;
 		payload.constructionStatus = cleanedFormData.constructionStatus;
-		payload.features = cleanedFormData.features;
-		payload.amenities = cleanedFormData.amenities;
+		payload.features = formData.features;
+		payload.amenities = formData.amenities;
+
 
 		// Images as array of strings of ids
 		if (uploadedImages.length > 0) {
@@ -520,21 +534,6 @@ export default function AddProperties() {
 		}
 	};
 
-	// Add handler to add custom unit type
-	// const handleAddCustomUnitType = () => {
-	// 	const trimmed = customUnitType.trim();
-	// 	if (trimmed && !formData.unitTypes.includes(trimmed)) {
-	// 		handleInputChange("unitTypes", [...formData.unitTypes, trimmed]);
-	// 		setCustomUnitType("");
-	// 	}
-	// };
-
-	// const handleRemoveUnitType = (type: string) => {
-	// 	handleInputChange(
-	// 		"unitTypes",
-	// 		formData.unitTypes.filter((t) => t !== type)
-	// 	);
-	// };
 	const handleAddCustomUnitType = () => {
 		const trimmed = customUnitType.trim();
 		if (!trimmed) return;
@@ -758,6 +757,10 @@ export default function AddProperties() {
 							formData={formData}
 							handleInputChange={handleInputChange}
 							errors={errors}
+							selectedFeatures={selectedFeatures}
+							selectedAmenities={selectedAmenities}
+							setSelectedFeatures={setSelectedFeatures}
+							setSelectedAmenities={setSelectedAmenites}
 						/>
 					</div>
 
