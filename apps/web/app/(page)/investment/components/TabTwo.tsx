@@ -9,6 +9,7 @@ import b from "@/assets/investment/icons/b.webp";
 import c from "@/assets/investment/icons/c.webp";
 import d from "@/assets/investment/icons/d.webp";
 import four from "@/assets/investment/four.webp";
+import RoiCalculator from "./RoiCalculator";
 import InvestmentDetailsModal from "./InvestmentDetailsModal";
 
 const steps = [
@@ -35,10 +36,24 @@ const steps = [
   },
 ];
 
-function TabTwo({ investments }: { investments: any[] }) {
+interface Investment {
+  id: string;
+  projectName: string;
+  description: string;
+  estimatedROI: number;
+  minAmount: number;
+  currency: string;
+  duration: number;
+  status: string;
+  investmentType: string;
+  image?: Array<{ imageUrl: string; isPrimary?: boolean }>;
+}
+
+function TabTwo({ investments }: { investments: Investment[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [current, setCurrent] = useState(0);
-  const [selectedInvestment, setSelectedInvestment] = useState<any>(null);
+  const [selectedInvestment, setSelectedInvestment] =
+    useState<Investment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const scrollToIndex = (idx: number) => {
@@ -247,6 +262,9 @@ function TabTwo({ investments }: { investments: any[] }) {
             </div>
           ))}
         </div>
+      </div>
+      <div className="mt-16">
+        <RoiCalculator />
       </div>
 
       {/* Investment Details Modal */}

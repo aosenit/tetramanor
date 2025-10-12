@@ -1,11 +1,17 @@
 "use client";
-import { useState } from "react";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
-function Pagination() {
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const totalPages = 25;
+interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
 
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: PaginationProps) {
   const getPages = () => {
     const pages = [];
 
@@ -37,19 +43,23 @@ function Pagination() {
 
   const handlePageChange = (page: number | string) => {
     if (typeof page === "number") {
-      setCurrentPage(page);
+      onPageChange(page);
+      // Scroll to top when page changes
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      onPageChange(currentPage - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      onPageChange(currentPage + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 

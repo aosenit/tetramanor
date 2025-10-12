@@ -9,12 +9,18 @@ import ContactAgentSidebar from "./ContactAgentSidebar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/toast-notification";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { shareProperty } from "@/lib/shareUtils";
 import {
   FaMapMarkerAlt,
   FaArrowLeft,
   FaCheckCircle,
-  FaBuilding,
   FaShareAlt,
 } from "react-icons/fa";
 import Link from "next/link";
@@ -85,6 +91,7 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
   );
   const { showToast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const [selectedFrequency, setSelectedFrequency] = useState<string>("ALL");
 
   const property: RentalPropertyDetail | null = data?.data || null;
 
@@ -192,39 +199,29 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
     new Map(allFeatures.map((item) => [item.id, item])).values()
   );
 
-  // Get all unique unit categories
-  const uniqueCategories = Array.from(
-    new Set(property.rental.map((unit) => unit.unitCategory).filter(Boolean))
-  );
+  // Define all possible filter categories (including ones not in current data)
+  const allPossibleCategories = [
+    "STANDARD_FURNISHED",
+    "LUXURY_FURNISHED",
+    "UNFURNISHED",
+  ];
 
-  // Filter rentals by selected category
-  const filteredRentals =
-    selectedCategory === "ALL"
-      ? property.rental
-      : property.rental.filter(
-          (unit) => unit.unitCategory === selectedCategory
-        );
+  // Define all possible rental frequencies
+  const allPossibleFrequencies = [
+    "MONTHLY",
+    "QUARTERLY",
+    "SEMI-ANNUALLY",
+    "ANNUALLY",
+  ];
 
-  // Calculate total units and available units from propertyUnit
-  // Get unique property units to avoid counting the same unit multiple times
-  const uniquePropertyUnits = Array.from(
-    new Map(
-      property.rental.map((rental) => [
-        rental.propertyUnit.id,
-        rental.propertyUnit,
-      ])
-    ).values()
-  );
-
-  const totalUnits = uniquePropertyUnits.reduce(
-    (sum, unit) => sum + (unit.numberOfUnits || 0),
-    0
-  );
-
-  const totalAvailableUnits = uniquePropertyUnits.reduce(
-    (sum, unit) => sum + (unit.availableUnits || 0),
-    0
-  );
+  // Filter rentals by selected category and frequency
+  const filteredRentals = property.rental.filter((unit) => {
+    const categoryMatch =
+      selectedCategory === "ALL" || unit.unitCategory === selectedCategory;
+    const frequencyMatch =
+      selectedFrequency === "ALL" || unit.frequency === selectedFrequency;
+    return categoryMatch && frequencyMatch;
+  });
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] pt-20">
@@ -268,33 +265,6 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
                   <FaMapMarkerAlt className="mr-2 h-5 w-5 text-[#CD6115]" />
                   <span className="text-lg">{property.address}</span>
                 </div>
-
-                {/* Property Stats - Only show if there are rental units */}
-                {property.rental.length > 0 && (
-                  <div className="flex flex-wrap gap-4 mt-4">
-                    <div className="flex items-center gap-2 px-4 py-2 bg-[#E8F5E8] rounded-lg">
-                      <FaBuilding className="text-[#116114]" />
-                      <span className="text-sm font-semibold text-gray-900">
-                        {property.rental.length} Unit{" "}
-                        {property.rental.length !== 1 ? "Types" : "Type"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg">
-                      <FaBuilding className="text-blue-600" />
-                      <span className="text-sm font-semibold text-gray-900">
-                        {totalUnits} Total Unit{totalUnits !== 1 ? "s" : ""}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-lg">
-                      <FaCheckCircle className="text-green-600" />
-                      <span className="text-sm font-semibold text-gray-900">
-                        {totalAvailableUnits === 0
-                          ? "Unavailable"
-                          : `${totalAvailableUnits} Available`}
-                      </span>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -404,55 +374,139 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
                 </h2>
               </div>
 
-              {/* Category Filters */}
-              {uniqueCategories.length > 0 && (
-                <div className="mb-6">
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => setSelectedCategory("ALL")}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        selectedCategory === "ALL"
-                          ? "bg-[#116114] text-white shadow-md"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
+              {/* Compact Filter Section */}
+              <div className="mb-6 bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  {/* <div className="flex items-center gap-2 text-gray-700 flex-shrink-0">
+                    <svg
+                      className="w-5 h-5 text-[#116114]"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
                     >
-                      All
-                    </button>
-                    {uniqueCategories.map((category) => {
-                      return (
-                        <button
-                          key={category}
-                          onClick={() => setSelectedCategory(category)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                            selectedCategory === category
-                              ? "bg-[#116114] text-white shadow-md"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                          }`}
-                        >
-                          {category.replace(/_/g, " ")}
-                        </button>
-                      );
-                    })}
+                      <path
+                        fillRule="evenodd"
+                        d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="font-semibold text-sm">Filter Units:</span>
+                  </div> */}
+
+                  {/* Furnishing Type Dropdown */}
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-xs text-gray-600 mb-1 font-medium">
+                      Furnishing Type
+                    </label>
+                    <Select
+                      value={selectedCategory}
+                      onValueChange={setSelectedCategory}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select furnishing type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ALL">All</SelectItem>
+                        {allPossibleCategories.map((category) => {
+                          return (
+                            <SelectItem key={category} value={category}>
+                              {category.replace(/_/g, " ")}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
                   </div>
+
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-xs text-gray-600 mb-1 font-medium">
+                      Rental Frequency
+                    </label>
+                    <Select
+                      value={selectedFrequency}
+                      onValueChange={setSelectedFrequency}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select rental frequency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ALL">All</SelectItem>
+                        {allPossibleFrequencies.map((frequency) => {
+                          return (
+                            <SelectItem key={frequency} value={frequency}>
+                              {frequency.replace(/-/g, " ")}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Clear Filters Button */}
+                  {(selectedCategory !== "ALL" ||
+                    selectedFrequency !== "ALL") && (
+                    <div className="flex-shrink-0 sm:self-end">
+                      <button
+                        onClick={() => {
+                          setSelectedCategory("ALL");
+                          setSelectedFrequency("ALL");
+                        }}
+                        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 border border-gray-300 transition-colors"
+                        title="Clear all filters"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                        <span className="hidden sm:inline">Clear</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
 
               {filteredRentals.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-500">
-                    No rental units available{" "}
-                    {selectedCategory !== "ALL" &&
-                      `in the ${selectedCategory.replace(/_/g, " ").toLowerCase()} category`}
-                    .
-                  </p>
-                  {selectedCategory !== "ALL" && (
-                    <button
-                      onClick={() => setSelectedCategory("ALL")}
-                      className="mt-4 text-[#116114] hover:underline font-medium"
-                    >
-                      View all units
-                    </button>
-                  )}
+                  <div className=" max-w-md mx-auto">
+                    <p className="text-gray-600 mb-2">
+                      {selectedCategory === "ALL" && selectedFrequency === "ALL"
+                        ? "No rental units are currently available for this property."
+                        : `No units available with the selected filters.`}
+                    </p>
+                    {(selectedCategory !== "ALL" ||
+                      selectedFrequency !== "ALL") && (
+                      <>
+                        <p className="text-sm text-gray-500 mb-4">
+                          Try selecting different filters or view all available
+                          units.
+                        </p>
+                        <button
+                          onClick={() => {
+                            setSelectedCategory("ALL");
+                            setSelectedFrequency("ALL");
+                          }}
+                          className="bg-[#116114] text-white px-4 py-2 rounded-lg hover:bg-[#0d4d10] transition-colors"
+                        >
+                          View All
+                        </button>
+                      </>
+                    )}
+                    {selectedCategory === "ALL" &&
+                      selectedFrequency === "ALL" && (
+                        <p className="text-sm text-gray-500">
+                          Please check back later or contact us for more
+                          information.
+                        </p>
+                      )}
+                  </div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

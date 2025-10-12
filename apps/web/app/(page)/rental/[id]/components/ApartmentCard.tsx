@@ -28,50 +28,8 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
   const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
-  const [displayCurrency, setDisplayCurrency] = useState<Currency>("USD");
+  const [displayCurrency, setDisplayCurrency] = useState<Currency>("NGN");
   const { convertCurrencySync } = useCurrencyConverter();
-
-  // Get the best available price and currency for each fee
-  const getBestPrice = (ngnAmount: number, usdAmount: number) => {
-    // If USD amount is available and greater than 0, use it
-    if (usdAmount > 0) {
-      return { amount: usdAmount, originalCurrency: "USD" as Currency };
-    }
-    // Otherwise use NGN amount
-    return { amount: ngnAmount, originalCurrency: "NGN" as Currency };
-  };
-
-  // Convert and format price for display
-  const formatPrice = (ngnAmount: number, usdAmount: number) => {
-    const { amount, originalCurrency } = getBestPrice(ngnAmount, usdAmount);
-
-    if (displayCurrency === originalCurrency) {
-      return formatCurrency(amount, originalCurrency);
-    }
-
-    const convertedAmount = convertCurrencySync(
-      amount,
-      originalCurrency,
-      displayCurrency
-    );
-    return formatCurrency(convertedAmount, displayCurrency);
-  };
-
-  // Check if price is converted
-  const isPriceConverted = (ngnAmount: number, usdAmount: number) => {
-    const { originalCurrency } = getBestPrice(ngnAmount, usdAmount);
-    return displayCurrency !== originalCurrency;
-  };
-  // Get bedroom count from apartment type
-  const getBedroomCount = (apartmentType: string) => {
-    if (apartmentType.includes("1 bedroom")) return 1;
-    if (apartmentType.includes("2 bedroom")) return 2;
-    if (apartmentType.includes("3 bedroom")) return 3;
-    if (apartmentType.includes("4 bedroom")) return 4;
-    return 2; // default
-  };
-
-  const bedroomCount = getBedroomCount(apartment.apartmentType);
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -108,10 +66,6 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
         {/* Property Details */}
         <div className="flex flex-wrap gap-4 text-sm">
           <div className="flex items-center text-gray-600">
-            <FaBed className="mr-2 h-4 w-4 text-[#CD6115]" />
-            <span>{bedroomCount} Bedrooms</span>
-          </div>
-          <div className="flex items-center text-gray-600">
             <FaCalendarAlt className="mr-2 h-4 w-4 text-[#CD6115]" />
             <span>{apartment.frequency}</span>
           </div>
@@ -132,63 +86,54 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
             <span className="text-sm text-gray-600">
               Rent Fee ({apartment.frequency.toLowerCase()}):
             </span>
-            <div className="flex items-center gap-1">
-              <span className="font-semibold text-gray-900">
-                {formatPrice(apartment.rentFee, apartment.dollarPrice.rentFee)}
-              </span>
-              {isPriceConverted(
-                apartment.rentFee,
-                apartment.dollarPrice.rentFee
-              ) && (
-                <span className="text-xs text-blue-600 bg-blue-100 px-1 py-0.5 rounded">
-                  ~
-                </span>
-              )}
-            </div>
+            <span className="font-semibold text-gray-900">
+              {displayCurrency === "NGN"
+                ? formatCurrency(apartment.rentFee, "NGN")
+                : formatCurrency(
+                    convertCurrencySync(
+                      apartment.rentFee,
+                      "NGN",
+                      displayCurrency
+                    ),
+                    displayCurrency
+                  )}
+            </span>
           </div>
 
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Agency Fee:</span>
-            <div className="flex items-center gap-1">
-              <span className="font-semibold text-gray-900">
-                {formatPrice(
-                  apartment.agencyFee,
-                  apartment.dollarPrice.agencyFee
-                )}
-              </span>
-              {isPriceConverted(
-                apartment.agencyFee,
-                apartment.dollarPrice.agencyFee
-              ) && (
-                <span className="text-xs text-blue-600 bg-blue-100 px-1 py-0.5 rounded">
-                  ~
-                </span>
-              )}
-            </div>
+            <span className="font-semibold text-gray-900">
+              {displayCurrency === "NGN"
+                ? formatCurrency(apartment.agencyFee, "NGN")
+                : formatCurrency(
+                    convertCurrencySync(
+                      apartment.agencyFee,
+                      "NGN",
+                      displayCurrency
+                    ),
+                    displayCurrency
+                  )}
+            </span>
           </div>
 
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Caution Fee:</span>
-            <div className="flex items-center gap-1">
-              <span className="font-semibold text-gray-900">
-                {formatPrice(
-                  apartment.cautionFee,
-                  apartment.dollarPrice.cautionFee
-                )}
-              </span>
-              {isPriceConverted(
-                apartment.cautionFee,
-                apartment.dollarPrice.cautionFee
-              ) && (
-                <span className="text-xs text-blue-600 bg-blue-100 px-1 py-0.5 rounded">
-                  ~
-                </span>
-              )}
-            </div>
+            <span className="font-semibold text-gray-900">
+              {displayCurrency === "NGN"
+                ? formatCurrency(apartment.cautionFee, "NGN")
+                : formatCurrency(
+                    convertCurrencySync(
+                      apartment.cautionFee,
+                      "NGN",
+                      displayCurrency
+                    ),
+                    displayCurrency
+                  )}
+            </span>
           </div>
 
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Available Units:</span>
+            <span className="text-sm text-gray-600">Number of Units:</span>
             <span className="font-semibold text-gray-900">
               {apartment.numberOfUnits === 0
                 ? "Unavailable"

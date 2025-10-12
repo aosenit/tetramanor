@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { IoIosBriefcase } from "react-icons/io";
 import { FaTag, FaNewspaper } from "react-icons/fa";
@@ -10,34 +10,40 @@ import { useFetchData } from "@/hooks/useApi";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
-const BlogSkeleton = () => (
-  <div className="space-y-10">
-    {[1, 2, 3, 4].map((i) => (
-      <div key={i} className="h-full overflow-y-auto rounded-md animate-pulse">
-        <div className="w-full h-60 bg-gray-200 rounded" />
-        <div className="space-y-4 p-4 bg-[#f1f4f1]">
-          <div className="h-6 w-1/2 bg-gray-200 rounded" />
-          <div className="h-4 w-full bg-gray-200 rounded" />
-          <div className="h-4 w-2/3 bg-gray-200 rounded" />
-          <div className="flex justify-between items-center mt-4">
-            <div className="h-8 w-32 bg-gray-200 rounded" />
-            <div className="flex gap-6">
-              <div className="h-4 w-16 bg-gray-200 rounded" />
-              <div className="h-4 w-16 bg-gray-200 rounded" />
-            </div>
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
+const POSTS_PER_PAGE = 4;
+
+interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  image: string;
+  date: string;
+  tag: string;
+}
+
+interface ApiBlogPost {
+  id: string;
+  title: string;
+  content: string;
+  coverImage?: {
+    imageUrl: string;
+  };
+  images?: Array<{
+    imageUrl: string;
+  }>;
+  createdAt: string;
+  tag?: string;
+}
 
 const Blogs: React.FC = () => {
   const { data, isLoading, error, refetch } = useFetchData("blogs");
-  let blogPosts = [];
+  const [currentPage, setCurrentPage] = useState(1);
+
+  let blogPosts: BlogPost[] = [];
 
   if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
-    blogPosts = data.data.map((post: any) => ({
+    blogPosts = data.data.map((post: ApiBlogPost) => ({
       id: post.id,
       slug: post.id,
       title: post.title,
@@ -52,6 +58,12 @@ const Blogs: React.FC = () => {
       tag: post.tag || "Blog",
     }));
   }
+
+  // Calculate pagination
+  const totalPages = Math.ceil(blogPosts.length / POSTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+  const endIndex = startIndex + POSTS_PER_PAGE;
+  const currentPosts = blogPosts.slice(startIndex, endIndex);
 
   if (isLoading) {
     return (
@@ -81,8 +93,8 @@ const Blogs: React.FC = () => {
           Failed to Load Blog Posts
         </h3>
         <p className="text-gray-600 text-center max-w-md mb-6">
-          We couldn't load the blog posts right now. Please check your internet
-          connection and try again.
+          We couldn&apos;t load the blog posts right now. Please check your
+          internet connection and try again.
         </p>
         <Button
           onClick={() => refetch()}
@@ -105,9 +117,9 @@ const Blogs: React.FC = () => {
           No Blog Posts Available
         </h3>
         <p className="text-gray-600 text-center max-w-md mb-6">
-          We don't have any blog posts published at the moment. Check back soon
-          for insights, updates, and articles about real estate and property
-          investment.
+          We don&apos;t have any blog posts published at the moment. Check back
+          soon for insights, updates, and articles about real estate and
+          property investment.
         </p>
         <Button
           onClick={() => window.location.reload()}
@@ -121,7 +133,7 @@ const Blogs: React.FC = () => {
   return (
     <div>
       <div className="space-y-10">
-        {blogPosts.map((post: any) => (
+        {currentPosts.map((post: BlogPost) => (
           <div key={post.id} className="h-full overflow-y-auto  rounded-md">
             <Image
               src={post.image}
@@ -160,9 +172,15 @@ const Blogs: React.FC = () => {
           </div>
         ))}
       </div>
-      <div className="flex justify-between items-center mt-10 max-w-md mx-auto">
-        <Pagination />
-      </div>
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center mt-10 max-w-md mx-auto">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
     </div>
   );
 };
