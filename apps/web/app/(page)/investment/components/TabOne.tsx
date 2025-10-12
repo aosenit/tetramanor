@@ -108,7 +108,7 @@ function TabOne({ investments }: { investments: any[] }) {
                 className="bg-[#f9f4f0] rounded-xl p-2 md:p-4 min-w-full max-w-full flex-shrink-0"
               >
                 <div className="grid md:grid-cols-2 gap-8">
-                  <div className="h-[300px] flex flex-col justify-between">
+                  <div className="min-h-[350px] flex flex-col justify-between">
                     <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#11611414]">
                       <FaCoins className="text-[#116114]" />
                     </div>

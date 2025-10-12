@@ -76,11 +76,11 @@ export default function RoiCalculator() {
             </h2>
             <div className="flex items-center gap-3">
               <FaPhoneAlt className="h-5 w-5 text-white" />
-              <span className="text-lg">+234 812 345 67</span>
+              <span className="text-lg">09166479719</span>
             </div>
             <div className="flex items-center gap-3">
               <FaEnvelope className="h-5 w-5 text-white" />
-              <span className="text-lg">tetramanor@mail.com</span>
+              <span className="text-lg">People@teramanor.com</span>
             </div>
           </div>
         </div>
