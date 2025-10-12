@@ -101,6 +101,7 @@ export default function PropertyDetails() {
   }
 
   const property = propertyResponse?.data;
+  console.log(property)
 
   return (
     <div className="min-h-screen px-4">

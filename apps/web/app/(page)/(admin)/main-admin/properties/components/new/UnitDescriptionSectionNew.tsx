@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import z from "zod";
 import Dropdown from "../../../rentals/edit-rentals/components/Dropdown";
-import { propertySchema } from "./AddPropertiesNew";
 import { X } from "lucide-react";
+import { propertySchema } from "@/lib/schema";
 
 type UnitDescriptionSectionProps = {
 	formData: z.infer<typeof propertySchema>;
@@ -131,9 +131,9 @@ export default function UnitDescriptionSection({
 				</div>
 
 				{/* Currency and Price */}
-				<div className="grid grid-cols-6 gap-4 mb-4">
+				<div className="grid sm:grid-cols-6 gap-4 mb-4">
 					<div className="col-span-1">
-						<Label className="block mb-1 text-sm text-[#323539] font-medium">
+						<Label className="block mb-1 text-sm text-[#323539] font-medium !text-nowrap">
 							Currency
 						</Label>
 						<Dropdown
