@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, Upload, X, Save, Loader } from "lucide-react";
+import { Loader2, Upload, X, Save } from "lucide-react";
 import { MdArrowBackIosNew } from "react-icons/md";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import {
   useUploadData,
   useFetchData,
   usePutData,
+  useDeleteData,
 } from "@/hooks/useApi";
 import Image from "next/image";
 import RichTextEditor from "./RichTextEditor";
@@ -69,7 +70,6 @@ export default function EditBlog() {
   const [galleryImages, setGalleryImages] = useState<UploadedImage[]>([]);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
-  const [status, setStatus] = useState("DRAFT");
   const [validationErrors, setValidationErrors] = useState<{
     title?: string;
     content?: string;
@@ -78,6 +78,12 @@ export default function EditBlog() {
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
   const [metaKeywords, setMetaKeywords] = useState("");
+  const [imageIdToDelete, setImageIdToDelete] = useState<string | null>(null);
+  const [deletingImageId, setDeletingImageId] = useState<string | null>(null);
+  const [publishAction, setPublishAction] = useState<
+    "publish" | "draft" | null
+  >(null);
+
   const { mutateAsync: uploadImages, isPending: isUploadingImages } =
     useUploadData("upload/images");
   const { mutateAsync: createBlog, isPending: isCreating } =
@@ -85,13 +91,16 @@ export default function EditBlog() {
   const { mutateAsync: updateBlog, isPending: isUpdating } = usePutData(
     `blogs/${blogId}`
   );
+  const { mutateAsync: deleteImage } = useDeleteData(
+    imageIdToDelete ? `upload/images/${imageIdToDelete}` : null
+  );
+
+  const isSubmitting = isCreating || isUpdating;
 
   // Fetch blog post data if editing
   const { data: blogPostResponse, isLoading: isLoadingBlog } = useFetchData(
     blogId ? `blogs/${blogId}` : null
   );
-
-  const isPending = isCreating || isUpdating;
 
   // Load existing blog post data when editing
   useEffect(() => {
@@ -100,10 +109,28 @@ export default function EditBlog() {
       setTitle(blogPost.title || "");
       setContent(blogPost.content || "");
       setFeatured(blogPost.featured || false);
-      setStatus(blogPost.status || "DRAFT");
-      setMetaTitle(blogPost.metaTitle || "");
-      setMetaDescription(blogPost.metaDescription || "");
-      setMetaKeywords(blogPost.metaKeywords || "");
+
+      // Handle metadata - support both old flat structure and new nested structure
+      const metadata = (
+        blogPost as BlogPost & {
+          metaData?: {
+            metaTitle?: string;
+            metaDescription?: string;
+            metaKeywords?: string;
+          };
+        }
+      ).metaData;
+      if (metadata) {
+        setMetaTitle(metadata.metaTitle || "");
+        setMetaDescription(metadata.metaDescription || "");
+        setMetaKeywords(metadata.metaKeywords || "");
+      } else {
+        // Fallback to old flat structure
+        setMetaTitle(blogPost.metaTitle || "");
+        setMetaDescription(blogPost.metaDescription || "");
+        setMetaKeywords(blogPost.metaKeywords || "");
+      }
+
       // Handle coverImage (single object)
       const coverImagesData = blogPost.coverImage
         ? [
@@ -158,22 +185,28 @@ export default function EditBlog() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async (status: string) => {
+  const handleSubmit = async (action: "publish" | "draft") => {
     setValidationErrors({});
-    setStatus(status);
-    if (!validateFields()) return;
+    setPublishAction(action);
+    const status = action === "publish" ? "PUBLISHED" : "DRAFT";
+    if (!validateFields()) {
+      setPublishAction(null);
+      return;
+    }
 
     try {
       const payload = {
         title: title.trim(),
         content: content.trim(),
         featured: featured,
-        status: status || "DRAFT",
+        status: status,
         coverImage: coverImages.length > 0 ? coverImages[0].id : null,
         images: galleryImages.map((img) => img.id),
-        metaTitle: metaTitle.trim(),
-        metaDescription: metaDescription.trim(),
-        metaKeywords: metaKeywords.trim(),
+        metaData: {
+          metaTitle: metaTitle.trim(),
+          metaDescription: metaDescription.trim(),
+          metaKeywords: metaKeywords.trim(),
+        },
       };
       if (isEditing) {
         await updateBlog(payload);
@@ -186,7 +219,7 @@ export default function EditBlog() {
     } catch (error) {
       console.error("Error saving blog post:", error);
     } finally {
-      setStatus("DRAFT");
+      setPublishAction(null);
     }
   };
 
@@ -223,10 +256,29 @@ export default function EditBlog() {
     }
   };
 
-  const removeImage = (imageId: string, type: "cover" | "gallery") => {
+  const removeImage = async (imageId: string, type: "cover" | "gallery") => {
     const setImages = type === "cover" ? setCoverImages : setGalleryImages;
     const currentImages = type === "cover" ? coverImages : galleryImages;
 
+    // If editing and the image exists on the server, delete it
+    if (isEditing) {
+      try {
+        setDeletingImageId(imageId);
+        setImageIdToDelete(imageId);
+        await deleteImage();
+        toast.success("Image deleted successfully");
+        setImageIdToDelete(null);
+        setDeletingImageId(null);
+      } catch (error) {
+        console.error("Error deleting image:", error);
+        toast.error("Failed to delete image");
+        setImageIdToDelete(null);
+        setDeletingImageId(null);
+        return;
+      }
+    }
+
+    // Remove from local state
     const newImages = currentImages.filter((img) => img.id !== imageId);
     setImages(newImages);
   };
@@ -275,7 +327,7 @@ export default function EditBlog() {
               variant="outline"
               size="sm"
               onClick={() => router.push("/main-admin/blog-posts")}
-              disabled={isPending}
+              disabled={isSubmitting}
               className="text-gray-600"
             >
               <MdArrowBackIosNew className="w-4 h-4 mr-2" />
@@ -301,7 +353,7 @@ export default function EditBlog() {
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full border-gray-300 focus:border-[#116114] focus:ring-[#116114]"
                 placeholder="Enter a compelling blog title..."
-                disabled={isPending}
+                disabled={isSubmitting}
               />
               {validationErrors.title && !isEditing && (
                 <p className="text-xs text-red-500 mt-1">
@@ -319,7 +371,7 @@ export default function EditBlog() {
                 content={content}
                 onChange={setContent}
                 placeholder="Start writing your blog content..."
-                disabled={isPending}
+                disabled={isSubmitting}
               />
               {validationErrors.content && !isEditing && (
                 <p className="text-xs text-red-500 mt-1">
@@ -385,7 +437,7 @@ export default function EditBlog() {
                   id="featured"
                   checked={featured}
                   onCheckedChange={(checked) => setFeatured(checked as boolean)}
-                  disabled={isPending}
+                  disabled={isSubmitting}
                 />
                 <Label
                   htmlFor="featured"
@@ -409,7 +461,7 @@ export default function EditBlog() {
                   onChange={(e) => handleImageUpload(e.target.files, "cover")}
                   className="hidden"
                   id="cover-images"
-                  disabled={isUploadingCover || isPending}
+                  disabled={isUploadingCover || isSubmitting}
                 />
                 <label htmlFor="cover-images" className="cursor-pointer">
                   {isUploadingCover ? (
@@ -443,15 +495,23 @@ export default function EditBlog() {
                         alt={image.name}
                         width={200}
                         height={120}
-                        className="w-full h-20 object-cover rounded border"
+                        className={`w-full h-20 object-cover rounded border ${
+                          deletingImageId === image.id ? "opacity-50" : ""
+                        }`}
                       />
-                      <button
-                        onClick={() => removeImage(image.id, "cover")}
-                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                        disabled={isPending}
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
+                      {deletingImageId === image.id ? (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded">
+                          <Loader2 className="w-5 h-5 text-white animate-spin" />
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => removeImage(image.id, "cover")}
+                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          disabled={isSubmitting || deletingImageId !== null}
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -476,7 +536,7 @@ export default function EditBlog() {
                   onChange={(e) => handleImageUpload(e.target.files, "gallery")}
                   className="hidden"
                   id="gallery-images"
-                  disabled={isUploadingGallery || isPending}
+                  disabled={isUploadingGallery || isSubmitting}
                 />
                 <label htmlFor="gallery-images" className="cursor-pointer">
                   {isUploadingGallery ? (
@@ -510,15 +570,23 @@ export default function EditBlog() {
                         alt={image.name}
                         width={200}
                         height={120}
-                        className="w-full h-20 object-cover rounded border"
+                        className={`w-full h-20 object-cover rounded border ${
+                          deletingImageId === image.id ? "opacity-50" : ""
+                        }`}
                       />
-                      <button
-                        onClick={() => removeImage(image.id, "gallery")}
-                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                        disabled={isPending}
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
+                      {deletingImageId === image.id ? (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded">
+                          <Loader2 className="w-5 h-5 text-white animate-spin" />
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => removeImage(image.id, "gallery")}
+                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          disabled={isSubmitting || deletingImageId !== null}
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -534,28 +602,36 @@ export default function EditBlog() {
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <div className="space-y-3">
                 <Button
-                  onClick={() => handleSubmit("PUBLISHED")}
-                  disabled={isPending}
+                  onClick={() => handleSubmit("publish")}
+                  disabled={isSubmitting || deletingImageId !== null}
                   className="w-full bg-[#116114] hover:bg-[#116114]/90 text-white"
                 >
-                  {(isCreating && status === "PUBLISHED") ||
-                  (isUpdating && status === "PUBLISHED")
-                    ? "Loading..."
-                    : "Publish Blog Post"}
+                  {publishAction === "publish" && isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Publishing...
+                    </>
+                  ) : (
+                    "Publish Blog Post"
+                  )}
                 </Button>
                 <Button
-                  onClick={() => handleSubmit("DRAFT")}
-                  disabled={isPending}
+                  onClick={() => handleSubmit("draft")}
+                  disabled={isSubmitting || deletingImageId !== null}
                   variant="outline"
                   className="w-full"
                 >
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    {(isCreating && status === "DRAFT") ||
-                    (isUpdating && status === "DRAFT")
-                      ? " Loading..."
-                      : "Save as Draft"}
-                  </>
+                  {publishAction === "draft" && isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save as Draft
+                    </>
+                  )}
                 </Button>
                 <p className="text-xs text-gray-500 text-center">
                   {isEditing
