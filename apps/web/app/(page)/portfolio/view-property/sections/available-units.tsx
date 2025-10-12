@@ -14,14 +14,22 @@ export default function AvailableUnits({ property }: AvailableUnitsProps) {
     return null;
   }
 
+  // Calculate total available units
+  const totalAvailableUnits = property.units.reduce(
+    (sum, unit) => sum + (unit.availableUnits || 0),
+    0
+  );
 
   return (
     <div className="container mx-auto px-4 lg:px-16 py-12 bg-[#FAFAFA]">
       {/* Section Header */}
-      <div className="mb-8">
+      <div className="mb-8 flex justify-between items-center">
         <h2 className="text-3xl font-bold mb-4 text-[#0b0a0a]">
           Available Unit Types
         </h2>
+        <h3 className="text-2xl font-semibold text-[#0b0a0a]">
+          {totalAvailableUnits} Available Units
+        </h3>
       </div>
 
       {/* Units Grid */}

@@ -204,14 +204,23 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
                   Features:
                 </h4>
                 <div className="flex flex-wrap gap-1">
-                  {apartment.features.slice(0, 3).map((feature) => (
-                    <span
-                      key={feature.id}
-                      className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
-                    >
-                      {feature.name}
-                    </span>
-                  ))}
+                  {apartment.features.slice(0, 3).map((feature, index) => {
+                    // Handle both string and object formats
+                    const isString = typeof feature === "string";
+                    const featureName = isString ? feature : feature.name;
+                    const featureKey = isString
+                      ? `feature-${index}`
+                      : feature.id;
+
+                    return (
+                      <span
+                        key={featureKey}
+                        className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
+                      >
+                        {featureName}
+                      </span>
+                    );
+                  })}
                   {apartment.features.length > 3 && (
                     <span className="text-xs text-gray-500 px-2 py-1">
                       +{apartment.features.length - 3} more
@@ -227,14 +236,23 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
                   Amenities:
                 </h4>
                 <div className="flex flex-wrap gap-1">
-                  {apartment.amenities.slice(0, 3).map((amenity) => (
-                    <span
-                      key={amenity.id}
-                      className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full"
-                    >
-                      {amenity.name}
-                    </span>
-                  ))}
+                  {apartment.amenities.slice(0, 3).map((amenity, index) => {
+                    // Handle both string and object formats
+                    const isString = typeof amenity === "string";
+                    const amenityName = isString ? amenity : amenity.name;
+                    const amenityKey = isString
+                      ? `amenity-${index}`
+                      : amenity.id;
+
+                    return (
+                      <span
+                        key={amenityKey}
+                        className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full"
+                      >
+                        {amenityName}
+                      </span>
+                    );
+                  })}
                   {apartment.amenities.length > 3 && (
                     <span className="text-xs text-gray-500 px-2 py-1">
                       +{apartment.amenities.length - 3} more

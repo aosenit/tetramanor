@@ -130,19 +130,66 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
   }
 
   // Get all unique amenities and features
-  const allAmenities = Array.from(
-    new Map(
-      property.rental
-        .flatMap((unit) => unit.amenities)
-        .map((item) => [item.id, item])
-    ).values()
+  const allAmenities: Array<{
+    id: string;
+    name: string;
+    icon?: string | null;
+  }> = [];
+  const allFeatures: Array<{ id: string; name: string; icon?: string | null }> =
+    [];
+
+  property.rental.forEach((unit) => {
+    // Process amenities - handle both string and object formats
+    (
+      unit.amenities as (string | { id: string; name: string; icon?: string })[]
+    ).forEach((amenity) => {
+      if (typeof amenity === "string") {
+        const trimmed = amenity.trim();
+        if (trimmed !== "") {
+          allAmenities.push({
+            id: trimmed,
+            name: trimmed,
+            icon: null,
+          });
+        }
+      } else if (amenity && amenity.name && amenity.name.trim() !== "") {
+        allAmenities.push({
+          id: amenity.id,
+          name: amenity.name,
+          icon: amenity.icon || null,
+        });
+      }
+    });
+
+    // Process features - handle both string and object formats
+    (
+      unit.features as (string | { id: string; name: string; icon?: string })[]
+    ).forEach((feature) => {
+      if (typeof feature === "string") {
+        const trimmed = feature.trim();
+        if (trimmed !== "") {
+          allFeatures.push({
+            id: trimmed,
+            name: trimmed,
+            icon: null,
+          });
+        }
+      } else if (feature && feature.name && feature.name.trim() !== "") {
+        allFeatures.push({
+          id: feature.id,
+          name: feature.name,
+          icon: feature.icon || null,
+        });
+      }
+    });
+  });
+
+  // Remove duplicates by creating Maps with unique IDs
+  const uniqueAmenities = Array.from(
+    new Map(allAmenities.map((item) => [item.id, item])).values()
   );
-  const allFeatures = Array.from(
-    new Map(
-      property.rental
-        .flatMap((unit) => unit.features)
-        .map((item) => [item.id, item])
-    ).values()
+  const uniqueFeatures = Array.from(
+    new Map(allFeatures.map((item) => [item.id, item])).values()
   );
 
   // Get all unique unit categories
@@ -156,10 +203,27 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
       ? property.rental
       : property.rental.filter(
           (unit) => unit.unitCategory === selectedCategory
+        );
+
+  // Calculate total units and available units from propertyUnit
+  // Get unique property units to avoid counting the same unit multiple times
+  const uniquePropertyUnits = Array.from(
+    new Map(
+      property.rental.map((rental) => [
+        rental.propertyUnit.id,
+        rental.propertyUnit,
+      ])
+    ).values()
   );
 
-  const availableUnits = property.rental.filter(
-    (unit) => unit.status === "AVAILABLE"
+  const totalUnits = uniquePropertyUnits.reduce(
+    (sum, unit) => sum + (unit.numberOfUnits || 0),
+    0
+  );
+
+  const totalAvailableUnits = uniquePropertyUnits.reduce(
+    (sum, unit) => sum + (unit.availableUnits || 0),
+    0
   );
 
   return (
@@ -215,12 +279,18 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
                         {property.rental.length !== 1 ? "Types" : "Type"}
                       </span>
                     </div>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg">
+                      <FaBuilding className="text-blue-600" />
+                      <span className="text-sm font-semibold text-gray-900">
+                        {totalUnits} Total Unit{totalUnits !== 1 ? "s" : ""}
+                      </span>
+                    </div>
                     <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-lg">
                       <FaCheckCircle className="text-green-600" />
                       <span className="text-sm font-semibold text-gray-900">
-                        {availableUnits.length === 0
+                        {totalAvailableUnits === 0
                           ? "Unavailable"
-                          : `${availableUnits.length} Available`}
+                          : `${totalAvailableUnits} Available`}
                       </span>
                     </div>
                   </div>
@@ -267,13 +337,13 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
             </div>
 
             {/* Amenities */}
-            {allAmenities.length > 0 && (
+            {uniqueAmenities.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
                   Amenities
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {allAmenities.map((amenity) => (
+                  {uniqueAmenities.map((amenity) => (
                     <div
                       key={amenity.id}
                       className="flex items-center gap-2 text-sm text-gray-700"
@@ -297,13 +367,13 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
             )}
 
             {/* Features */}
-            {allFeatures.length > 0 && (
+            {uniqueFeatures.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
                   Features
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {allFeatures.map((feature) => (
+                  {uniqueFeatures.map((feature) => (
                     <div
                       key={feature.id}
                       className="flex items-center gap-2 text-sm text-gray-700"
@@ -400,7 +470,10 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
 
           {/* Right Column - Contact Sidebar */}
           <div className="lg:col-span-1">
-            <ContactAgentSidebar propertyName={property.name} rentalId={property.id} />
+            <ContactAgentSidebar
+              propertyName={property.name}
+              rentalId={property.id}
+            />
           </div>
         </div>
       </div>

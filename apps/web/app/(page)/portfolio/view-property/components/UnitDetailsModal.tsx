@@ -113,7 +113,7 @@ export default function UnitDetailsModal({
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center text-gray-600">
+                  {/* <div className="flex items-center text-gray-600">
                     <FaCalendarAlt className="mr-3 h-4 w-4 text-[#116114]" />
                     <div>
                       <span className="text-sm text-gray-500">
@@ -123,19 +123,21 @@ export default function UnitDetailsModal({
                         {formatDate(unit.createdAt)}
                       </p>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
               {/* Description */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Description
-                </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {unit.description}
-                </p>
-              </div>
+              {unit.description && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Description
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {unit.description}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Pricing Details */}
@@ -204,7 +206,7 @@ export default function UnitDetailsModal({
                 <div className="border-t pt-3">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600 font-medium">
-                      Total  (All Units):
+                      Total (All Units):
                     </span>
                     <div className="flex items-center gap-1">
                       <span className="font-bold text-lg text-gray-900">
@@ -222,15 +224,11 @@ export default function UnitDetailsModal({
                   </div>
                 </div>
               </div>
-
-
             </div>
           </div>
 
-
-
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+          {/* <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
             <Button
               variant="outline"
               className="flex-1"
@@ -243,7 +241,7 @@ export default function UnitDetailsModal({
                 Express Interest
               </Button>
             )}
-          </div>
+          </div> */}
         </div>
       </DialogContent>
     </Dialog>

@@ -115,6 +115,9 @@ export default function PropertyDetailsModal({
 
   // Get amenity icon
   const getAmenityIcon = (amenity: string) => {
+    if (!amenity) {
+      return <FaHome className="h-4 w-4" />;
+    }
     const lowerAmenity = amenity.toLowerCase();
     for (const [key, icon] of Object.entries(amenityIcons)) {
       if (lowerAmenity.includes(key)) {
@@ -312,25 +315,35 @@ export default function PropertyDetailsModal({
                   Features
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {apartment.features.map((feature) => (
-                    <span
-                      key={feature.id}
-                      className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
-                    >
-                      {feature.icon && feature.icon.trim() !== "" ? (
-                        <Image
-                          src={feature.icon}
-                          alt=""
-                          width={12}
-                          height={12}
-                          className="object-contain"
-                        />
-                      ) : (
-                        <FaHome className="h-3 w-3" />
-                      )}
-                      {feature.name}
-                    </span>
-                  ))}
+                  {apartment.features.map((feature, index) => {
+                    // Handle both string and object formats
+                    const isString = typeof feature === "string";
+                    const featureName = isString ? feature : feature.name;
+                    const featureIcon = isString ? null : feature.icon;
+                    const featureKey = isString
+                      ? `feature-${index}`
+                      : feature.id;
+
+                    return (
+                      <span
+                        key={featureKey}
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                      >
+                        {featureIcon && featureIcon.trim() !== "" ? (
+                          <Image
+                            src={featureIcon}
+                            alt=""
+                            width={12}
+                            height={12}
+                            className="object-contain"
+                          />
+                        ) : (
+                          getAmenityIcon(featureName)
+                        )}
+                        {featureName}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -341,25 +354,35 @@ export default function PropertyDetailsModal({
                   Amenities
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {apartment.amenities.map((amenity) => (
-                    <span
-                      key={amenity.id}
-                      className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
-                    >
-                      {amenity.icon && amenity.icon.trim() !== "" ? (
-                        <Image
-                          src={amenity.icon}
-                          alt=""
-                          width={12}
-                          height={12}
-                          className="object-contain"
-                        />
-                      ) : (
-                        getAmenityIcon(amenity.name)
-                      )}
-                      {amenity.name}
-                    </span>
-                  ))}
+                  {apartment.amenities.map((amenity, index) => {
+                    // Handle both string and object formats
+                    const isString = typeof amenity === "string";
+                    const amenityName = isString ? amenity : amenity.name;
+                    const amenityIcon = isString ? null : amenity.icon;
+                    const amenityKey = isString
+                      ? `amenity-${index}`
+                      : amenity.id;
+
+                    return (
+                      <span
+                        key={amenityKey}
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
+                      >
+                        {amenityIcon && amenityIcon.trim() !== "" ? (
+                          <Image
+                            src={amenityIcon}
+                            alt=""
+                            width={12}
+                            height={12}
+                            className="object-contain"
+                          />
+                        ) : (
+                          getAmenityIcon(amenityName)
+                        )}
+                        {amenityName}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             )}
