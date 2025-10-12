@@ -9,28 +9,52 @@ interface QuickFiltersProps {
   activeFurnishing: string;
   onTypeChange: (type: string) => void;
   onFurnishingChange: (furnishing: string) => void;
+  apartmentTypes?: string[];
+  categories?: string[];
 }
 
-const propertyTypes = [
-  { value: "all", label: "All Properties", icon: FaHome },
-  { value: "STUDIO", label: "Studio", icon: FaBed },
-  { value: "ONE_BEDROOM", label: "1 Bedroom", icon: FaBed },
-  { value: "TWO_BEDROOM", label: "2 Bedrooms", icon: FaBuilding },
-  { value: "THREE_BEDROOM", label: "3 Bedrooms", icon: FaBuilding },
-];
+// Helper function to format apartment type labels
+const formatApartmentType = (type: string) => {
+  return type
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
 
-const furnishingOptions = [
-  { value: "any", label: "Any" },
-  { value: "furnished", label: "Furnished" },
-  { value: "unfurnished", label: "Unfurnished" },
-];
+// Helper function to format category labels
+const formatCategory = (category: string) => {
+  return category
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
 
 export default function QuickFilters({
   activeType,
   activeFurnishing,
   onTypeChange,
   onFurnishingChange,
+  apartmentTypes = [],
+  categories = [],
 }: QuickFiltersProps) {
+  // Create property types from backend data
+  const propertyTypes = [
+    { value: "all", label: "All Properties", icon: FaHome },
+    ...apartmentTypes.map((type) => ({
+      value: type,
+      label: formatApartmentType(type),
+      icon: type.includes("BEDROOM") ? FaBuilding : FaBed,
+    })),
+  ];
+
+  // Create furnishing options from backend data
+  const furnishingOptions = [
+    { value: "any", label: "Any" },
+    ...categories.map((category) => ({
+      value: category,
+      label: formatCategory(category),
+    })),
+  ];
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
       <div className="space-y-4">
@@ -48,7 +72,9 @@ export default function QuickFilters({
                   key={type.value}
                   variant={isActive ? "default" : "outline"}
                   size="sm"
-                  onClick={() => onTypeChange(type.value === "all" ? "" : type.value)}
+                  onClick={() =>
+                    onTypeChange(type.value === "all" ? "" : type.value)
+                  }
                   className={`${
                     isActive
                       ? "bg-[#116114] text-white hover:bg-[#0d4d10]"
@@ -76,7 +102,11 @@ export default function QuickFilters({
                   key={option.value}
                   variant={isActive ? "default" : "outline"}
                   size="sm"
-                  onClick={() => onFurnishingChange(option.value === "any" ? "" : option.value)}
+                  onClick={() =>
+                    onFurnishingChange(
+                      option.value === "any" ? "" : option.value
+                    )
+                  }
                   className={`${
                     isActive
                       ? "bg-[#CD6115] text-white hover:bg-[#b55512]"

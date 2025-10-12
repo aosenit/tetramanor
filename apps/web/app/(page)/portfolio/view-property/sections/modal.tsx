@@ -5,7 +5,7 @@ import { IoClose } from "react-icons/io5";
 import placeholder from "@/assets/placeholder.jpg";
 import { usePostExportData } from "@/hooks/useApi";
 import { useToast } from "@chakra-ui/react";
-import PhoneInput from "@/components/ui/PhoneInput";
+import PhoneInputV2 from "@/components/ui/PhoneInputV2";
 
 const Modal = ({
   onClose,
@@ -173,7 +173,7 @@ const Modal = ({
                   >
                     Phone number *
                   </label>
-                  <PhoneInput
+                  <PhoneInputV2
                     value={formData.phone}
                     onChange={handlePhoneChange}
                     placeholder="Enter phone number"

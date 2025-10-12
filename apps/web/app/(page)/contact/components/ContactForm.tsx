@@ -9,17 +9,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import type { ContactData } from "@/types/contact";
-import PhoneInput from "@/components/ui/PhoneInput";
+import PhoneInputV2 from "@/components/ui/PhoneInputV2";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   phone: z
     .string()
     .min(1, "Phone number is required")
-    .regex(
-      /^\+\d{7,15}$/,
-      "Please enter a valid phone number with country code"
-    ),
+    .min(7, "Phone number must be at least 7 digits")
+    .max(20, "Phone number is too long"),
   email: z.string().email("Please enter a valid email address"),
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
@@ -177,7 +175,7 @@ function ContactForm() {
                     name="phone"
                     control={control}
                     render={({ field }) => (
-                      <PhoneInput
+                      <PhoneInputV2
                         value={field.value || ""}
                         onChange={field.onChange}
                         placeholder="Enter phone number"

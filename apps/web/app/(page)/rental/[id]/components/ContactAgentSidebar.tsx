@@ -1,96 +1,164 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { FaPhone, FaEnvelope, FaWhatsapp, FaUser } from "react-icons/fa";
+import { FaPhone, FaEnvelope, FaWhatsapp, FaSpinner } from "react-icons/fa";
+import { usePostData } from "@/hooks/useApi";
+import { useToast } from "@/components/ui/toast-notification";
+import PhoneInputV2 from "@/components/ui/PhoneInputV2";
+
+// Validation schema
+const contactFormSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  phone: z
+    .string()
+    .min(1, "Phone number is required")
+    .min(7, "Phone number must be at least 7 digits")
+    .max(20, "Phone number is too long"),
+  email: z.string().email("Please enter a valid email address"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+
+type ContactFormData = z.infer<typeof contactFormSchema>;
 
 interface ContactAgentSidebarProps {
   propertyName: string;
+  rentalId?: string;
 }
 
 export default function ContactAgentSidebar({
   propertyName,
+  rentalId,
 }: ContactAgentSidebarProps) {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: `I am interested in ${propertyName}. Please contact me with more details.`,
+  const { mutateAsync: sendMessage, isPending } =
+    usePostData("rentals/request");
+  const { showToast } = useToast();
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset,
+  } = useForm<ContactFormData>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      message: `I am interested in ${propertyName}. Please contact me with more details.`,
+    },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
+  const onSubmit = async (data: ContactFormData) => {
+    try {
+      await sendMessage({
+        ...data,
+        rentalId,
+      });
+      showToast(
+        "Message Sent!",
+        "Your message has been sent successfully. We'll get back to you soon.",
+        "success"
+      );
+      reset({
+        name: "",
+        email: "",
+        phone: "",
+        message: `I am interested in ${propertyName}. Please contact me with more details.`,
+      });
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      showToast(
+        "Failed to Send",
+        "Failed to send message. Please try again.",
+        "error"
+      );
+    }
   };
 
   return (
     <div className="sticky top-4 space-y-4">
       {/* Contact Agent Card */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">
-          Contact Agent
-        </h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Contact Agent</h3>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <Input
               type="text"
               placeholder="Your Name"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              className="w-full"
-              required
+              {...register("name")}
+              className={`w-full ${errors.name ? "border-red-500" : ""}`}
             />
+            {errors.name && (
+              <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
+            )}
           </div>
 
           <div>
             <Input
               type="email"
               placeholder="Your Email"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              className="w-full"
-              required
+              {...register("email")}
+              className={`w-full ${errors.email ? "border-red-500" : ""}`}
             />
+            {errors.email && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           <div>
-            <Input
-              type="tel"
-              placeholder="Your Phone Number"
-              value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
-              className="w-full"
-              required
+            <Controller
+              name="phone"
+              control={control}
+              render={({ field }) => (
+                <PhoneInputV2
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  placeholder="Enter phone number"
+                  error={!!errors.phone}
+                  required
+                />
+              )}
             />
+            {errors.phone && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors.phone.message}
+              </p>
+            )}
           </div>
 
           <div>
             <Textarea
               placeholder="Your Message"
-              value={formData.message}
-              onChange={(e) =>
-                setFormData({ ...formData, message: e.target.value })
-              }
-              className="w-full min-h-[100px]"
-              required
+              {...register("message")}
+              className={`w-full min-h-[100px] ${errors.message ? "border-red-500" : ""}`}
             />
+            {errors.message && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors.message.message}
+              </p>
+            )}
           </div>
 
           <Button
             type="submit"
             className="w-full bg-[#116114] hover:bg-[#0d4d10] text-white"
+            disabled={isPending}
           >
-            Send Message
+            {isPending ? (
+              <>
+                <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              "Send Message"
+            )}
           </Button>
         </form>
 
@@ -125,7 +193,7 @@ export default function ContactAgentSidebar({
       </div>
 
       {/* Property Alert Card */}
-      <div className="bg-gradient-to-br from-[#116114] to-[#0d4d10] rounded-lg shadow-sm p-6 text-white">
+      {/* <div className="bg-gradient-to-br from-[#116114] to-[#0d4d10] rounded-lg shadow-sm p-6 text-white">
         <h3 className="text-lg font-bold mb-2">Get Property Alerts</h3>
         <p className="text-sm text-white/90 mb-4">
           Be the first to know about new properties matching your criteria.
@@ -136,7 +204,7 @@ export default function ContactAgentSidebar({
         >
           Subscribe to Alerts
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }

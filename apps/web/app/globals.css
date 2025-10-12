@@ -48,6 +48,11 @@ body {
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
 }
 
+/* Arrow-shaped tag for property cards */
+.clip-path-arrow {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+}
+
 .social-icon {
   transition:
     color 0.2s cubic-bezier(0.4, 0, 0.2, 1),

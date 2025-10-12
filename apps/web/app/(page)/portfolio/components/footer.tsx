@@ -40,7 +40,7 @@ export default function Footer() {
           <p className="text-[#000000] mb-4">
             Your Trusted Real Estate Partner in Lagos
           </p>
-          <form className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+          {/* <form className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
             <div className="flex items-center bg-white border border-[#383838] px-4 py-3 w-full">
               <IoLocationOutline className="mr-2 text-lg text-[#383838]" />
               <input
@@ -55,7 +55,7 @@ export default function Footer() {
             >
               Search
             </button>
-          </form>
+          </form> */}
         </div>
 
         {/* Links */}

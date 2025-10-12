@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
-import PropertyCard from "../components/property-card";
+import PropertyCardNew from "../components/property-card-new";
 import { useFetchData } from "@/hooks/useApi";
-import type { PropertyItem } from "@/types/property";
+import type { Property } from "../types";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
@@ -23,7 +23,7 @@ function Ongoing() {
     sortOrder: "desc",
   });
 
-  const properties: PropertyItem[] = propertyResponse?.data?.items || [];
+  const properties: Property[] = propertyResponse?.data?.items || [];
 
   return (
     <section className="py-16 px-4 container mx-auto md:px-10 lg:px-16">
@@ -55,38 +55,39 @@ function Ongoing() {
         </div>
       ) : (
         <>
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Left: First card spans full height */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-2 gap-6">
+            {/* Large card on the left - spans 2 rows */}
             {properties[0] && (
-              <div className="w-full h-full">
-                <PropertyCard
+              <div className="lg:row-span-2">
+                <PropertyCardNew
                   key={properties[0].id}
-                  image={properties[0].images[0]?.imageUrl}
-                  title={properties[0].name}
-                  location={properties[0].address}
-                  status={properties[0].status}
-                  constructionStatus={properties[0].constructionStatus}
-                  className="h-full min-h-[700px]"
-                  slug={properties[0].id}
+                  property={properties[0]}
+                  size="large"
+                  className="w-full h-full"
                 />
               </div>
             )}
 
-            {/* Right: Stack next two cards */}
-            <div className="flex flex-col gap-6">
-              {properties.slice(1, 3).map((property) => (
-                <PropertyCard
-                  key={property.id}
-                  image={property.images[0]?.imageUrl}
-                  title={property.name}
-                  location={property.address}
-                  status={property.status}
-                  constructionStatus={property.constructionStatus}
-                  className="flex-1"
-                  slug={property.id}
+            {/* Two smaller cards on the right */}
+            {properties[1] && (
+              <div className="lg:row-span-1">
+                <PropertyCardNew
+                  key={properties[1].id}
+                  property={properties[1]}
+                  className="w-full"
                 />
-              ))}
-            </div>
+              </div>
+            )}
+
+            {properties[2] && (
+              <div className="lg:row-span-1">
+                <PropertyCardNew
+                  key={properties[2].id}
+                  property={properties[2]}
+                  className="w-full"
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex justify-center mt-8">

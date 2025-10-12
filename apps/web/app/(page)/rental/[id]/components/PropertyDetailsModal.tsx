@@ -21,7 +21,6 @@ import {
   FaSwimmingPool,
   FaDumbbell,
   FaShieldAlt,
-  FaParking,
   FaTv,
   FaUtensils,
   FaWind,
@@ -29,16 +28,18 @@ import {
 import placeholder from "@/assets/placeholder.svg";
 import SimpleCurrencyToggle from "@/components/ui/SimpleCurrencyToggle";
 import {
-  convertCurrency,
-  formatCurrency,
   Currency,
-} from "@/lib/simpleCurrencyConverter";
-import Link from "next/link";
+  useCurrencyConverter,
+  formatCurrency,
+} from "@/hooks/useCurrencyConverter";
 
 interface PropertyDetailsModalProps {
   apartment: RentalUnit | null;
   isOpen: boolean;
   onClose: () => void;
+  onContactClick: () => void;
+  onScheduleInspectionClick: () => void;
+  onRentClick: () => void;
 }
 
 // Amenity icon mapping
@@ -58,8 +59,12 @@ export default function PropertyDetailsModal({
   apartment,
   isOpen,
   onClose,
+  onContactClick,
+  onScheduleInspectionClick,
+  onRentClick,
 }: PropertyDetailsModalProps) {
   const [displayCurrency, setDisplayCurrency] = useState<Currency>("USD");
+  const { convertCurrencySync } = useCurrencyConverter();
 
   if (!apartment) return null;
 
@@ -81,7 +86,7 @@ export default function PropertyDetailsModal({
       return formatCurrency(amount, originalCurrency);
     }
 
-    const convertedAmount = convertCurrency(
+    const convertedAmount = convertCurrencySync(
       amount,
       originalCurrency,
       displayCurrency
@@ -124,7 +129,7 @@ export default function PropertyDetailsModal({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-hide">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gray-900">
-            {apartment.apartmentType} - Detailed Information
+            {apartment.apartmentType}
           </DialogTitle>
         </DialogHeader>
 
@@ -182,11 +187,6 @@ export default function PropertyDetailsModal({
                       {apartment.status === "AVAILABLE"
                         ? "Available"
                         : "Not Available"}
-                    </span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                      {formatCategory(apartment.unitCategory)}
                     </span>
                   </div>
                 </div>
@@ -310,13 +310,23 @@ export default function PropertyDetailsModal({
                   Features
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {apartment.features.map((feature, index) => (
+                  {apartment.features.map((feature) => (
                     <span
-                      key={index}
+                      key={feature.id}
                       className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
                     >
-                      <FaHome className="h-3 w-3" />
-                      {feature}
+                      {feature.icon && feature.icon.trim() !== "" ? (
+                        <Image
+                          src={feature.icon}
+                          alt=""
+                          width={12}
+                          height={12}
+                          className="object-contain"
+                        />
+                      ) : (
+                        <FaHome className="h-3 w-3" />
+                      )}
+                      {feature.name}
                     </span>
                   ))}
                 </div>
@@ -329,13 +339,23 @@ export default function PropertyDetailsModal({
                   Amenities
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {apartment.amenities.map((amenity, index) => (
+                  {apartment.amenities.map((amenity) => (
                     <span
-                      key={index}
+                      key={amenity.id}
                       className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
                     >
-                      {getAmenityIcon(amenity)}
-                      {amenity}
+                      {amenity.icon && amenity.icon.trim() !== "" ? (
+                        <Image
+                          src={amenity.icon}
+                          alt=""
+                          width={12}
+                          height={12}
+                          className="object-contain"
+                        />
+                      ) : (
+                        getAmenityIcon(amenity.name)
+                      )}
+                      {amenity.name}
                     </span>
                   ))}
                 </div>
@@ -358,11 +378,12 @@ export default function PropertyDetailsModal({
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
             {apartment.status === "AVAILABLE" ? (
-              <Link href="/login" className="flex-1">
-                <Button className="w-full bg-green-700 hover:bg-green-800 text-white">
-                  Rent This Apartment
-                </Button>
-              </Link>
+              <Button
+                onClick={onRentClick}
+                className="w-full bg-green-700 hover:bg-green-800 text-white"
+              >
+                Rent This Apartment
+              </Button>
             ) : (
               <Button
                 className="flex-1 bg-gray-400 text-gray-600 cursor-not-allowed"
@@ -371,16 +392,20 @@ export default function PropertyDetailsModal({
                 Not Available
               </Button>
             )}
-            <Link href="/contact" className="flex-1">
-              <Button variant="outline" className="w-full">
-                Schedule Viewing
-              </Button>
-            </Link>
-            <Link href="/contact" className="flex-1">
-              <Button variant="outline" className="w-full">
-                Contact Agent
-              </Button>
-            </Link>
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={onScheduleInspectionClick}
+            >
+              Schedule Viewing
+            </Button>
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={onContactClick}
+            >
+              Contact Agent
+            </Button>
           </div>
         </div>
       </DialogContent>

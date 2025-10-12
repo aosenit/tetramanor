@@ -89,14 +89,16 @@ function TabTwo({ investments }: { investments: any[] }) {
     <div>
       <div className="space-y-12">
         <div className="relative">
-          <button
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
-            onClick={handlePrev}
-            disabled={current === 0}
-            aria-label="Previous"
-          >
-            <FaChevronLeft />
-          </button>
+          {investments.length > 1 && (
+            <button
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
+              onClick={handlePrev}
+              disabled={current === 0}
+              aria-label="Previous"
+            >
+              <FaChevronLeft />
+            </button>
+          )}
           <div
             className="flex overflow-x-auto gap-8 scrollbar-hide pb-2 overscroll-x-contain overflow-y-hidden"
             ref={scrollRef}
@@ -212,14 +214,16 @@ function TabTwo({ investments }: { investments: any[] }) {
               </div>
             ))}
           </div>
-          <button
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
-            onClick={handleNext}
-            disabled={current === investments.length - 1}
-            aria-label="Next"
-          >
-            <FaChevronRight />
-          </button>
+          {investments.length > 1 && (
+            <button
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow p-2 disabled:opacity-50"
+              onClick={handleNext}
+              disabled={current === investments.length - 1}
+              aria-label="Next"
+            >
+              <FaChevronRight />
+            </button>
+          )}
         </div>
       </div>
       <div className="mt-10">
