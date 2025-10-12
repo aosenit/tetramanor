@@ -77,11 +77,27 @@ export default function ScheduleInspectionModal({
   };
 
   const getMinDate = (): string => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split("T")[0];
   };
 
   const onSubmit = async (data: InspectionFormData) => {
+    // Validate date is not in the past or today
+    const selectedDate = new Date(data.date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate <= today) {
+      showToast(
+        "Invalid Date",
+        "Please select a date starting from tomorrow.",
+        "error"
+      );
+      return;
+    }
+
     // Validate date is a weekday
     if (!isWeekday(data.date)) {
       showToast(
@@ -236,7 +252,8 @@ export default function ScheduleInspectionModal({
               <p className="text-sm text-red-500">{errors.date.message}</p>
             )}
             <p className="text-sm text-gray-500">
-              Inspections available Monday through Saturday only
+              Inspections available Monday through Saturday only. Must be
+              scheduled at least 1 day in advance.
             </p>
             {blockedDates.length > 0 && (
               <p className="text-sm text-orange-600">

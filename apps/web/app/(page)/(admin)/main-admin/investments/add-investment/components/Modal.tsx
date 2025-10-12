@@ -134,11 +134,20 @@ export default function InvestmentModal({
   };
 
   const formatCurrency = (amount: number, currency: string) => {
-    const formatter = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency === "NGN" ? "NGN" : currency === "USD" ? "USD" : "EUR",
+    const currencySymbols: Record<string, string> = {
+      NGN: "₦",
+      USD: "$",
+      EUR: "€",
+      GBP: "£",
+    };
+
+    const symbol = currencySymbols[currency] || currency;
+    const formattedAmount = amount.toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     });
-    return formatter.format(amount);
+
+    return `${symbol}${formattedAmount}`;
   };
 
   const getInvestmentTypeLabel = (type: string) => {
@@ -202,7 +211,11 @@ export default function InvestmentModal({
             </div>
             <div className="flex items-center justify-between">
               <p>Duration</p>
-              <p>{post?.duration || "N/A"}</p>
+              <p>
+                {post?.duration
+                  ? `${post.duration} ${post.duration === 1 ? "month" : "months"}`
+                  : "N/A"}
+              </p>
             </div>
             <div className="flex items-center justify-between">
               <p>Min Investment</p>

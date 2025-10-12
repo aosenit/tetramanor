@@ -2,7 +2,7 @@ import { Plus, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LuInstagram } from "react-icons/lu";
-import { BsTwitterX, BsWhatsapp } from "react-icons/bs";
+import { BsTwitterX, BsWhatsapp, BsFacebook, BsTiktok } from "react-icons/bs";
 import { SlSocialLinkedin } from "react-icons/sl";
 import { useState, useEffect } from "react";
 
@@ -35,6 +35,13 @@ export default function Socials({
       defaultUrl: "https://wa.me/",
     },
     {
+      icon: BsFacebook,
+      name: "Facebook",
+      placeholder: "Input url link",
+      key: "facebook",
+      defaultUrl: "https://facebook.com/",
+    },
+    {
       icon: SlSocialLinkedin,
       name: "LinkedIn",
       placeholder: "Input url link",
@@ -54,6 +61,13 @@ export default function Socials({
       placeholder: "Input url link",
       key: "instagram",
       defaultUrl: "https://instagram.com/",
+    },
+    {
+      icon: BsTiktok,
+      name: "TikTok",
+      placeholder: "Input url link",
+      key: "tiktok",
+      defaultUrl: "https://tiktok.com/@",
     },
   ];
 

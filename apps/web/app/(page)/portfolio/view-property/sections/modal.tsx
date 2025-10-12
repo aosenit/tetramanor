@@ -153,7 +153,7 @@ const Modal = ({
                     htmlFor="name"
                     className="block text-gray-700 mb-2 text-sm"
                   >
-                    First name
+                    Full name
                   </label>
                   <input
                     type="text"
