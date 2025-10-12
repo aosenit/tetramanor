@@ -22,8 +22,9 @@ export default function Socials({
   onSocialLinksChange,
   disabled = false,
 }: SocialLinkFormProps) {
-  const [localSocialLinks, setLocalSocialLinks] =
-    useState<SocialLink[]>(socialLinks);
+  const [localSocialLinks, setLocalSocialLinks] = useState<SocialLink[]>(
+    socialLinks || []
+  );
 
   const socialPlatforms = [
     {
@@ -56,22 +57,23 @@ export default function Socials({
     },
   ];
 
-  // Normalize social links to use consistent platform names
-  const normalizeSocialLinks = (links: SocialLink[]) => {
-    return links.map((link) => {
-      const platformKey = link.platform.toLowerCase();
-      const platformConfig = socialPlatforms.find((p) => p.key === platformKey);
-      return {
-        ...link,
-        platform: platformConfig ? platformConfig.name : link.platform,
-      };
-    });
-  };
-
   // Update local state when props change
   useEffect(() => {
-    const normalizedLinks = normalizeSocialLinks(socialLinks);
-    setLocalSocialLinks(normalizedLinks);
+    if (socialLinks && socialLinks.length > 0) {
+      // Normalize social links to use consistent platform names
+      const normalizedLinks = socialLinks.map((link) => {
+        const platformKey = link.platform.toLowerCase();
+        const platformConfig = socialPlatforms.find(
+          (p) => p.key === platformKey
+        );
+        return {
+          ...link,
+          platform: platformConfig ? platformConfig.name : link.platform,
+        };
+      });
+      setLocalSocialLinks(normalizedLinks);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socialLinks]);
 
   const handleAddLink = (platform: string) => {
@@ -119,13 +121,13 @@ export default function Socials({
 
   return (
     <div className="w-full max-w-md mx-auto space-y-3 p-4">
-      {socialPlatforms.map((platform, index) => {
+      {socialPlatforms.map((platform) => {
         const IconComponent = platform.icon;
         const existingLink = getLinkForPlatform(platform.key);
 
         return (
           <div
-            key={index}
+            key={platform.key}
             className="flex items-center gap-3 bg-gray-50 rounded-lg p-3 border border-gray-200 hover:border-gray-300 transition-colors"
           >
             <IconComponent className="w-6 h-6 text-[#4C5560] flex-shrink-0" />

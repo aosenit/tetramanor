@@ -731,6 +731,9 @@ const rentalSchema = z.object({
 	availableUnits: z
 		.number()
 		.min(0, "Available units must be a non-negative number"),
+	numberOfUnits: z
+		.number()
+		.min(0, "number of units must be a non-negative number"),
 	currency: z.enum(["NGN", "USD", "EUR", "GBP"]),
 	unitCategory: z.enum([
 		"STANDARD_FURNISHED",
@@ -784,6 +787,7 @@ export default function EditRental() {
 		status: "NOT_AVAILABLE",
 		images: [],
 		availableUnits: 0,
+		numberOfUnits:0,
 		currency: "NGN",
 		unitCategory: "UNFURNISHED",
 	});
@@ -831,7 +835,7 @@ export default function EditRental() {
 				propertyId: rental?.propertyId || "",
 				apartmentType: rental?.apartmentType || "",
 				location: rental?.location || "",
-				rent: rental?.rent || 0,
+				rent: rental?.rentFee || 0,
 				frequency: rental?.frequency || "MONTHLY",
 				agencyFee: rental?.agencyFee || 0,
 				cautionFee: rental?.cautionFee || 0,
@@ -839,13 +843,15 @@ export default function EditRental() {
 				images: rental?.images || [],
 				isFurnished: rental?.isFurnished || false,
 				availableUnits: rental?.availableUnits || 0,
+				numberOfUnits: rental?.numberOfUnits || 0,
 				currency: rental?.currency || "NGN",
 				unitCategory: rental?.unitCategory || "UNFURNISHED",
+				
 			});
 
 			// Set selected property for edit mode
 			const property = properties.find((p) => p.id === rental?.propertyId);
-			
+			console.log(rentalData.data)
 			if (property) {
 				setSelectedProperty(property);
 			}
@@ -1004,6 +1010,7 @@ export default function EditRental() {
 				setIsSubmitting(false);
 				return;
 			}
+			
 
 			const numberOfUnitsOfType =
 				selectedProperty?.units?.filter(
@@ -1191,7 +1198,7 @@ export default function EditRental() {
 						Available units
 					</label>
 					<Input
-						value={formData.availableUnits}
+						value={formData.numberOfUnits}
 						type="number"
 						onChange={(e) =>
 							handleInputChange(
