@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
-  FaBed,
   FaCalendarAlt,
   FaMapMarkerAlt,
   FaCheckCircle,
@@ -25,7 +24,6 @@ import {
   FaUtensils,
   FaWind,
 } from "react-icons/fa";
-import placeholder from "@/assets/placeholder.svg";
 import SimpleCurrencyToggle from "@/components/ui/SimpleCurrencyToggle";
 import {
   Currency,
@@ -63,36 +61,10 @@ export default function PropertyDetailsModal({
   onScheduleInspectionClick,
   onRentClick,
 }: PropertyDetailsModalProps) {
-  const [displayCurrency, setDisplayCurrency] = useState<Currency>("USD");
+  const [displayCurrency, setDisplayCurrency] = useState<Currency>("NGN");
   const { convertCurrencySync } = useCurrencyConverter();
 
   if (!apartment) return null;
-
-  // Get the best available price and currency for each fee
-  const getBestPrice = (ngnAmount: number, usdAmount: number) => {
-    // If USD amount is available and greater than 0, use it
-    if (usdAmount > 0) {
-      return { amount: usdAmount, originalCurrency: "USD" as Currency };
-    }
-    // Otherwise use NGN amount
-    return { amount: ngnAmount, originalCurrency: "NGN" as Currency };
-  };
-
-  // Convert and format price for display
-  const formatPrice = (ngnAmount: number, usdAmount: number) => {
-    const { amount, originalCurrency } = getBestPrice(ngnAmount, usdAmount);
-
-    if (displayCurrency === originalCurrency) {
-      return formatCurrency(amount, originalCurrency);
-    }
-
-    const convertedAmount = convertCurrencySync(
-      amount,
-      originalCurrency,
-      displayCurrency
-    );
-    return formatCurrency(convertedAmount, displayCurrency);
-  };
 
   // Format category
   const formatCategory = (category: string) => {
@@ -102,19 +74,11 @@ export default function PropertyDetailsModal({
       .replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
-  // Get bedroom count from apartment type
-  const getBedroomCount = (apartmentType: string) => {
-    if (apartmentType.includes("1 bedroom")) return 1;
-    if (apartmentType.includes("2 bedroom")) return 2;
-    if (apartmentType.includes("3 bedroom")) return 3;
-    if (apartmentType.includes("4 bedroom")) return 4;
-    return 2; // default
-  };
-
-  const bedroomCount = getBedroomCount(apartment.apartmentType);
-
   // Get amenity icon
   const getAmenityIcon = (amenity: string) => {
+    if (!amenity) {
+      return <FaHome className="h-4 w-4" />;
+    }
     const lowerAmenity = amenity.toLowerCase();
     for (const [key, icon] of Object.entries(amenityIcons)) {
       if (lowerAmenity.includes(key)) {
@@ -134,33 +98,6 @@ export default function PropertyDetailsModal({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Property Images */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="relative h-48 w-full rounded-lg overflow-hidden">
-              <Image
-                src={placeholder}
-                alt={apartment.apartmentType}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {[...Array(3)].map((_, index) => (
-                <div
-                  key={index}
-                  className="relative h-20 w-full rounded overflow-hidden"
-                >
-                  <Image
-                    src={placeholder}
-                    alt={`${apartment.apartmentType} ${index + 2}`}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Basic Information */}
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-4">
@@ -172,10 +109,6 @@ export default function PropertyDetailsModal({
                   <div className="flex items-center text-gray-600">
                     <FaMapMarkerAlt className="mr-3 h-4 w-4 text-[#CD6115]" />
                     <span>{apartment.location}</span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <FaBed className="mr-3 h-4 w-4 text-[#CD6115]" />
-                    <span>{bedroomCount} Bedrooms</span>
                   </div>
                   <div className="flex items-center text-gray-600">
                     <FaCalendarAlt className="mr-3 h-4 w-4 text-[#CD6115]" />
@@ -216,32 +149,54 @@ export default function PropertyDetailsModal({
               </div>
               <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Monthly Rent:</span>
+                  <span className="text-gray-600">
+                    {apartment.frequency === "MONTHLY"
+                      ? "Monthly Rent:"
+                      : `Rent (${apartment.frequency}):`}
+                  </span>
                   <span className="font-semibold text-lg text-gray-900">
-                    {formatPrice(
-                      apartment.rentFee,
-                      apartment.dollarPrice.rentFee
-                    )}
+                    {displayCurrency === "NGN"
+                      ? formatCurrency(apartment.rentFee, "NGN")
+                      : formatCurrency(
+                          convertCurrencySync(
+                            apartment.rentFee,
+                            "NGN",
+                            displayCurrency
+                          ),
+                          displayCurrency
+                        )}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Agency Fee:</span>
                   <span className="font-semibold text-gray-900">
-                    {formatPrice(
-                      apartment.agencyFee,
-                      apartment.dollarPrice.agencyFee
-                    )}
+                    {displayCurrency === "NGN"
+                      ? formatCurrency(apartment.agencyFee, "NGN")
+                      : formatCurrency(
+                          convertCurrencySync(
+                            apartment.agencyFee,
+                            "NGN",
+                            displayCurrency
+                          ),
+                          displayCurrency
+                        )}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Caution Fee:</span>
                   <span className="font-semibold text-gray-900">
-                    {formatPrice(
-                      apartment.cautionFee,
-                      apartment.dollarPrice.cautionFee
-                    )}
+                    {displayCurrency === "NGN"
+                      ? formatCurrency(apartment.cautionFee, "NGN")
+                      : formatCurrency(
+                          convertCurrencySync(
+                            apartment.cautionFee,
+                            "NGN",
+                            displayCurrency
+                          ),
+                          displayCurrency
+                        )}
                   </span>
                 </div>
 
@@ -251,52 +206,48 @@ export default function PropertyDetailsModal({
                       Total Move-in Cost:
                     </span>
                     <span className="font-bold text-lg text-green-600">
-                      {formatPrice(
-                        apartment.rentFee +
-                          apartment.agencyFee +
-                          apartment.cautionFee,
-                        apartment.dollarPrice.rentFee +
-                          apartment.dollarPrice.agencyFee +
-                          apartment.dollarPrice.cautionFee
-                      )}
+                      {displayCurrency === "NGN"
+                        ? formatCurrency(
+                            apartment.rentFee +
+                              apartment.agencyFee +
+                              apartment.cautionFee,
+                            "NGN"
+                          )
+                        : formatCurrency(
+                            convertCurrencySync(
+                              apartment.rentFee +
+                                apartment.agencyFee +
+                                apartment.cautionFee,
+                              "NGN",
+                              displayCurrency
+                            ),
+                            displayCurrency
+                          )}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Property Unit Details */}
+              {/* Rental Details */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Property Details
+                  Rental Details
                 </h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Unit Type:</span>
+                    <span className="text-gray-600">Unit Category:</span>
                     <span className="font-medium">
-                      {apartment.propertyUnit.unitType}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Available Units:</span>
-                    <span className="font-medium">
-                      {apartment.propertyUnit.availableUnits}
+                      {formatCategory(apartment.unitCategory)}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Number of Units:</span>
                     <span className="font-medium">
-                      {apartment.propertyUnit.numberOfUnits}
+                      {apartment.numberOfUnits === 0
+                        ? "Unavailable"
+                        : apartment.numberOfUnits}
                     </span>
                   </div>
-                  {/* <div className="flex justify-between">
-                    <span className="text-gray-600">Price Threshold:</span>
-                    <span className="font-medium">
-                      {formatCurrency(
-                        apartment.propertyUnit.priceThreshold,
-                        apartment.propertyUnit.currency as Currency
-                      )}
-                    </span>
-                  </div> */}
                 </div>
               </div>
             </div>
@@ -310,25 +261,35 @@ export default function PropertyDetailsModal({
                   Features
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {apartment.features.map((feature) => (
-                    <span
-                      key={feature.id}
-                      className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
-                    >
-                      {feature.icon && feature.icon.trim() !== "" ? (
-                        <Image
-                          src={feature.icon}
-                          alt=""
-                          width={12}
-                          height={12}
-                          className="object-contain"
-                        />
-                      ) : (
-                        <FaHome className="h-3 w-3" />
-                      )}
-                      {feature.name}
-                    </span>
-                  ))}
+                  {apartment.features.map((feature, index) => {
+                    // Handle both string and object formats
+                    const isString = typeof feature === "string";
+                    const featureName = isString ? feature : feature.name;
+                    const featureIcon = isString ? null : feature.icon;
+                    const featureKey = isString
+                      ? `feature-${index}`
+                      : feature.id;
+
+                    return (
+                      <span
+                        key={featureKey}
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                      >
+                        {featureIcon && featureIcon.trim() !== "" ? (
+                          <Image
+                            src={featureIcon}
+                            alt=""
+                            width={12}
+                            height={12}
+                            className="object-contain"
+                          />
+                        ) : (
+                          getAmenityIcon(featureName)
+                        )}
+                        {featureName}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -339,41 +300,39 @@ export default function PropertyDetailsModal({
                   Amenities
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {apartment.amenities.map((amenity) => (
-                    <span
-                      key={amenity.id}
-                      className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
-                    >
-                      {amenity.icon && amenity.icon.trim() !== "" ? (
-                        <Image
-                          src={amenity.icon}
-                          alt=""
-                          width={12}
-                          height={12}
-                          className="object-contain"
-                        />
-                      ) : (
-                        getAmenityIcon(amenity.name)
-                      )}
-                      {amenity.name}
-                    </span>
-                  ))}
+                  {apartment.amenities.map((amenity, index) => {
+                    // Handle both string and object formats
+                    const isString = typeof amenity === "string";
+                    const amenityName = isString ? amenity : amenity.name;
+                    const amenityIcon = isString ? null : amenity.icon;
+                    const amenityKey = isString
+                      ? `amenity-${index}`
+                      : amenity.id;
+
+                    return (
+                      <span
+                        key={amenityKey}
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
+                      >
+                        {amenityIcon && amenityIcon.trim() !== "" ? (
+                          <Image
+                            src={amenityIcon}
+                            alt=""
+                            width={12}
+                            height={12}
+                            className="object-contain"
+                          />
+                        ) : (
+                          getAmenityIcon(amenityName)
+                        )}
+                        {amenityName}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             )}
           </div>
-
-          {/* Property Unit Description */}
-          {apartment.propertyUnit.description && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Property Overview
-              </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                {apartment.propertyUnit.description}
-              </p>
-            </div>
-          )}
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">

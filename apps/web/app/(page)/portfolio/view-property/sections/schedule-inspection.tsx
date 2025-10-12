@@ -41,6 +41,7 @@ export default function ScheduleInspection({
   };
   const getMinDate = (): string => {
     const today = new Date();
+    today.setDate(today.getDate() + 1); // Set to tomorrow
     return today.toISOString().split("T")[0];
   };
 
