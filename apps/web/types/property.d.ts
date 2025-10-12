@@ -85,6 +85,18 @@ export interface PropertyResponse {
   statusCode: number;
 }
 
+export interface Feature {
+  id: string;
+  name: string;
+  icon: string;
+}
+
+export interface Amenity {
+  id: string;
+  name: string;
+  icon: string;
+}
+
 export interface Rental {
   id: string;
   name: string;
@@ -97,8 +109,8 @@ export interface Rental {
   whyInvest: any[];
   investmentAdvantages: any[];
   deletedAt: string | null;
-  features: string[];
-  amenities: string[];
+  features: Feature[];
+  amenities: Amenity[];
   slug: string;
   createdAt: string;
   brochure: string | null;
@@ -150,8 +162,8 @@ export interface RentalListingItem {
   address: string;
   coverImage: PropertyImage | null;
   images: PropertyImage[];
-  amenities: string[];
-  features: string[];
+  amenities: Amenity[];
+  features: Feature[];
   categories: string[];
   apartmentType: string[];
 }
@@ -200,8 +212,8 @@ export interface RentalUnit {
   cautionFee: number;
   status: "AVAILABLE" | "NOT_AVAILABLE";
   unitCategory: string;
-  features: string[];
-  amenities: string[];
+  features: Feature[];
+  amenities: Amenity[];
   createdAt: string;
   updatedAt: string;
   highlight: boolean;

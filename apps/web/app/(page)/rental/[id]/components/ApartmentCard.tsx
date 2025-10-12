@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { RentalUnit } from "@/types/property";
-import { FaBed, FaCalendarAlt, FaMapMarkerAlt, FaCheckCircle } from "react-icons/fa";
+import { FaBed, FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import PropertyDetailsModal from "./PropertyDetailsModal";
 import RentalInquiryModal from "./RentalInquiryModal";
@@ -62,15 +62,6 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
     const { originalCurrency } = getBestPrice(ngnAmount, usdAmount);
     return displayCurrency !== originalCurrency;
   };
-
-  // Format category
-  const formatCategory = (category: string) => {
-    return category
-      .replace(/_/g, " ")
-      .toLowerCase()
-      .replace(/\b\w/g, (l) => l.toUpperCase());
-  };
-
   // Get bedroom count from apartment type
   const getBedroomCount = (apartmentType: string) => {
     if (apartmentType.includes("1 bedroom")) return 1;
@@ -123,11 +114,6 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
           <div className="flex items-center text-gray-600">
             <FaCalendarAlt className="mr-2 h-4 w-4 text-[#CD6115]" />
             <span>{apartment.frequency}</span>
-          </div>
-          <div className="flex items-center text-gray-600">
-            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-              {formatCategory(apartment.unitCategory)}
-            </span>
           </div>
         </div>
       </div>
@@ -216,12 +202,12 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
                   Features:
                 </h4>
                 <div className="flex flex-wrap gap-1">
-                  {apartment.features.slice(0, 3).map((feature, index) => (
+                  {apartment.features.slice(0, 3).map((feature) => (
                     <span
-                      key={index}
+                      key={feature.id}
                       className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
                     >
-                      {feature}
+                      {feature.name}
                     </span>
                   ))}
                   {apartment.features.length > 3 && (
@@ -239,12 +225,12 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
                   Amenities:
                 </h4>
                 <div className="flex flex-wrap gap-1">
-                  {apartment.amenities.slice(0, 3).map((amenity, index) => (
+                  {apartment.amenities.slice(0, 3).map((amenity) => (
                     <span
-                      key={index}
+                      key={amenity.id}
                       className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full"
                     >
-                      {amenity}
+                      {amenity.name}
                     </span>
                   ))}
                   {apartment.amenities.length > 3 && (
@@ -309,6 +295,7 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
         propertyName={apartment.apartmentType}
+        rentalId={apartment.id}
       />
       <ScheduleInspectionModal
         isOpen={isInspectionModalOpen}

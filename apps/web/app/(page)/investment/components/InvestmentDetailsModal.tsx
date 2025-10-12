@@ -20,21 +20,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  FaUser,
-  FaEnvelope,
-  FaPhone,
-  FaDollarSign,
-  FaSpinner,
-} from "react-icons/fa";
+import { FaUser, FaEnvelope, FaDollarSign, FaSpinner } from "react-icons/fa";
 import { usePostData } from "@/hooks/useApi";
 import { useToast } from "@/components/ui/toast-notification";
+import PhoneInputV2 from "@/components/ui/PhoneInputV2";
 
 // Validation schema
 const investmentRequestSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
-  phone: z.string().min(10, "Please enter a valid phone number"),
+  phone: z
+    .string()
+    .min(7, "Phone number must be at least 7 digits")
+    .max(20, "Phone number is too long"),
   amount: z.number().min(1, "Amount must be greater than 0"),
   currency: z.string().min(1, "Currency is required"),
   message: z.string().optional(),
@@ -123,7 +121,7 @@ export default function InvestmentDetailsModal({
       >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gray-900">
-            Investment Request -{" "}
+            Invest in{" "}
             {investment.projectName || "Investment Opportunity"}
           </DialogTitle>
         </DialogHeader>
@@ -215,16 +213,13 @@ export default function InvestmentDetailsModal({
                 >
                   Phone Number <span className="text-red-500">*</span>
                 </Label>
-                <div className="relative">
-                  <FaPhone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    {...register("phone")}
-                    className={`pl-10 ${errors.phone ? "border-red-500" : ""}`}
-                  />
-                </div>
+                <PhoneInputV2
+                  value={watch("phone")}
+                  onChange={(value) => setValue("phone", value)}
+                  placeholder="Enter your phone number"
+                  required
+                  error={!!errors.phone}
+                />
                 {errors.phone && (
                   <p className="text-sm text-red-500">{errors.phone.message}</p>
                 )}
@@ -242,8 +237,8 @@ export default function InvestmentDetailsModal({
                   <Input
                     id="amount"
                     type="number"
-                    min={investment.minAmount || 50000000}
-                    placeholder={`Minimum: ${formatCurrency(investment.minAmount || 50000000)}`}
+                    min={investment.minAmount}
+                    placeholder={`Minimum: ${formatCurrency(investment.minAmount)}`}
                     {...register("amount", { valueAsNumber: true })}
                     className={`pl-10 ${errors.amount ? "border-red-500" : ""}`}
                   />

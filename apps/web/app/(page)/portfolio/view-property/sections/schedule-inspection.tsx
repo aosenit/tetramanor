@@ -8,7 +8,7 @@ import ten from "@/assets/portfolio/ten.webp"
 
 import { usePostData } from "@/hooks/useApi";
 import { useToast } from "@chakra-ui/react";
-import PhoneInput from "@/components/ui/PhoneInput";
+import PhoneInputV2 from "@/components/ui/PhoneInputV2";
 
 interface ScheduleInspectionProps {
   propertyTitle?: string;
@@ -205,7 +205,7 @@ export default function ScheduleInspection({
                 <label htmlFor="phone" className="block text-gray-700 mb-2">
                   Phone number *
                 </label>
-                <PhoneInput
+                <PhoneInputV2
                   value={formData.phone}
                   onChange={handlePhoneChange}
                   placeholder="Enter phone number"
@@ -233,7 +233,7 @@ export default function ScheduleInspection({
               <label htmlFor="date" className="block text-gray-700 mb-2">
                 Preferred Inspection Date *
               </label>
-              <div className="relative">
+              <div className="">
                 <input
                   type="date"
                   id="date"
@@ -244,7 +244,7 @@ export default function ScheduleInspection({
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#116114]"
                   required
                 />
-                <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                {/* <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" /> */}
               </div>
               <p className="text-sm text-gray-500 mt-1">
                 Inspections available Monday through Saturday only

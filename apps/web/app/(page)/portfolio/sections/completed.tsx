@@ -55,14 +55,29 @@ function Completed() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {properties.map((property) => (
-              <PropertyCardNew
-                key={property.id}
-                property={property}
-                className="w-full"
-              />
-            ))}
+          <div className="space-y-6">
+            {/* Large card on top */}
+            {properties[0] && (
+              <div className="w-full">
+                <PropertyCardNew
+                  key={properties[0].id}
+                  property={properties[0]}
+                  size="large"
+                  className="w-full"
+                />
+              </div>
+            )}
+
+            {/* Two smaller cards below */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {properties.slice(1, 3).map((property) => (
+                <PropertyCardNew
+                  key={property.id}
+                  property={property}
+                  className="w-full"
+                />
+              ))}
+            </div>
           </div>
 
           <div className="flex justify-center mt-8">

@@ -55,14 +55,39 @@ function Ongoing() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {properties.map((property) => (
-              <PropertyCardNew
-                key={property.id}
-                property={property}
-                className="w-full"
-              />
-            ))}
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-2 gap-6">
+            {/* Large card on the left - spans 2 rows */}
+            {properties[0] && (
+              <div className="lg:row-span-2">
+                <PropertyCardNew
+                  key={properties[0].id}
+                  property={properties[0]}
+                  size="large"
+                  className="w-full h-full"
+                />
+              </div>
+            )}
+
+            {/* Two smaller cards on the right */}
+            {properties[1] && (
+              <div className="lg:row-span-1">
+                <PropertyCardNew
+                  key={properties[1].id}
+                  property={properties[1]}
+                  className="w-full"
+                />
+              </div>
+            )}
+
+            {properties[2] && (
+              <div className="lg:row-span-1">
+                <PropertyCardNew
+                  key={properties[2].id}
+                  property={properties[2]}
+                  className="w-full"
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex justify-center mt-8">

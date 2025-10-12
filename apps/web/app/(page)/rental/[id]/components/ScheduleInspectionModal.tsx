@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FaCalendarAlt, FaSpinner } from "react-icons/fa";
+import { FaSpinner } from "react-icons/fa";
 import PhoneInputV2 from "@/components/ui/PhoneInputV2";
 
 // Validation schema
@@ -222,7 +222,7 @@ export default function ScheduleInspectionModal({
             <Label htmlFor="date" className="text-sm font-medium text-gray-700">
               Preferred Inspection Date <span className="text-red-500">*</span>
             </Label>
-            <div className="relative">
+            <div className="">
               <Input
                 id="date"
                 type="date"
@@ -230,7 +230,7 @@ export default function ScheduleInspectionModal({
                 min={getMinDate()}
                 className={errors.date ? "border-red-500" : ""}
               />
-              <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+              {/* <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" /> */}
             </div>
             {errors.date && (
               <p className="text-sm text-red-500">{errors.date.message}</p>

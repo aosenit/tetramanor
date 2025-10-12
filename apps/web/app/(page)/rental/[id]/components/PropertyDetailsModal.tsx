@@ -129,7 +129,7 @@ export default function PropertyDetailsModal({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-hide">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gray-900">
-            {apartment.apartmentType} - Detailed Information
+            {apartment.apartmentType}
           </DialogTitle>
         </DialogHeader>
 
@@ -187,11 +187,6 @@ export default function PropertyDetailsModal({
                       {apartment.status === "AVAILABLE"
                         ? "Available"
                         : "Not Available"}
-                    </span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                      {formatCategory(apartment.unitCategory)}
                     </span>
                   </div>
                 </div>
@@ -315,13 +310,23 @@ export default function PropertyDetailsModal({
                   Features
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {apartment.features.map((feature, index) => (
+                  {apartment.features.map((feature) => (
                     <span
-                      key={index}
+                      key={feature.id}
                       className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
                     >
-                      <FaHome className="h-3 w-3" />
-                      {feature}
+                      {feature.icon && feature.icon.trim() !== "" ? (
+                        <Image
+                          src={feature.icon}
+                          alt=""
+                          width={12}
+                          height={12}
+                          className="object-contain"
+                        />
+                      ) : (
+                        <FaHome className="h-3 w-3" />
+                      )}
+                      {feature.name}
                     </span>
                   ))}
                 </div>
@@ -334,13 +339,23 @@ export default function PropertyDetailsModal({
                   Amenities
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {apartment.amenities.map((amenity, index) => (
+                  {apartment.amenities.map((amenity) => (
                     <span
-                      key={index}
+                      key={amenity.id}
                       className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
                     >
-                      {getAmenityIcon(amenity)}
-                      {amenity}
+                      {amenity.icon && amenity.icon.trim() !== "" ? (
+                        <Image
+                          src={amenity.icon}
+                          alt=""
+                          width={12}
+                          height={12}
+                          className="object-contain"
+                        />
+                      ) : (
+                        getAmenityIcon(amenity.name)
+                      )}
+                      {amenity.name}
                     </span>
                   ))}
                 </div>

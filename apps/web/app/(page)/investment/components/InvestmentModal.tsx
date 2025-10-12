@@ -183,10 +183,13 @@ const InvestmentModal = ({ open, onOpenChange }: InvestmentModalProps) => {
                 name="phone"
                 rules={{
                   required: "Phone number is required",
-                  pattern: {
-                    value: /^\+\d{7,15}$/,
-                    message:
-                      "Please enter a valid phone number with country code",
+                  minLength: {
+                    value: 7,
+                    message: "Phone number must be at least 7 digits",
+                  },
+                  maxLength: {
+                    value: 20,
+                    message: "Phone number is too long",
                   },
                 }}
                 render={({ field }) => (

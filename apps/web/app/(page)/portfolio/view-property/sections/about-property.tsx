@@ -13,6 +13,27 @@ interface AboutPropertyProps {
 }
 
 export default function AboutProperty({ property }: AboutPropertyProps) {
+  // Helper to render icon (from backend or fallback to check icon)
+  const renderIcon = (
+    iconUrl: string | undefined,
+    colorClass: string = "text-[#116114]"
+  ) => {
+    if (iconUrl && iconUrl.trim() !== "") {
+      return (
+        <Image
+          src={iconUrl}
+          alt=""
+          width={20}
+          height={20}
+          className="mr-3 mt-1 flex-shrink-0 object-contain"
+        />
+      );
+    }
+    return (
+      <FaCheck className={`h-5 w-5 ${colorClass} mr-3 mt-1 flex-shrink-0`} />
+    );
+  };
+
   return (
     <div className="container mx-auto px-4 lg:px-16 py-12 bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
@@ -59,7 +80,7 @@ export default function AboutProperty({ property }: AboutPropertyProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {property.features?.map((feature, idx) => (
             <div className="flex items-start" key={feature.id || idx}>
-              <FaCheck className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
+              {renderIcon(feature.icon)}
               <span>{feature.name}</span>
             </div>
           ))}
@@ -76,7 +97,7 @@ export default function AboutProperty({ property }: AboutPropertyProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {property.amenities?.map((amenity, idx) => (
             <div className="flex items-start" key={amenity.id || idx}>
-              <FaCheck className="h-5 w-5 text-[#116114] mr-3 mt-1 flex-shrink-0" />
+              {renderIcon(amenity.icon)}
               <span>{amenity.name}</span>
             </div>
           ))}

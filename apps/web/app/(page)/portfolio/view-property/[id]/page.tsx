@@ -2,13 +2,14 @@
 import React from "react";
 import Hero from "../sections/hero";
 import AboutProperty from "../sections/about-property";
+import AvailableUnits from "../sections/available-units";
 import WhyInvest from "../sections/why-invest";
 import MorePictures from "../sections/more-pictures";
 import EconomicAdvantages from "../sections/economic-advantages";
 import ScheduleInspection from "../sections/schedule-inspection";
 import Footer from "@/components/home/Footer";
 import MapSection from "../sections/map";
-import { FiShare2, FiArrowLeft, FiHeart } from "react-icons/fi";
+import { FiShare2, FiArrowLeft } from "react-icons/fi";
 import { ToastProvider, useToast } from "@/components/ui/toast-notification";
 import { shareProperty } from "@/lib/shareUtils";
 import { useFetchData } from "@/hooks/useApi";
@@ -22,7 +23,6 @@ interface PageProps {
 
 function PageContent({ params }: PageProps) {
   const { showToast } = useToast();
-  const [isFavorited, setIsFavorited] = React.useState(false);
 
   const { data, isLoading, error } = useFetchData(
     `property/detail/${params.id}`
@@ -46,17 +46,6 @@ function PageContent({ params }: PageProps) {
         "error"
       );
     }
-  };
-
-  const handleFavorite = () => {
-    setIsFavorited(!isFavorited);
-    showToast(
-      isFavorited ? "Removed from favorites" : "Added to favorites",
-      isFavorited
-        ? "Property has been removed from your favorites."
-        : "Property has been added to your favorites.",
-      "success"
-    );
   };
 
   const handleBackToPortfolio = () => {
@@ -122,8 +111,7 @@ function PageContent({ params }: PageProps) {
   return (
     <div>
       <div className="pt-14">
-
-      <Hero property={property} />
+        <Hero property={property} />
       </div>
       <div className="flex justify-between items-center p-4">
         <button
@@ -131,7 +119,7 @@ function PageContent({ params }: PageProps) {
           onClick={handleBackToPortfolio}
         >
           <FiArrowLeft className="w-4 h-4" />
-          <span>Back to Portfolio</span>
+          <span>Back to Properties</span>
         </button>
 
         <div className="flex items-center gap-2">
@@ -141,22 +129,10 @@ function PageContent({ params }: PageProps) {
           >
             <FiShare2 className="w-4 h-4" />
           </button>
-
-          <button
-            className={`flex items-center justify-center w-10 h-10 bg-white border border-gray-200 rounded-lg transition-all duration-200 ${
-              isFavorited
-                ? "text-red-500 border-red-200 bg-red-50"
-                : "text-[#151515] hover:border-gray-300 hover:bg-gray-50"
-            }`}
-            onClick={handleFavorite}
-          >
-            <FiHeart
-              className={`w-4 h-4 ${isFavorited ? "fill-current" : ""}`}
-            />
-          </button>
         </div>
       </div>
       <AboutProperty property={property} />
+      <AvailableUnits property={property} />
       <WhyInvest property={property} />
       <MorePictures property={property} />
       <MapSection location={property.address} />
