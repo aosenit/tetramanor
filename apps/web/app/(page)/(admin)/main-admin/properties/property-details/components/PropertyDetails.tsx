@@ -151,7 +151,7 @@ export default function PropertyDetails() {
 							disabled={isUpdating}
 							className={`border-[#116114] text-[#116114] hover:opacity-80 ${
 								isUpdating ? "opacity-50 cursor-not-allowed" : ""
-							}`}
+							} ${property?.status !== "AVAILABLE" && "border-red-500 text-red-500"}`}
 							variant="outline"
 							onClick={() =>
 								handleToggleAvailability(

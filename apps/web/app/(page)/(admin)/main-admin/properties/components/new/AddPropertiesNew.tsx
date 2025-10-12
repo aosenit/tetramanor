@@ -122,6 +122,7 @@ export default function AddProperties() {
 			unitType: "",
 			numberOfUnits: 0,
 			currency: "USD",
+			unitPrice: 0,
 		},
 	]);
 	const initialFeatures = features?.filter((item: any) => item.icon !== "");
@@ -138,18 +139,18 @@ export default function AddProperties() {
 	}, [features, amenities, isEditMode]);
 
 	useEffect(() => {
-		const featureIds = selectedFeatures.map((f: any) =>
-			typeof f === "string" ? f : f.id
+		const featureName = selectedFeatures.map((f: any) =>
+			typeof f === "string" ? f : f.name
 		);
-		const amenityIds = selectedAmenities.map((a: any) =>
-			typeof a === "string" ? a : a.id
+		const amenityName = selectedAmenities.map((a: any) =>
+			typeof a === "string" ? a : a.name
 		);
 
-		handleInputChange("features", featureIds);
-		handleInputChange("amenities", amenityIds);
+		handleInputChange("features", featureName);
+		handleInputChange("amenities", amenityName);
 
-		console.log("Selected feature IDs:", featureIds);
-		console.log("Selected amenity IDs:", amenityIds);
+		console.log("Selected feature IDs:", featureName);
+		console.log("Selected amenity IDs:", amenityName);
 	}, [selectedFeatures, selectedAmenities]);
 
 	const handleAddUnitsForm = () => {
@@ -160,6 +161,7 @@ export default function AddProperties() {
 				unitType: "",
 				numberOfUnits: 0,
 				currency: "USD",
+				price: 0,
 			},
 		]);
 	};
@@ -255,7 +257,7 @@ export default function AddProperties() {
 	const handleInputChange = (field: string, value: any) => {
 		setFormData((prev) => {
 			const unitFields = [
-				"price",
+				"unitPrice",
 				"currency",
 				"numberOfUnits",
 				"unitType",
@@ -267,7 +269,7 @@ export default function AddProperties() {
 					updatedUnits.push({
 						unitType: "",
 						numberOfUnits: 0,
-						price: 0,
+						unitPrice: 0,
 						description: "",
 						currency: "USD",
 					});
@@ -455,7 +457,7 @@ export default function AddProperties() {
 		// }
 
 		setIsSubmitting(true);
-		
+
 		// Filter out empty features and amenities
 		const cleanedFormData = {
 			...formData,
@@ -484,7 +486,6 @@ export default function AddProperties() {
 		payload.constructionStatus = cleanedFormData.constructionStatus;
 		payload.features = formData.features;
 		payload.amenities = formData.amenities;
-
 
 		// Images as array of strings of ids
 		if (uploadedImages.length > 0) {
