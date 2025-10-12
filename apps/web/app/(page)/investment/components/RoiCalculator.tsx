@@ -92,7 +92,7 @@ export default function RoiCalculator() {
             </h3>
 
             <div className="mb-8">
-              <div className="font-medium mb-2">Amount to invest (P)</div>
+              <div className="font-medium mb-2">Amount to invest </div>
               <div className="flex gap-4">
                 <select
                   value={currency}
@@ -118,7 +118,7 @@ export default function RoiCalculator() {
 
             <div className="mb-8">
               <div className="flex justify-between mb-2">
-                <span className="font-medium">Annual Interest Rate (r)</span>
+                <span className="font-medium">Annual Interest Rate </span>
                 <span className="font-semibold text-green-700">
                   {interestRate}%
                 </span>
@@ -139,7 +139,7 @@ export default function RoiCalculator() {
             </div>
 
             <div className="mb-8">
-              <div className="font-medium mb-2">Duration in Years (t)</div>
+              <div className="font-medium mb-2">Duration in Years </div>
               <input
                 type="number"
                 placeholder="e.g., 3"
