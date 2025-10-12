@@ -139,7 +139,7 @@ function TabTwo({ investments }: { investments: Investment[] }) {
                       />
                     </div>
                   </div>
-                  <div className="h-[300px] flex flex-col justify-between">
+                  <div className="min-h-[350px] flex flex-col justify-between">
                     <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#11611414]">
                       <FaMoneyBillTrendUp className="text-[#116114]" />
                     </div>
