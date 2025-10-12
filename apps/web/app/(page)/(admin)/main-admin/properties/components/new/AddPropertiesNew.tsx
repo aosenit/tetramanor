@@ -453,7 +453,7 @@ export default function AddProperties() {
 		e.preventDefault();
 
 		// if (!validateForm()) {
-		//   return; // Validation errors are already shown in validateForm
+		//   return; // Validation errors are already shown in validateFor
 		// }
 
 		setIsSubmitting(true);
