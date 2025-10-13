@@ -14,6 +14,7 @@ export default function FloatingWhatsApp({
   const handleWhatsAppClick = () => {
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.link/r086uv/${phoneNumber}?text=${encodedMessage}`;
+    console.log(whatsappUrl);
 
     window.open("https://wa.link/vl7uyl", "_blank");
   };
