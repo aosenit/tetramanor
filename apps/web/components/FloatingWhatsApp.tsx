@@ -9,12 +9,13 @@ interface FloatingWhatsAppProps {
 
 export default function FloatingWhatsApp({
   phoneNumber = "2348012345678", // Default Nigerian number - you can change this
-  message = "Hello! I'm interested in your real estate services."
+  message = "Hello! I'm interested in your real estate services.",
 }: FloatingWhatsAppProps) {
   const handleWhatsAppClick = () => {
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-    window.open(whatsappUrl, "_blank");
+    const whatsappUrl = `https://wa.link/r086uv/${phoneNumber}?text=${encodedMessage}`;
+
+    window.open("https://wa.link/vl7uyl", "_blank");
   };
 
   return (
@@ -25,10 +26,10 @@ export default function FloatingWhatsApp({
         aria-label="Chat with us on WhatsApp"
       >
         <FaWhatsapp className="w-6 h-6" />
-        
+
         {/* Pulse animation */}
         <div className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-20"></div>
-        
+
         {/* Tooltip */}
         <div className="absolute right-full top-1/2 -translate-y-1/2 mr-3 bg-gray-800 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
           Chat with us on WhatsApp
