@@ -67,7 +67,7 @@ export default function ContactPage() {
 
   // Update form data when API data is loaded
   useEffect(() => {
-    if (data && data.success) {
+    if (data && data.success && data.data) {
       setFormData({
         ...data.data,
         mapEmbedCode: data.data.mapEmbedCode || "",
