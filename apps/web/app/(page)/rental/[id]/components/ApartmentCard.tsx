@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { RentalUnit } from "@/types/property";
-import { FaBed, FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaCouch } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import PropertyDetailsModal from "./PropertyDetailsModal";
 import RentalInquiryModal from "./RentalInquiryModal";
@@ -14,6 +14,15 @@ import {
   useCurrencyConverter,
   formatCurrency,
 } from "@/hooks/useCurrencyConverter";
+
+// Utility function to format text from backend (removes underscores and formats properly)
+const formatBackendText = (text: string): string => {
+  if (!text) return "";
+  return text
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
 
 interface ApartmentCardProps {
   apartment: RentalUnit;
@@ -40,9 +49,11 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
             <h3 className="text-lg font-bold mb-1">
               {apartment.apartmentType}
             </h3>
-            <div className="flex items-center text-sm text-white/90">
-              <FaMapMarkerAlt className="mr-1 h-3 w-3" />
-              <span>{apartment.location}</span>
+            <div className="flex items-center text-sm text-white">
+              <FaCouch className="mr-1.5 h-3.5 w-3.5 text-[#CD6115]" />
+              <span className="font-medium">
+                {formatBackendText(apartment.unitCategory)}
+              </span>
             </div>
           </div>
           <div

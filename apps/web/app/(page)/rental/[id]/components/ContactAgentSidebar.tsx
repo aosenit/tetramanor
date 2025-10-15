@@ -166,21 +166,21 @@ export default function ContactAgentSidebar({
           <p className="text-sm text-gray-600 mb-4">Or contact us directly:</p>
           <div className="space-y-3">
             <a
-              href="tel:+2348012345678"
+              href="tel:+09166479719"
               className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#116114] transition-colors"
             >
               <FaPhone className="w-4 h-4 text-[#CD6115]" />
-              <span>+234 801 234 5678</span>
+              <span>+234 9166479719</span>
             </a>
             <a
-              href="mailto:rentals@tetramanor.com"
+              href="mailto:People@teramanor.com"
               className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#116114] transition-colors"
             >
               <FaEnvelope className="w-4 h-4 text-[#CD6115]" />
-              <span>rentals@tetramanor.com</span>
+              <span>People@teramanor.com</span>
             </a>
             <a
-              href="https://wa.me/2348012345678"
+              href="https://wa.me/09166479719"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#25D366] transition-colors"

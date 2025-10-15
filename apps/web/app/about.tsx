@@ -3,6 +3,7 @@ import HomeKeyFeatures from "@/components/home/HomeKeyFeatures";
 import React from "react";
 import Header from "@/components/Header";
 import Image from "next/image";
+import TetramoreCode from "./(page)/about/components/TetramoreCode";
 
 export default function About() {
   return (
@@ -41,39 +42,7 @@ export default function About() {
 
       {/* The Tetramanor Code (Promise/Values) */}
       <section className="py-16 bg-[#FAFAFA]">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-[#CD6115] mb-4">
-            The Tetramanor Code
-          </h2>
-          <p className="text-gray-700 mb-8">
-            This is the promise we make to our clients
-          </p>
-          <blockquote className="border-l-4 border-[#CD6115] pl-4 italic text-gray-800 mb-6">
-            We will not compromise our standards for any reason whatsoever.
-            <br />
-            We will not want our clients to make a profit.
-            <br />
-            We will not sell to our clients spaces we are not willing to live in
-            ourselves.
-          </blockquote>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <span className="bg-white px-4 py-2 rounded shadow text-sm">
-              Reasonable Prices
-            </span>
-            <span className="bg-white px-4 py-2 rounded shadow text-sm">
-              Strategic Locations
-            </span>
-            <span className="bg-white px-4 py-2 rounded shadow text-sm">
-              Keeping it Real
-            </span>
-            <span className="bg-white px-4 py-2 rounded shadow text-sm">
-              Flexible
-            </span>
-            <span className="bg-white px-4 py-2 rounded shadow text-sm">
-              Reliable
-            </span>
-          </div>
-        </div>
+        <TetramoreCode />
       </section>
 
       {/* Why Choose Tetramanor */}
@@ -147,7 +116,7 @@ export default function About() {
       <section className="py-16 bg-[#FAFAFA]">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-6 text-center">
-            Tetramanor's Visionaries, Inventors, Builders.
+            Tetramanor&apos;s Visionaries, Inventors, Builders.
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-6 gap-6 justify-center">
             {/* Example team members, replace with dynamic data if available */}
