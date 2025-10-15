@@ -173,7 +173,7 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
                         key={featureKey}
                         className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
                       >
-                        {featureName}
+                        {featureName.toUpperCase()}
                       </span>
                     );
                   })}
@@ -205,7 +205,7 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
                         key={amenityKey}
                         className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full"
                       >
-                        {amenityName}
+                        {amenityName.toUpperCase()}
                       </span>
                     );
                   })}
@@ -276,7 +276,7 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
       <ScheduleInspectionModal
         isOpen={isInspectionModalOpen}
         onClose={() => setIsInspectionModalOpen(false)}
-        propertyId={apartment.id}
+        propertyId={apartment.propertyId}
         propertyName={apartment.apartmentType}
       />
     </div>

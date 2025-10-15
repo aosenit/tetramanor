@@ -81,7 +81,7 @@ export default function AboutProperty({ property }: AboutPropertyProps) {
           {property.features?.map((feature, idx) => (
             <div className="flex items-start" key={feature.id || idx}>
               {renderIcon(feature.icon)}
-              <span>{feature.name}</span>
+              <span>{feature.name.toUpperCase()}</span>
             </div>
           ))}
         </div>
@@ -98,7 +98,7 @@ export default function AboutProperty({ property }: AboutPropertyProps) {
           {property.amenities?.map((amenity, idx) => (
             <div className="flex items-start" key={amenity.id || idx}>
               {renderIcon(amenity.icon)}
-              <span>{amenity.name}</span>
+              <span>{amenity.name.toUpperCase()}</span>
             </div>
           ))}
         </div>

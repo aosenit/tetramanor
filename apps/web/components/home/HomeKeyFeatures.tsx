@@ -1,10 +1,17 @@
+"use client";
+
 import { Button } from "@chakra-ui/react";
 import Image from "next/image";
-import bedone from "@/assets/home/bedone.webp";
-import React from 'react';
-import CountUp from 'react-countup';
+import placeholder from "@/assets/placeholder.jpg";
+import React from "react";
+import CountUp from "react-countup";
+import { useFetchData } from "@/hooks/useApi";
 
 export default function HomeKeyFeatures() {
+  // Fetch capital appreciation data
+  const { data, isLoading } = useFetchData("miscs/capital-appreciation");
+  const properties = data?.data || [];
+  const featuredProperty = properties[0]; // Get the first property for display
   return (
     <section className=" w-full container mx-auto px-4 lg:px-16 py-12 fade-in-up">
       <div className=" grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -30,7 +37,7 @@ export default function HomeKeyFeatures() {
             </div>
             <div className="bg-[#202020] rounded-xl p-6 flex flex-col justify-center min-h-[120px]">
               <div className="text-3xl font-extrabold text-white mb-2">
-               <CountUp end={100} duration={2.5} suffix="+" />
+                <CountUp end={100} duration={2.5} suffix="+" />
               </div>
               <div className="text-white text-base font-medium">
                 Years of Combined Experience
@@ -68,9 +75,9 @@ export default function HomeKeyFeatures() {
         {/* Right Side */}
         <div className="flex flex-col gap-6 h-full ">
           <div className=" text-gray-700 text-base mb-2 lg:pl-10">
-            At Tetramanor, we don't just build homes — we build long-term value.
-            Through quality construction and strategic development, our clients
-            enjoy both comfort and exceptional returns.
+            At Tetramanor, we don&apos;t just build homes — we build long-term
+            value. Through quality construction and strategic development, our
+            clients enjoy both comfort and exceptional returns.
           </div>
           <div className="bg-[#F5F5F5] rounded-xl p-6 flex flex-col lg:flex-row gap-4 h-full">
             <div className="lg:w-2/3 flex flex-col justify-between">
@@ -79,9 +86,9 @@ export default function HomeKeyFeatures() {
                   Proven Capital Appreciation
                 </div>
                 <div className="text-gray-700 text-base mb-4">
-                  We've seen impressive capital growth across our projects. TM
-                  HighGardens, initially sold at ₦55M, is now valued at ₦120M in
-                  just two years.
+                  We&apos;ve seen impressive capital growth across our projects.
+                  TM HighGardens, initially sold at ₦55M, is now valued at ₦120M
+                  in just two years.
                 </div>
               </div>
               <Button
@@ -93,32 +100,40 @@ export default function HomeKeyFeatures() {
               </Button>
             </div>
             {/* Image Card */}
-            <div className="relative mt-6 rounded-xl overflow-hidden shadow-lg lg:w-1/3 img-hover-zoom">
-              <Image
-                fill
-                src={bedone}
-                alt="TM HighGardens"
-                className="w-full h-48 object-cover"
-              />
-              <div className="absolute top-4 left-4 bg-[#202020] bg-opacity-80 text-white text-xs px-3 py-1 rounded-full">
-                3 Bedroom (TMHG)
+            {isLoading ? (
+              <div className="relative mt-6 rounded-xl overflow-hidden shadow-lg lg:w-1/3 bg-gray-200 animate-pulse h-64" />
+            ) : (
+              <div className="relative mt-6 rounded-xl overflow-hidden shadow-lg lg:w-1/3 img-hover-zoom">
+                <Image
+                  fill
+                  src={featuredProperty?.image || placeholder}
+                  alt={featuredProperty?.name || "Property"}
+                  className="w-full h-48 object-cover"
+                />
+                {featuredProperty && (
+                  <>
+                    <div className="absolute top-4 left-4 bg-[#202020] bg-opacity-80 text-white text-xs px-3 py-1 rounded-full">
+                      {featuredProperty.unitType}
+                    </div>
+                    <div className="absolute bottom-0 left-0 w-full bg-[#202020] bg-opacity-90 p-4">
+                      <div className="font-bold text-lg text-white mb-1">
+                        {featuredProperty.name}
+                      </div>
+                      <ul className="text-white text-sm space-y-1">
+                        <li>
+                          <span className="font-semibold">Launch Value:</span>{" "}
+                          {featuredProperty.launchValue}
+                        </li>
+                        <li>
+                          <span className="font-semibold">Current Value:</span>{" "}
+                          {featuredProperty.currentValue}
+                        </li>
+                      </ul>
+                    </div>
+                  </>
+                )}
               </div>
-              <div className="absolute bottom-0 left-0 w-full bg-[#202020] bg-opacity-90 p-4">
-                <div className="font-bold text-lg text-white mb-1">
-                  TM HighGardens
-                </div>
-                <ul className="text-white text-sm space-y-1">
-                  <li>
-                    <span className="font-semibold">Launch Value:</span>{" "}
-                    $250,000
-                  </li>
-                  <li>
-                    <span className="font-semibold">Current Value:</span>{" "}
-                    $450,000
-                  </li>
-                </ul>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
