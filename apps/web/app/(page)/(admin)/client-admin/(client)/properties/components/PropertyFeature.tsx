@@ -51,7 +51,7 @@ export function PropertyFeatures({ features }: PropertyFeaturesProps) {
       {features.map((feature) => (
         <div key={feature} className="flex items-center gap-2">
           {getIcon(feature)}
-          <span>{feature}</span>
+          <span>{feature.toUpperCase()}</span>
         </div>
       ))}
     </div>

@@ -95,7 +95,7 @@ const RentalPropertyCard: React.FC<RentalPropertyCardProps> = ({
                           key={amenity.id}
                           className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
                         >
-                          {amenity.name}
+                          {amenity.name.toUpperCase()}
                         </span>
                       ))}
                       {rental.amenities.length > 4 && (
@@ -197,7 +197,7 @@ const RentalPropertyCard: React.FC<RentalPropertyCardProps> = ({
                       key={amenityKey}
                       className="text-xs bg-gray-50 text-gray-700 px-2 py-1 rounded border border-gray-200"
                     >
-                      {amenityName}
+                      {amenityName.toUpperCase()}
                     </span>
                   );
                 })}

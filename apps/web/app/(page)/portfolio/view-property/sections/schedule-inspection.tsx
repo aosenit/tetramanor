@@ -175,11 +175,11 @@ export default function ScheduleInspection({
             <div className="space-y-4">
               <div className="flex items-center">
                 <FaPhone className="mr-3 text-[#116114]" />
-                <span>+234 812 345 67</span>
+                <span> 09166479719</span>
               </div>
               <div className="flex items-center">
                 <FaEnvelope className="mr-3 text-[#116114]" />
-                <span>tetramanor@mail.com</span>
+                <span>People@teramanor.com</span>
               </div>
             </div>
           </div>

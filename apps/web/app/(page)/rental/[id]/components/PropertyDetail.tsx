@@ -89,6 +89,11 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
   const { data, isLoading, error, refetch } = useFetchData(
     `rentals/listing/${propertyId}`
   );
+
+  // Fetch property specs for features and amenities
+  const { data: specsData } = useFetchData("admin/property-specs");
+  const propertySpecs = specsData?.data || { features: [], amenities: [] };
+
   const { showToast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedFrequency, setSelectedFrequency] = useState<string>("ALL");
@@ -136,69 +141,6 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
     );
   }
 
-  // Get all unique amenities and features
-  const allAmenities: Array<{
-    id: string;
-    name: string;
-    icon?: string | null;
-  }> = [];
-  const allFeatures: Array<{ id: string; name: string; icon?: string | null }> =
-    [];
-
-  property.rental.forEach((unit) => {
-    // Process amenities - handle both string and object formats
-    (
-      unit.amenities as (string | { id: string; name: string; icon?: string })[]
-    ).forEach((amenity) => {
-      if (typeof amenity === "string") {
-        const trimmed = amenity.trim();
-        if (trimmed !== "") {
-          allAmenities.push({
-            id: trimmed,
-            name: trimmed,
-            icon: null,
-          });
-        }
-      } else if (amenity && amenity.name && amenity.name.trim() !== "") {
-        allAmenities.push({
-          id: amenity.id,
-          name: amenity.name,
-          icon: amenity.icon || null,
-        });
-      }
-    });
-
-    // Process features - handle both string and object formats
-    (
-      unit.features as (string | { id: string; name: string; icon?: string })[]
-    ).forEach((feature) => {
-      if (typeof feature === "string") {
-        const trimmed = feature.trim();
-        if (trimmed !== "") {
-          allFeatures.push({
-            id: trimmed,
-            name: trimmed,
-            icon: null,
-          });
-        }
-      } else if (feature && feature.name && feature.name.trim() !== "") {
-        allFeatures.push({
-          id: feature.id,
-          name: feature.name,
-          icon: feature.icon || null,
-        });
-      }
-    });
-  });
-
-  // Remove duplicates by creating Maps with unique IDs
-  const uniqueAmenities = Array.from(
-    new Map(allAmenities.map((item) => [item.id, item])).values()
-  );
-  const uniqueFeatures = Array.from(
-    new Map(allFeatures.map((item) => [item.id, item])).values()
-  );
-
   // Define all possible filter categories (including ones not in current data)
   const allPossibleCategories = [
     "STANDARD_FURNISHED",
@@ -222,6 +164,63 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
       selectedFrequency === "ALL" || unit.frequency === selectedFrequency;
     return categoryMatch && frequencyMatch;
   });
+
+  // Get unit categories from FILTERED rentals (not all rentals)
+  const visibleUnitCategories = new Set<string>();
+  filteredRentals.forEach((unit) => {
+    if (unit.unitCategory) {
+      visibleUnitCategories.add(unit.unitCategory);
+    }
+  });
+
+  // Filter amenities based on furnishType matching VISIBLE unit categories
+  // This makes features/amenities dynamic based on the selected filter
+  const uniqueAmenities =
+    propertySpecs.amenities?.filter(
+      (amenity: {
+        id: string;
+        name: string;
+        icon?: string | null;
+        furnishType?: string | null;
+      }) => {
+        // If "All" is selected, show items with null furnishType OR matching any category
+        if (selectedCategory === "ALL") {
+          return (
+            !amenity.furnishType ||
+            amenity.furnishType === null ||
+            visibleUnitCategories.has(amenity.furnishType)
+          );
+        }
+
+        // If specific category is selected, ONLY show items matching that category
+        // (exclude null items for strict filtering)
+        return visibleUnitCategories.has(amenity.furnishType || "");
+      }
+    ) || [];
+
+  // Filter features based on furnishType matching VISIBLE unit categories
+  const uniqueFeatures =
+    propertySpecs.features?.filter(
+      (feature: {
+        id: string;
+        name: string;
+        icon?: string | null;
+        furnishType?: string | null;
+      }) => {
+        // If "All" is selected, show items with null furnishType OR matching any category
+        if (selectedCategory === "ALL") {
+          return (
+            !feature.furnishType ||
+            feature.furnishType === null ||
+            visibleUnitCategories.has(feature.furnishType)
+          );
+        }
+
+        // If specific category is selected, ONLY show items matching that category
+        // (exclude null items for strict filtering)
+        return visibleUnitCategories.has(feature.furnishType || "");
+      }
+    ) || [];
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] pt-20">
@@ -329,7 +328,7 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
                       ) : (
                         <FaCheckCircle className="text-[#116114] flex-shrink-0" />
                       )}
-                      <span>{amenity.name}</span>
+                      <span>{amenity.name.toUpperCase()}</span>
                     </div>
                   ))}
                 </div>
@@ -359,7 +358,7 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
                       ) : (
                         <FaCheckCircle className="text-[#CD6115] flex-shrink-0" />
                       )}
-                      <span>{feature.name}</span>
+                      <span>{feature.name.toUpperCase()}</span>
                     </div>
                   ))}
                 </div>

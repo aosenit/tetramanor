@@ -286,13 +286,14 @@ export default function PropertyDetailsModal({
                         ) : (
                           getAmenityIcon(featureName)
                         )}
-                        {featureName}
+                        {featureName.toUpperCase()}
                       </span>
                     );
                   })}
                 </div>
               </div>
-            )}
+            )
+            }
 
             {apartment.amenities.length > 0 && (
               <div>
@@ -325,7 +326,7 @@ export default function PropertyDetailsModal({
                         ) : (
                           getAmenityIcon(amenityName)
                         )}
-                        {amenityName}
+                        {amenityName.toUpperCase()}
                       </span>
                     );
                   })}

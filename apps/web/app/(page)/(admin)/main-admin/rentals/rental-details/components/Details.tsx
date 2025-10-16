@@ -1,47 +1,28 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Pencil, Plus, RefreshCw } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import placeholder from "@/assets/placeholder.svg";
-import React, { useState, useEffect } from "react";
-import { MdArrowBackIosNew } from "react-icons/md";
+import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useApi";
 import Loader from "@/components/Loader";
+import IconDisplay from "../../../properties/property-details/components/IconDisplay";
+import { MdArrowBackIosNew } from "react-icons/md";
 
-// Default features and amenities arrays (will be overridden by API data)
-const defaultFeatures = [
-  "High-Quality Kitchen Cabinets & Wardrobes",
-  "Walk-in Closets",
-  "POP Ceilings",
-  "Premium Sanitary Fittings",
-  "Vintage PVC French Windows",
-  "Uninterrupted Power Supply",
-  "Efficient Waste Disposal & Central Sewage Management",
-  "Vitrified & Granite Tiles",
-  "Backup Power Supply",
-  "24/7 Concierge Services",
-];
-
-const defaultAmenities = [
-  "Fiber Optic Connectivity",
-  "Fully Equipped Gym",
-  "Stunning Sea View",
-  "Uninterrupted Power Supply",
-  "Stunning Sea View",
-  "Lounge/Bar",
-  "Fiber Optic Connectivity",
-  "24/7 Concierge Services",
-  "State of the art interior decor",
-];
-
-interface DetailsProps {
-  refetch?: () => void;
+interface FeatureOrAmenity {
+  name: string;
+  icon: string;
 }
 
-function Details({ refetch }: DetailsProps) {
+interface RentalImage {
+  id: string;
+  imageUrl: string;
+}
+
+function Details() {
   const searchParams = useSearchParams();
   const rentalId = searchParams.get("id");
   const router = useRouter();
@@ -50,26 +31,10 @@ function Details({ refetch }: DetailsProps) {
     data: rentalData,
     isLoading,
     error,
-    refetch: refetchRental,
   } = useFetchData(rentalId ? `rentals/${rentalId}/details` : null);
 
-  const [rental, setRental] = useState<any>(null);
-  const [property, setProperty] = useState<any>(null);
-console.log(property);
-  useEffect(() => {
-    if (rentalData?.data) {
-      setRental(rentalData.data);
-      setProperty(rentalData.data.property);
-    }
-  }, [rentalData]);
-
-  // Handle refetch
-  const handleRefetch = () => {
-    refetchRental();
-    if (refetch) {
-      refetch();
-    }
-  };
+  const rental = rentalData?.data;
+  const property = rentalData?.data.property;
 
   // Format currency
   const formatCurrency = (amount: number) => {
@@ -164,7 +129,7 @@ console.log(property);
           <p className="text-xl font-medium text-[#181818]">Rental detail</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {rental.images ? (
-              rental.images.map((image: any) => (
+              rental.images.map((image: RentalImage) => (
                 <Image
                   key={image.id}
                   src={image.imageUrl || placeholder}
@@ -179,13 +144,15 @@ console.log(property);
                 src={placeholder}
                 alt="property"
                 className="w-[200px] h-[200px] object-cover"
+                width={300}
+                height={250}
               />
             )}
           </div>
           <div className=" space-y-4 max-w-6xl pt-4">
             <div className="flex items-center justify-between">
               <p className="text-[#181818]">Apartment type </p>
-              <p className="text-[#181818]">{rental.apartmentType || "N/A"}</p>
+              <p className="text-[#181818]">{rental?.apartmentType || "N/A"}</p>
             </div>
             <div className="flex items-center justify-between">
               <p className="text-[#181818]">Location </p>
@@ -197,9 +164,7 @@ console.log(property);
             </div>
             <div className="flex items-center justify-between">
               <p className="text-[#181818]">Property furnished</p>
-              <p className="text-[#181818]">
-                {rentalData.data?.isFurnished ? "Yes" : "No"}
-              </p>
+              <p className="text-[#181818]">{rentalData.data?.unitCategory}</p>
             </div>
             <div className="flex items-center justify-between">
               <p className="text-[#000000]">Status</p>
@@ -223,7 +188,7 @@ console.log(property);
             <div className="flex items-center text-[#181818] justify-between">
               <p>Rental price </p>
               <p>
-                {formatCurrency(rental.rent || 0)}
+                {formatCurrency(rental.rentFee || 0)}
                 {formatFrequency(rental.frequency || "MONTHLY")}
               </p>
             </div>
@@ -239,7 +204,7 @@ console.log(property);
               <p>Total package</p>
               <p>
                 {formatCurrency(
-                  (rental.rent || 0) +
+                  (rental.rentFee || 0) +
                     (rental.agencyFee || 0) +
                     (rental.cautionFee || 0)
                 )}
@@ -263,8 +228,8 @@ console.log(property);
               <p>{property?.constructionStatus || "N/A"}</p>
             </div>
             <div className="flex items-center text-[#181818] justify-between">
-              <p>Unit amount</p>
-              <p>{property?.unitAmount || "N/A"}</p>
+              <p>Total units</p>
+              <p>{property?.totalUnits || "N/A"}</p>
             </div>
           </div>
         </div>
@@ -272,37 +237,32 @@ console.log(property);
           <h2 className="text-sm font-medium text-[#181818]  mb-6">Features</h2>
 
           <div className="flex flex-wrap gap-4">
-            {(property?.features || defaultFeatures).map(
-              (feature: string, index: number) => (
-                <div
-                  key={index}
-                  className="border border-gray-200 rounded-lg px-4 py-2 w-fit  flex items-center h-auto"
-                >
-                  <div className="w-2 h-2 bg-[#323539] rounded-full mr-2 flex-shrink-0"></div>
-                  <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden  w-full">
-                    {feature}
-                  </span>
-                </div>
-              )
+            {property?.features && property.features.length > 0 ? (
+              property.features.map((feature: FeatureOrAmenity) => (
+                <IconDisplay
+                  key={`feature-${feature.name}`}
+                  item={{ id: true, name: feature.name, icon: feature.icon }}
+                />
+              ))
+            ) : (
+              <p className="text-[#858C95] text-sm">No features available</p>
             )}
           </div>
-          <h2 className="text-sm font-medium text-[#181818] mb-6">
-            Amenities{" "}
+
+          <h2 className="text-sm font-medium text-[#181818] mb-6 mt-6">
+            Amenities
           </h2>
 
-          <div className="flex  gap-4">
-            {(property?.amenities || defaultAmenities).map(
-              (amenity: string, index: number) => (
-                <div
-                  key={index}
-                  className="border border-gray-200 rounded-lg px-4 py-2 w-fit flex items-center h-auto"
-                >
-                  <div className="w-2 h-2 bg-[#323539] rounded-full mr-2 flex-shrink-0"></div>
-                  <span className="text-[#323539] text-sm whitespace-nowrap overflow-hidden  w-full">
-                    {amenity}
-                  </span>
-                </div>
-              )
+          <div className="flex flex-wrap gap-4">
+            {property?.amenities && property.amenities.length > 0 ? (
+              property.amenities.map((amenity: FeatureOrAmenity) => (
+                <IconDisplay
+                  key={`amenity-${amenity.name}`}
+                  item={{ id: true, name: amenity.name, icon: amenity.icon }}
+                />
+              ))
+            ) : (
+              <p className="text-[#858C95] text-sm">No amenities available</p>
             )}
           </div>
         </div>

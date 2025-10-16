@@ -13,7 +13,7 @@ import Socials from "./SocialLinkForm";
 import { useFetchData, usePutData } from "@/hooks/useApi";
 import Loader from "@/components/Loader";
 import { LuInstagram } from "react-icons/lu";
-import { BsTwitterX, BsWhatsapp } from "react-icons/bs";
+import { BsTwitterX, BsWhatsapp, BsFacebook, BsTiktok } from "react-icons/bs";
 import { SlSocialLinkedin } from "react-icons/sl";
 import { Breadcrumb } from "../../customers/components/Breadcrumb";
 
@@ -67,7 +67,7 @@ export default function ContactPage() {
 
   // Update form data when API data is loaded
   useEffect(() => {
-    if (data && data.success) {
+    if (data && data.success && data.data) {
       setFormData({
         ...data.data,
         mapEmbedCode: data.data.mapEmbedCode || "",
@@ -101,14 +101,11 @@ export default function ContactPage() {
   const handleSocialLinksChange = (
     socialLinks: Array<{ platform: string; url: string }>
   ) => {
-    // Only include social links that have non-empty URLs
-    const validSocialLinks = socialLinks.filter(
-      (link) => link.url.trim() !== ""
-    );
-
+    // Keep all links in state (including empty ones for better UX)
+    // Filter will happen when saving to backend
     setFormData((prev) => ({
       ...prev,
-      socialMedia: validSocialLinks,
+      socialMedia: socialLinks,
     }));
   };
 
@@ -116,7 +113,17 @@ export default function ContactPage() {
     setError(null);
 
     try {
-      const response = await updateContact(formData);
+      // Filter out social links with empty URLs before saving
+      const validSocialLinks = formData.socialMedia.filter(
+        (link) => link.url.trim() !== ""
+      );
+
+      const dataToSave = {
+        ...formData,
+        socialMedia: validSocialLinks,
+      };
+
+      const response = await updateContact(dataToSave);
 
       if (response) {
         setEditMode(false);
@@ -289,6 +296,8 @@ export default function ContactPage() {
                   switch (platform.toLowerCase()) {
                     case "whatsapp":
                       return <BsWhatsapp className="w-5 h-5 text-green-600" />;
+                    case "facebook":
+                      return <BsFacebook className="w-5 h-5 text-blue-600" />;
                     case "linkedin":
                       return (
                         <SlSocialLinkedin className="w-5 h-5 text-blue-600" />
@@ -297,6 +306,8 @@ export default function ContactPage() {
                       return <BsTwitterX className="w-5 h-5 text-black" />;
                     case "instagram":
                       return <LuInstagram className="w-5 h-5 text-pink-600" />;
+                    case "tiktok":
+                      return <BsTiktok className="w-5 h-5 text-black" />;
                     default:
                       return (
                         <div className="w-5 h-5 bg-gray-400 rounded-full" />

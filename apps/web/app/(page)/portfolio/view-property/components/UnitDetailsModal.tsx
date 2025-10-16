@@ -195,12 +195,12 @@ export default function UnitDetailsModal({
                       {unit.availableUnits}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
+                  {/* <div className="flex justify-between items-center">
                     <span className="text-gray-600">Sold Units:</span>
                     <span className="font-semibold text-gray-900">
                       {unit.numberOfUnits - unit.availableUnits}
                     </span>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="border-t pt-3">
