@@ -1,8 +1,13 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { Spinner } from "@chakra-ui/react";
 import { Upload, X } from "lucide-react";
-
 import React from "react";
+import {
+  UPLOAD_LIMITS,
+  ACCEPTED_FILE_TYPES,
+  getFileSizeLabel,
+  validateFiles,
+} from "@/lib/upload-config";
+import { toast } from "sonner";
 
 // Copy type definitions from AddProperties
 export interface UploadedImage {
@@ -52,6 +57,60 @@ export default function PropertyMediaSection({
   removeDocument,
   isDeletingImage,
 }: PropertyMediaSectionProps) {
+  // Validation wrapper for image upload
+  const handleImageUploadWithValidation = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const validation = validateFiles(
+      files,
+      UPLOAD_LIMITS.IMAGE_MAX_SIZE,
+      ACCEPTED_FILE_TYPES.ALL_IMAGES
+    );
+
+    if (!validation.valid) {
+      validation.errors.forEach((error) => toast.error(error));
+      return;
+    }
+
+    handleImageUpload(files);
+  };
+
+  // Validation wrapper for document upload
+  const handleDocumentUploadWithValidation = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const validation = validateFiles(
+      files,
+      UPLOAD_LIMITS.DOCUMENT_MAX_SIZE,
+      ACCEPTED_FILE_TYPES.DOCUMENTS
+    );
+
+    if (!validation.valid) {
+      validation.errors.forEach((error) => toast.error(error));
+      return;
+    }
+
+    handleDocumentUpload(files);
+  };
+
+  // Validation wrapper for banner upload
+  const handleBannerUploadWithValidation = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const validation = validateFiles(
+      files,
+      UPLOAD_LIMITS.IMAGE_MAX_SIZE,
+      ACCEPTED_FILE_TYPES.ALL_IMAGES
+    );
+
+    if (!validation.valid) {
+      validation.errors.forEach((error) => toast.error(error));
+      return;
+    }
+
+    handleBannerUpload(files);
+  };
+
   return (
     <div className="mt-8">
       <h3 className="text-base font-medium text-[#116114] mb-4">
@@ -68,11 +127,15 @@ export default function PropertyMediaSection({
               Upload property Images
               <Upload className="w-6 h-6 text-gray-400" />
             </span>
+            <span className="text-xs text-gray-500 mt-1">
+              Max {getFileSizeLabel(UPLOAD_LIMITS.IMAGE_MAX_SIZE)} • JPEG, PNG,
+              WebP
+            </span>
             <input
               type="file"
               multiple
-              accept="image/*"
-              onChange={(e) => handleImageUpload(e.target.files)}
+              accept={ACCEPTED_FILE_TYPES.ALL_IMAGES}
+              onChange={(e) => handleImageUploadWithValidation(e.target.files)}
               className="hidden"
               id="image-upload"
               disabled={isUploadingImages}
@@ -121,10 +184,16 @@ export default function PropertyMediaSection({
               Upload property brochure
               <Upload className="w-6 h-6 text-gray-400" />
             </span>
+            <span className="text-xs text-gray-500 mt-1">
+              Max {getFileSizeLabel(UPLOAD_LIMITS.DOCUMENT_MAX_SIZE)} • PDF,
+              DOC, DOCX
+            </span>
             <input
               type="file"
-              accept=".pdf,.doc,.docx"
-              onChange={(e) => handleDocumentUpload(e.target.files)}
+              accept={ACCEPTED_FILE_TYPES.DOCUMENTS}
+              onChange={(e) =>
+                handleDocumentUploadWithValidation(e.target.files)
+              }
               className="hidden"
               id="document-upload"
               disabled={isUploadingDocument}
@@ -174,10 +243,14 @@ export default function PropertyMediaSection({
               Upload property banner
               <Upload className="w-6 h-6 text-gray-400" />
             </span>
+            <span className="text-xs text-gray-500 mt-1">
+              Max {getFileSizeLabel(UPLOAD_LIMITS.IMAGE_MAX_SIZE)} • JPEG, PNG,
+              WebP
+            </span>
             <input
               type="file"
-              accept="image/*"
-              onChange={(e) => handleBannerUpload(e.target.files)}
+              accept={ACCEPTED_FILE_TYPES.ALL_IMAGES}
+              onChange={(e) => handleBannerUploadWithValidation(e.target.files)}
               className="hidden"
               id="banner-upload"
               disabled={isUploadingImages}

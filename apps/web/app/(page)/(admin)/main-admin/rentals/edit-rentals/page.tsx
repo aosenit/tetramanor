@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { MdArrowBackIosNew } from "react-icons/md";
 import Link from "next/link";
-import TagInputGroup from "../../properties/components/PropertyFeaturesForm";
+import FeaturesAmenitiesSection from "../../properties/components/FeaturesAmenitiesSection";
 import Dropdown from "./components/Dropdown";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -103,8 +103,8 @@ export default function EditRental() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null
   );
-  const [features, setFeatures] = useState<string[]>([]);
-  const [amenities, setAmenities] = useState<string[]>([]);
+  const [selectedFeatures, setSelectedFeatures] = useState<any[]>([]);
+  const [selectedAmenities, setSelectedAmenities] = useState<any[]>([]);
   const [imageIdToDelete, setImageIdToDelete] = useState<string | null>(null);
 
   const { data: rentalData, isLoading: isLoadingRental } = useFetchData(
@@ -176,11 +176,49 @@ export default function EditRental() {
         setUploadedImages([]);
       }
 
-      const propertyFeatures = rental?.property?.features || [];
-      const propertyAmenities = rental?.property?.amenities || [];
+      // Load rental's features and amenities from the rental detail response
+      // Backend returns them as string arrays or object arrays (with name and icon)
+      const rentalFeatures = rental?.features || [];
+      const rentalAmenities = rental?.amenities || [];
 
-      setFeatures(propertyFeatures);
-      setAmenities(propertyAmenities);
+      // Convert to component format with id, name, and icon
+      const featuresWithIcons = rentalFeatures.map((feature: any) => {
+        // Handle both object format {name, icon} and string format
+        if (typeof feature === "string") {
+          return {
+            id: `custom-${feature}`,
+            name: feature,
+            icon: "",
+          };
+        }
+        return {
+          id: `custom-${feature.name}`,
+          name: feature.name,
+          icon: feature.icon || "",
+        };
+      });
+
+      const amenitiesWithIcons = rentalAmenities.map((amenity: any) => {
+        // Handle both object format {name, icon} and string format
+        if (typeof amenity === "string") {
+          return {
+            id: `custom-${amenity}`,
+            name: amenity,
+            icon: "",
+          };
+        }
+        return {
+          id: `custom-${amenity.name}`,
+          name: amenity.name,
+          icon: amenity.icon || "",
+        };
+      });
+
+      console.log("Loaded rental features:", featuresWithIcons);
+      console.log("Loaded rental amenities:", amenitiesWithIcons);
+
+      setSelectedFeatures(featuresWithIcons);
+      setSelectedAmenities(amenitiesWithIcons);
     }
   }, [rentalData, isEditMode, properties]);
 
@@ -346,10 +384,24 @@ export default function EditRental() {
         formData.availableUnits.toString()
       );
       formDataToSubmit.append("currency", formData.currency);
-      formDataToSubmit.append("unitCategory", formData.unitCategory); // ✅ keep only this one
+      formDataToSubmit.append("unitCategory", formData.unitCategory);
+
+      // Add features and amenities as arrays of strings (just names)
+      const featureNames = selectedFeatures.map((f: any) =>
+        typeof f === "string" ? f : f.name
+      );
+      const amenityNames = selectedAmenities.map((a: any) =>
+        typeof a === "string" ? a : a.name
+      );
+
+      // Append features and amenities as JSON strings
+      formDataToSubmit.append("features", JSON.stringify(featureNames));
+      formDataToSubmit.append("amenities", JSON.stringify(amenityNames));
 
       // Handle images for edit vs create mode
       console.log("Uploaded images:", uploadedImages);
+      console.log("Features to submit:", featureNames);
+      console.log("Amenities to submit:", amenityNames);
 
       if (isEditMode) {
         // In edit mode, only add new images (those with file objects)
@@ -420,8 +472,12 @@ export default function EditRental() {
     "UNFURNISHED",
   ];
   useEffect(() => {
-    setFeatures(selectedProperty?.features);
-    setAmenities(selectedProperty?.amenities);
+    if (selectedProperty?.features) {
+      setSelectedFeatures(selectedProperty.features);
+    }
+    if (selectedProperty?.amenities) {
+      setSelectedAmenities(selectedProperty.amenities);
+    }
   }, [selectedProperty]);
 
   // Loading state for edit mode
@@ -799,22 +855,13 @@ export default function EditRental() {
           />
         </div>
 
-        <h3 className="text-base py-4 font-medium text-[#116114]">
-          Property features and amenities
-        </h3>
-        <TagInputGroup
-          label="Features"
-          value={features}
-          onChange={setFeatures}
-          required
-          disabled
-        />
-        <TagInputGroup
-          label="Amenities"
-          value={amenities}
-          onChange={setAmenities}
-          disabled
-          required
+        <FeaturesAmenitiesSection
+          formData={formData}
+          errors={errors}
+          selectedFeatures={selectedFeatures}
+          selectedAmenities={selectedAmenities}
+          setSelectedFeatures={setSelectedFeatures}
+          setSelectedAmenities={setSelectedAmenities}
         />
 
         <div className="flex justify-between items-center py-8">
