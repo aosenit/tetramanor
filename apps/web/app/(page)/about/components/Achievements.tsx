@@ -47,7 +47,7 @@ const achievements: Achievement[] = [
 export default function Achievements() {
   // Fetch capital appreciation data
   const { data, isLoading } = useFetchData("miscs/capital-appreciation");
-  const properties: Property[] = data?.data || [];
+  const properties: Property[] = Array.isArray(data?.data) ? data.data : [];
   return (
     <div className="container mx-auto px-4 md:px-8 lg:px-16 py-8 md:py-12">
       <div className="max-w-2xl text-center mx-auto">
@@ -124,9 +124,9 @@ export default function Achievements() {
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent p-3 md:p-4 flex flex-col justify-end">
-                      <div className="absolute top-3 md:top-4 left-3 md:left-4 bg-slate-700/60 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium">
+                      {/* <div className="absolute top-3 md:top-4 left-3 md:left-4 bg-slate-700/60 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium">
                         Property Type
-                      </div>
+                      </div> */}
                       <h2 className="text-lg md:text-xl font-semibold text-white">
                         Property Name
                       </h2>
