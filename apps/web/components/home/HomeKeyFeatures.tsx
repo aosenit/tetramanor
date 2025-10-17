@@ -87,7 +87,7 @@ export default function HomeKeyFeatures() {
                 </div>
                 <div className="text-gray-700 text-base mb-4">
                   We&apos;ve seen impressive capital growth across our projects.
-                  TM HighGardens, initially sold at ₦55M, is now valued at ₦120M
+                  {featuredProperty?.name}, initially sold at {featuredProperty?.launchValue}, is now valued at {featuredProperty?.currentValue}
                   in just two years.
                 </div>
               </div>
@@ -112,9 +112,9 @@ export default function HomeKeyFeatures() {
                 />
                 {featuredProperty && (
                   <>
-                    <div className="absolute top-4 left-4 bg-[#202020] bg-opacity-80 text-white text-xs px-3 py-1 rounded-full">
+                    {/* <div className="absolute top-4 left-4 bg-[#202020] bg-opacity-80 text-white text-xs px-3 py-1 rounded-full">
                       {featuredProperty.unitType}
-                    </div>
+                    </div> */}
                     <div className="absolute bottom-0 left-0 w-full bg-[#202020] bg-opacity-90 p-4">
                       <div className="font-bold text-lg text-white mb-1">
                         {featuredProperty.name}

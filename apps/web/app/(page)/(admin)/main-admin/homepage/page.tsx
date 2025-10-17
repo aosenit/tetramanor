@@ -1,6 +1,7 @@
 import Header from "./components/header";
 import QuickActions from "./components/QuickActions";
 import FeaturedProperty from "./components/FeaturedProperty";
+import CapitalAppreciation from "./components/CapitalAppreciation";
 import { Suspense } from "react";
 import Loader from "@/components/Loader";
 
@@ -17,6 +18,7 @@ export default function HomepagePage() {
         <div className="bg-white p-1"></div>
         <Header />
         <QuickActions />
+        <CapitalAppreciation />
         <FeaturedProperty />
       </div>
     </Suspense>

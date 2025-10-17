@@ -152,15 +152,16 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
             </span>
           </div>
         </div>
-        {(apartment.features.length > 0 || apartment.amenities.length > 0) && (
+        {(apartment.features?.length > 0 ||
+          apartment.amenities?.length > 0) && (
           <div className="mt-4 space-y-2">
-            {apartment.features.length > 0 && (
+            {apartment.features?.length > 0 && (
               <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-2">
                   Features:
                 </h4>
                 <div className="flex flex-wrap gap-1">
-                  {apartment.features.slice(0, 3).map((feature, index) => {
+                  {apartment.features?.slice(0, 3).map((feature, index) => {
                     // Handle both string and object formats
                     const isString = typeof feature === "string";
                     const featureName = isString ? feature : feature.name;
@@ -177,22 +178,22 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
                       </span>
                     );
                   })}
-                  {apartment.features.length > 3 && (
+                  {apartment.features?.length > 3 && (
                     <span className="text-xs text-gray-500 px-2 py-1">
-                      +{apartment.features.length - 3} more
+                      +{apartment.features?.length - 3} more
                     </span>
                   )}
                 </div>
               </div>
             )}
 
-            {apartment.amenities.length > 0 && (
+            {apartment.amenities?.length > 0 && (
               <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-2">
                   Amenities:
                 </h4>
                 <div className="flex flex-wrap gap-1">
-                  {apartment.amenities.slice(0, 3).map((amenity, index) => {
+                  {apartment.amenities?.slice(0, 3).map((amenity, index) => {
                     // Handle both string and object formats
                     const isString = typeof amenity === "string";
                     const amenityName = isString ? amenity : amenity.name;
@@ -209,9 +210,9 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
                       </span>
                     );
                   })}
-                  {apartment.amenities.length > 3 && (
+                  {apartment.amenities?.length > 3 && (
                     <span className="text-xs text-gray-500 px-2 py-1">
-                      +{apartment.amenities.length - 3} more
+                      +{apartment.amenities?.length - 3} more
                     </span>
                   )}
                 </div>
