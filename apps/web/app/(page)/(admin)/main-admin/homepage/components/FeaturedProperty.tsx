@@ -11,6 +11,7 @@ import { Loader2, AlertCircle, RefreshCw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import placeholder from "@/assets/placeholder.svg";
+import ProvenCapitalAppreciation from "@/components/home/ProvenCapitalAppreciation";
 
 // Confirmation Modal Component
 const ConfirmationModal = ({
@@ -97,25 +98,6 @@ const DetailModal = ({
   type: "property" | "rental";
 }) => {
   if (!isOpen || !data) return null;
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  console.log(data);
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -638,6 +620,7 @@ export default function FeaturedProperty() {
             </div>
           </div>
         </div>
+
         <OngoingCampaigns />
       </div>
 
