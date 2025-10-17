@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useFetchData, usePostData } from "@/hooks/useApi";
+import { useFetchData, usePutData } from "@/hooks/useApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,7 +12,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Pencil, TrendingUp, Loader2, DollarSign } from "lucide-react";
+import { Pencil, TrendingUp, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -42,11 +42,11 @@ export default function CapitalAppreciation() {
   );
 
   // Update mutation
-  const { mutateAsync: updateCapitalAppreciation, isPending } = usePostData(
+  const { mutateAsync: updateCapitalAppreciation, isPending } = usePutData(
     "miscs/capital-appreciation"
   );
 
-  const appreciationData = data?.data?.[0];
+  const appreciationData = data?.data;
 
   // Load existing data when component mounts or data changes
   useEffect(() => {
@@ -134,7 +134,9 @@ export default function CapitalAppreciation() {
     }
 
     try {
-      const response = await updateCapitalAppreciation(formData);
+      // add id to the form data
+      const formDataWithId = { ...formData, id: appreciationData?.id };
+      const response = await updateCapitalAppreciation(formDataWithId);
       toast.success(
         response?.data?.message || "Capital appreciation updated successfully"
       );
