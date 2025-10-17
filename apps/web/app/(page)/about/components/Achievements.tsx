@@ -156,9 +156,9 @@ export default function Achievements() {
                     />
 
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent p-3 md:p-4 flex flex-col justify-end">
-                      <div className="absolute top-3 md:top-4 left-3 md:left-4 bg-slate-700/60 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium">
+                      {/* <div className="absolute top-3 md:top-4 left-3 md:left-4 bg-slate-700/60 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium">
                         {property.unitType}
-                      </div>
+                      </div> */}
                       <h2 className="text-lg md:text-xl font-semibold text-white">
                         {property.name}
                       </h2>

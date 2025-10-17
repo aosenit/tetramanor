@@ -112,9 +112,9 @@ export default function HomeKeyFeatures() {
                 />
                 {featuredProperty && (
                   <>
-                    <div className="absolute top-4 left-4 bg-[#202020] bg-opacity-80 text-white text-xs px-3 py-1 rounded-full">
+                    {/* <div className="absolute top-4 left-4 bg-[#202020] bg-opacity-80 text-white text-xs px-3 py-1 rounded-full">
                       {featuredProperty.unitType}
-                    </div>
+                    </div> */}
                     <div className="absolute bottom-0 left-0 w-full bg-[#202020] bg-opacity-90 p-4">
                       <div className="font-bold text-lg text-white mb-1">
                         {featuredProperty.name}
