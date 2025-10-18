@@ -100,7 +100,6 @@ export default function HomeKeyFeatures() {
                 See more
               </Button>
             </div>
-            {/* Image Card */}
             {isLoading ? (
               <div className="relative mt-6 rounded-xl overflow-hidden shadow-lg lg:w-1/3 bg-gray-200 animate-pulse h-64" />
             ) : (
