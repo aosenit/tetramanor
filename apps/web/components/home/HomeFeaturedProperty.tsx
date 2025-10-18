@@ -159,7 +159,7 @@ export default function HomeFeaturedProperty() {
                 { label: "Floors", value: "30" },
                 { label: "Amenities", value: "10+" },
                 { label: "Parking levels", value: "6" },
-                { label: "Floors", value: "30" },
+                // { label: "Floors", value: "30" },
               ].map((item, index) => (
                 <div key={index}>
                   <div className="font-bold">{item.value}</div>
