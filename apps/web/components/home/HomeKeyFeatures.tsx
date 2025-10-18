@@ -72,7 +72,6 @@ export default function HomeKeyFeatures() {
             </div>
           </div>
         </div>
-        {/* Right Side */}
         <div className="flex flex-col gap-6 h-full ">
           <div className=" text-gray-700 text-base mb-2 lg:pl-10">
             At Tetramanor, we don&apos;t just build homes — we build long-term
@@ -87,7 +86,9 @@ export default function HomeKeyFeatures() {
                 </div>
                 <div className="text-gray-700 text-base mb-4">
                   We&apos;ve seen impressive capital growth across our projects.
-                  {featuredProperty?.name}, initially sold at {featuredProperty?.launchValue}, is now valued at {featuredProperty?.currentValue}
+                  {featuredProperty?.name}, initially sold at{" "}
+                  {featuredProperty?.launchValue}, is now valued at{" "}
+                  {featuredProperty?.currentValue}
                   in just two years.
                 </div>
               </div>
