@@ -11,7 +11,6 @@ import { Loader2, AlertCircle, RefreshCw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import placeholder from "@/assets/placeholder.svg";
-import ProvenCapitalAppreciation from "@/components/home/ProvenCapitalAppreciation";
 
 // Confirmation Modal Component
 const ConfirmationModal = ({
@@ -33,7 +32,6 @@ const ConfirmationModal = ({
   confirmText?: string;
   cancelText?: string;
 }) => {
-  const router = useRouter();
   if (!isOpen) return null;
 
   return (

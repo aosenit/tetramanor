@@ -250,7 +250,6 @@ export default function EditBlog() {
       }
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error("Failed to upload images");
     } finally {
       setIsUploading(false);
     }
@@ -271,7 +270,6 @@ export default function EditBlog() {
         setDeletingImageId(null);
       } catch (error) {
         console.error("Error deleting image:", error);
-        toast.error("Failed to delete image");
         setImageIdToDelete(null);
         setDeletingImageId(null);
         return;
@@ -476,8 +474,10 @@ export default function EditBlog() {
                         <p className="text-sm font-medium text-gray-700">
                           Upload cover images
                         </p>
-                        <p className="text-xs text-gray-500">
-                          Drag and drop or click to select
+
+                        {/* PNG, JPG, JPEG not more than 10MB each */}
+                        <p className="text-[11px] text-gray-500">
+                          ( PNG, JPG, JPEG not more than 10MB)
                         </p>
                       </div>
                     </div>
@@ -553,6 +553,9 @@ export default function EditBlog() {
                         </p>
                         <p className="text-xs text-gray-500">
                           Add additional images
+                        </p>
+                        <p className="text-[11px] text-gray-500">
+                          ( PNG, JPG, JPEG not more than 10MB)
                         </p>
                       </div>
                     </div>
