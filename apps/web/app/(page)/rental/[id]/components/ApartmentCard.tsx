@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { RentalUnit } from "@/types/property";
-import { FaBed, FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaCouch } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import PropertyDetailsModal from "./PropertyDetailsModal";
 import RentalInquiryModal from "./RentalInquiryModal";
@@ -14,6 +14,15 @@ import {
   useCurrencyConverter,
   formatCurrency,
 } from "@/hooks/useCurrencyConverter";
+
+// Utility function to format text from backend (removes underscores and formats properly)
+const formatBackendText = (text: string): string => {
+  if (!text) return "";
+  return text
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
 
 interface ApartmentCardProps {
   apartment: RentalUnit;
@@ -40,9 +49,11 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
             <h3 className="text-lg font-bold mb-1">
               {apartment.apartmentType}
             </h3>
-            <div className="flex items-center text-sm text-white/90">
-              <FaMapMarkerAlt className="mr-1 h-3 w-3" />
-              <span>{apartment.location}</span>
+            <div className="flex items-center text-sm text-white">
+              <FaCouch className="mr-1.5 h-3.5 w-3.5 text-[#CD6115]" />
+              <span className="font-medium">
+                {formatBackendText(apartment.unitCategory)}
+              </span>
             </div>
           </div>
           <div
@@ -141,15 +152,16 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
             </span>
           </div>
         </div>
-        {(apartment.features.length > 0 || apartment.amenities.length > 0) && (
+        {(apartment.features?.length > 0 ||
+          apartment.amenities?.length > 0) && (
           <div className="mt-4 space-y-2">
-            {apartment.features.length > 0 && (
+            {apartment.features?.length > 0 && (
               <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-2">
                   Features:
                 </h4>
                 <div className="flex flex-wrap gap-1">
-                  {apartment.features.slice(0, 3).map((feature, index) => {
+                  {apartment.features?.slice(0, 3).map((feature, index) => {
                     // Handle both string and object formats
                     const isString = typeof feature === "string";
                     const featureName = isString ? feature : feature.name;
@@ -162,26 +174,26 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
                         key={featureKey}
                         className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
                       >
-                        {featureName}
+                        {featureName.toUpperCase()}
                       </span>
                     );
                   })}
-                  {apartment.features.length > 3 && (
+                  {apartment.features?.length > 3 && (
                     <span className="text-xs text-gray-500 px-2 py-1">
-                      +{apartment.features.length - 3} more
+                      +{apartment.features?.length - 3} more
                     </span>
                   )}
                 </div>
               </div>
             )}
 
-            {apartment.amenities.length > 0 && (
+            {apartment.amenities?.length > 0 && (
               <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-2">
                   Amenities:
                 </h4>
                 <div className="flex flex-wrap gap-1">
-                  {apartment.amenities.slice(0, 3).map((amenity, index) => {
+                  {apartment.amenities?.slice(0, 3).map((amenity, index) => {
                     // Handle both string and object formats
                     const isString = typeof amenity === "string";
                     const amenityName = isString ? amenity : amenity.name;
@@ -194,13 +206,13 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
                         key={amenityKey}
                         className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full"
                       >
-                        {amenityName}
+                        {amenityName.toUpperCase()}
                       </span>
                     );
                   })}
-                  {apartment.amenities.length > 3 && (
+                  {apartment.amenities?.length > 3 && (
                     <span className="text-xs text-gray-500 px-2 py-1">
-                      +{apartment.amenities.length - 3} more
+                      +{apartment.amenities?.length - 3} more
                     </span>
                   )}
                 </div>
@@ -265,7 +277,7 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
       <ScheduleInspectionModal
         isOpen={isInspectionModalOpen}
         onClose={() => setIsInspectionModalOpen(false)}
-        propertyId={apartment.id}
+        propertyId={apartment.propertyId}
         propertyName={apartment.apartmentType}
       />
     </div>

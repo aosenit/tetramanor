@@ -255,13 +255,13 @@ export default function PropertyDetailsModal({
 
           {/* Features and Amenities */}
           <div className="grid md:grid-cols-2 gap-6">
-            {apartment.features.length > 0 && (
+            {apartment.features?.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">
                   Features
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {apartment.features.map((feature, index) => {
+                  {apartment.features?.map((feature, index) => {
                     // Handle both string and object formats
                     const isString = typeof feature === "string";
                     const featureName = isString ? feature : feature.name;
@@ -286,7 +286,7 @@ export default function PropertyDetailsModal({
                         ) : (
                           getAmenityIcon(featureName)
                         )}
-                        {featureName}
+                        {featureName.toUpperCase()}
                       </span>
                     );
                   })}
@@ -294,13 +294,13 @@ export default function PropertyDetailsModal({
               </div>
             )}
 
-            {apartment.amenities.length > 0 && (
+            {apartment.amenities?.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">
                   Amenities
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {apartment.amenities.map((amenity, index) => {
+                  {apartment.amenities?.map((amenity, index) => {
                     // Handle both string and object formats
                     const isString = typeof amenity === "string";
                     const amenityName = isString ? amenity : amenity.name;
@@ -325,7 +325,7 @@ export default function PropertyDetailsModal({
                         ) : (
                           getAmenityIcon(amenityName)
                         )}
-                        {amenityName}
+                        {amenityName.toUpperCase()}
                       </span>
                     );
                   })}

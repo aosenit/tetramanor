@@ -3,8 +3,8 @@
 import React from "react";
 import { useState } from "react";
 import Image from "next/image";
-import { FaPhone, FaEnvelope, FaCalendarAlt } from "react-icons/fa";
-import ten from "@/assets/portfolio/ten.webp"
+import { FaPhone, FaEnvelope } from "react-icons/fa";
+import ten from "@/assets/portfolio/ten.webp";
 
 import { usePostData } from "@/hooks/useApi";
 import { useToast } from "@chakra-ui/react";
@@ -40,9 +40,13 @@ export default function ScheduleInspection({
     return blockedDates.includes(dateString);
   };
   const getMinDate = (): string => {
-    const today = new Date();
-    today.setDate(today.getDate() + 1); // Set to tomorrow
-    return today.toISOString().split("T")[0];
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1); // Set to tomorrow
+    // Format date as YYYY-MM-DD in local timezone
+    const year = tomorrow.getFullYear();
+    const month = String(tomorrow.getMonth() + 1).padStart(2, "0");
+    const day = String(tomorrow.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

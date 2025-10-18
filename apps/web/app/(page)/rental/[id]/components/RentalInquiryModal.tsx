@@ -310,14 +310,14 @@ export default function RentalInquiryModal({
               <p className="text-sm text-gray-600 text-center">
                 Need immediate assistance?{" "}
                 <a
-                  href="tel:+2348012345678"
+                  href="tel:+2349166479719"
                   className="text-[#116114] font-semibold hover:underline"
                 >
-                  Call +234 801 234 5678
+                  Call +234 9166479719
                 </a>{" "}
                 or{" "}
                 <a
-                  href="mailto:rentals@tetramanor.com"
+                  href="mailto:people@teramanor.com"
                   className="text-[#116114] font-semibold hover:underline"
                 >
                   Email Us
