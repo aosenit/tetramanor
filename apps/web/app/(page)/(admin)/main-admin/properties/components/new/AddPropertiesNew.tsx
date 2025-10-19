@@ -148,9 +148,6 @@ export default function AddProperties() {
 
     handleInputChange("features", featureName);
     handleInputChange("amenities", amenityName);
-
-    console.log("Selected feature IDs:", featureName);
-    console.log("Selected amenity IDs:", amenityName);
   }, [selectedFeatures, selectedAmenities]);
 
   const handleAddUnitsForm = () => {
@@ -216,7 +213,7 @@ export default function AddProperties() {
     );
 
   // Load property data when editing
-  console.log(formData);
+
   useEffect(() => {
     if (propertyData && isEditMode) {
       setFormData({

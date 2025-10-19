@@ -3,6 +3,7 @@ import { useFetchData } from "@/hooks/useApi";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 type FeaturesAmenitiesSectionProps = {
   formData: any;
@@ -134,13 +135,21 @@ export default function FeaturesAmenitiesSection({
               className="flex items-center px-3 py-1.5 rounded-full border border-gray-300 text-sm bg-white"
             >
               {tag.icon ? (
-                <img src={tag.icon} alt={tag.name} className="w-5 h-5 mr-2" />
+                <Image
+                  src={tag.icon}
+                  alt={tag.name}
+                  width={20}
+                  height={20}
+                  className="w-5 h-5 mr-2"
+                />
               ) : (
                 <span className="text-green-600 font-semibold text-xs mr-2">
                   TM
                 </span>
               )}
-              <span className="uppercase text-xs font-medium">{tag.name}</span>
+              <span className="uppercase text-xs font-medium">
+                {tag?.name?.toLocaleUpperCase()}
+              </span>
               <button
                 type="button"
                 onClick={() => handleRemoveFeature(tag.id)}
@@ -162,7 +171,7 @@ export default function FeaturesAmenitiesSection({
                 <option value="">Select feature...</option>
                 {displayedFeatures.map((opt: any) => (
                   <option key={opt.id} value={opt.id}>
-                    {opt.name}
+                    {opt?.name?.toLocaleUpperCase()}
                   </option>
                 ))}
               </select>
@@ -242,13 +251,21 @@ export default function FeaturesAmenitiesSection({
               className="flex items-center px-3 py-1.5 rounded-full border border-gray-300 text-sm bg-white"
             >
               {tag.icon ? (
-                <img src={tag.icon} alt={tag.name} className="w-5 h-5 mr-2" />
+                <Image
+                  src={tag.icon}
+                  alt={tag.name}
+                  width={20}
+                  height={20}
+                  className="w-5 h-5 mr-2"
+                />
               ) : (
                 <span className="text-green-600 font-semibold text-xs mr-2">
                   TM
                 </span>
               )}
-              <span className="uppercase text-xs font-medium">{tag.name}</span>
+              <span className="uppercase text-xs font-medium">
+                {tag?.name?.toLocaleUpperCase()}
+              </span>
               <button
                 type="button"
                 onClick={() => handleRemoveAmenity(tag.id)}
@@ -270,7 +287,7 @@ export default function FeaturesAmenitiesSection({
                 <option value="">Select amenity...</option>
                 {displayedAmenities.map((opt: any) => (
                   <option key={opt.id} value={opt.id}>
-                    {opt.name}
+                    {opt?.name?.toLocaleUpperCase()}
                   </option>
                 ))}
               </select>
