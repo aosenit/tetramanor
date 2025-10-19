@@ -1,0 +1,18 @@
+# *
+User-agent: *
+Allow: /
+
+# Disallow admin areas
+Disallow: /main-admin/
+Disallow: /client-admin/
+Disallow: /login
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /new-password
+
+# Host
+Host: https://tetramanor.com
+
+# Sitemaps
+Sitemap: https://tetramanor.com/sitemap.xml
+

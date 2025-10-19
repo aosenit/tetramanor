@@ -1,0 +1,49 @@
+{
+  "name": "Tetramanor - Real Estate & Property Investment",
+  "short_name": "Tetramanor",
+  "description": "Discover luxury properties, investment opportunities, and rental solutions with Tetramanor. Nigeria's leading real estate company.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#116114",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "real estate"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Portfolio",
+      "short_name": "Portfolio",
+      "description": "View our property portfolio",
+      "url": "/portfolio",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Rentals",
+      "short_name": "Rentals",
+      "description": "Browse rental properties",
+      "url": "/rental",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Investments",
+      "short_name": "Investments",
+      "description": "Explore investment opportunities",
+      "url": "/investment",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
