@@ -2,16 +2,23 @@
 
 import { Button } from "@chakra-ui/react";
 import Image from "next/image";
-import placeholder from "@/assets/placeholder.jpg";
+import propertyImage from "@/assets/home/bedone.webp";
 import React from "react";
 import CountUp from "react-countup";
 import { useFetchData } from "@/hooks/useApi";
 
 export default function HomeKeyFeatures() {
-  // Fetch capital appreciation data
   const { data, isLoading } = useFetchData("miscs/capital-appreciation");
-  const properties = data?.data || [];
-  const featuredProperty = properties[0]; // Get the first property for display
+  const featuredProperty = data?.data; 
+
+  // Format currency values
+  const formatCurrency = (value: number, currency: string = "NGN") => {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: currency,
+      minimumFractionDigits: 0,
+    }).format(value);
+  };
   return (
     <section className=" w-full container mx-auto px-4 lg:px-16 py-12 fade-in-up">
       <div className=" grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -87,8 +94,17 @@ export default function HomeKeyFeatures() {
                 <div className="text-gray-700 text-base mb-4">
                   We&apos;ve seen impressive capital growth across our projects.
                   {featuredProperty?.name}, initially sold at{" "}
-                  {featuredProperty?.launchValue}, is now valued at{" "}
-                  {featuredProperty?.currentValue}
+                  {featuredProperty?.launchValue &&
+                    formatCurrency(
+                      featuredProperty.launchValue,
+                      featuredProperty.currency
+                    )}
+                  , is now valued at{" "}
+                  {featuredProperty?.currentValue &&
+                    formatCurrency(
+                      featuredProperty.currentValue,
+                      featuredProperty.currency
+                    )}{" "}
                   in just two years.
                 </div>
               </div>
@@ -106,7 +122,7 @@ export default function HomeKeyFeatures() {
               <div className="relative mt-6 rounded-xl overflow-hidden shadow-lg lg:w-1/3 img-hover-zoom">
                 <Image
                   fill
-                  src={featuredProperty?.image || placeholder}
+                  src={propertyImage}
                   alt={featuredProperty?.name || "Property"}
                   className="w-full h-48 object-cover"
                 />
@@ -122,11 +138,17 @@ export default function HomeKeyFeatures() {
                       <ul className="text-white text-sm space-y-1">
                         <li>
                           <span className="font-semibold">Launch Value:</span>{" "}
-                          {featuredProperty.launchValue}
+                          {formatCurrency(
+                            featuredProperty.launchValue,
+                            featuredProperty.currency
+                          )}
                         </li>
                         <li>
                           <span className="font-semibold">Current Value:</span>{" "}
-                          {featuredProperty.currentValue}
+                          {formatCurrency(
+                            featuredProperty.currentValue,
+                            featuredProperty.currency
+                          )}
                         </li>
                       </ul>
                     </div>

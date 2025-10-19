@@ -1,12 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import one from "@/assets/about/icons/one.webp";
 import two from "@/assets/about/icons/two.webp";
 import three from "@/assets/about/icons/three.webp";
 import placeholder from "@/assets/placeholder.jpg";
+import propertyA from "@/assets/about/five.webp";
+import propertyB from "@/assets/about/six.webp";
+import propertyC from "@/assets/about/five.webp";
+import propertyD from "@/assets/about/four.webp";
 import { useFetchData } from "@/hooks/useApi";
+import { Button } from "@chakra-ui/react";
 
 interface Achievement {
   image: StaticImageData;
@@ -17,10 +22,9 @@ interface Achievement {
 interface Property {
   id: string;
   name: string;
-  unitType: string;
-  launchValue: string;
-  currentValue: string;
-  image: string;
+  launchValue: number;
+  currentValue: number;
+  currency: string;
 }
 
 const achievements: Achievement[] = [
@@ -44,10 +48,35 @@ const achievements: Achievement[] = [
   },
 ];
 
+// Array of property images to cycle through
+const propertyImages = [propertyA, propertyB, propertyC, propertyD];
+
 export default function Achievements() {
   // Fetch capital appreciation data
   const { data, isLoading } = useFetchData("miscs/capital-appreciation");
-  const properties: Property[] = Array.isArray(data?.data) ? data.data : [];
+  const [showAll, setShowAll] = useState(false);
+
+  // Handle both single object and array responses
+  const rawData = data?.data;
+  const properties: Property[] = Array.isArray(rawData)
+    ? rawData
+    : rawData
+      ? [rawData]
+      : [];
+
+  // Determine which properties to display
+  const displayedProperties =
+    showAll || properties.length <= 4 ? properties : properties.slice(0, 4);
+  const hasMoreThan4 = properties.length > 4;
+
+  // Format currency values
+  const formatCurrency = (value: number, currency: string = "NGN") => {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: currency,
+      minimumFractionDigits: 0,
+    }).format(value);
+  };
   return (
     <div className="container mx-auto px-4 md:px-8 lg:px-16 py-8 md:py-12">
       <div className="max-w-2xl text-center mx-auto">
@@ -101,85 +130,118 @@ export default function Achievements() {
             className="object-contain"
           />
         </div>
-        <div className="grid gap-4 md:gap-6 mt-8 md:mt-12 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          {isLoading
-            ? // Loading skeleton
+        <div
+          className={`mt-8 md:mt-12 ${
+            showAll && hasMoreThan4
+              ? "overflow-x-auto pb-4"
+              : "grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+          }`}
+        >
+          <div
+            className={`${
+              showAll && hasMoreThan4
+                ? "flex gap-4 md:gap-6 min-w-max"
+                : "contents"
+            }`}
+          >
+            {isLoading ? (
+              // Loading skeleton
               [...Array(4)].map((_, index) => (
                 <div
                   key={index}
-                  className="relative rounded-xl overflow-hidden aspect-[4/5] bg-gray-200 animate-pulse"
+                  className={`relative rounded-xl overflow-hidden aspect-[4/5] bg-gray-200 animate-pulse ${
+                    showAll && hasMoreThan4 ? "w-[280px] md:w-[320px]" : ""
+                  }`}
                 />
               ))
-            : properties.length === 0
-              ? // Show placeholder when no data
-                [...Array(4)].map((_, index) => (
-                  <div
-                    key={index}
-                    className="relative rounded-xl overflow-hidden aspect-[4/5] group"
-                  >
-                    <Image
-                      src={placeholder}
-                      alt="Property placeholder"
-                      fill
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent p-3 md:p-4 flex flex-col justify-end">
-                      {/* <div className="absolute top-3 md:top-4 left-3 md:left-4 bg-slate-700/60 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium">
-                        Property Type
-                      </div> */}
-                      <h2 className="text-lg md:text-xl font-semibold text-white">
-                        Property Name
-                      </h2>
-                      <ul className="text-xs md:text-sm space-y-0.5 md:space-y-1 text-white/90">
-                        <li>
-                          • Launch Value:{" "}
-                          <span className="font-semibold text-white">N/A</span>
-                        </li>
-                        <li>
-                          • Current Value:{" "}
-                          <span className="font-semibold text-white">N/A</span>
-                        </li>
-                      </ul>
-                    </div>
+            ) : properties.length === 0 ? (
+              // Show placeholder when no data
+              <div
+                className={`relative rounded-xl overflow-hidden aspect-[4/5] group ${
+                  showAll && hasMoreThan4 ? "w-[280px] md:w-[320px]" : ""
+                }`}
+              >
+                <Image
+                  src={placeholder}
+                  alt="Property placeholder"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent p-3 md:p-4 flex flex-col justify-end">
+                  <h2 className="text-lg md:text-xl font-semibold text-white">
+                    Property Name
+                  </h2>
+                  <ul className="text-xs md:text-sm space-y-0.5 md:space-y-1 text-white/90">
+                    <li>
+                      • Launch Value:{" "}
+                      <span className="font-semibold text-white">N/A</span>
+                    </li>
+                    <li>
+                      • Current Value:{" "}
+                      <span className="font-semibold text-white">N/A</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              // Show properties
+              displayedProperties.map((property, index) => (
+                <div
+                  key={property.id}
+                  className={`relative rounded-xl overflow-hidden aspect-[4/5] group ${
+                    showAll && hasMoreThan4
+                      ? "w-[280px] md:w-[320px] flex-shrink-0"
+                      : ""
+                  }`}
+                >
+                  <Image
+                    src={propertyImages[index % propertyImages.length]}
+                    alt={property.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent p-3 md:p-4 flex flex-col justify-end">
+                    <h2 className="text-lg md:text-xl font-semibold text-white">
+                      {property.name}
+                    </h2>
+                    <ul className="text-xs md:text-sm space-y-0.5 md:space-y-1 text-white/90">
+                      <li>
+                        • Launch Value:{" "}
+                        <span className="font-semibold text-white">
+                          {formatCurrency(
+                            property.launchValue,
+                            property.currency
+                          )}
+                        </span>
+                      </li>
+                      <li>
+                        • Current Value:{" "}
+                        <span className="font-semibold text-white">
+                          {formatCurrency(
+                            property.currentValue,
+                            property.currency
+                          )}
+                        </span>
+                      </li>
+                    </ul>
                   </div>
-                ))
-              : properties.map((property) => (
-                  <div
-                    key={property.id}
-                    className="relative rounded-xl overflow-hidden aspect-[4/5] group"
-                  >
-                    <Image
-                      src={property.image || placeholder}
-                      alt={property.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent p-3 md:p-4 flex flex-col justify-end">
-                      {/* <div className="absolute top-3 md:top-4 left-3 md:left-4 bg-slate-700/60 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium">
-                        {property.unitType}
-                      </div> */}
-                      <h2 className="text-lg md:text-xl font-semibold text-white">
-                        {property.name}
-                      </h2>
-                      <ul className="text-xs md:text-sm space-y-0.5 md:space-y-1 text-white/90">
-                        <li>
-                          • Launch Value:{" "}
-                          <span className="font-semibold text-white">
-                            {property.launchValue}
-                          </span>
-                        </li>
-                        <li>
-                          • Current Value:{" "}
-                          <span className="font-semibold text-white">
-                            {property.currentValue}
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                ))}
+                </div>
+              ))
+            )}
+          </div>
         </div>
+        {hasMoreThan4 && (
+          <div className="mt-6 flex justify-center">
+            <Button
+              onClick={() => setShowAll(!showAll)}
+              colorScheme="green"
+              variant="outline"
+              className="text-primary border-primary hover:bg-primary hover:text-white transition-colors"
+            >
+              {showAll ? "Show Less" : `Show All (${properties.length})`}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
