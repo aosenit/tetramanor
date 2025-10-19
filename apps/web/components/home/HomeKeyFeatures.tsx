@@ -8,9 +8,8 @@ import CountUp from "react-countup";
 import { useFetchData } from "@/hooks/useApi";
 
 export default function HomeKeyFeatures() {
-  // Fetch capital appreciation data
   const { data, isLoading } = useFetchData("miscs/capital-appreciation");
-  const featuredProperty = data?.data; // Get the property data directly
+  const featuredProperty = data?.data; 
 
   // Format currency values
   const formatCurrency = (value: number, currency: string = "NGN") => {
