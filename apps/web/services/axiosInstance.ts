@@ -1,7 +1,7 @@
 import axios from "axios";
 import { toast } from "sonner";
 
-export const baseUrl = "https://tetramanor-d9nd.onrender.com/";
+export const baseUrl = "https://afe1b34346f5.ngrok-free.app/";
 
 const axiosInstance = axios.create({
   baseURL: baseUrl,

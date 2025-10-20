@@ -8,7 +8,7 @@ export function OrganizationSchema() {
     url: "https://tetramanor.com",
     logo: "https://tetramanor.com/full-logo.png",
     image: "https://tetramanor.com/full-logo.png",
-    telephone: "+234-XXX-XXX-XXXX",
+    telephone: "+2349166479719",
     email: "info@tetramanor.com",
     address: {
       "@type": "PostalAddress",
@@ -17,10 +17,11 @@ export function OrganizationSchema() {
       addressRegion: "Lagos State",
     },
     sameAs: [
-      "https://www.facebook.com/tetramanor",
-      "https://www.twitter.com/tetramanor",
-      "https://www.instagram.com/tetramanor",
-      "https://www.linkedin.com/company/tetramanor",
+      "https://web.facebook.com/share/r/1BG9en1Y2p/",
+      "https://www.tiktok.com/@tetramanorltd?_t=ZS-90UKR9fGKXJ&_r=1",
+      "https://www.instagram.com/tetramanor.ng?igsh=MWZxODdnN2gwM2p5bQ==",
+      "https://www.linkedin.com/company/tetramanor-ltd-/?originalSubdomain=ng",
+      "https://www.tiktok.com/@tetramanorltd?_t=ZS-90UKR9fGKXJ&_r=1",
     ],
     areaServed: {
       "@type": "Country",
